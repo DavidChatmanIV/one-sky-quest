@@ -1,0 +1,359 @@
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+/* Navbar */
+.navbar {
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: #ffffff;
+padding: 1rem 2rem;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.logo {
+font-size: 1.8rem;
+font-weight: bold;
+margin-right: auto;
+}
+
+.nav-links {
+list-style: none;
+display: flex;
+gap: 1.5rem;
+}
+
+.nav-links a {
+text-decoration: none;
+color: #333;
+font-weight: 500;
+}
+
+.theme-toggle {
+margin-left: auto;
+cursor: pointer;
+font-size: 1.5rem;
+}
+
+/* Hero */
+.hero {
+  background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=1950&q=80') center/cover no-repeat;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding-top: 6rem; /* <--- Add padding so nav doesn't overlap */
+  position: relative;
+  text-align: center;
+}
+
+.hero-content {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.hero h1 {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.search-tabs {
+  margin-bottom: 1rem;
+}
+
+.tab {
+  background: #0077ff;
+  color: white;
+  padding: 0.5rem 1rem;
+  margin: 0 0.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #005bb5;
+}
+
+.hero-search input {
+  padding: 0.7rem;
+  margin: 0.5rem 0;
+  width: 45%;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-search {
+  margin-top: 1rem;
+  background: #0077ff;
+  color: white;
+  padding: 0.7rem 2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-hero {
+  margin-top: 1rem;
+  display: inline-block;
+  background: #0077ff;
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 5px;
+  text-decoration: none;
+}
+/* Tab Buttons */
+.tab-buttons {
+margin-bottom: 2rem;
+}
+
+.tab-btn {
+background-color: #0077ff;
+color: white;
+padding: 0.6rem 1.5rem;
+margin: 0 0.5rem;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+background-color: #005bb5;
+}
+
+/* Search Form */
+.search-form {
+max-width: 600px;
+margin: 0 auto 2rem;
+}
+
+.form-row {
+display: flex;
+justify-content: center;
+gap: 1rem;
+margin-bottom: 1rem;
+}
+
+.search-form input {
+padding: 0.7rem;
+width: 45%;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+
+/* Search Button */
+.search-btn {
+background-color: #0077ff;
+color: white;
+padding: 0.7rem 2rem;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+margin-top: 1rem;
+}
+
+.search-btn:hover {
+background-color: #005bb5;
+}
+
+/* Start Exploring Button */
+.explore-btn {
+display: inline-block;
+background-color: #0077ff;
+color: white;
+padding: 0.8rem 2rem;
+border-radius: 5px;
+text-decoration: none;
+margin-top: 2rem;
+}
+
+.explore-btn:hover {
+background-color: #005bb5;
+}
+
+/* Footer */
+footer {
+text-align: center;
+padding: 2rem 1rem;
+background-color: #333;
+color: white;
+}
+
+/* Dark Theme */
+body.dark-theme {
+background-color: #121212;
+color: #eee;
+}
+
+body.dark-theme .navbar {
+background-color: #222;
+}
+
+body.dark-theme .nav-links a {
+color: #eee;
+}
+
+body.dark-theme .hero {
+background-color: #1e1e1e;
+}
+
+body.dark-theme .tab-btn,
+body.dark-theme .search-btn,
+body.dark-theme .explore-btn {
+background-color: #0099ff;
+}
+
+body.dark-theme .tab-btn:hover,
+body.dark-theme .search-btn:hover,
+body.dark-theme .explore-btn:hover {
+background-color: #0077cc;
+}
+
+body.dark-theme footer {
+background-color: #111;
+}
+
+/* Featured Destinations */
+.featured-destinations {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.destination-card {
+  background: var(--card-bg, #ffffff);
+  border-radius: 10px;
+  padding: 2rem;
+  width: 250px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.destination-card:hover {
+  transform: translateY(-10px);
+}
+
+.destination-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+/* Icons Section */
+.icons-section {
+display: flex;
+justify-content: center;
+gap: 3rem;
+padding: 4rem 1rem;
+background-color: #f5f5f5;
+}
+
+.icon-box {
+text-align: center;
+}
+
+.icon-box img {
+width: 80px;
+margin-bottom: 1rem;
+}
+
+/* Ready to Book */
+.ready-book {
+text-align: center;
+padding: 4rem 1rem;
+}
+
+
+.booking-form {
+display: flex;
+flex-direction: column;
+max-width: 400px;
+margin: 2rem auto 0;
+gap: 1rem;
+}
+
+.booking-form input {
+padding: 0.8rem;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+
+/* About Us */
+.about-us {
+padding: 4rem 1rem;
+background-color: #f5f5f5;
+text-align: center;
+}
+
+/* Contact Us */
+.contact-us {
+padding: 4rem 1rem;
+text-align: center;
+}
+
+.contact-form {
+display: flex;
+flex-direction: column;
+max-width: 400px;
+margin: 2rem auto 0;
+gap: 1rem;
+}
+
+.contact-form textarea {
+padding: 0.8rem;
+border: 1px solid #ccc;
+border-radius: 5px;
+resize: none;
+height: 150px;
+}
+
+/* Adjust for dark theme */
+body.dark-theme .destination-card {
+background-color: #1e1e1e;
+color: #eee;
+}
+
+body.dark-theme .icons-section {
+background-color: #222;
+}
+
+body.dark-theme .about-us {
+background-color: #222;
+}
+
+/* Travel Icons Section */
+.travel-icons {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.travel-icons h2 {
+  margin-bottom: 2rem;
+}
+
+.icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.travel-icon {
+  font-size: 3rem;
+}
