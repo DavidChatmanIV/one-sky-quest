@@ -6,119 +6,196 @@
   <title>One Sky Quest</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">One Sky Quest</div>
+      <ul class="nav-links">
+        <li><a href="#flights">Flights</a></li>
+        <li><a href="#hotels">Hotels</a></li>
+        <li><a href="#packages">Packages</a></li>
+        <li><a href="#">Cars</a></li>
+        <li><a href="#">Cruises</a></li>
+        <li><a href="#" class="btn-small">Book</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+      <div class="theme-toggle" id="theme-toggle">🌙</div>
+    </nav>
+  </header>
 
-<header>
-  <nav class="navbar">
-    <div class="logo">One Sky Quest</div>
-    <ul class="nav-links">
-      <li><a href="#flights">Flights</a></li>
-      <li><a href="#hotels">Hotels</a></li>
-      <li><a href="#packages">Packages</a></li>
-      <li><a href="#">Cars</a></li>
-      <li><a href="#">Cruises</a></li>
-      <li><a href="#" class="btn-small">Book</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <div class="theme-toggle" id="theme-toggle">🌙</div>
-  </nav>
-</header>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Discover Your Next Adventure</h1>
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="flights-tab">Flights</button>
+        <button class="tab-btn" data-tab="hotels-tab">Hotels</button>
+        <button class="tab-btn" data-tab="packages-tab">Packages</button>
+      </div>
 
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-content">
-    <h1>Discover Your Next Adventure</h1>
+      <datalist id="airport-list">
+        <option value="John F. Kennedy International Airport (JFK)">
+        <option value="Los Angeles International Airport (LAX)">
+        <option value="Chicago O'Hare International Airport (ORD)">
+        <option value="Dallas/Fort Worth International Airport (DFW)">
+        <option value="Denver International Airport (DEN)">
+        <option value="Newark Liberty International Airport (EWR)">
+        <option value="San Francisco International Airport (SFO)">
+        <option value="Miami International Airport (MIA)">
+        <option value="Seattle-Tacoma International Airport (SEA)">
+      </datalist>
 
-    <div class="tab-buttons">
-      <button class="tab-btn active">Flights</button>
-      <button class="tab-btn">Hotels</button>
-      <button class="tab-btn">Packages</button>
+      <!-- Tab Content for Flights -->
+      <div class="tab-content active" id="flights-tab">
+        <form class="search-form">
+          <div class="form-row">
+            <input list="airport-list" name="from" id="from" placeholder="From?" required />
+            <input list="airport-list" name="to" id="to" placeholder="To?" required />
+          </div>
+          <div class="form-row">
+            <input type="date" required />
+            <input type="date" required />
+          </div>
+          <button type="submit" class="search-btn">Search Flights</button>
+        </form>
+      </div>
+
+      <!-- Tab Content for Hotels -->
+      <div class="tab-content" id="hotels-tab">
+        <form class="search-form">
+          <div class="form-row">
+            <input type="text" placeholder="City or Hotel Name" required />
+          </div>
+          <div class="form-row">
+            <input type="date" placeholder="Check-in Date" required />
+            <input type="date" placeholder="Check-out Date" required />
+          </div>
+          <button type="submit" class="search-btn">Search Hotels</button>
+        </form>
+      </div>
+
+      <!-- Tab Content for Packages -->
+      <div class="tab-content" id="packages-tab">
+        <form class="search-form">
+          <div class="form-row">
+            <input type="text" placeholder="Destination" required />
+          </div>
+          <div class="form-row">
+            <input type="date" placeholder="Start Date" required />
+            <input type="date" placeholder="End Date" required />
+          </div>
+          <div class="form-row">
+            <input type="number" placeholder="Number of Travelers" min="1" required />
+          </div>
+          <button type="submit" class="search-btn">Find Packages</button>
+        </form>
+      </div>
+
+      <a href="#" class="explore-btn">Start Exploring</a>
     </div>
+  </section>
 
-    <form class="search-form">
-      <div class="form-row">
-        <input type="text" placeholder="From?" required />
-        <input type="text" placeholder="To?" required />
+  <!-- Featured Destinations -->
+  <section class="featured-destinations" id="flights">
+    <h2>Featured Destinations</h2>
+    <div class="tabs">
+      <button class="tab active" data-tab="all">All</button>
+      <button class="tab" data-tab="beach">Beach</button>
+      <button class="tab" data-tab="adventure">Adventure</button>
+      <button class="tab" data-tab="romantic">Romantic</button>
+    </div>
+    <div class="destination-grid">
+      <div class="destination-card beach show">
+        <span class="emoji">🌴</span>
+        <h3>Maldives</h3>
+        <p>Beach Getaway</p>
       </div>
-      <div class="form-row">
-        <input type="date" required />
-        <input type="date" required />
+      <div class="destination-card adventure show">
+        <span class="emoji">⛰️</span>
+        <h3>Swiss Alps</h3>
+        <p>Adventure Experience</p>
       </div>
-      <button type="submit" class="search-btn">Search</button>
+      <div class="destination-card romantic show">
+        <span class="emoji">💖</span>
+        <h3>Paris</h3>
+        <p>Romantic Escape</p>
+      </div>
+      <div class="destination-card beach show">
+        <span class="emoji">🏝️</span>
+        <h3>Bahamas</h3>
+        <p>Island Paradise</p>
+      </div>
+      <div class="destination-card romantic show">
+        <span class="emoji">🏛️</span>
+        <h3>Santorini</h3>
+        <p>Romantic Views</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us -->
+  <section class="about-us" id="about">
+    <h2>About Us</h2>
+    <p>One Sky Quest is your trusted travel companion. We specialize in making dream vacations a reality — from exotic getaways to cultural journeys and thrilling adventures. Our mission is to help travelers explore the world with ease, confidence, and unforgettable experiences.</p>
+  </section>
+
+  <!-- Contact Us -->
+  <section class="contact-us" id="contact">
+    <h2>Contact Us</h2>
+    <p>Have questions or need help planning your next adventure? Reach out to us!</p>
+    <form class="contact-form">
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea placeholder="Your Message" required></textarea>
+      <button type="submit" class="search-btn">Send Message</button>
     </form>
+  </section>
 
-    <a href="#" class="explore-btn">Start Exploring</a>
-  </div>
-</section>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 One Sky Quest. All rights reserved.</p>
+  </footer>
 
-<!-- Featured Destinations -->
-<section class="featured-destinations" id="flights">
-  <h2>Featured Destinations</h2>
-  <div class="card-grid">
-    <div class="destination-card">🛫<p>Flight Deals</p></div>
-    <div class="destination-card">🌍<p>International Routes</p></div>
-    <div class="destination-card">🏙️<p>Weekend Getaways</p></div>
-    <div class="destination-card">🛏️<p>Luxury Resorts</p></div>
-    <div class="destination-card">🏨<p>City Hotels</p></div>
-    <div class="destination-card">🏕️<p>Cozy & Affordable</p></div>
-    <div class="destination-card">🧳<p>All-Inclusive</p></div>
-    <div class="destination-card">🎒<p>Adventure Tours</p></div>
-    <div class="destination-card">👨‍👩‍👧‍👦<p>Family Trips</p></div>
-  </div>
-</section>
+  <!-- Scripts -->
+  <script>
+    const toggle = document.getElementById("theme-toggle");
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-theme");
+      toggle.textContent = document.body.classList.contains("dark-theme") ? "☀️" : "🌙";
+    });
 
-<!-- Travel Icons -->
-<section class="travel-icons">
-  <h2>Plan Your Adventure</h2>
-  <div class="icon-row">
-    <div class="travel-icon">🛫</div>
-    <div class="travel-icon">🌍</div>
-    <div class="travel-icon">🏙️</div>
-    <div class="travel-icon">🛏️</div>
-    <div class="travel-icon">🏨</div>
-    <div class="travel-icon">🏕️</div>
-    <div class="travel-icon">🧳</div>
-    <div class="travel-icon">🎒</div>
-    <div class="travel-icon">👨‍👩‍👧‍👦</div>
-  </div>
-</section>
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
 
-<!-- Ready to Book -->
-<section class="ready-book">
-  <h2>Ready to Book Your Dream Trip?</h2>
-  <a href="#" class="explore-btn">Book Now</a>
-</section>
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach(b => b.classList.remove("active"));
+        tabContents.forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
 
-<!-- About Us -->
-<section class="about-us">
-  <h2>About Us</h2>
-  <p>One Sky Quest is your trusted travel companion. We help you explore unforgettable adventures around the globe — from mountain escapes to tropical paradises.</p>
-</section>
+    const destinationTabs = document.querySelectorAll(".tab");
+    const destinations = document.querySelectorAll(".destination-card");
 
-<!-- Contact Us -->
-<section class="contact-us" id="contact">
-  <h2>Contact Us</h2>
-  <form class="contact-form">
-    <input type="text" placeholder="Your Name" required />
-    <input type="email" placeholder="Your Email" required />
-    <textarea placeholder="Your Message" required></textarea>
-    <button type="submit" class="search-btn">Send Message</button>
-  </form>
-</section>
+    destinationTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        destinationTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
 
-<footer>
-  <p>&copy; 2025 One Sky Quest. All rights reserved.</p>
-</footer>
+        const target = tab.dataset.tab;
+        destinations.forEach(dest => {
+          dest.classList.remove("show");
+          if (target === "all" || dest.classList.contains(target)) {
+            dest.classList.add("show");
+          }
+        });
+      });
+    });
 
-<!-- JavaScript for Dark Mode -->
-<script>
-  const toggle = document.getElementById("theme-toggle");
-  toggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark-theme");
-    toggle.textContent = document.body.classList.contains("dark-theme") ? "☀️" : "🌙";
-  });
-</script>
-
+    destinations.forEach(d => d.classList.add("show"));
+  </script>
 </body>
 </html>
