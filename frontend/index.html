@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>One Sky Quest</title>
   <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Book flights, hotels, and curated trips with One Sky Quest. Plan smarter, travel better.">
+<meta name="keywords" content="travel, flights, hotels, vacation deals, travel planner">
+<meta property="og:image" content="link-to-thumbnail.jpg" />
 </head>
 <body>
+  
   <!-- Navbar -->
   <header>
     <nav class="navbar">
@@ -20,108 +24,552 @@
         <li><a href="#" class="btn-small">Book</a></li>
         <li><a href="#contact">Contact</a></li>
         <li><a href="#about">About</a></li>
+        <li><a href="#saved-trips">Saved Trips</a></li>
+        <li><a href="#" onclick="openAuthModal()">👤 Login</a></li>
+
       </ul>
       <div class="theme-toggle" id="theme-toggle">🌙</div>
     </nav>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Discover Your Next Adventure</h1>
-      <div class="tab-buttons">
-        <button class="tab-btn active" data-tab="flights-tab">Flights</button>
-        <button class="tab-btn" data-tab="hotels-tab">Hotels</button>
-        <button class="tab-btn" data-tab="packages-tab">Packages</button>
+  <!-- login -->
+<!-- Auth Modal -->
+<div id="authModal" class="auth-modal">
+  <div class="auth-content">
+    <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+    <div class="auth-tabs">
+      <button onclick="showLogin()" id="loginTab" class="active">Login</button>
+      <button onclick="showRegister()" id="registerTab">Register</button>
+    </div>
+    <form id="loginForm" class="auth-form">
+      <input type="email" placeholder="Email" required />
+      <input type="password" placeholder="Password" required />
+      <button type="submit" class="search-btn">Login</button>
+    </form>
+    <form id="registerForm" class="auth-form hidden">
+      <input type="text" placeholder="Full Name" required />
+      <input type="email" placeholder="Email" required />
+      <input type="password" placeholder="Password" required />
+      <button type="submit" class="search-btn">Register</button>
+    </form>
+  </div>
+</div>
+<!-- Discover -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Discover Your Next Adventure</h1>
+    <p class="hero-subtext">🌍 Plan Smarter. Travel Better. One Sky, Endless Adventures.</p>
+    <!-- Tab Buttons -->
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="flights-form">✈️ Flights</button>
+      <button class="tab-btn" data-tab="hotels-form">🏨 Hotels</button>
+      <button class="tab-btn" data-tab="packages-form">🎁 Packages</button>
+      <button class="tab-btn" data-tab="cars-form">🚗 Cars</button>
+      <button class="tab-btn" data-tab="cruises-form">🚢 Cruises</button>
+    </div>
+
+    <!-- Tabs Content -->
+    <!-- Flight tab -->
+    <div class="tab-content active" id="flights-form">
+      <form class="search-form">
+        <div class="form-row">
+          <label for="from">From</label>
+          <input list="airport-list" name="from" id="from" placeholder="From?" required />
+          <label for="to">To</label>
+          <input list="airport-list" name="to" id="to" placeholder="To?" required />
+        </div>
+        <div class="form-row">
+          <label for="departure">Departure</label>
+          <input type="date" id="departure" required />
+          <label for="return">Return</label>
+          <input type="date" id="return" required />
+        </div>
+        <button type="submit" class="search-btn">Search</button>
+      </form>
+    </div>
+
+    <!-- Hotels tab -->
+    <div class="tab-content" id="hotels-form">
+      <form class="search-form">
+        <div class="form-row">
+        <input type="text" name="location" placeholder="City or Hotel Name" required />
+    <input type="date" name="check-in" required />
+    <input type="date" name="check-out" required />
+    <button type="submit" class="search-btn">Search Hotels</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Packages Tab -->
+    <div class="tab-content" id="packages-form">
+  <form class="search-form">
+    <input type="text" name="destination" placeholder="Destination" required />
+    <input type="date" name="start-date" required />
+    <input type="date" name="end-date" required />
+    <input type="number" name="travelers" placeholder="Travelers" min="1" required />
+    <button type="submit" class="search-btn">Find Packages</button>
+  </form>
+</div>
+
+<!-- Cars Tab -->
+<div class="tab-content" id="cars-form">
+  <form class="search-form">
+    <input type="text" name="pickup-location" placeholder="Pick-up Location" required />
+    <input type="date" name="pickup-date" required />
+    <input type="date" name="return-date" required />
+    <button type="submit" class="search-btn">Find Cars</button>
+  </form>
+</div>
+
+<!-- Cruises Tab -->
+<div class="tab-content" id="cruises-form">
+  <form class="search-form">
+    <input type="text" name="cruise-destination" placeholder="Cruise Destination" required />
+    <input type="date" name="cruise-start" required />
+    <input type="date" name="cruise-end" required />
+    <button type="submit" class="search-btn">Find Cruises</button>
+  </form>
+</div>
+<!-- Tabs Content -->
+
+    <a href="#destinations" class="explore-btn">Start Exploring</a>
+
+    <datalist id="airport-list">
+      <option value="JFK - John F. Kennedy International Airport">
+      <option value="LAX - Los Angeles International Airport">
+      <option value="ORD - Chicago O'Hare International Airport">
+      <option value="DFW - Dallas/Fort Worth International Airport">
+      <option value="DEN - Denver International Airport">
+      <option value="EWR - Newark Liberty International Airport">
+      <option value="SFO - San Francisco International Airport">
+      <option value="MIA - Miami International Airport">
+      <option value="SEA - Seattle-Tacoma International Airport">
+    </datalist>
+  </div>
+</section>
+
+<!-- ai trip builder -->
+<section class="ai-trip-builder" id="ai-builder">
+  <div class="ai-content">
+    <h2>✨ Build Your Perfect Trip with AI</h2>
+    <p class="tools-subtext">Plan smarter with personalized recommendations — all tailored to your vibe, budget, and goals.</p>
+    <form id="ai-form" class="ai-form">
+      <div class="form-row">
+        <input type="text" placeholder="Where do you want to go?" required />
+      </div>
+      <div class="form-row">
+        <input type="number" placeholder="Your Budget ($)" min="100" required />
+        <select required>
+          <option value="">Trip Vibe</option>
+          <option value="relaxing">🌴 Relaxing</option>
+          <option value="adventurous">⛰️ Adventurous</option>
+          <option value="romantic">💖 Romantic</option>
+          <option value="cultural">🏛️ Cultural</option>
+        </select>
+      </div>
+      <button type="submit" class="search-btn">🎯 Generate My Trip</button>
+    </form>
+    <div id="ai-results" style="margin-top: 2rem;"></div>
+  </div>
+</section>
+<!-- ai trip builder -->
+
+<!-- Smart Travel Tools Section -->
+<section class="smart-tools" id="tools">
+  <div class="tools-container">
+    <h2>🧠 Smart Travel Tools</h2>
+    <p class="tools-subtext">Plan. Personalize. Pack. Smarter ways to explore the world, all in one place.</p>
+
+    <div class="tool-card">
+      <h3>🧮 Budget Tracker</h3>
+      <p>Keep tabs on spending, convert currencies instantly, and get tips to stretch your budget further.</p>
+    </div>
+
+    <div class="tool-card">
+      <h3>🚨 Real-Time Alerts</h3>
+      <p>Flight delays? Weather warnings? Gate changes? Get notified instantly so you never miss a beat.</p>
+    </div>
+
+    <div class="tool-card">
+      <h3>📶 Offline Mode</h3>
+      <p>No internet? No problem. Access your itinerary, maps, and boarding passes anytime, anywhere.</p>
+    </div>
+  </div>
+</section>
+<!-- Smart Travel Tools Section -->
+
+<!-- Last Minute Week Deals Section -->
+
+<section class="last-minute-deals">
+    <h2>⏳Last-Minute Escapes</h2>
+
+    <div class="deal-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="beach">Beach</button>
+      <button class="filter-btn" data-filter="city">City</button>
+      <button class="filter-btn" data-filter="nature">Nature</button>
+    <button class="filter-btn" id="reset-btn">Reset</button>
+    </div>
+
+    <div class="deals-container">
+      <div class="deal-card beach">
+        <img src="https://via.placeholder.com/300x200?text=Beach+Deal" alt="Beach Getaway">
+        <div class="deal-details">
+          <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+          <h4>Beach Getaway</h4>
+          <p>3 nights in the Bahamas</p>
+        </div>
       </div>
 
-      <!-- Tabs Content -->
-      <div class="tab-content active" id="flights-tab">
-        <form class="search-form">
-          <div class="form-row">
-            <input list="airport-list" name="from" placeholder="From?" required />
-            <input list="airport-list" name="to" placeholder="To?" required />
-          </div>
-          <div class="form-row">
-            <input type="date" required />
-            <input type="date" required />
-          </div>
-          <button type="submit" class="search-btn">Search</button>
-        </form>
+      <div class="deal-card city">
+        <img src="https://via.placeholder.com/300x200?text=City+Break" alt="City Escape">
+        <div class="deal-details">
+          <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+          <h4>City Escape</h4>
+          <p>Weekend in New York</p>
+        </div>
       </div>
 
-      <div class="tab-content" id="hotels-tab">
-        <form>
-          <input type="text" placeholder="City or Hotel Name" required />
-          <input type="date" required />
-          <input type="date" required />
-          <button type="submit" class="search-btn">Search Hotels</button>
-        </form>
+      <div class="deal-card nature">
+        <img src="https://via.placeholder.com/300x200?text=Nature+Retreat" alt="Nature Retreat">
+        <div class="deal-details">
+          <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+          <h4>Nature Retreat</h4>
+          <p>Mountain cabin stay</p>
+        </div>
       </div>
-
-      <div class="tab-content" id="packages-tab">
-        <form>
-          <input type="text" placeholder="Destination" required />
-          <input type="date" required />
-          <input type="date" required />
-          <input type="number" placeholder="Travelers" min="1" required />
-          <button type="submit" class="search-btn">Find Packages</button>
-        </form>
-      </div>
-
-      <a href="#" class="explore-btn">Start Exploring</a>
-
-      <datalist id="airport-list">
-        <option value="JFK - John F. Kennedy International Airport">
-        <option value="LAX - Los Angeles International Airport">
-        <option value="ORD - Chicago O'Hare International Airport">
-        <option value="DFW - Dallas/Fort Worth International Airport">
-        <option value="DEN - Denver International Airport">
-        <option value="EWR - Newark Liberty International Airport">
-        <option value="SFO - San Francisco International Airport">
-        <option value="MIA - Miami International Airport">
-        <option value="SEA - Seattle-Tacoma International Airport">
-      </datalist>
     </div>
   </section>
+<!-- Last Minute Week Deals Section -->
+
+<!-- Explore Unique Stays Section -->
+<section class="unique-stays" id="unique-stays">
+  <div class="section-header">
+    <h2>🏕️ Explore Unique Stays</h2>
+    <p class="deals-subtext">From treehouses to overwater bungalows — stay somewhere unforgettable.</p>
+  </div>
+
+  <div class="stays-container">
+    <!-- Unique Stay Card 1 -->
+    <div class="stay-card treehouse" data-id="luxury-treehouse">
+      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1000&q=80" alt="Luxury Treehouse, Oregon" />
+      <div class="stay-details">
+        <span class="tag">Treehouse</span>
+        <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+        <h4>🌲 Luxury Treehouse, Oregon</h4>
+        <p>Sleep among the pines with skylight views and a wood-fire hot tub.</p>
+        <button class="explore-btn">Explore Stay</button>
+      </div>
+    </div>
+
+    <!-- Unique Stay Card 2 -->
+    <div class="stay-card bungalow" data-id="overwater-bungalow">
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Overwater Bungalow, Maldives" />
+      <div class="stay-details">
+        <span class="tag">Bungalow</span>
+        <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+        <h4>🏝️ Overwater Bungalow, Maldives</h4>
+        <p>Wake up over turquoise waters with steps into the sea.</p>
+        <button class="explore-btn">Explore Stay</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Explore Unique Stays Section -->
+
+<!-- Discover Your New Favorite Stay Section -->
+<section class="favorite-stays" id="favorite-stays">
+  <div class="section-header">
+    <h2>🏨 Discover Your New Favorite Stay</h2>
+    <p class="deals-subtext">Find the perfect spot — from modern hotels to cozy lodges.</p>
+  </div>
+
+  <div class="stays-container">
+    <!-- Stay Card 1 -->
+    <div class="stay-card hotel" data-id="urban-hotel-nyc">
+      <img src="https://images.unsplash.com/photo-1559599189-95d8c0dc9aa3?auto=format&fit=crop&w=1000&q=80" alt="Modern Hotel NYC" />
+      <div class="stay-details">
+        <span class="tag">Hotel</span>
+        <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+        <h4>🗽 Modern Hotel, NYC</h4>
+        <p>Stylish city views with rooftop access in Midtown Manhattan.</p>
+        <button class="explore-btn">Explore Stay</button>
+      </div>
+    </div>
+
+    <!-- Stay Card 2 -->
+    <div class="stay-card lodge" data-id="mountain-lodge-co">
+      <img src="https://images.unsplash.com/photo-1600585152749-728c1b0b1a3f?auto=format&fit=crop&w=1000&q=80" alt="Mountain Lodge Colorado" />
+      <div class="stay-details">
+        <span class="tag">Lodge</span>
+        <button class="save-trip" aria-label="Save trip">❤️<span class="sr-only">Save this trip</span></button>
+        <h4>⛰️ Mountain Lodge, Colorado</h4>
+        <p>Rustic charm with panoramic mountain views and a fireplace suite.</p>
+        <button class="explore-btn">Explore Stay</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Discover Your New Favorite Stay Section -->
+
+<!-- Explore Travel Deals by Type Section -->
+<section class="deals-by-type" id="deals-by-type">
+  <div class="section-header">
+    <h2>🔎 Explore Travel Deals by Type</h2>
+    <p class="deals-subtext">Choose the kind of adventure that fits your vibe.</p>
+  </div>
+
+  <div class="type-cards-container">
+    <!-- Deal Type Card -->
+    <a href="#beach-deals" class="type-card">
+      <span class="emoji">🏖️</span>
+      <h4>Beach</h4>
+    </a>
+
+    <a href="#adventure-deals" class="type-card">
+      <span class="emoji">⛰️</span>
+      <h4>Adventure</h4>
+    </a>
+
+    <a href="#romantic-deals" class="type-card">
+      <span class="emoji">💖</span>
+      <h4>Romantic</h4>
+    </a>
+
+    <a href="#family-deals" class="type-card">
+      <span class="emoji">👨‍👩‍👧‍👦</span>
+      <h4>Family</h4>
+    </a>
+
+    <a href="#budget-deals" class="type-card">
+      <span class="emoji">💸</span>
+      <h4>Budget</h4>
+    </a>
+
+    <a href="#nature-deals" class="type-card">
+      <span class="emoji">🌿</span>
+      <h4>Nature</h4>
+    </a>
+  </div>
+</section>
+<!-- Travel Deals Explorer -->
+
 
   <!-- Featured Destinations -->
-  <section class="featured-destinations" id="flights">
+  <section class="featured-destinations" id="destinations">
     <h2>Featured Destinations</h2>
+    
+    <!-- Destinations Tabs -->
     <div class="tabs">
-      <button class="tab active" data-tab="all">All</button>
-      <button class="tab" data-tab="beach">Beach</button>
-      <button class="tab" data-tab="adventure">Adventure</button>
-      <button class="tab" data-tab="romantic">Romantic</button>
+      <button class="tab active" data-category="all">All</button>
+      <button class="tab" data-category="beach">Beach</button>
+      <button class="tab" data-category="adventure">Adventure</button>
+      <button class="tab" data-category="romantic">Romantic</button>
     </div>
+
+<!-- Destinations Grid -->
     <div class="destination-grid">
-      <div class="destination-card beach show">
+      <div class="destination-card beach show" data-category="beach">
         <span class="emoji floating">🌴</span>
         <h3>Maldives</h3>
         <p>Beach Getaway</p>
+        <!-- Add inside your destination or trip card -->
+      <button 
+        class="save-trip" 
+        onclick="toggleSaveTrip(this, 'Maldives', '$1,200 • Flights + Resort', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1000&q=80')" 
+        aria-label="Save Trip">
+        <span class="heart-icon">♡</span>
+      </button>
+
       </div>
-      <div class="destination-card adventure show">
+      <div class="destination-card adventure show" data-category="adventure">
         <span class="emoji floating">⛰️</span>
         <h3>Swiss Alps</h3>
         <p>Adventure Experience</p>
+        <!-- Add inside your destination or trip card -->
+<button 
+        class="save-trip" 
+        onclick="toggleSaveTrip(this, 'Swiss Alps', '$1,499 • Flights + Chalet Stay', 'https://images.unsplash.com/photo-1582719478181-3e0ad1b360c0?auto=format&fit=crop&w=1000&q=80')" 
+        aria-label="Save Trip">
+        <span class="heart-icon">♡</span>
+      </button>
       </div>
-      <div class="destination-card romantic show">
+      <div class="destination-card romantic show" data-category="romantic">
         <span class="emoji floating">💖</span>
         <h3>Paris</h3>
         <p>Romantic Escape</p>
+        <!-- Add inside your destination or trip card -->
+<button 
+        class="save-trip" 
+        onclick="toggleSaveTrip(this, 'Paris', '$899 • Flight + 5-Star Stay', 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80')" 
+        aria-label="Save Trip">
+        <span class="heart-icon">♡</span>
+      </button>
       </div>
-      <div class="destination-card beach show">
+      <div class="destination-card beach show" data-category="beach">
         <span class="emoji floating">🏝️</span>
         <h3>Bahamas</h3>
         <p>Island Paradise</p>
+        <!-- Add inside your destination or trip card -->
+<button 
+        class="save-trip" 
+        onclick="toggleSaveTrip(this, 'Bahamas', '$750 • All-Inclusive', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80')" 
+        aria-label="Save Trip">
+        <span class="heart-icon">♡</span>
+      </button>
+
       </div>
-      <div class="destination-card romantic show">
+      <div class="destination-card romantic show" data-category="romantic">
         <span class="emoji floating">🏛️</span>
         <h3>Santorini</h3>
         <p>Romantic Views</p>
+        <!-- Add inside your destination or trip card -->
+<button 
+        class="save-trip" 
+        onclick="toggleSaveTrip(this, 'Santorini', '$1,100 • Flight + Villa', 'https://images.unsplash.com/photo-1606788075761-7e8c6b04ed0f?auto=format&fit=crop&w=1000&q=80')" 
+        aria-label="Save Trip">
+        <span class="heart-icon">♡</span>
+      </button>
       </div>
     </div>
   </section>
+
+  <!-- Hidden Gem Finder Section -->
+<section class="hidden-gems" id="hidden-gems">
+  <div class="gems-container">
+    <h2>🔎 Hidden Gem Finder</h2>
+    <p class="gems-subtext">Uncover secret spots and unique experiences loved by locals—beyond the tourist traps.</p>
+
+    <div class="gem-card">
+      <h3>🌿 Local Secrets</h3>
+      <p>Discover places only the locals know—quiet beaches, scenic cafes, hidden trails, and cultural treasures.</p>
+    </div>
+
+    <div class="gem-card">
+      <h3>📍 Personalized Suggestions</h3>
+      <p>AI tailors recommendations based on your vibe, interests, and trip style. No two trips are ever the same.</p>
+    </div>
+
+    <div class="gem-card">
+      <h3>🧭 Explore Differently</h3>
+      <p>Break free from tourist checklists. See the world with fresh eyes and craft stories worth sharing.</p>
+    </div>
+
+    <!-- Suggest a Hidden Gem -->
+    <div class="gem-submission">
+      <h3>💡 Know a Hidden Gem?</h3>
+      <p>Share your secret spot and help other travelers discover something magical.</p>
+      <form id="gemForm">
+        <input type="text" placeholder="Location Name" required />
+        <input type="text" placeholder="Why it's special..." required />
+        <button type="submit" class="search-btn">Submit Hidden Gem</button>
+      </form>
+      <p id="gemConfirm" style="display:none; margin-top:1rem; color:#0077ff;">Thank you for your suggestion!</p>
+    </div>
+  </div>
+</section>
+
+<!-- Trip Calendar & Packing Checklist -->
+<section class="trip-planner" id="trip-planner">
+  <div class="planner-container">
+    <h2>🗓️ Trip Calendar & Checklist</h2>
+    <p class="planner-subtext">Stay organized from takeoff to touchdown.</p>
+
+    <!-- Trip Date Input -->
+    <div class="trip-dates">
+      <label>Departure:</label>
+      <input type="date" />
+      <label>Return:</label>
+      <input type="date" />
+    </div>
+
+    <!-- Packing List -->
+    <div class="packing-list">
+      <h3>🎒 Packing List</h3>
+      <form id="packingForm">
+        <input type="text" id="itemInput" placeholder="Add item..." required />
+        <button type="submit" class="search-btn">Add</button>
+      </form>
+      <ul id="packingItems" class="packing-items"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- Budget by Group Section -->
+<section class="group-budget" id="group-budget">
+  <div class="budget-container">
+    <h2>💸 Group Budget Calculator</h2>
+    <p class="budget-subtext">Traveling with friends or family? Estimate the cost per person in seconds.</p>
+
+    <form id="groupBudgetForm">
+      <input type="number" id="totalBudget" placeholder="Total Trip Budget ($)" min="1" required />
+      <input type="number" id="numPeople" placeholder="Number of People" min="1" required />
+      <button type="submit" class="search-btn">Calculate Per Person</button>
+    </form>
+
+    <div id="budgetResult" class="budget-result" style="display: none;">
+      <h3>Estimated Cost Per Person:</h3>
+      <p><span id="costPerPerson">$0</span></p>
+    </div>
+  </div>
+</section>
+
+
+<!-- Language & Culture Toolkit Section -->
+<!-- Language & Culture Toolkit Section -->
+
+<!-- Build My Dream Trip Wizard Section -->
+<section class="dream-trip-wizard" id="dream-wizard">
+  <div class="wizard-container">
+    <h2>Build My Dream Trip</h2>
+    <form id="dreamTripForm">
+      <div class="wizard-step">
+        <label for="budget">What's your budget?</label>
+        <select id="budget" name="budget" required>
+          <option value="">Select Budget</option>
+          <option value="low">$500 - $1000</option>
+          <option value="mid">$1000 - $3000</option>
+          <option value="high">$3000+</option>
+        </select>
+      </div>
+
+      <div class="wizard-step">
+        <label for="vibe">What's the vibe?</label>
+        <select id="vibe" name="vibe" required>
+          <option value="">Select Vibe</option>
+          <option value="chill">Chill & Relax</option>
+          <option value="adventure">Adventure & Explore</option>
+          <option value="luxury">Luxury Experience</option>
+        </select>
+      </div>
+
+      <div class="wizard-step">
+        <label for="interests">What are your interests?</label>
+        <select id="interests" name="interests" required>
+          <option value="">Select Interest</option>
+          <option value="beach">Beach</option>
+          <option value="food">Food & Culture</option>
+          <option value="history">History & Museums</option>
+          <option value="nature">Nature & Wildlife</option>
+        </select>
+      </div>
+
+      <button type="submit" class="search-btn">Generate Trip</button>
+    </form>
+
+    <div id="tripSuggestion" class="trip-suggestion hidden">
+      <h3>Your Dream Trip:</h3>
+      <p id="tripDetails"></p>
+      <div class="tweak-options">
+        <button onclick="tweakTrip('cheaper')">Make it Cheaper</button>
+        <button onclick="tweakTrip('adventure')">Add More Adventure</button>
+        <button onclick="tweakTrip('layovers')">Less Layovers</button>
+      </div>
+    </div>
+  </div>
+</section>
 
   <!-- Search Results -->
   <section class="search-results" id="search-results">
@@ -133,19 +581,19 @@
       <button class="result-tab" data-type="package">Packages</button>
     </div>
     <div class="results-grid">
-      <div class="result-card flight show">
+      <div class="result-card flight show" data-type="flights">
         <h3>✈️ NYC to LAX</h3>
         <p>Non-stop | 5h 30m</p>
         <p>$199</p>
         <button class="book-btn">Book Flight</button>
       </div>
-      <div class="result-card hotel show">
+      <div class="result-card hotel show" data-type="hotels">
         <h3>🏨 Sunset Inn</h3>
         <p>4.5 Stars | Pool | Free Wi-Fi</p>
         <p>$129/night</p>
         <button class="book-btn">Book Hotel</button>
       </div>
-      <div class="result-card package show">
+      <div class="result-card package show" data-type="packages">
         <h3>🧳 Paris Getaway</h3>
         <p>Flight + Hotel | 5 Nights</p>
         <p>$899 total</p>
@@ -154,12 +602,138 @@
     </div>
   </section>
 
+<!-- ❤️ Saved Trips Section -->
+<section id="saved-trips" class="saved-trips-section">
+  <h2>❤️ Your Saved Trips</h2>
+  <div id="savedTripsGrid" class="deals-grid">
+    <!-- Dynamic saved trip cards will be rendered here -->
+    <button class="save-btn" onclick="toggleSaveTrip(this, 'Paris Getaway', '$899', 'https://example.com/paris.jpg')">❤️</button>
+  </div>
+</section>
+
+<!-- 👤 User Dashboard -->
+<section class="user-dashboard" id="dashboard">
+  <h2>Welcome Back, David</h2>
+  <div class="dashboard-grid">
+    
+    <!-- 🧳 Saved Trips Overview -->
+    <div class="dashboard-box">
+      <h3>🧳 Saved Trips</h3>
+      <p>You’ve saved <strong>4</strong> trips.</p>
+      <ul id="dashboard-saved-links" class="dashboard-links">
+        <li><a href="#saved-trips"><span class="emoji">✈️</span> Paris Getaway</a></li>
+        <li><a href="#saved-trips"><span class="emoji">🏝️</span> Maldives Retreat</a></li>
+      </ul>
+    </div>
+
+    <!-- 📧 Profile Information -->
+    <div class="dashboard-box">
+      <h3>📧 Profile Info</h3>
+      <p>Email: <a href="mailto:david@example.com">david@example.com</a></p>
+      <button class="btn-small">Edit Profile</button>
+    </div>
+
+
+    <!-- ⚙️ Travel Preferences -->
+    <div class="dashboard-box">
+      <h3>⚙️ Preferences</h3>
+      <p><strong>Vibe:</strong> Adventure<br><strong>Budget:</strong> Mid</p>
+      <button class="btn-small">Update</button>
+    </div>
+
+  </div>
+</section>
+
+  <!-- 🌍 Traveler Stories & Itineraries -->
+<section class="social-feed" id="travel-stories">
+  <div class="feed-container">
+    <h2>🌍 Traveler Stories & Itineraries</h2>
+    <p class="feed-subtext">See what others are exploring — or share your own adventure below.</p>
+
+    <form id="itineraryForm" enctype="multipart/form-data">
+      <input type="text" placeholder="Trip Title (e.g. Backpacking Peru)" required />
+      <textarea placeholder="Key Highlights (e.g. Day 1: Machu Picchu, Day 2: Cusco...)" rows="4" required></textarea>
+
+      <select id="itineraryTravelType" required>
+        <option value="">Who did you travel with?</option>
+        <option value="solo">Solo Trip</option>
+        <option value="group">Group Trip</option>
+      </select>
+
+      <input type="number" id="itineraryGroupSizeInput" placeholder="Group Size (e.g. 5)" min="1" style="display: none;" />
+
+      <input type="number" placeholder="Estimated Budget ($)" min="0" required />
+      <input type="file" accept="image/*" required />
+
+      <button type="submit" class="search-btn">Submit Itinerary</button>
+    </form>
+
+    <p id="itineraryConfirm" style="display: none; margin-top: 1rem; color: #0077ff;">
+      Your itinerary has been submitted! ✈️
+    </p>
+  </div>
+
+  <!-- 📸 Story Gallery -->
+  <div class="story-gallery">
+    <div class="story-card">
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80" alt="Amalfi Coast" />
+      <div class="story-details">
+        <h4>🇮🇹 Amalfi Coast Getaway</h4>
+        <p>"Breathtaking views, wine by the sea, and hidden beach caves! Day 1 was unreal."</p>
+        <span class="tag">#Italy #SummerTrip #Romantic</span>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <img src="https://images.unsplash.com/photo-1589395831447-cb3e5b5abcf9?auto=format&fit=crop&w=1000&q=80" alt="Tokyo Adventure" />
+      <div class="story-details">
+        <h4>🇯🇵 Tokyo Solo Adventure</h4>
+        <p>"Explored hidden ramen shops, joined a night market tour, and even visited a temple by sunrise!"</p>
+        <span class="tag">#Japan #SoloTravel #HiddenGems</span>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <img src="https://images.unsplash.com/photo-1603575443985-cdc5e94b15f0?auto=format&fit=crop&w=1000&q=80" alt="Paris Itinerary" />
+      <div class="story-details">
+        <h4>🇫🇷 3-Day Paris Itinerary</h4>
+        <p>"Day 1: Louvre & Seine Cruise. Day 2: Montmartre + wine tasting. Day 3: Versailles & croissants. C’est la vie!"</p>
+        <span class="tag">#Paris #WeekendEscape #CulturalTrip</span>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 🌍 Traveler Stories & Itineraries -->
+
+  <!-- User Reviews / Testimonials Section -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-container">
+    <h2>⭐ What Travelers Are Saying</h2>
+    <p class="testimonials-subtext">Real experiences from our amazing users.</p>
+
+    <div class="testimonial-card">
+      <p>“One Sky Quest made planning my honeymoon stress-free and magical. Everything was so smooth!”</p>
+      <h4>— Emily R., 🌺 Hawaii</h4>
+    </div>
+
+    <div class="testimonial-card">
+      <p>“I discovered hidden gems in Japan I never would've found without this platform. Highly recommend!”</p>
+      <h4>— Marcus L., 🇯🇵 Tokyo</h4>
+    </div>
+
+    <div class="testimonial-card">
+      <p>“I loved the AI trip builder. It suggested a perfect romantic escape to Santorini!”</p>
+      <h4>— Jasmine K., 💙 Greece</h4>
+    </div>
+  </div>
+</section>
+
   <!-- About Us -->
   <section class="about-us" id="about">
     <h2>About Us</h2>
     <p>One Sky Quest is your trusted travel companion. We specialize in making dream vacations a reality — from exotic getaways to cultural journeys and thrilling adventures.</p>
   </section>
-
+  
   <!-- Contact Us -->
   <section class="contact-us" id="contact">
     <h2>Contact Us</h2>
@@ -171,14 +745,159 @@
       <button type="submit" class="search-btn">Send Message</button>
     </form>
   </section>
+  
+  <!-- 🌐 Social & Community Features -->
+<section class="social-section" id="community">
+  <h2>🌐 Social & Community</h2>
+  <p class="subtext">Connect with fellow travelers, share your journey, and explore together.</p>
+
+  <div class="social-grid">
+    <!-- Trip Sharing -->
+    <div class="feature-card">
+      <h3>📤 Trip Sharing</h3>
+      <p>Share your travel plans with privacy options: <strong>Public</strong>, <strong>Friends Only</strong>, or <strong>Private</strong>.</p>
+      <button class="explore-btn">Share a Trip</button>
+    </div>
+
+    <!-- Who's Going -->
+    <div class="feature-card">
+      <h3>🧭 Who's Going?</h3>
+      <p>See other travelers heading to your destination and connect before takeoff.</p>
+      <button class="explore-btn">View Travelers</button>
+    </div>
+
+    <!-- Live Chat -->
+    <div class="feature-card">
+      <h3>💬 Live Chat & Meetups</h3>
+      <p>Join group chats or meetups with fellow travelers and locals during your journey.</p>
+      <button class="explore-btn">Join Chat</button>
+    </div>
+
+    <!-- Forums -->
+    <div class="feature-card">
+      <h3>🗣️ Discussion Boards</h3>
+      <p>Ask questions, swap tips, and share stories with the One Sky Quest community.</p>
+      <button class="explore-btn">Visit Forums</button>
+    </div>
+
+    <!-- Post Your Story CTA -->
+    <div class="post-story-cta">
+      <button class="explore-btn" onclick="document.getElementById('post-story').scrollIntoView({ behavior: 'smooth' })">
+        📸 Post Your Story
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 📝 Share Your Itinerary -->
+<section class="itinerary-submission" id="post-itinerary">
+  <div class="submission-container">
+    <h2>📝 Share Your Itinerary</h2>
+    <p class="submission-subtext">Let the One Sky Quest community explore your travel plans, tips, and style — solo or group!</p>
+
+    <!-- Sample Itinerary 1 -->
+    <div class="itinerary-card">
+      <img src="https://images.unsplash.com/photo-1582719478148-dfacc645d0b5?auto=format&fit=crop&w=1000&q=80" alt="Thailand Itinerary" />
+      <div class="itinerary-details">
+        <h4>🇹🇭 7-Day Thailand Adventure</h4>
+        <p><strong>Highlights:</strong> Bangkok street food, Phi Phi Islands, Chiang Mai temples</p>
+        <p><strong>Budget:</strong> $1,200 | <strong>Group Size:</strong> 3 friends</p>
+        <button class="explore-btn">View Full Itinerary</button>
+      </div>
+    </div>
+
+    <!-- Sample Itinerary 2 -->
+    <div class="itinerary-card">
+      <img src="https://images.unsplash.com/photo-1590490350373-d1bb62fb3b3c?auto=format&fit=crop&w=1000&q=80" alt="NYC Itinerary" />
+      <div class="itinerary-details">
+        <h4>🗽 NYC in 4 Days</h4>
+        <p><strong>Highlights:</strong> Broadway, Central Park picnic, Empire State Building at night</p>
+        <p><strong>Budget:</strong> $900 | <strong>Group Size:</strong> Couple</p>
+        <button class="explore-btn">View Full Itinerary</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 📸 Share Your Travel Story -->
+<section class="story-submission" id="post-story">
+  <div class="submission-container">
+    <h2>📸 Share Your Travel Story</h2>
+    <p class="submission-subtext">Inspire others with your solo or group travel experience — include highlights, a photo, and how you traveled!</p>
+
+    <form id="storyForm" enctype="multipart/form-data">
+      <input type="text" placeholder="Trip Title (e.g. Iceland Solo Escape)" required />
+      <textarea placeholder="Your story (highlights, surprises, etc.)" rows="4" required></textarea>
+
+      <select id="travelType" required>
+        <option value="">Who did you travel with?</option>
+        <option value="solo">Solo Trip</option>
+        <option value="group">Group Trip</option>
+      </select>
+
+      <input type="number" id="groupSizeInput" placeholder="Group Size (e.g. 4)" min="1" style="display: none;" />
+      <input type="text" placeholder="#hashtags (e.g. #Europe #Backpacking)" />
+      <input type="file" accept="image/*" required />
+      <button type="submit" class="search-btn">Post My Story</button>
+    </form>
+
+    <p id="storyConfirm" style="display: none; margin-top: 1rem; color: #0077ff;">
+      Thanks for sharing your journey! 🌍
+    </p>
+  </div>
+</section>
+
+<!-- Social & Community Features -->
+
+  <!-- Legal & Info Section -->
+<section class="legal-info" id="legal">
+  <div class="legal-container">
+    <h2>📚 Info & Policies</h2>
+    <p class="legal-subtext">Everything you need to know before you book or travel.</p>
+
+    <div class="legal-links">
+      <a href="#">📰 Newsroom</a>
+      <a href="#">📄 Terms of Use</a>
+      <a href="#">🔒 Privacy Policy</a>
+      <a href="#">❌ Cancel Your Trip</a>
+      <a href="#">📞 Help & Support</a>
+    </div>
+  </div>
+</section>
 
   <!-- Footer -->
   <footer>
     <p>&copy; 2025 One Sky Quest. All rights reserved.</p>
   </footer>
+  
+  <!-- Cookie Consent Banner -->
+<div class="cookie-banner" id="cookieBanner">
+  <p>
+    We use cookies to personalize content and enhance your travel experience.
+    <button class="accept-btn" id="acceptCookies">Accept</button>
+  </p>
+</div>
+
+<!-- Feedback Button -->
+<div class="feedback-tab" id="feedbackTab" onclick="toggleFeedbackForm()">
+  💬 Feedback
+</div>
+
+<!-- Feedback Form Modal -->
+<div class="feedback-modal" id="feedbackModal">
+  <div class="feedback-form">
+    <h3>We’d love your feedback!</h3>
+    <p>Tell us what you’d like to see or improve on One Sky Quest.</p>
+    <textarea placeholder="Your thoughts..." rows="4" required></textarea>
+    <button onclick="submitFeedback()">Submit</button>
+    <p id="feedbackThanks" style="display:none; color:#0077ff; margin-top:1rem;">Thank you for your feedback! 🙌</p>
+  </div>
+</div>
+
 
   <!-- JavaScript -->
   <script>
+  document.addEventListener("DOMContentLoaded", () => {
     // Theme Toggle
     const toggle = document.getElementById("theme-toggle");
     toggle.addEventListener("click", () => {
@@ -186,41 +905,221 @@
       toggle.textContent = document.body.classList.contains("dark-theme") ? "☀️" : "🌙";
     });
 
-    // Main Tab Switcher
+    // Discover Tabs Switcher (Flights, Hotels, Packages, Cars, Cruises)
     const tabButtons = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content");
 
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        tabButtons.forEach(b => b.classList.remove("active"));
-        tabContents.forEach(c => c.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById(btn.dataset.tab).classList.add("active");
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const tabId = button.dataset.tab;
+
+        // Toggle active button
+        tabButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        // Toggle visible form
+        tabContents.forEach(content => {
+          content.classList.remove("active");
+        });
+        const activeContent = document.getElementById(tabId);
+        if (activeContent) {
+          activeContent.classList.add("active");
+        }
       });
     });
 
-    // Destination Tabs
+// AI Trip Builder JavaScript
+document.addEventListener("DOMContentLoaded", () => {
+  const aiForm = document.getElementById("ai-form");
+  const aiResults = document.getElementById("ai-results");
+
+  if (aiForm) {
+    aiForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const destination = aiForm.querySelector("input[type='text']").value.trim();
+      const budget = aiForm.querySelector("input[type='number']").value.trim();
+      const vibe = aiForm.querySelector("select").value;
+
+      if (!destination || !budget || !vibe) {
+        aiResults.innerHTML = `<p style="color: red;">Please fill out all fields to generate a trip.</p>`;
+        return;
+      }
+
+      // Example AI logic simulation (can later connect to real API)
+      const mockSuggestions = {
+        relaxing: ["Bali", "Maldives", "Tulum"],
+        adventurous: ["Patagonia", "New Zealand", "Swiss Alps"],
+        romantic: ["Paris", "Santorini", "Venice"],
+        cultural: ["Kyoto", "Cairo", "Rome"]
+      };
+
+      const pick = mockSuggestions[vibe] || ["Somewhere special"];
+      const random = pick[Math.floor(Math.random() * pick.length)];
+
+      aiResults.innerHTML = `
+        <div class="ai-suggestion">
+          <h3>Your AI-Recommended Trip ✨</h3>
+          <p><strong>Destination:</strong> ${destination || random}</p>
+          <p><strong>Budget:</strong> $${budget}</p>
+          <p><strong>Vibe:</strong> ${vibe.charAt(0).toUpperCase() + vibe.slice(1)}</p>
+          <p>Plan includes flights, stays, and experiences tailored for <em>${vibe}</em> travelers.</p>
+        </div>
+      `;
+    });
+  }
+});
+// AI Trip Builder JavaScript
+
+// Last-Minute Escapes JavaScript
+  const filterButtons = document.querySelectorAll('.filter-btn');
+    const dealCards = document.querySelectorAll('.deal-card');
+    const resetButton = document.getElementById('reset-btn');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter');
+
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        dealCards.forEach(card => {
+          if (filter === 'all' || card.classList.contains(filter)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    resetButton.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      filterButtons[0].classList.add('active');
+
+      dealCards.forEach(card => {
+        card.style.display = 'block';
+      });
+    });
+
+    const savedTrips = JSON.parse(localStorage.getItem('savedTrips')) || [];
+
+    document.querySelectorAll('.deal-card').forEach(card => {
+      const id = card.getAttribute('data-id');
+      const saveBtn = card.querySelector('.save-trip');
+      if (savedTrips.includes(id)) {
+        saveBtn.classList.add('saved');
+      }
+
+      saveBtn.addEventListener('click', () => {
+        saveBtn.classList.toggle('saved');
+        if (saveBtn.classList.contains('saved')) {
+          if (!savedTrips.includes(id)) savedTrips.push(id);
+        } else {
+          const index = savedTrips.indexOf(id);
+          if (index > -1) savedTrips.splice(index, 1);
+        }
+        localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
+      });
+    });
+// Last-Minute Escapes JavaScript
+
+// Explore Unique Stays JavaScript
+
+  const savedUniqueStays = JSON.parse(localStorage.getItem('savedUniqueStays')) || [];
+
+  document.querySelectorAll('#unique-stays .stay-card').forEach(card => {
+    const id = card.getAttribute('data-id');
+    const saveBtn = card.querySelector('.save-trip');
+
+    // Mark as saved if it was already saved
+    if (savedUniqueStays.includes(id)) {
+      saveBtn.classList.add('saved');
+    }
+
+    // Toggle save on click
+    saveBtn.addEventListener('click', () => {
+      saveBtn.classList.toggle('saved');
+      if (saveBtn.classList.contains('saved')) {
+        if (!savedUniqueStays.includes(id)) savedUniqueStays.push(id);
+      } else {
+        const index = savedUniqueStays.indexOf(id);
+        if (index > -1) savedUniqueStays.splice(index, 1);
+      }
+      localStorage.setItem('savedUniqueStays', JSON.stringify(savedUniqueStays));
+    });
+  });
+// Explore Unique Stays JavaScript
+
+  /* Discover Your New Favorite Stay Section*/
+const savedFavoriteGrid = JSON.parse(localStorage.getItem('savedFavoriteGridStays')) || [];
+
+    document.querySelectorAll('.stay-card').forEach(card => {
+      const id = card.getAttribute('data-id');
+      const saveBtn = card.querySelector('.save-trip');
+      if (savedFavoriteGrid.includes(id)) {
+        saveBtn.classList.add('saved');
+      }
+
+      saveBtn.addEventListener('click', () => {
+        saveBtn.classList.toggle('saved');
+        if (saveBtn.classList.contains('saved')) {
+          if (!savedFavoriteGrid.includes(id)) savedFavoriteGrid.push(id);
+        } else {
+          const index = savedFavoriteGrid.indexOf(id);
+          if (index > -1) savedFavoriteGrid.splice(index, 1);
+        }
+        localStorage.setItem('savedFavoriteGridStays', JSON.stringify(savedFavoriteGrid));
+      });
+    });
+  /* Discover Your New Favorite Stay Section*/
+
+// Featured Destinations Tabs
     const categoryTabs = document.querySelectorAll(".tab");
-    const destinations = document.querySelectorAll(".destination-card");
+    const destinationCards = document.querySelectorAll(".destination-card");
 
     categoryTabs.forEach(tab => {
       tab.addEventListener("click", () => {
         categoryTabs.forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
 
-        const filter = tab.dataset.tab;
-        destinations.forEach(card => {
-          card.classList.remove("show");
-          if (filter === "all" || card.classList.contains(filter)) {
+        const category = tab.dataset.category;
+
+        destinationCards.forEach(card => {
+          if (category === "all" || card.dataset.category === category) {
             card.classList.add("show");
+          } else {
+            card.classList.remove("show");
           }
         });
       });
     });
+// Featured Destinations Tabs
+    
+// <!-- Build My Dream Trip Wizard Section JavaScript-->
+      document.getElementById("dreamTripForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-    destinations.forEach(card => card.classList.add("show"));
+    const budget = document.getElementById("budget").value;
+    const vibe = document.getElementById("vibe").value;
+    const interests = document.getElementById("interests").value;
 
-    // Search Results Tabs
+    const result = `A ${vibe} trip focusing on ${interests}, within a ${budget} budget. Including flights, hotels, and a custom itinerary.`;
+
+    document.getElementById("tripDetails").textContent = result;
+    document.getElementById("tripSuggestion").classList.remove("hidden");
+  });
+
+  function tweakTrip(type) {
+    let message = "";
+    if (type === "cheaper") message = "Now optimizing for lower cost flights & hostels.";
+    if (type === "adventure") message = "Added thrilling activities & excursions.";
+    if (type === "layovers") message = "Recalculating to minimize layovers.";
+    document.getElementById("tripDetails").textContent += `\n\n${message}`;
+  }
+    // <!-- Build My Dream Trip Wizard Section JavaScript-->
+    
+    // Search Results Filtering
     const resultTabs = document.querySelectorAll(".result-tab");
     const resultCards = document.querySelectorAll(".result-card");
 
@@ -230,6 +1129,7 @@
         tab.classList.add("active");
 
         const filter = tab.dataset.type;
+
         resultCards.forEach(card => {
           card.classList.remove("show");
           if (filter === "all" || card.classList.contains(filter)) {
@@ -238,6 +1138,332 @@
         });
       });
     });
+  });
+ // Search Results Filtering
+
+ // Hidden Gem Form Submission
+const gemForm = document.getElementById("gemForm");
+const gemConfirm = document.getElementById("gemConfirm");
+
+if (gemForm) {
+  gemForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    gemForm.reset();
+    gemConfirm.style.display = "block";
+    setTimeout(() => {
+      gemConfirm.style.display = "none";
+    }, 4000);
+  });
+}
+ // Hidden Gem Form Submission
+  
+ // Dream Trip Wizard Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("dream-trip-form");
+  const resultSection = document.getElementById("dream-trip-result");
+  const resultText = document.getElementById("trip-suggestion-text");
+  const tweakButton = document.getElementById("tweak-button");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const budget = form.querySelector("input[type='number']").value;
+    const vibe = form.querySelector("select").value;
+    const interests = form.querySelector("textarea").value;
+
+    // Mock suggestion logic (later replace with real AI call)
+    const suggestion = `Based on your vibe "${vibe}" and interest in ${interests}, we suggest a ${budget}-budget trip to ${getRandomDestination(vibe)}.`;
+
+    resultText.textContent = suggestion;
+    resultSection.style.display = "block";
+  });
+
+  tweakButton.addEventListener("click", () => {
+    alert("AI tweak feature coming soon! (e.g., Make it cheaper, Add more adventure)");
+  });
+
+  function getRandomDestination(vibe) {
+    const options = {
+      relaxing: ["Maldives", "Bali", "Hawaii"],
+      adventurous: ["Swiss Alps", "New Zealand", "Costa Rica"],
+      romantic: ["Paris", "Santorini", "Venice"],
+      luxury: ["Dubai", "Monaco", "Tokyo"],
+      "budget": ["Thailand", "Portugal", "Mexico"],
+    };
+
+    const list = options[vibe] || ["somewhere special"];
+    return list[Math.floor(Math.random() * list.length)];
+  }
+});
+ // Dream Trip Wizard Logic
+
+// Trip Planner Packing List Logic
+const packingForm = document.getElementById("packingForm");
+const itemInput = document.getElementById("itemInput");
+const packingItems = document.getElementById("packingItems");
+
+if (packingForm) {
+  packingForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const itemText = itemInput.value.trim();
+    if (itemText === "") return;
+
+    const li = document.createElement("li");
+    li.textContent = itemText;
+
+    li.addEventListener("click", () => {
+      li.classList.toggle("packed");
+    });
+
+    packingItems.appendChild(li);
+    itemInput.value = "";
+  });
+}
+// Trip Planner Packing List Logic
+
+// Post story //
+document.getElementById('storyModal').style.display = 'block';
+// Post story //
+
+// Language & Culture Toolkit Logic
+
+    // Language & Culture Toolkit Logic
+
+// Show group size input if 'Group Trip' selected (Itinerary Form)
+const itineraryTravelType = document.getElementById("itineraryTravelType");
+const itineraryGroupSizeInput = document.getElementById("itineraryGroupSizeInput");
+
+if (itineraryTravelType) {
+  itineraryTravelType.addEventListener("change", () => {
+    if (itineraryTravelType.value === "group") {
+      itineraryGroupSizeInput.style.display = "block";
+      itineraryGroupSizeInput.setAttribute("required", "true");
+    } else {
+      itineraryGroupSizeInput.style.display = "none";
+      itineraryGroupSizeInput.removeAttribute("required");
+    }
+  });
+}
+// Show group size input if 'Group Trip' selected (Itinerary Form)
+
+// Submission confirmation (already exists)
+const storyForm = document.getElementById("storyForm");
+const storyConfirm = document.getElementById("storyConfirm");
+
+if (storyForm) {
+  storyForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    storyForm.reset();
+    groupSizeInput.style.display = "none"; // Reset group input
+    storyConfirm.style.display = "block";
+    setTimeout(() => {
+      storyConfirm.style.display = "none";
+    }, 4000);
+  });
+}
+document.getElementById('storyModal').style.display = 'block';
+// Submission confirmation (already exists)
+
+
+// Group Budget Calculator Logic
+const groupBudgetForm = document.getElementById("groupBudgetForm");
+const totalBudget = document.getElementById("totalBudget");
+const numPeople = document.getElementById("numPeople");
+const costPerPerson = document.getElementById("costPerPerson");
+const budgetResult = document.getElementById("budgetResult");
+
+if (groupBudgetForm) {
+  groupBudgetForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const total = parseFloat(totalBudget.value);
+    const people = parseInt(numPeople.value);
+
+    if (!isNaN(total) && people > 0) {
+      const cost = (total / people).toFixed(2);
+      costPerPerson.textContent = `$${cost}`;
+      budgetResult.style.display = "block";
+    }
+  });
+}
+// Group Budget Calculator Logic
+
+// Traveler Stories & Itineraries
+  document.getElementById("travelType").addEventListener("change", function () {
+    const groupInput = document.getElementById("groupSizeInput");
+    groupInput.style.display = this.value === "group" ? "block" : "none";
+  });
+
+  document.getElementById("storyForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    document.getElementById("storyConfirm").style.display = "block";
+    setTimeout(() => {
+      document.getElementById("storyConfirm").style.display = "none";
+      this.reset();
+      document.getElementById("groupSizeInput").style.display = "none";
+    }, 3000);
+  });
+// Traveler Stories & Itineraries
+
+
+/// Itinerary submission confirm (already in place)
+const itineraryForm = document.getElementById("itineraryForm");
+const itineraryConfirm = document.getElementById("itineraryConfirm");
+
+if (itineraryForm) {
+  itineraryForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    itineraryForm.reset();
+    itineraryGroupSizeInput.style.display = "none";
+    itineraryConfirm.style.display = "block";
+    setTimeout(() => {
+      itineraryConfirm.style.display = "none";
+    }, 4000);
+  });
+}
+/// Itinerary submission confirm (already in place)
+
+// Cookie Consent Logic
+const cookieBanner = document.getElementById("cookieBanner");
+const acceptBtn = document.getElementById("acceptCookies");
+
+// Show banner only if not previously accepted
+if (!localStorage.getItem("cookiesAccepted")) {
+  cookieBanner.style.display = "block";
+}
+
+if (acceptBtn) {
+  acceptBtn.addEventListener("click", () => {
+    localStorage.setItem("cookiesAccepted", "true");
+    cookieBanner.style.display = "none";
+  });
+}
+
+// Travel Deals Explorer Filters
+const dealTabs = document.querySelectorAll(".deal-tab");
+const dealCards = document.querySelectorAll(".deal-card");
+
+dealTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    dealTabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    const filter = tab.dataset.type;
+
+    dealCards.forEach(card => {
+      card.classList.remove("show");
+      if (filter === "all" || card.classList.contains(filter)) {
+        card.classList.add("show");
+      }
+    });
+  });
+});
+// Travel Deals Explorer Filters
+
+// Feedback toggle & demo submission
+function toggleFeedbackForm() {
+  const modal = document.getElementById("feedbackModal");
+  modal.style.display = modal.style.display === "block" ? "none" : "block";
+}
+
+function submitFeedback() {
+  document.querySelector(".feedback-form textarea").value = "";
+  document.getElementById("feedbackThanks").style.display = "block";
+  setTimeout(() => {
+    document.getElementById("feedbackThanks").style.display = "none";
+    document.getElementById("feedbackModal").style.display = "none";
+  }, 3000);
+}
+// Feedback toggle & demo submission
+
+// Save Trip / Heart Icon Logic
+
+function toggleSaveTrip(btn, title, price, image) {
+  let savedTrips = JSON.parse(localStorage.getItem('savedTrips')) || [];
+  const index = savedTrips.findIndex(trip => trip.title === title);
+  const heartIcon = btn.querySelector(".heart-icon");
+
+  if (index > -1) {
+    savedTrips.splice(index, 1);
+    btn.classList.remove('saved');
+    heartIcon.textContent = '♡';
+  } else {
+    savedTrips.push({ title, price, image });
+    btn.classList.add('saved');
+    heartIcon.textContent = '❤️';
+  }
+
+  // Trigger pulse animation
+  heartIcon.classList.add("animate");
+  setTimeout(() => heartIcon.classList.remove("animate"), 400);
+
+  localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
+  renderSavedTrips();
+}
+
+// login and Register
+function openAuthModal() {
+  document.getElementById('authModal').style.display = 'block';
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').style.display = 'none';
+}
+
+function showLogin() {
+  document.getElementById('loginForm').classList.remove('hidden');
+  document.getElementById('registerForm').classList.add('hidden');
+  document.getElementById('loginTab').classList.add('active');
+  document.getElementById('registerTab').classList.remove('active');
+}
+
+function showRegister() {
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('registerForm').classList.remove('hidden');
+  document.getElementById('loginTab').classList.remove('active');
+  document.getElementById('registerTab').classList.add('active');
+}
+// login and Register
+
+//  Dashboard //
+function renderDashboardLinks() {
+  const dashboardList = document.getElementById('dashboard-saved-links');
+  const savedTrips = JSON.parse(localStorage.getItem('savedTrips')) || [];
+
+  if (!dashboardList) return;
+
+  if (savedTrips.length === 0) {
+    dashboardList.innerHTML = `<li>No saved trips yet ❤️</li>`;
+    return;
+  }
+
+  dashboardList.innerHTML = savedTrips
+    .map(trip => {
+      return `<li><a href="#saved-trips"><span class="emoji">❤️</span> ${trip.title}</a></li>`;
+    })
+    .join('');
+}
+//  Dashboard //
+
+// Call it after DOM loads
+document.addEventListener("DOMContentLoaded", () => {
+  renderSavedTrips();
+  renderDashboardLinks(); // Add this
+});
+
+
+function updateDashboardTripLinks() {
+  const savedTrips = JSON.parse(localStorage.getItem("savedTrips")) || [];
+  const linksContainer = document.getElementById("dashboard-saved-links");
+
+  if (!linksContainer) return;
+
+  linksContainer.innerHTML = savedTrips.map(trip => {
+    const safeId = trip.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+    return `<li><a href="#trip-${safeId}">${trip.title}</a></li>`;
+  }).join('');
+}
+
+
   </script>
 </body>
 </html>
