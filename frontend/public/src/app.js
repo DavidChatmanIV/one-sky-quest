@@ -2,6 +2,9 @@ import React from "react";
 import { Button } from "antd";
 import "./index.css"; // Tailwind styles
 
+import TravelCard from "./components/travelCard";
+// import AdminDashboard from "./pages/AdminDashboard"; // Uncomment if testing dashboard instead
+
 function App() {
 return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 to-white text-gray-900">
@@ -21,6 +24,23 @@ return (
         AntD Button
         </Button>
     </header>
+
+      {/* Travel Cards Section */}
+    <section className="p-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <TravelCard
+        title="Paris Getaway"
+        location="Paris, France"
+        description="Explore the City of Light with rich culture and cuisine."
+        />
+        <TravelCard
+        title="Tokyo Adventure"
+        location="Tokyo, Japan"
+        description="Dive into high-tech life, anime, and sushi overload."
+        />
+    </section>
+
+      {/* Uncomment this if testing admin dashboard view instead */}
+      {/* <AdminDashboard /> */}
     </div>
 );
 }
