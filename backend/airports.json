@@ -1,0 +1,11 @@
+[
+    {"code": "JFK", "name":"John F. Kennedy International Airport"} ,
+    {"code": "LAX", "name": "Los Angeles International Airport"} ,
+    { "code": "ORD", "name": "Chicago O'Hare International Airport" } ,
+    { "code": "DFW", "name": "Dallas/Fort Worth International Airport" } ,
+    { "code": "DEN", "name": "Denver International Airport" } ,
+    { "code": "EWR", "name": "Newark Liberty International Airport" } ,
+    { "code": "SFO", "name": "San Francisco International Airport" } ,
+    { "code": "MIA", "name": "Miami International Airport" } ,
+    { "code": "SEA", "name": "Seattle-Tacoma International Airport" }
+]
