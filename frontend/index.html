@@ -33,6 +33,7 @@
   </header>
 
   <!-- login -->
+
 <!-- Auth Modal -->
 <div id="authModal" class="auth-modal">
   <div class="auth-content">
@@ -69,24 +70,19 @@
     </div>
 
     <!-- Tabs Content -->
+
     <!-- Flight tab -->
-    <div class="tab-content active" id="flights-form">
-      <form class="search-form">
-        <div class="form-row">
-          <label for="from">From</label>
-          <input list="airport-list" name="from" id="from" placeholder="From?" required />
-          <label for="to">To</label>
-          <input list="airport-list" name="to" id="to" placeholder="To?" required />
-        </div>
-        <div class="form-row">
-          <label for="departure">Departure</label>
-          <input type="date" id="departure" required />
-          <label for="return">Return</label>
-          <input type="date" id="return" required />
-        </div>
-        <button type="submit" class="search-btn">Search</button>
-      </form>
-    </div>
+    <form id="homeSearchForm" class="search-form tab-content active">
+  <div class="form-row">
+    <input type="text" id="homeFrom" placeholder="e.g. JFK" required />
+    <input type="text" id="homeTo" placeholder="e.g. LAX" required />
+  </div>
+  <div class="form-row">
+    <input type="date" id="homeDeparture" required />
+    <input type="date" id="homeReturn" required />
+  </div>
+  <button type="submit" class="search-btn">🔍 Search</button>
+</form>
 
     <!-- Hotels tab -->
     <div class="tab-content" id="hotels-form">
@@ -173,6 +169,7 @@
   </div>
 </section>
 <!-- ai trip builder -->
+
 
 <!-- Smart Travel Tools Section -->
 <section class="smart-tools" id="tools">
@@ -1450,19 +1447,33 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDashboardLinks(); // Add this
 });
 
+//  Contact Form
+const contactForm = document.getElementById("contactForm");
 
-function updateDashboardTripLinks() {
-  const savedTrips = JSON.parse(localStorage.getItem("savedTrips")) || [];
-  const linksContainer = document.getElementById("dashboard-saved-links");
+if (contactForm) {
+  contactForm.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-  if (!linksContainer) return;
+    const name = document.getElementById("contactName").value;
+    const email = document.getElementById("contactEmail").value;
+    const message = document.getElementById("contactMessage").value;
 
-  linksContainer.innerHTML = savedTrips.map(trip => {
-    const safeId = trip.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
-    return `<li><a href="#trip-${safeId}">${trip.title}</a></li>`;
-  }).join('');
+    fetch("https://your-backend-name.onrender.com/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message })
+    })
+      .then(res => res.text())
+      .then(response => {
+        alert(response); // Or show it in a modal
+        contactForm.reset();
+      })
+      .catch(err => {
+        console.error("Contact form error:", err);
+      });
+  });
 }
-
+// Contact Form
 
   </script>
 </body>
