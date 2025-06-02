@@ -569,35 +569,27 @@
 </section>
 
   <!-- Search Results -->
-  <section class="search-results" id="search-results">
-    <h2>Search Results</h2>
-    <div class="result-tabs">
-      <button class="result-tab active" data-type="all">All</button>
-      <button class="result-tab" data-type="flight">Flights</button>
-      <button class="result-tab" data-type="hotel">Hotels</button>
-      <button class="result-tab" data-type="package">Packages</button>
-    </div>
-    <div class="results-grid">
-      <div class="result-card flight show" data-type="flights">
-        <h3>✈️ NYC to LAX</h3>
-        <p>Non-stop | 5h 30m</p>
-        <p>$199</p>
-        <button class="book-btn">Book Flight</button>
-      </div>
-      <div class="result-card hotel show" data-type="hotels">
-        <h3>🏨 Sunset Inn</h3>
-        <p>4.5 Stars | Pool | Free Wi-Fi</p>
-        <p>$129/night</p>
-        <button class="book-btn">Book Hotel</button>
-      </div>
-      <div class="result-card package show" data-type="packages">
-        <h3>🧳 Paris Getaway</h3>
-        <p>Flight + Hotel | 5 Nights</p>
-        <p>$899 total</p>
-        <button class="book-btn">Book Package</button>
-      </div>
-    </div>
-  </section>
+<section class="search-results" id="search-results">
+  <h2 class="text-2xl font-bold mb-4">Search Results</h2>
+
+  <!-- Sort Dropdown -->
+  <div class="mb-4">
+    <label for="sortOptions" class="mr-2 font-medium">Sort by:</label>
+    <select id="sortOptions" class="p-2 border rounded-md">
+      <option value="recommended">Recommended</option>
+      <option value="price-low">Price: low to high</option>
+      <option value="price-high">Price: high to low</option>
+      <option value="rating">Guest rating</option>
+      <option value="duration">Trip duration</option>
+    </select>
+  </div>
+
+  <!-- Listings Container -->
+  <div id="resultsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+  <div id="packageResults" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+  <!-- Search Results -->
 
 <!-- ❤️ Saved Trips Section -->
 <section id="saved-trips" class="saved-trips-section">
@@ -1445,6 +1437,102 @@ function renderDashboardLinks() {
 document.addEventListener("DOMContentLoaded", () => {
   renderSavedTrips();
   renderDashboardLinks(); // Add this
+});
+
+// Flights Routes
+document.addEventListener("DOMContentLoaded", () => {
+  const search = JSON.parse(localStorage.getItem("bookingSearch")) || {};
+  const resultsList = document.getElementById("resultsList");
+
+  fetch(`https://your-backend.onrender.com/api/flights/search?from=${search.from}&to=${search.to}&departure=${search.departure}&return=${search.returnDate}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.results.length === 0) {
+        resultsList.innerHTML = "<p>No flights found. Try adjusting your dates.</p>";
+        return;
+      }
+
+      resultsList.innerHTML = data.results.map(flight => `
+        <div class="border rounded-md p-4 shadow bg-white">
+          <h3 class="font-bold">${flight.airline}</h3>
+          <p>${flight.from} ➡️ ${flight.to}</p>
+          <p>🕒 ${flight.duration} | ⭐ ${flight.rating}</p>
+          <p class="text-blue-600 font-bold">$${flight.price}</p>
+        </div>
+      `).join("");
+    })
+    .catch(err => {
+      console.error("Error loading flights:", err);
+    });
+});
+
+// Flights list
+
+// Hotel list
+fetch("https://your-backend.onrender.com/api/hotels?location=Miami&maxPrice=250")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("resultsList");
+    container.innerHTML = "";
+    data.forEach(item => {
+      container.innerHTML += `
+        <div class="border rounded-md shadow-sm p-4 bg-white">
+          <img src="${item.image}" class="w-full h-40 object-cover rounded-md mb-2">
+          <h3 class="text-lg font-bold">${item.name}</h3>
+          <p>⭐ ${item.stars} stars | 👍 ${item.rating} guest rating</p>
+          <p class="text-blue-600 font-semibold mt-2">$${item.price} / night</p>
+        </div>
+      `;
+    });
+  });
+
+// Hotel list
+
+// package list
+document.addEventListener("DOMContentLoaded", () => {
+  const packageList = document.getElementById("packageList");
+  const sortSelect = document.getElementById("packageSort");
+  const budgetFilter = document.getElementById("budgetFilter");
+
+  async function loadPackages() {
+    let query = "";
+
+    const budget = budgetFilter.value;
+    const sort = sortSelect.value;
+
+    if (budget) {
+      query += `maxPrice=${budget}`;
+    }
+
+    const res = await fetch(`https://one-sky-quest-backend.onrender.com/api/packages?${query}`);
+    const data = await res.json();
+
+    let packages = data.packages || [];
+
+    // Optional frontend sort
+    if (sort === "price-low") packages.sort((a, b) => a.price - b.price);
+    if (sort === "price-high") packages.sort((a, b) => b.price - a.price);
+
+    packageList.innerHTML = "";
+
+    packages.forEach(pkg => {
+      packageList.innerHTML += `
+        <div class="p-4 border rounded shadow bg-white">
+          <img src="${pkg.image}" alt="${pkg.name}" class="w-full h-40 object-cover rounded mb-3">
+          <h3 class="text-xl font-bold">${pkg.name}</h3>
+          <p>${pkg.destination}</p>
+          <p>${pkg.description}</p>
+          <p class="text-blue-600 font-semibold mt-2">$${pkg.price}</p>
+          <p>Duration: ${pkg.duration} days</p>
+        </div>
+      `;
+    });
+  }
+
+  sortSelect.addEventListener("change", loadPackages);
+  budgetFilter.addEventListener("change", loadPackages);
+
+  loadPackages(); // Initial load
 });
 
 //  Contact Form

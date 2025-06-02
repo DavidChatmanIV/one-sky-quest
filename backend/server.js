@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const Booking = require("./models/Booking");
 const Contact = require("./models/Contact")
+const flightRoutes = require("./routes/flight.routes")
+const hotelRoutes = require("./routes/hotel.routes");
+const packageRoutes = require("./routes/package.routes");
 
 // App setup
 const app = express();
@@ -40,6 +43,18 @@ app.post("/book", async (req, res) => {
         res.status(500).send("Booking failed. Try again.");
     }
 });
+
+// Flight Routes
+app.use("/api/flights", flightRoutes);
+// Flight Routes
+
+// Hotel Routes
+app.use("/api/hotels", hotelRoutes);
+// Hotel Routes
+
+// package Routes
+app.use("/api/packages", packageRoutes);
+// package Routes
 
 // Contact form route
 app.post("/contact", async (req, res) => {
