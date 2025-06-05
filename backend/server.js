@@ -10,6 +10,8 @@ const Contact = require("./models/Contact")
 const flightRoutes = require("./routes/flight.routes")
 const hotelRoutes = require("./routes/hotel.routes");
 const packageRoutes = require("./routes/package.routes");
+const carRoutes = require("./routes/car.routes");
+const cruiseRoutes = require("./routes/cruise.route")
 
 // App setup
 const app = express();
@@ -55,6 +57,14 @@ app.use("/api/hotels", hotelRoutes);
 // package Routes
 app.use("/api/packages", packageRoutes);
 // package Routes
+
+// car Routes
+app.use("/api/cars", carRoutes);
+// car Routes
+
+// cruise Routes
+app.use("/api/cruises", cruiseRoutes);
+// cruise Routes
 
 // Contact form route
 app.post("/contact", async (req, res) => {

@@ -65,7 +65,34 @@
     <div id="resultsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
 </section>
 
-<!-- Scripts -->
+<section id="carResults" class="max-w-6xl mx-auto mt-12">
+<h2 class="text-2xl font-bold mb-4">🚗 Available Rental Cars</h2>
+<div id="carsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+<section id="cruiseSection" class="p-6 bg-gray-100">
+<h2 class="text-2xl font-bold mb-4">🚢 Cruise Deals</h2>
+
+<!-- Filters -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <input type="text" id="cruiseDestination" placeholder="Destination" class="p-2 border rounded-md" />
+    <input type="text" id="departurePort" placeholder="Departure Port" class="p-2 border rounded-md" />
+    <select id="cruiseMaxPrice" class="p-2 border rounded-md">
+    <option value="">Max Price</option>
+    <option value="500">$500</option>
+    <option value="1000">$1000</option>
+    <option value="2000">$2000</option>
+    </select>
+    <button id="filterCruises" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply Filters</button>
+</div>
+
+<!-- Cruise Results -->
+<div id="cruiseResults" class="grid gap-4 md:grid-cols-3"></div>
+</section>
+
+
+
+<!-- Jav Scripts -->
 <script>
     // Submit booking form
     document.getElementById("bookingForm").addEventListener("submit", function (e) {
@@ -150,6 +177,31 @@
         renderListings(e.target.value);
     });
     });
+
+    document.addEventListener("DOMContentLoaded", () => {
+fetch("https://your-backend.onrender.com/api/cars")
+    .then(res => res.json())
+    .then(data => {
+    const cars = data.cars;
+    const container = document.getElementById("carsList");
+
+    container.innerHTML = "";
+    cars.forEach(car => {
+        container.innerHTML += `
+        <div class="bg-white rounded shadow p-4">
+            <img src="${car.image}" class="w-full h-40 object-cover rounded mb-2" />
+            <h3 class="font-bold">${car.company} ${car.model}</h3>
+            <p>${car.location}</p>
+            <p>Seats: ${car.seats} | ⭐ ${car.rating}</p>
+            <p class="text-blue-600 font-bold mt-2">$${car.price} / day</p>
+        </div>
+        `;
+    });
+    });
+});
+
+
+
 </script>
 </body>
 </html>
