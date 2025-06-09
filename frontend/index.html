@@ -1070,7 +1070,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = card.getAttribute('data-id');
     const saveBtn = card.querySelector('.save-trip');
 
-    // Mark as saved if it was already saved
+    
     if (savedUniqueStays.includes(id)) {
       saveBtn.classList.add('saved');
     }
@@ -1421,22 +1421,26 @@ function toggleSaveTrip(btn, title, price, image) {
   const heartIcon = btn.querySelector(".heart-icon");
 
   if (index > -1) {
+    // Trip already saved — remove it
     savedTrips.splice(index, 1);
     btn.classList.remove('saved');
     heartIcon.textContent = '♡';
   } else {
-    savedTrips.push({ title, price, image });
+    // Save new trip with source
+    savedTrips.push({
+      title,
+      price,
+      image,
+      source: 'homepage' // 🔥 Mark as saved from homepage
+    });
     btn.classList.add('saved');
     heartIcon.textContent = '❤️';
   }
 
-  // Trigger pulse animation
-  heartIcon.classList.add("animate");
-  setTimeout(() => heartIcon.classList.remove("animate"), 400);
-
   localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
-  renderSavedTrips();
 }
+
+// Save Trip / Heart Icon Logic
 
 // login and Register
 function openAuthModal() {

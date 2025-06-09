@@ -1,193 +1,498 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Book Your Trip | One Sky Quest</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>One Sky Quest – Booking</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="booking.css" />
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-white min-h-screen text-gray-800">
 
-<!-- Booking Form (Manual Request) -->
-<section class="py-12 px-4 bg-white rounded-2xl shadow-lg max-w-2xl mx-auto mt-12">
+<!-- AOS CSS -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- 🗓️ Booking Form -->
+    <section class="max-w-2xl mx-auto mt-12 bg-white rounded-2xl shadow-lg p-8">
     <h2 class="text-3xl font-bold text-center mb-6">🗓️ Book Your Trip</h2>
     <form id="bookingForm" class="space-y-4">
-    <input type="text" id="bookingName" placeholder="Your Name" required class="w-full p-3 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500" />
-    <input type="email" id="bookingEmail" placeholder="Your Email" required class="w-full p-3 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500" />
-    <textarea id="bookingDetails" placeholder="Trip Details..." required class="w-full p-3 border border-blue-300 rounded-xl h-32 resize-none focus:ring-2 focus:ring-blue-500"></textarea>
-    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">Book Now</button>
-    </form>
-</section>
-
-<!-- Divider -->
-<div class="my-12 border-t border-gray-300 max-w-5xl mx-auto"></div>
-
-<!-- Search Form -->
-<section class="bg-white p-6 rounded-xl shadow-md max-w-5xl mx-auto">
-    <h2 class="text-2xl font-bold mb-4">🔎 Search Stays</h2>
-    <form id="searchForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Where to?</label>
-        <input type="text" id="destination" placeholder="City or Country" required class="w-full p-2 border border-gray-300 rounded-md" />
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Check-in / Check-out</label>
-        <input type="text" id="dates" placeholder="Jun 6 – Jun 13" required class="w-full p-2 border border-gray-300 rounded-md" />
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Travelers</label>
-        <input type="text" id="travelers" placeholder="2 travelers, 1 room" required class="w-full p-2 border border-gray-300 rounded-md" />
-    </div>
-    <div>
-        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
-        🔍 Search
+        <input
+        type="text"
+        id="bookingName"
+        placeholder="Your Name"
+        required
+        class="w-full p-3 border border-gray-300 rounded-xl"
+        />
+        <input
+        type="email"
+        id="bookingEmail"
+        placeholder="Your Email"
+        required
+        class="w-full p-3 border border-gray-300 rounded-xl"
+        />
+        <textarea
+        id="bookingDetails"
+        placeholder="Trip Details..."
+        required
+        class="w-full p-3 border border-gray-300 rounded-xl h-32 resize-none"
+        ></textarea>
+        <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200"
+        >
+        Book Now
         </button>
-    </div>
     </form>
-</section>
+    </section>
 
-<!-- Search Results -->
-<section class="max-w-6xl mx-auto mt-12 px-4">
-    <h2 id="resultsHeading" class="text-2xl font-bold mb-4 text-blue-700 hidden"></h2>
+    <!-- ✈️ Flights Search -->
+    <section class="bg-white p-6 rounded-xl shadow-md max-w-5xl mx-auto mt-12">
+    <h2 class="text-2xl font-bold mb-4 text-center text-blue-700">
+        ✈️ Find Flights
+    </h2>
+    <form
+        id="flightSearchForm"
+        class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
+    >
+        <div>
+        <label class="block text-sm font-medium text-gray-700">From</label>
+        <input
+            type="text"
+            id="flightFrom"
+            placeholder="City or Airport"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div>
+        <label class="block text-sm font-medium text-gray-700">To</label>
+        <input
+            type="text"
+            id="flightTo"
+            placeholder="City or Airport"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div>
+        <label class="block text-sm font-medium text-gray-700">Dates</label>
+        <input
+            type="text"
+            id="flightDates"
+            placeholder="e.g. Jul 1 – Jul 5"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div>
+        <label class="block text-sm font-medium text-gray-700"
+            >Travelers</label
+        >
+        <input
+            type="number"
+            id="flightTravelers"
+            value="1"
+            min="1"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div class="md:col-span-4">
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+        >
+            Search Flights
+        </button>
+        </div>
+    </form>
+    </section>
+
+    <!-- 🧾 Flight Results -->
+    <section class="max-w-6xl mx-auto mt-8 px-4">
+    <h2
+        id="flightResultsHeading"
+        class="text-2xl font-bold mb-4 text-blue-700 hidden"
+    >
+        Flight Results
+    </h2>
+    <div
+        id="flightResultsList"
+        class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    ></div>
+    </section>
+
+    <!-- Saved trip-->
+    <section
+    class="max-w-6xl mx-auto my-12 p-6 bg-white rounded-xl shadow"
+    id="savedTripsSection"
+    >
+    <h2 class="text-2xl font-bold mb-4 text-blue-700">📁 Saved Trips</h2>
+    <div
+        id="savedTripsList"
+        class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+    ></div>
+    </section>
+    <!-- Saved trip -->
+
+    <!-- Divider -->
+    <hr class="my-12 border-t border-gray-300 max-w-5xl mx-auto" />
+
+    <!-- 🔍 Search Stays -->
+    <section class="bg-white p-6 rounded-xl shadow-md max-w-5xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4 text-center text-blue-700">
+        🔎 Search Stays
+    </h2>
+    <form
+        id="searchForm"
+        class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
+    >
+        <div>
+        <label class="block text-sm font-medium text-gray-700"
+            >Where to?</label
+        >
+        <input
+            type="text"
+            id="destination"
+            placeholder="City or Country"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div>
+    <label class="block text-sm font-medium text-gray-700"
+            >Check-in / Check-out</label
+        >
+        <input
+            type="text"
+            id="dates"
+            placeholder="Jun 6 – Jun 13"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div>
+        <label class="block text-sm font-medium text-gray-700"
+            >Travelers</label
+        >
+        <input
+            type="text"
+            id="travelers"
+            placeholder="2 travelers, 1 room"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md"
+        />
+        </div>
+        <div>
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+        >
+            🔍 Search
+        </button>
+        </div>
+    </form>
+    </section>
+
+    <!-- 🏨 Stay Your Way -->
+    <section class="bg-white p-6 rounded-xl shadow-md max-w-5xl mx-auto mt-8">
+    <h2 class="text-xl font-bold mb-2 text-center text-blue-800">
+        🏨 Stay Your Way
+    </h2>
+    <p class="text-center text-gray-600 mb-4">
+        Choose your preferred type of stay:
+    </p>
+
+    <div class="stay-type-grid" id="stayTypeButtons">
+        <div class="stay-card" data-type="hotel">🏨 Hotel</div>
+        <div class="stay-card" data-type="airbnb">🏡 Airbnb</div>
+        <div class="stay-card" data-type="cabin">🌲 Cabin</div>
+    </div>
+    </section>
+
+    <!--Saved Trip -->
+    <section class="mt-10 px-4" id="savedTripsSection">
+    <h2 class="text-2xl font-bold mb-4">📌 Saved Trips</h2>
+    <div
+        id="savedTripsList"
+        class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+    ></div>
+    </section>
+
+    <button
+    onclick="toggleSaveTrip(this, 'DreamStay Resort', 199, 'dream.jpg')"
+    class="save-btn"
+    >
+    <span class="heart-icon">♡</span> Save
+    </button>
+
+    <!-- Saved Trip -->
+
+    <!-- 📋 Search Results -->
+    <section class="max-w-6xl mx-auto mt-12 px-4">
+    <h2
+        id="resultsHeading"
+        class="text-2xl font-bold mb-4 text-blue-700 hidden"
+    ></h2>
 
     <!-- Sort dropdown -->
     <div id="sortBlock" class="mb-4 hidden">
-    <label for="sortOptions" class="mr-2 font-medium">Sort by:</label>
-    <select id="sortOptions" class="p-2 border rounded-md">
+        <label for="sortOptions" class="mr-2 font-medium">Sort by:</label>
+        <select id="sortOptions" class="p-2 border rounded-md">
         <option value="recommended">Recommended</option>
         <option value="price-low">Price: low to high</option>
         <option value="price-high">Price: high to low</option>
         <option value="guest-rating">Guest rating</option>
         <option value="stars">Star rating</option>
-    </select>
+        </select>
     </div>
 
-    <div id="resultsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-</section>
+    <div
+        id="resultsList"
+        class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    ></div>
+    </section>
 
-<section id="carResults" class="max-w-6xl mx-auto mt-12">
-<h2 class="text-2xl font-bold mb-4">🚗 Available Rental Cars</h2>
-<div id="carsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-</section>
+    <!-- 🚗 Rental Cars -->
+    <section id="carResults" class="max-w-6xl mx-auto mt-12 px-4">
+    <h2 class="text-2xl font-bold mb-4 text-blue-700">
+        🚗 Available Rental Cars
+    </h2>
+    <div id="carsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+    </section>
 
-<section id="cruiseSection" class="p-6 bg-gray-100">
-<h2 class="text-2xl font-bold mb-4">🚢 Cruise Deals</h2>
+    <!-- 🚢 Cruise Deals -->
+    <section
+    id="cruiseSection"
+    class="p-6 bg-gray-100 max-w-6xl mx-auto mt-12 rounded-xl"
+    >
+    <h2 class="text-2xl font-bold mb-4 text-blue-700">🚢 Cruise Deals</h2>
 
-<!-- Filters -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <input type="text" id="cruiseDestination" placeholder="Destination" class="p-2 border rounded-md" />
-    <input type="text" id="departurePort" placeholder="Departure Port" class="p-2 border rounded-md" />
-    <select id="cruiseMaxPrice" class="p-2 border rounded-md">
-    <option value="">Max Price</option>
-    <option value="500">$500</option>
-    <option value="1000">$1000</option>
-    <option value="2000">$2000</option>
-    </select>
-    <button id="filterCruises" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply Filters</button>
-</div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <input
+        type="text"
+        id="cruiseDestination"
+        placeholder="Destination"
+        class="p-2 border rounded-md"
+        />
+        <input
+        type="text"
+        id="departurePort"
+        placeholder="Departure Port"
+        class="p-2 border rounded-md"
+        />
+        <select id="cruiseMaxPrice" class="p-2 border rounded-md">
+        <option value="">Max Price</option>
+        <option value="500">$500</option>
+        <option value="1000">$1000</option>
+        <option value="2000">$2000</option>
+        </select>
+        <button
+        id="filterCruises"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+        Apply Filters
+        </button>
+    </div>
 
-<!-- Cruise Results -->
-<div id="cruiseResults" class="grid gap-4 md:grid-cols-3"></div>
-</section>
+    <div id="cruiseResults" class="grid gap-4 md:grid-cols-3"></div>
+    </section>
 
+    <!-- 📦 Travel Packages -->
+    <section class="max-w-6xl mx-auto mt-12 px-4">
+    <h2 class="text-2xl font-bold mb-4">📦 Explore Travel Packages</h2>
+    <form
+        id="packageFilterForm"
+        class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+    >
+        <input
+        type="text"
+        id="packageDestination"
+        placeholder="Destination"
+        class="p-2 border rounded-md"
+        />
+        <select id="packageType" class="p-2 border rounded-md">
+        <option value="">Any Type</option>
+        <option value="luxury">Luxury</option>
+        <option value="adventure">Adventure</option>
+        <option value="romantic">Romantic</option>
+        <option value="family">Family</option>
+        </select>
+        <select id="packageMaxPrice" class="p-2 border rounded-md">
+        <option value="">Max Price</option>
+        <option value="500">$500</option>
+        <option value="1000">$1000</option>
+        <option value="2000">$2000</option>
+        </select>
+        <button
+        type="submit"
+        class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+        Apply Filters
+        </button>
+    </form>
+    <div
+        id="packageResults"
+        class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    ></div>
+    </section>
 
+    <!--  Toast Notification -->
+    <div
+    id="toast"
+    class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg hidden transition-all duration-300"
+    >
+    Booking confirmed!
+    </div>
 
-<!-- Jav Scripts -->
-<script>
-    // Submit booking form
-    document.getElementById("bookingForm").addEventListener("submit", function (e) {
-    e.preventDefault();
+    <!-- JavaScript -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("bookingForm");
+        const stayCards = document.querySelectorAll(".stay-card");
+        const resultsHeading = document.getElementById("resultsHeading");
+        const resultsList = document.getElementById("resultsList");
+        const sortOptions = document.getElementById("sortOptions");
+        const toast = document.getElementById("toast");
 
-    const name = document.getElementById("bookingName").value;
-    const email = document.getElementById("bookingEmail").value;
-    const tripDetails = document.getElementById("bookingDetails").value;
+        let selectedType = "hotel";
 
-    fetch("https://your-backend-name.onrender.com/book", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, tripDetails })
-    })
-    .then(res => res.text())
-    .then(response => {
-        alert(response);
-        this.reset();
-    })
-    .catch(err => {
-        console.error("Booking error:", err);
-    });
-    });
+        // Handle stay type selection
+        stayCards.forEach((card) => {
+        card.addEventListener("click", () => {
+            selectedType = card.dataset.type;
+            stayCards.forEach((c) => c.classList.remove("active"));
+            card.classList.add("active");
 
-    // Search form logic
-    document.getElementById("searchForm").addEventListener("submit", function (e) {
-    e.preventDefault();
+            resultsHeading.classList.remove("hidden");
+            resultsHeading.textContent = `Showing: ${selectedType.toUpperCase()} Stays`;
 
-    const destination = document.getElementById("destination").value;
-    const dates = document.getElementById("dates").value;
-    const travelers = document.getElementById("travelers").value;
+            fetch(`/api/hotels?type=${selectedType}`)
+            .then((res) => res.json())
+            .then(renderListings)
+            .catch((err) => {
+                console.error("Fetch error:", err);
+                resultsList.innerHTML = `<p class="text-red-600 text-center">Something went wrong.</p>`;
+            });
+        });
+        });
 
-    const heading = document.getElementById("resultsHeading");
-    heading.classList.remove("hidden");
-    heading.textContent = `Showing stays in ${destination} from ${dates} for ${travelers}`;
+        // Handle booking form submission
+        form.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-    document.getElementById("sortBlock").classList.remove("hidden");
+        const name = document.getElementById("bookingName").value.trim();
+        const email = document.getElementById("bookingEmail").value.trim();
+        const tripDetails = document
+            .getElementById("bookingDetails")
+            .value.trim();
 
-    const listings = [
-        {
-        name: "DreamStay Resort",
-        price: 248,
-        rating: 4.8,
-        stars: 5,
-        img: "https://via.placeholder.com/300x200"
-        },
-        {
-        name: "Budget Inn",
-        price: 89,
-        rating: 4.0,
-        stars: 3,
-        img: "https://via.placeholder.com/300x200"
+        fetch("/api/bookings/book", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+            name,
+            email,
+            tripDetails,
+            type: selectedType,
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+            toast.textContent = data.message || "✅ Booking confirmed!";
+            toast.classList.remove("hidden");
+            setTimeout(() => toast.classList.add("hidden"), 3000);
+
+              // Save trip to localStorage
+            saveTrip({ name, email, tripDetails, type: selectedType });
+            form.reset();
+            })
+            .catch((err) => {
+            console.error("Booking error:", err);
+            alert("There was a problem booking your trip.");
+            });
+        });
+
+        // Search mock listings
+        document
+        .getElementById("searchForm")
+        .addEventListener("submit", function (e) {
+            e.preventDefault();
+            const destination = document
+            .getElementById("destination")
+            .value.trim();
+            const dates = document.getElementById("dates").value;
+            const travelers = document.getElementById("travelers").value;
+
+            resultsHeading.classList.remove("hidden");
+            resultsHeading.textContent = `Showing stays in ${destination} from ${dates} for ${travelers}`;
+            document.getElementById("sortBlock").classList.remove("hidden");
+
+            fetch(`/api/hotels?location=${destination}&type=${selectedType}`)
+            .then((res) => res.json())
+            .then(renderListings)
+            .catch((err) => {
+                console.error("Search fetch failed:", err);
+                resultsList.innerHTML = `<p class="text-red-600 text-center">No results found.</p>`;
+            });
+        });
+
+        // Sort listings
+        sortOptions.addEventListener("change", () => {
+        const destination = document
+            .getElementById("destination")
+            .value.trim();
+        if (destination) {
+            fetch(`/api/hotels?location=${destination}&type=${selectedType}`)
+            .then((res) => res.json())
+            .then(renderListings);
         }
-        // More listings can be added here
-    ];
+        });
 
-    function renderListings(sortBy = "recommended") {
-        const container = document.getElementById("resultsList");
-        container.innerHTML = "";
+        function renderListings(data = []) {
+        resultsList.innerHTML = "";
 
-        let sorted = [...listings];
+        if (!data.length) {
+            resultsList.innerHTML = `<p class="text-red-600 text-center">No matching stays found.</p>`;
+            return;
+        }
+
+        let sorted = [...data];
+        const sortBy = sortOptions.value;
         if (sortBy === "price-low") sorted.sort((a, b) => a.price - b.price);
         if (sortBy === "price-high") sorted.sort((a, b) => b.price - a.price);
-        if (sortBy === "guest-rating") sorted.sort((a, b) => b.rating - a.rating);
+        if (sortBy === "guest-rating")
+            sorted.sort((a, b) => b.rating - a.rating);
         if (sortBy === "stars") sorted.sort((a, b) => b.stars - a.stars);
 
-        sorted.forEach(item => {
-        container.innerHTML += `
-            <div class="border rounded-md shadow-md p-4 bg-white">
-            <img src="${item.img}" class="w-full h-40 object-cover rounded-md mb-3">
-            <h3 class="text-lg font-bold">${item.name}</h3>
-            <p>⭐ ${item.stars} stars | 👍 ${item.rating} guest rating</p>
-            <p class="text-blue-600 font-semibold mt-2">$${item.price} / night</p>
-            </div>
-        `;
+        sorted.forEach((item) => {
+            resultsList.innerHTML += `
+        <div class="border rounded-md shadow-md p-4 bg-white">
+        <img src="${
+        item.image || "https://via.placeholder.com/300x200"
+        }" class="w-full h-40 object-cover rounded-md mb-3">
+        <h3 class="text-lg font-bold">${item.name}</h3>
+        <p>${item.location}</p>
+        <p>⭐ ${item.stars || 4} stars | 👍 ${
+            item.rating || 4.5
+            } guest rating</p>
+        <p class="text-blue-600 font-semibold mt-2">$${item.price} / night</p>
+        </div>
+    `;
         });
-    }
+        }
 
-    renderListings();
+        // Load car results
+        fetch("https://your-backend.onrender.com/api/cars")
+        .then((res) => res.json())
+        .then((data) => {
+            const cars = data.cars;
+            const container = document.getElementById("carsList");
+            container.innerHTML = "";
 
-    document.getElementById("sortOptions").addEventListener("change", (e) => {
-        renderListings(e.target.value);
-    });
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-fetch("https://your-backend.onrender.com/api/cars")
-    .then(res => res.json())
-    .then(data => {
-    const cars = data.cars;
-    const container = document.getElementById("carsList");
-
-    container.innerHTML = "";
-    cars.forEach(car => {
-        container.innerHTML += `
+            cars.forEach((car) => {
+            container.innerHTML += `
         <div class="bg-white rounded shadow p-4">
             <img src="${car.image}" class="w-full h-40 object-cover rounded mb-2" />
             <h3 class="font-bold">${car.company} ${car.model}</h3>
@@ -196,12 +501,170 @@ fetch("https://your-backend.onrender.com/api/cars")
             <p class="text-blue-600 font-bold mt-2">$${car.price} / day</p>
         </div>
         `;
+            });
+        });
+
+        // Handle package filters
+        document
+        .getElementById("packageFilterForm")
+        .addEventListener("submit", function (e) {
+            e.preventDefault();
+            const destination = document
+            .getElementById("packageDestination")
+            .value.trim();
+            const type = document.getElementById("packageType").value;
+            const maxPrice = document.getElementById("packageMaxPrice").value;
+            const results = document.getElementById("packageResults");
+
+            const query = new URLSearchParams();
+            if (destination) query.append("destination", destination);
+            if (type) query.append("type", type);
+            if (maxPrice) query.append("maxPrice", maxPrice);
+
+            fetch(`/api/packages?${query.toString()}`)
+            .then((res) => res.json())
+            .then((data) => {
+                results.innerHTML = "";
+
+                if (!data.length) {
+                results.innerHTML = `<p class="text-red-500 text-center">No packages found.</p>`;
+                return;
+                }
+
+                data.forEach((pkg) => {
+                results.innerHTML += `
+            <div class="border rounded-lg shadow p-4 bg-white">
+            <img src="${
+            pkg.image || "https://via.placeholder.com/300x200"
+            }" class="w-full h-40 object-cover rounded mb-3" />
+            <h3 class="text-lg font-bold">${pkg.name}</h3>
+            <p class="text-gray-600 mb-1">${pkg.destination}</p>
+            <p class="text-blue-600 font-semibold mb-2">$${pkg.price}</p>
+            <p class="text-sm text-gray-500 capitalize">${pkg.type}</p>
+            </div>
+        `;
+                });
+            })
+            .catch((err) => {
+                console.error("Package fetch error:", err);
+                results.innerHTML = `<p class="text-red-600">Something went wrong.</p>`;
+            });
+        });
+
+        // Flight Search
+        document
+        .getElementById("flightSearchForm")
+        .addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const from = document.getElementById("flightFrom").value.trim();
+            const to = document.getElementById("flightTo").value.trim();
+            const dates = document.getElementById("flightDates").value.trim();
+            const travelers = document.getElementById("flightTravelers").value;
+
+            const heading = document.getElementById("flightResultsHeading");
+            const list = document.getElementById("flightResultsList");
+
+            heading.classList.remove("hidden");
+            heading.textContent = `Flights from ${from} to ${to} for ${travelers} traveler(s)`;
+
+            fetch(
+            `/api/flights?from=${from}&to=${to}&dates=${dates}&travelers=${travelers}`
+            )
+            .then((res) => res.json())
+            .then((flights) => {
+                list.innerHTML = "";
+
+                if (!flights.length) {
+                list.innerHTML = `<p class="text-red-600 text-center">No flights found.</p>`;
+                return;
+                }
+
+                flights.forEach((flight) => {
+                list.innerHTML += `
+            <div class="border rounded-md shadow-md p-4 bg-white">
+            <h3 class="text-lg font-bold">${flight.airline}</h3>
+            <p>${flight.from} → ${flight.to}</p>
+            <p>🕒 ${flight.departureTime} – ${flight.arrivalTime}</p>
+            <p>✈️ Duration: ${flight.duration}</p>
+            <p class="text-blue-600 font-semibold mt-2">$${flight.price}</p>
+            </div>
+        `;
+                });
+            })
+            .catch((err) => {
+                console.error("Flight fetch error:", err);
+                list.innerHTML = `<p class="text-red-600 text-center">Error loading flights.</p>`;
+            });
+        });
+
+        // Saved Trips Functions
+        function saveTrip(trip) {
+        const trips = JSON.parse(localStorage.getItem("savedTrips") || "[]");
+        trips.push(trip);
+        localStorage.setItem("savedTrips", JSON.stringify(trips));
+        renderSavedTrips();
+        }
+
+        function renderSavedTrips() {
+        const trips = JSON.parse(localStorage.getItem("savedTrips") || "[]");
+        const container = document.getElementById("savedTripsList");
+        container.innerHTML = "";
+
+        if (trips.length === 0) {
+            container.innerHTML = `<p class="text-gray-500">No saved trips yet.</p>`;
+            return;
+        }
+
+        trips.forEach((trip, index) => {
+            container.innerHTML += `
+        <div class="border p-4 rounded-md bg-gray-50 shadow">
+        <h3 class="font-bold text-lg mb-1">${trip.name}</h3>
+        <p>${trip.email}</p>
+        <p class="text-gray-600 text-sm mb-2">${trip.tripDetails}</p>
+        <div class="flex gap-2">
+            <button onclick="deleteTrip(${index})" class="text-red-500 hover:underline">🗑 Delete</button>
+        </div>
+        </div>
+    `;
+        });
+        }
+
+        function deleteTrip(index) {
+        let trips = JSON.parse(localStorage.getItem("savedTrips") || "[]");
+        trips.splice(index, 1);
+        localStorage.setItem("savedTrips", JSON.stringify(trips));
+        renderSavedTrips();
+        }
+
+        function toggleSaveTrip(btn, title, price, image) {
+        let savedTrips = JSON.parse(localStorage.getItem("savedTrips")) || [];
+        const index = savedTrips.findIndex((trip) => trip.title === title);
+        const heartIcon = btn.querySelector(".heart-icon");
+
+        if (index > -1) {
+            // Trip already saved — remove it
+            savedTrips.splice(index, 1);
+            btn.classList.remove("saved");
+            heartIcon.textContent = "♡";
+        } else {
+            // Save new trip with source
+            savedTrips.push({
+            title,
+            price,
+            image,
+              source: "booking", // 🔥 Marks saved from booking page
+            });
+            btn.classList.add("saved");
+            heartIcon.textContent = "❤️";
+        }
+
+        localStorage.setItem("savedTrips", JSON.stringify(savedTrips));
+        }
+
+        // Load saved trips
+        renderSavedTrips();
     });
-    });
-});
-
-
-
-</script>
+    </script>
 </body>
 </html>

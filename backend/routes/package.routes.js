@@ -1,32 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const Package = require("../models/package.model");
+const Package = require("../models/Package");
 
-// GET all or filtered
 router.get("/", async (req, res) => {
+const { destination, maxPrice, type } = req.query;
+const query = {};
+
+if (destination) query.destination = new RegExp(destination, "i");
+if (maxPrice) query.price = { $lte: parseFloat(maxPrice) };
+if (type) query.type = type;
+
 try {
-    const { maxPrice, tag, destination } = req.query;
-    let filter = {};
-
-    if (maxPrice) filter.price = { $lte: Number(maxPrice) };
-    if (tag) filter.tags = tag;
-    if (destination) filter.destination = new RegExp(destination, "i");
-
-    const packages = await Package.find(filter);
-    res.json({ packages });
+    const packages = await Package.find(query);
+    res.json(packages);
 } catch (err) {
-    res.status(500).json({ error: "Server error fetching packages" });
-}
-});
-
-// POST a new package (for seeding or admin use)
-router.post("/", async (req, res) => {
-try {
-    const newPackage = new Package(req.body);
-    await newPackage.save();
-    res.status(201).json(newPackage);
-} catch (err) {
-    res.status(400).json({ error: "Error adding package" });
+    console.error("Error fetching packages:", err);
+    res.status(500).json({ message: "Error loading packages" });
 }
 });
 
