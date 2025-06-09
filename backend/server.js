@@ -5,15 +5,21 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
+
+// Models
 const Booking = require("./models/Booking");
-const Contact = require("./models/Contact")
-const flightRoutes = require("./routes/flight.routes")
+const Contact = require("./models/Contact");
+
+// Routes
+const flightRoutes = require("./routes/flight.routes");
 const hotelRoutes = require("./routes/hotel.routes");
 const packageRoutes = require("./routes/package.routes");
 const carRoutes = require("./routes/car.routes");
-const cruiseRoutes = require("./routes/cruise.route")
+const cruiseRoutes = require("./routes/cruise.route");
+const bookingRoutes = require("./routes/booking.routes");
+const placeRoutes = require("./routes/placeroutes");
+const authRoutes = require("./routes/auth.routes"); // ✅ NEW: Auth route
 
-// App setup
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -27,63 +33,38 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log(" Connected to MongoDB"))
-.catch((err) => console.error("MongoDB connection error:", err));
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // Serve frontend statically (optional for full-stack apps)
 app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Booking form route
-app.post("/book", async (req, res) => {
-    try {
-        const { name, email, tripDetails } = req.body;
-        const newBooking = new Booking({ name, email, TripDetails });
-        await newBooking.save();
-        res.send("Thank you for booking! We received your trip.");
-    } catch (err) {
-        console.error("Booking error", err);
-        res.status(500).send("Booking failed. Try again.");
-    }
-});
+// ✅ Modular Routes
+app.use("/api", authRoutes); // 🔐 Login, Register (user/admin)
+app.use("/api", bookingRoutes); // 📋 Bookings
 
-// Flight Routes
+// Other Routes
 app.use("/api/flights", flightRoutes);
-// Flight Routes
-
-// Hotel Routes
 app.use("/api/hotels", hotelRoutes);
-// Hotel Routes
-
-// package Routes
 app.use("/api/packages", packageRoutes);
-// package Routes
-
-// car Routes
 app.use("/api/cars", carRoutes);
-// car Routes
-
-// cruise Routes
 app.use("/api/cruises", cruiseRoutes);
-// cruise Routes
+app.use("/api/places", placeRoutes);
 
-// Contact form route
+// 📬 Contact Form
 app.post("/contact", async (req, res) => {
 try {
     const { name, email, message } = req.body;
     const newContact = new Contact({ name, email, message });
     await newContact.save();
-    res.send(" Thank you for contacting us!");
+    res.send("Thank you for contacting us!");
 } catch (err) {
     console.error("Contact error:", err);
-    res.status(500).send(" Contact form failed. Try again.");
+    res.status(500).send("Contact form failed. Try again.");
 }
 });
 
-// Place API routes
-const placeRoutes = require("./routes/placeroutes");
-app.use("/api/places", placeRoutes);
-
 // Start server
 app.listen(PORT, () => {
-console.log(`Server running on port ${PORT}`);
+console.log(`🚀 Server running on port ${PORT}`);
 });
