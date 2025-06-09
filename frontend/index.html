@@ -12,27 +12,31 @@
 <body>
   
   <!-- Navbar -->
-  <header>
-    <nav class="navbar">
-      <div class="logo">One Sky Quest</div>
-      <ul class="nav-links">
-        <li><a href="#flights">Flights</a></li>
-        <li><a href="#hotels">Hotels</a></li>
-        <li><a href="#packages">Packages</a></li>
-        <li><a href="#">Cars</a></li>
-        <li><a href="#">Cruises</a></li>
-        <li><a href="#" class="btn-small">Book</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#saved-trips">Saved Trips</a></li>
-        <li><a href="#" onclick="openAuthModal()">👤 Login</a></li>
+<header>
+  <nav class="navbar">
+    <div class="logo-group">
+  <img src="/images/logo.jpg" alt="One Sky Quest Logo" class="logo-img" />
+      <span class="logo-text">One Sky Quest</span>
+    </div>
 
-      </ul>
-      <div class="theme-toggle" id="theme-toggle">🌙</div>
-    </nav>
-  </header>
+    <ul class="nav-links">
+      <li><a href="#flights">Flights</a></li>
+      <li><a href="#hotels">Hotels</a></li>
+      <li><a href="#packages">Packages</a></li>
+      <li><a href="#">Cars</a></li>
+      <li><a href="#">Cruises</a></li>
+      <li><a href="#" class="btn-small">Book</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#saved-trips">Saved Trips</a></li>
+      <li><a href="#" onclick="openAuthModal()">👤 Login</a></li>
+    </ul>
 
-  <!-- login -->
+    <div class="theme-toggle" id="theme-toggle">🌙</div>
+  </nav>
+</header>
+<!-- navbar -->
+
 <!-- Auth Modal -->
 <div id="authModal" class="auth-modal">
   <div class="auth-content">
@@ -69,24 +73,19 @@
     </div>
 
     <!-- Tabs Content -->
+
     <!-- Flight tab -->
-    <div class="tab-content active" id="flights-form">
-      <form class="search-form">
-        <div class="form-row">
-          <label for="from">From</label>
-          <input list="airport-list" name="from" id="from" placeholder="From?" required />
-          <label for="to">To</label>
-          <input list="airport-list" name="to" id="to" placeholder="To?" required />
-        </div>
-        <div class="form-row">
-          <label for="departure">Departure</label>
-          <input type="date" id="departure" required />
-          <label for="return">Return</label>
-          <input type="date" id="return" required />
-        </div>
-        <button type="submit" class="search-btn">Search</button>
-      </form>
-    </div>
+    <form id="homeSearchForm" class="search-form tab-content active">
+  <div class="form-row">
+    <input type="text" id="homeFrom" placeholder="e.g. JFK" required />
+    <input type="text" id="homeTo" placeholder="e.g. LAX" required />
+  </div>
+  <div class="form-row">
+    <input type="date" id="homeDeparture" required />
+    <input type="date" id="homeReturn" required />
+  </div>
+  <button type="submit" class="search-btn">🔍 Search</button>
+</form>
 
     <!-- Hotels tab -->
     <div class="tab-content" id="hotels-form">
@@ -173,6 +172,7 @@
   </div>
 </section>
 <!-- ai trip builder -->
+
 
 <!-- Smart Travel Tools Section -->
 <section class="smart-tools" id="tools">
@@ -572,35 +572,73 @@
 </section>
 
   <!-- Search Results -->
-  <section class="search-results" id="search-results">
-    <h2>Search Results</h2>
-    <div class="result-tabs">
-      <button class="result-tab active" data-type="all">All</button>
-      <button class="result-tab" data-type="flight">Flights</button>
-      <button class="result-tab" data-type="hotel">Hotels</button>
-      <button class="result-tab" data-type="package">Packages</button>
-    </div>
-    <div class="results-grid">
-      <div class="result-card flight show" data-type="flights">
-        <h3>✈️ NYC to LAX</h3>
-        <p>Non-stop | 5h 30m</p>
-        <p>$199</p>
-        <button class="book-btn">Book Flight</button>
-      </div>
-      <div class="result-card hotel show" data-type="hotels">
-        <h3>🏨 Sunset Inn</h3>
-        <p>4.5 Stars | Pool | Free Wi-Fi</p>
-        <p>$129/night</p>
-        <button class="book-btn">Book Hotel</button>
-      </div>
-      <div class="result-card package show" data-type="packages">
-        <h3>🧳 Paris Getaway</h3>
-        <p>Flight + Hotel | 5 Nights</p>
-        <p>$899 total</p>
-        <button class="book-btn">Book Package</button>
-      </div>
-    </div>
-  </section>
+<section class="search-results" id="search-results">
+  <h2 class="text-2xl font-bold mb-4">Search Results</h2>
+
+  <!-- Sort Dropdown -->
+  <div class="mb-4">
+    <label for="sortOptions" class="mr-2 font-medium">Sort by:</label>
+    <select id="sortOptions" class="p-2 border rounded-md">
+      <option value="recommended">Recommended</option>
+      <option value="price-low">Price: low to high</option>
+      <option value="price-high">Price: high to low</option>
+      <option value="rating">Guest rating</option>
+      <option value="duration">Trip duration</option>
+    </select>
+  </div>
+
+  <!-- Listings Container -->
+  <div id="resultsList" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+  <div id="packageResults" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+<!-- Filters Section -->
+<div class="max-w-6xl mx-auto px-4 py-4 bg-white shadow-md rounded-md grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6 items-end">
+
+  <!-- Sort Select -->
+  <div>
+    <label for="packageSort" class="block text-sm font-medium text-gray-700">Sort By</label>
+    <select id="packageSort" class="w-full p-2 border rounded-md">
+      <option value="">Recommended</option>
+      <option value="price-low">Price: Low to High</option>
+      <option value="price-high">Price: High to Low</option>
+      <option value="rating">Guest Rating</option>
+      <option value="duration">Duration</option>
+    </select>
+  </div>
+
+  <!-- Budget Filter -->
+  <div>
+    <label for="budgetFilter" class="block text-sm font-medium text-gray-700">Max Budget</label>
+    <select id="budgetFilter" class="w-full p-2 border rounded-md">
+      <option value="">Any</option>
+      <option value="500">Under $500</option>
+      <option value="1000">Under $1000</option>
+      <option value="1500">Under $1500</option>
+    </select>
+  </div>
+
+  <!-- Airline Filter -->
+  <div>
+    <label for="airlineFilter" class="block text-sm font-medium text-gray-700">Airline</label>
+    <select id="airlineFilter" class="w-full p-2 border rounded-md">
+      <option value="">All</option>
+      <option value="Delta">Delta</option>
+      <option value="United">United</option>
+      <option value="American Airlines">American Airlines</option>
+      <option value="JetBlue">JetBlue</option>
+    </select>
+  </div>
+
+  <!-- Destination Search -->
+  <div class="col-span-1 md:col-span-2">
+    <label for="destinationSearch" class="block text-sm font-medium text-gray-700">Destination</label>
+    <input type="text" id="destinationSearch" placeholder="e.g. Paris" class="w-full p-2 border border-gray-300 rounded-md" />
+  </div>
+
+</div>
+
+  <!-- Search Results -->
 
 <!-- ❤️ Saved Trips Section -->
 <section id="saved-trips" class="saved-trips-section">
@@ -1450,19 +1488,262 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDashboardLinks(); // Add this
 });
 
+// Flights Routes
+document.addEventListener("DOMContentLoaded", () => {
+  const search = JSON.parse(localStorage.getItem("bookingSearch")) || {};
+  const resultsList = document.getElementById("resultsList");
 
-function updateDashboardTripLinks() {
-  const savedTrips = JSON.parse(localStorage.getItem("savedTrips")) || [];
-  const linksContainer = document.getElementById("dashboard-saved-links");
+  fetch(`https://your-backend.onrender.com/api/flights/search?from=${search.from}&to=${search.to}&departure=${search.departure}&return=${search.returnDate}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.results.length === 0) {
+        resultsList.innerHTML = "<p>No flights found. Try adjusting your dates.</p>";
+        return;
+      }
 
-  if (!linksContainer) return;
+      resultsList.innerHTML = data.results.map(flight => `
+        <div class="border rounded-md p-4 shadow bg-white">
+          <h3 class="font-bold">${flight.airline}</h3>
+          <p>${flight.from} ➡️ ${flight.to}</p>
+          <p>🕒 ${flight.duration} | ⭐ ${flight.rating}</p>
+          <p class="text-blue-600 font-bold">$${flight.price}</p>
+        </div>
+      `).join("");
+    })
+    .catch(err => {
+      console.error("Error loading flights:", err);
+    });
+});
 
-  linksContainer.innerHTML = savedTrips.map(trip => {
-    const safeId = trip.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
-    return `<li><a href="#trip-${safeId}">${trip.title}</a></li>`;
-  }).join('');
+// Flights list
+
+// Hotel list
+fetch("https://your-backend.onrender.com/api/hotels?location=Miami&maxPrice=250")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("resultsList");
+    container.innerHTML = "";
+    data.forEach(item => {
+      container.innerHTML += `
+        <div class="border rounded-md shadow-sm p-4 bg-white">
+          <img src="${item.image}" class="w-full h-40 object-cover rounded-md mb-2">
+          <h3 class="text-lg font-bold">${item.name}</h3>
+          <p>⭐ ${item.stars} stars | 👍 ${item.rating} guest rating</p>
+          <p class="text-blue-600 font-semibold mt-2">$${item.price} / night</p>
+        </div>
+      `;
+    });
+  });
+
+// Hotel list
+
+// cars list
+document.addEventListener("DOMContentLoaded", () => {
+  const carForm = document.querySelector("#cars-form form");
+  const carResults = document.getElementById("carResults");
+
+  carForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const pickupLocation = carForm.querySelector("[name='pickup-location']").value;
+    const pickupDate = carForm.querySelector("[name='pickup-date']").value;
+    const returnDate = carForm.querySelector("[name='return-date']").value;
+
+    const res = await fetch(`https://one-sky-quest-backend.onrender.com/api/cars?location=${pickupLocation}`);
+    const data = await res.json();
+    const cars = data.cars || [];
+
+    carResults.innerHTML = "";
+
+    if (cars.length === 0) {
+      carResults.innerHTML = `<p class="text-center text-gray-600 col-span-full">No cars found.</p>`;
+      return;
+    }
+
+    cars.forEach(car => {
+      carResults.innerHTML += `
+        <div class="border rounded-lg p-4 shadow bg-white">
+          <img src="${car.image}" alt="${car.name}" class="w-full h-40 object-cover rounded mb-3">
+          <h3 class="text-lg font-semibold">${car.name}</h3>
+          <p>${car.description}</p>
+          <p class="text-blue-600 font-bold mt-2">$${car.price} / day</p>
+        </div>
+      `;
+    });
+  });
+});
+// cars list
+
+// package list
+document.addEventListener("DOMContentLoaded", () => {
+  const packageList = document.getElementById("packageList");
+  const sortSelect = document.getElementById("packageSort");
+  const budgetFilter = document.getElementById("budgetFilter");
+
+  async function loadPackages() {
+    let query = "";
+
+    const budget = budgetFilter.value;
+    const sort = sortSelect.value;
+
+    if (budget) {
+      query += `maxPrice=${budget}`;
+    }
+
+    const res = await fetch(`https://one-sky-quest-backend.onrender.com/api/packages?${query}`);
+    const data = await res.json();
+
+    let packages = data.packages || [];
+
+    // Optional frontend sort
+    if (sort === "price-low") packages.sort((a, b) => a.price - b.price);
+    if (sort === "price-high") packages.sort((a, b) => b.price - a.price);
+
+    packageList.innerHTML = "";
+
+    packages.forEach(pkg => {
+      packageList.innerHTML += `
+        <div class="p-4 border rounded shadow bg-white">
+          <img src="${pkg.image}" alt="${pkg.name}" class="w-full h-40 object-cover rounded mb-3">
+          <h3 class="text-xl font-bold">${pkg.name}</h3>
+          <p>${pkg.destination}</p>
+          <p>${pkg.description}</p>
+          <p class="text-blue-600 font-semibold mt-2">$${pkg.price}</p>
+          <p>Duration: ${pkg.duration} days</p>
+        </div>
+      `;
+    });
+  }
+
+  sortSelect.addEventListener("change", loadPackages);
+  budgetFilter.addEventListener("change", loadPackages);
+
+  loadPackages(); // Initial load
+});
+
+// Cruises
+document.addEventListener("DOMContentLoaded", () => {
+  const cruiseResults = document.getElementById("cruiseResults");
+  const destinationInput = document.getElementById("cruiseDestination");
+  const portInput = document.getElementById("departurePort");
+  const priceSelect = document.getElementById("cruiseMaxPrice");
+  const filterBtn = document.getElementById("filterCruises");
+
+  async function fetchCruises() {
+    const destination = destinationInput.value;
+    const departurePort = portInput.value;
+    const maxPrice = priceSelect.value;
+
+    const query = new URLSearchParams();
+    if (destination) query.append("destination", destination);
+    if (departurePort) query.append("departurePort", departurePort);
+    if (maxPrice) query.append("maxPrice", maxPrice);
+
+    const res = await fetch(`https://one-sky-quest-backend.onrender.com/api/cruises?${query.toString()}`);
+    const data = await res.json();
+
+    renderCruises(data.cruises || []);
+  }
+
+  function renderCruises(cruises) {
+    cruiseResults.innerHTML = "";
+
+    cruises.forEach(cruise => {
+      cruiseResults.innerHTML += `
+        <div class="bg-white p-4 rounded shadow">
+          <img src="${cruise.image}" alt="${cruise.name}" class="w-full h-40 object-cover rounded mb-3">
+          <h3 class="text-lg font-semibold">${cruise.name}</h3>
+          <p>${cruise.destination}</p>
+          <p>Departure: ${cruise.departurePort}</p>
+          <p>Duration: ${cruise.duration} days</p>
+          <p class="text-blue-600 font-bold mt-2">$${cruise.price}</p>
+        </div>
+      `;
+    });
+  }
+
+  filterBtn.addEventListener("click", fetchCruises);
+
+  fetchCruises(); // Initial load
+});
+// Cruises
+
+//  Contact Form
+const contactForm = document.getElementById("contactForm");
+
+if (contactForm) {
+  contactForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("contactName").value;
+    const email = document.getElementById("contactEmail").value;
+    const message = document.getElementById("contactMessage").value;
+
+    fetch("https://your-backend-name.onrender.com/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message })
+    })
+      .then(res => res.text())
+      .then(response => {
+        alert(response); 
+        contactForm.reset();
+      })
+      .catch(err => {
+        console.error("Contact form error:", err);
+      });
+  });
 }
+// Contact Form
 
+// filters section
+document.addEventListener("DOMContentLoaded", () => {
+  const packageList = document.getElementById("packageList");
+  const sortSelect = document.getElementById("packageSort");
+  const budgetFilter = document.getElementById("budgetFilter");
+  const airlineFilter = document.getElementById("airlineFilter");
+  const destinationSearch = document.getElementById("destinationSearch");
+
+  async function loadPackages() {
+    const queryParams = new URLSearchParams();
+
+    if (budgetFilter.value) queryParams.append("maxPrice", budgetFilter.value);
+    if (airlineFilter.value) queryParams.append("airline", airlineFilter.value);
+    if (destinationSearch.value.trim()) queryParams.append("destination", destinationSearch.value.trim());
+
+    const res = await fetch(`https://one-sky-quest-backend.onrender.com/api/packages?${queryParams.toString()}`);
+    const data = await res.json();
+
+    let packages = data.packages || [];
+
+    if (sortSelect.value === "price-low") packages.sort((a, b) => a.price - b.price);
+    if (sortSelect.value === "price-high") packages.sort((a, b) => b.price - a.price);
+
+    packageList.innerHTML = "";
+
+    packages.forEach(pkg => {
+      packageList.innerHTML += `
+        <div class="p-4 border rounded shadow bg-white">
+          <img src="${pkg.image}" alt="${pkg.name}" class="w-full h-40 object-cover rounded mb-3">
+          <h3 class="text-xl font-bold">${pkg.name}</h3>
+          <p>${pkg.destination}</p>
+          <p>${pkg.airline || ""}</p>
+          <p>${pkg.description}</p>
+          <p class="text-blue-600 font-semibold mt-2">$${pkg.price}</p>
+          <p>Duration: ${pkg.duration} days</p>
+        </div>
+      `;
+    });
+  }
+
+  [sortSelect, budgetFilter, airlineFilter, destinationSearch].forEach(input =>
+    input.addEventListener("change", loadPackages)
+  );
+
+  loadPackages(); // Initial load
+});
+
+// filters section
 
   </script>
 </body>

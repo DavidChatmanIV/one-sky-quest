@@ -5,6 +5,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
+const Booking = require("./models/Booking");
+const Contact = require("./models/Contact")
+const flightRoutes = require("./routes/flight.routes")
+const hotelRoutes = require("./routes/hotel.routes");
+const packageRoutes = require("./routes/package.routes");
+const carRoutes = require("./routes/car.routes");
+const cruiseRoutes = require("./routes/cruise.route")
 
 // App setup
 const app = express();
@@ -27,17 +34,49 @@ mongoose
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Booking form route
-app.post("/book", (req, res) => {
-const bookingData = req.body;
-console.log("📦 Booking Form Data:", bookingData);
-res.send("✅ Thank you for booking! We received your trip details.");
+app.post("/book", async (req, res) => {
+    try {
+        const { name, email, tripDetails } = req.body;
+        const newBooking = new Booking({ name, email, TripDetails });
+        await newBooking.save();
+        res.send("Thank you for booking! We received your trip.");
+    } catch (err) {
+        console.error("Booking error", err);
+        res.status(500).send("Booking failed. Try again.");
+    }
 });
 
+// Flight Routes
+app.use("/api/flights", flightRoutes);
+// Flight Routes
+
+// Hotel Routes
+app.use("/api/hotels", hotelRoutes);
+// Hotel Routes
+
+// package Routes
+app.use("/api/packages", packageRoutes);
+// package Routes
+
+// car Routes
+app.use("/api/cars", carRoutes);
+// car Routes
+
+// cruise Routes
+app.use("/api/cruises", cruiseRoutes);
+// cruise Routes
+
 // Contact form route
-app.post("/contact", (req, res) => {
-const contactData = req.body;
-console.log("✉️ Contact Form Data:", contactData);
-res.send("✅ Thank you for contacting us! We will get back to you soon.");
+app.post("/contact", async (req, res) => {
+try {
+    const { name, email, message } = req.body;
+    const newContact = new Contact({ name, email, message });
+    await newContact.save();
+    res.send(" Thank you for contacting us!");
+} catch (err) {
+    console.error("Contact error:", err);
+    res.status(500).send(" Contact form failed. Try again.");
+}
 });
 
 // Place API routes

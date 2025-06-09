@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Place = require("../models/Place"); // MongoDB Mongoose model
 
-// ✅ GET all places
+//  GET all places
 router.get("/", async (req, res) => {
 try {
     const places = await Place.find();
@@ -14,7 +14,7 @@ try {
 }
 });
 
-// ✅ POST a new place
+// POST a new place
 router.post("/", async (req, res) => {
 const { name, country, description } = req.body;
 

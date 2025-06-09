@@ -55,6 +55,44 @@
   font-size: 1.5rem;
 }
 
+.logo-group {
+  display: flex;
+  align-items: center;
+  margin-right: auto;
+}
+
+.logo-img {
+  width: 40px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #005CBF, #00B5E2, #FF6B35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-img {
+  width: 70px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #005CBF, #00B5E2, #FF6B35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+/* Navbar */
+
+
 /* Hero */
 .hero {
   background: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=1950&q=80") center/cover no-repeat;
