@@ -1,23 +1,28 @@
+/* Global Styles */
 body {
-font-family: 'Segoe UI', sans-serif;
-background-color: #f9fafb;
-color: #1f2937;
-margin: 0;
-padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #c7d2fe, #bae6fd, #fecaca); /* blue to soft rose */
+  color: #1f2937;
+  margin: 0;
+  padding: 0;
 }
 
+/* Section Container */
 section {
-margin-top: 3rem;
+  margin-top: 3rem;
+  padding: 0 1rem;
 }
 
+/* Section Titles */
 .section-title {
-font-size: 1.5rem;
-font-weight: bold;
-margin-bottom: 0.5rem;
-color: #1e3a8a;
-text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #1e3a8a;
+  text-align: center;
 }
 
+/* Subtext */
 .section-subtext {
 font-size: 0.95rem;
 color: #555;
@@ -25,66 +30,77 @@ margin-bottom: 1rem;
 text-align: center;
 }
 
+/* Forms */
 form input,
 form textarea,
 form select {
-font-size: 1rem;
-border-radius: 10px;
-border: 1px solid #cbd5e0;
-padding: 0.75rem;
-width: 100%;
-transition: border 0.2s ease;
-background-color: white;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e0;
+  padding: 0.75rem;
+  width: 100%;
+  transition: border 0.2s ease;
+  background-color: #ffffff;
 }
 
 form input:focus,
 form textarea:focus,
 form select:focus {
-outline: none;
-border-color: #3b82f6;
-box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
 button {
-font-weight: bold;
-border: none;
-cursor: pointer;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
 }
 
-/* Stay Type Filter Cards */
+/* Booking Card Style */
+.booking-card {
+  background-color: #ffffff;
+  border-left: 8px solid #3b82f6; /* default blue border – override per section in HTML if needed */
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Stay Type Filter */
 .stay-type-grid {
-display: flex;
-gap: 1rem;
-justify-content: center;
-flex-wrap: wrap;
-margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .stay-card {
-padding: 0.75rem 1.5rem;
-border: 2px solid #ccc;
-border-radius: 8px;
-background: white;
-cursor: pointer;
-transition: all 0.3s ease;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .stay-card:hover {
-background-color: #f0f8ff;
-border-color: #0077ff;
+  background-color: #f0f8ff;
+  border-color: #0077ff;
 }
 
 .stay-card.active {
-background-color: #0077ff;
-color: white;
-border-color: #0077ff;
+  background-color: #0077ff;
+  color: white;
+  border-color: #0077ff;
 }
 
-/* Hotel/Result Cards */
+/* Hotel or Result Cards */
 .hotel-card {
-border: 1px solid #ddd;
-padding: 1rem;
-border-radius: 12px;
-background-color: white;
-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
