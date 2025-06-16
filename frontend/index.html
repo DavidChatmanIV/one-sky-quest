@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One Sky Quest</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
   <meta name="description" content="Book flights, hotels, and curated trips with One Sky Quest. Plan smarter, travel better.">
-<meta name="keywords" content="travel, flights, hotels, vacation deals, travel planner">
-<meta property="og:image" content="link-to-thumbnail.jpg" />
+  <meta name="keywords" content="travel, flights, hotels, vacation deals, travel planner">
+  <meta name="author" content="One Sky Quest Team">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta property="og:image" content="images/link-to-thumbnail.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  
+
   <header>
   <nav class="navbar">
     <div class="logo-group">
@@ -151,42 +154,22 @@
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Custom Styles -->
-<style>
-  @keyframes fade-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
+<!-- ✅ AOS Animation CSS (Optional, if used) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out forwards;
-  }
+<!-- ✅ AOS Animation CSS (Optional, if used) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
-  body {
-    background-color: #f8f9fa;
-    color: #333;
-  }
-
-  .card {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  input:invalid,
-  select:invalid {
-    outline: 2px solid red;
-  }
-</style>
-
-
-<body class="not-modal">
-
-  <!-- ✅ Trigger Button -->
-  <div class="text-center mt-6">
-    <button onclick="showTeamQuestModal()"
-      class="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-5 rounded-full shadow transition">
-      🏆 Team Travel?
-    </button>
-  </div>
+  <body class="bg-gray-50 text-gray-800">
+    <!-- ✅ Trigger Button Section -->
+    <div class="text-center mt-6">
+      <button
+        onclick="showTeamQuestModal()"
+        class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded animate-fade-in"
+      >
+        🏆 Team Travel?
+      </button>
+    </div>
 
   <!-- ✅ Modal -->
   <div id="teamQuestModal"
