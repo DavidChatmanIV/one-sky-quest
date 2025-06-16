@@ -1,0 +1,31 @@
+body {
+font-family: sans-serif;
+padding: 1rem;
+background: #f4f4f8;
+}
+
+.chat-preview {
+padding: 10px;
+margin-bottom: 5px;
+background: white;
+cursor: pointer;
+border-radius: 5px;
+}
+
+.chat-window {
+margin-top: 1rem;
+}
+
+.messages {
+max-height: 300px;
+overflow-y: auto;
+background: white;
+padding: 1rem;
+border-radius: 5px;
+}
+
+form {
+display: flex;
+gap: 1rem;
+margin-top: 0.5rem;
+}

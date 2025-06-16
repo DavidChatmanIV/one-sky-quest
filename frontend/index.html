@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One Sky Quest</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
   <meta name="description" content="Book flights, hotels, and curated trips with One Sky Quest. Plan smarter, travel better.">
-<meta name="keywords" content="travel, flights, hotels, vacation deals, travel planner">
-<meta property="og:image" content="link-to-thumbnail.jpg" />
+  <meta name="keywords" content="travel, flights, hotels, vacation deals, travel planner">
+  <meta name="author" content="One Sky Quest Team">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta property="og:image" content="images/link-to-thumbnail.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  
-  <!-- Navbar -->
-<header>
+
+  <header>
   <nav class="navbar">
     <div class="logo-group">
-  <img src="/images/logo.jpg" alt="One Sky Quest Logo" class="logo-img" />
+      <img src="/images/logo.jpg" alt="One Sky Quest Logo" class="logo-img" />
       <span class="logo-text">One Sky Quest</span>
     </div>
 
     <ul class="nav-links">
-      <li><a href="#flights">Flights</a></li>
-      <li><a href="#hotels">Hotels</a></li>
-      <li><a href="#packages">Packages</a></li>
-      <li><a href="#">Cars</a></li>
-      <li><a href="#">Cruises</a></li>
-      <li><a href="#" class="btn-small">Book</a></li>
+      <li><a href="booking.html?tab=flights">Flights</a></li>
+      <li><a href="booking.html?tab=hotels">Hotels</a></li>
+      <li><a href="booking.html?tab=packages">Packages</a></li>
+      <li><a href="booking.html?tab=cars">Cars</a></li>
+      <li><a href="booking.html?tab=cruises">Cruises</a></li>
+      <li><a href="booking.html" class="btn-small">Book</a></li>
       <li><a href="#contact">Contact</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#saved-trips">Saved Trips</a></li>
@@ -35,7 +37,7 @@
     <div class="theme-toggle" id="theme-toggle">🌙</div>
   </nav>
 </header>
-<!-- navbar -->
+<!-- Navbar -->
 
 <!-- Auth Modal -->
 <div id="authModal" class="auth-modal">
@@ -146,6 +148,86 @@
     </datalist>
   </div>
 </section>
+
+<!-- 🏀 Team Quest Modal -->
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- ✅ AOS Animation CSS (Optional, if used) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+<!-- ✅ AOS Animation CSS (Optional, if used) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+  <body class="bg-gray-50 text-gray-800">
+    <!-- ✅ Trigger Button Section -->
+    <div class="text-center mt-6">
+      <button
+        onclick="showTeamQuestModal()"
+        class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded animate-fade-in"
+      >
+        🏆 Team Travel?
+      </button>
+    </div>
+
+  <!-- ✅ Modal -->
+  <div id="teamQuestModal"
+    class="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-md flex items-center justify-center hidden">
+    <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full animate-fade-in">
+      <h2 class="text-2xl font-extrabold text-blue-700 mb-2">🏀 Play Hard. Stay Easy?</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        Planning a tournament trip? We'll help you find hotels with pools, lounges, and space to meet up.
+      </p>
+
+      <form id="teamQuestForm" class="space-y-4">
+        <select id="sport" class="w-full p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required>
+          <option value="">Select Sport</option>
+          <option>Basketball</option>
+          <option>Football</option>
+          <option>Soccer</option>
+          <option>Volleyball</option>
+          <option>Track & Field</option>
+          <option>Lacrosse</option>
+          <option>Cheerleading</option>
+        </select>
+
+        <!-- Location -->
+        <input type="text" id="eventLocation" placeholder="Tournament City or Venue"
+          class="w-full p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required />
+
+        <!-- 🗓️ Date Range -->
+        <div class="flex gap-4">
+          <input type="date" id="startDate"
+            class="w-1/2 p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required />
+          <input type="date" id="endDate"
+            class="w-1/2 p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required />
+        </div>
+
+        <!-- 📝 Notes -->
+        <textarea id="parentSchedule" placeholder="Type your child's game schedule here..."
+          class="w-full p-3 rounded-xl border border-gray-300 bg-white shadow-sm" rows="4"></textarea>
+
+        <!-- 📎 File Upload -->
+        <input type="file" id="scheduleUpload"
+          class="w-full file:rounded-xl file:border file:border-gray-300 file:shadow-sm file:px-4 file:py-2"
+          accept=".pdf,.doc,.docx,.jpg,.png" />
+
+        <!-- Submit -->
+        <button type="submit"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition">
+          🔍 Find Team-Friendly Hotels
+        </button>
+      </form>
+
+      <button onclick="closeTeamQuestModal()"
+        class="mt-4 text-sm text-blue-500 hover:text-blue-700 underline block text-center">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+<!-- 🏀 Team Quest Modal -->
 
 <!-- ai trip builder -->
 <section class="ai-trip-builder" id="ai-builder">
@@ -1440,6 +1522,7 @@ function toggleSaveTrip(btn, title, price, image) {
   localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
 }
 
+
 // Save Trip / Heart Icon Logic
 
 // login and Register
@@ -1671,6 +1754,41 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCruises(); // Initial load
 });
 // Cruises
+
+// Team Quest
+
+function showTeamQuestModal() {
+  document.getElementById("teamQuestModal").classList.remove("hidden");
+}
+
+//  Close Modal
+function closeTeamQuestModal() {
+  document.getElementById("teamQuestModal").classList.add("hidden");
+
+  // Reset form and validation state
+  const form = document.getElementById("teamQuestForm");
+  if (form) {
+    form.reset();
+    [...form.elements].forEach(el => el.classList.remove("invalid"));
+  }
+}
+
+// Handle Form Submission
+document.getElementById("teamQuestForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const sport = document.getElementById("sport").value;
+  const location = document.getElementById("eventLocation").value;
+  const date = document.getElementById("eventDate").value;
+
+  const formData = { sport, location, date };
+  localStorage.setItem("teamQuestData", JSON.stringify(formData));
+
+  // Redirect to booking.html with query string
+  window.location.href = `booking.html?sport=${sport}&location=${encodeURIComponent(location)}&date=${date}`;
+});
+
+// Team Quest
 
 //  Contact Form
 const contactForm = document.getElementById("contactForm");

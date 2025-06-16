@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quest Feed – One Sky Quest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+  <!-- 🛫 Header -->
+  <header class="bg-white shadow p-4 flex items-center justify-between">
+    <h1 class="text-xl font-bold">🌍 Quest Feed</h1>
+    <nav>
+      <a href="#" class="text-blue-600 hover:underline">Home</a>
+      <a href="#" class="ml-4 text-blue-600 hover:underline">Profile</a>
+    </nav>
+  </header>
+
+  <!-- 📝 Post Composer -->
+  <main class="max-w-2xl mx-auto mt-6 p-4 space-y-6">
+    <section class="bg-white p-4 rounded-xl shadow">
+      <textarea
+        placeholder="Share your travel update..."
+        class="w-full p-3 border border-gray-300 rounded-xl resize-none"
+        rows="3"
+      ></textarea>
+      <div class="text-right mt-2">
+        <button
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          Post
+        </button>
+      </div>
+    </section>
+
+    <!-- 🧾 Post Feed Container (for dynamic JS posts) -->
+    <section class="feed space-y-6">
+      <!-- 📌 Sample Post -->
+      <div class="bg-white p-4 rounded-xl shadow space-y-4">
+        <div class="flex items-start space-x-3">
+          <img
+            src="avatar.jpg"
+            alt="User Avatar"
+            class="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <div class="flex justify-between items-center">
+              <strong>@davidchatman</strong>
+              <small class="text-sm text-gray-500">2h · Tokyo, Japan</small>
+            </div>
+            <p class="mt-1">Just had the best ramen ever 🍜✨</p>
+          </div>
+        </div>
+
+        <div
+          class="flex space-x-4 pt-2 border-t border-gray-100 text-sm text-gray-600"
+        >
+          <button class="hover:text-blue-600">💬 Comment</button>
+          <button class="hover:text-blue-600">🔁 ReQuest</button>
+          <button class="hover:text-yellow-500">⭐ Quest Point</button>
+        </div>
+
+        <div class="pt-2 text-right">
+          <a href="#" class="text-blue-600 text-sm hover:underline">🧵 View full thread</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 🔗 Footer -->
+  <footer class="text-center text-gray-400 text-sm mt-12 mb-6">
+    &copy; 2026 One Sky Quest. All rights reserved.
+  </footer>
+
+  <!-- 🚀 Post Creation Script -->
+  <script>
+    const postButton = document.querySelector("button");
+    const textarea = document.querySelector("textarea");
+    const feed = document.querySelector(".feed");
+
+    postButton.addEventListener("click", () => {
+      const text = textarea.value.trim();
+      if (text === "") return;
+
+      const newPost = document.createElement("div");
+      newPost.className = "bg-white p-4 rounded-xl shadow space-y-4";
+
+      newPost.innerHTML = `
+        <div class="flex items-start space-x-3">
+          <img src="avatar.jpg" alt="User Avatar" class="w-10 h-10 rounded-full object-cover" />
+          <div>
+            <div class="flex justify-between items-center">
+              <strong>@you</strong>
+              <small class="text-sm text-gray-500">Just now · Your Location</small>
+            </div>
+            <p class="mt-1">${text}</p>
+        </div>
+        </div>
+
+        <div class="flex space-x-4 pt-2 border-t border-gray-100 text-sm text-gray-600">
+        <button class="hover:text-blue-600">💬 Comment</button>
+        <button class="hover:text-blue-600">🔁 ReQuest</button>
+        <button class="hover:text-yellow-500">⭐ Quest Point</button>
+        </div>
+
+        <div class="pt-2 text-right">
+        <a href="#" class="text-blue-600 text-sm hover:underline">🧵 View full thread</a>
+        </div>
+    `;
+
+    feed.prepend(newPost);
+    textarea.value = "";
+    });
+</script>
+</body>
+</html>

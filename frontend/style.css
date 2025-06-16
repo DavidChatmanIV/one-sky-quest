@@ -89,8 +89,18 @@
   -webkit-text-fill-color: transparent;
 }
 
-
 /* Navbar */
+
+.search-form input,
+.search-form select {
+  padding: 4px;
+  border-radius: 0;
+}
+
+.not-modal input,
+.not-modal select {
+  /* global overrides stay away from modals */
+}
 
 
 /* Hero */
@@ -237,6 +247,7 @@
 .explore-btn:hover {
   background-color: #005bb5;
 }
+
 
 /* Ai Build My Dream Trip */
 .ai-trip-builder {
