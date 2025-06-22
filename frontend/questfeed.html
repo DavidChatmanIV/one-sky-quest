@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quest Feed – One Sky Quest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="./questfeed.js"></script>
+  <link rel="stylesheet" href="./questfeed.css" />
+</head>
+<body class="bg-gray-100">
+
+<!-- 🧭 Navbar -->
+<header class="navbar">
+  <h1 class="logo">One Sky Quest</h1>
+  <nav class="nav-links">
+    <a href="/index.html">Home</a>
+    <a href="/dm.html">DMs</a>
+    <a href="/profile.html">Profile</a>
+  </nav>
+</header>
+
+<div class="background-overlay"></div>
+
+<main class="feed-layout">
+  <section class="feed-container" id="feed">
+    <!-- ✍️ Post Creator -->
+    <div class="post-creator mb-6">
+      <textarea placeholder="Share your travel update..." class="w-full p-3 rounded-lg border border-gray-300"></textarea>
+      <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Post</button>
+    </div>
+
+    <!-- 🔥 Trending Meme Card -->
+    <div class="bg-white rounded-2xl shadow p-4 mb-6 w-full max-w-md mx-auto">
+      <div class="flex items-center text-blue-600 text-sm font-semibold mb-2">
+        <span class="mr-1">📈 Trending</span>
+        <span class="hover:underline cursor-pointer">#LakersSale</span>
+      </div>
+
+      <div class="flex items-center justify-between mb-2">
+        <span class="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">FUNNY</span>
+        <div class="flex items-center space-x-2">
+          <img src="/images/user-kobe.jpg" alt="Profile" class="w-8 h-8 rounded-full">
+          <p class="text-sm font-semibold text-gray-800">@nochillgil</p>
+          <span class="text-xs text-gray-500">XP 785</span>
+          <span class="text-xs text-gray-400">· 52m</span>
+        </div>
+      </div>
+
+      <p class="text-gray-800 text-sm mb-3">
+        Jeanie when the rest of the Buss family ask for their share of the Lakers sale
+      </p>
+
+      <img src="/uploads/lakers-sale-meme.jpeg" alt="Lakers Meme" class="w-full rounded-xl mb-3">
+
+      <div class="flex items-center justify-between text-gray-600 text-sm">
+        <div class="flex space-x-4">
+          <span class="flex items-center space-x-1"><span>❤️</span><span>265</span></span>
+          <span class="flex items-center space-x-1"><span>💬</span><span>10</span></span>
+          <span class="flex items-center space-x-1"><span>🔁</span><span>29</span></span>
+        </div>
+        <button class="text-blue-900 font-semibold hover:underline">⭐ REMIX</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="trending-tags" id="trendingTags">
+    <h4 class="font-bold text-gray-700 mb-2">🌍 Trending Tags</h4>
+    <!-- Tags dynamically inserted -->
+  </aside>
+</main>
+
+<!-- 👤 Profile Hover Card -->
+<div id="profilePopup" class="absolute hidden bg-white border shadow-md p-4 rounded-lg w-60 z-50">
+  <img 
+    src="./images/avatar-default.jpg" 
+    alt="User avatar" 
+    onerror="this.src='./images/fallback-avatar.jpg'" 
+    class="w-12 h-12 rounded-full object-cover border border-white shadow-sm mb-2" 
+  >
+  <div class="font-bold text-gray-900" id="popupName">@username</div>
+  <p class="text-sm text-gray-600" id="popupBio">Traveler. Photographer. Dreamer.</p>
+</div>
+
+<!-- 🧠 Script -->
+<script>
+  const samplePosts = [
+    {
+      id: 1,
+      user: {
+        username: "davidchatman",
+        avatar: "./images/avatar-default.jpg",
+        bio: "Full-stack dev & world explorer"
+      },
+      location: "Tokyo, Japan",
+      time: "2h",
+      text: "Just had the best ramen ever 🍜✨",
+      tags: ["#Tokyo", "#FoodieFinds"]
+    },
+    {
+      id: 2,
+      user: {
+        username: "skybound",
+        avatar: "./images/avatar-default.jpg",
+        bio: "Chasing sunsets and skyviews"
+      },
+      location: "Paris, France",
+      time: "3h",
+      text: "Clouds were unreal today 🌥️",
+      tags: ["#SkySnaps", "#HiddenGems"]
+    }
+  ];
+
+  const feed = document.getElementById("feed");
+  const trendingTags = document.getElementById("trendingTags");
+  const profilePopup = document.getElementById("profilePopup");
+
+  const tagCounts = {};
+
+  samplePosts.forEach(post => {
+    const card = document.createElement("div");
+    card.className = "post-card bg-white rounded-xl p-4 shadow mb-4";
+    card.innerHTML = `
+      <div class="post-header flex items-center mb-2 space-x-3">
+        <img 
+          src="${post.user.avatar}" 
+          alt="${post.user.username}'s avatar" 
+          class="w-10 h-10 rounded-full object-cover hover:cursor-pointer border border-white shadow-sm" 
+          onerror="this.src='./images/fallback-avatar.jpg'" 
+          data-user='${JSON.stringify(post.user)}'
+        >
+        <div>
+          <strong>@${post.user.username}</strong>
+          <div class="text-xs text-gray-500">${post.time} · ${post.location}</div>
+        </div>
+      </div>
+      <p class="text-gray-800">${post.text}</p>
+      <div class="post-actions mt-3 flex space-x-4 text-gray-500 text-sm">
+        <button type="button">💬 Comment</button>
+        <button type="button">🔁 ReQuest</button>
+        <button type="button">⭐ Quest Point</button>
+      </div>
+    `;
+    feed.appendChild(card);
+
+    post.tags.forEach(tag => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    });
+  });
+
+  Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).forEach(([tag]) => {
+    const li = document.createElement("div");
+    li.textContent = tag;
+    li.classList.add("cursor-pointer", "hover:underline", "text-sm", "text-blue-600");
+    li.onclick = () => filterPostsByTag(tag);
+    trendingTags.appendChild(li);
+  });
+
+  function filterPostsByTag(tag) {
+    [...feed.children].forEach(card => {
+      card.style.display = card.innerHTML.includes(tag) ? "block" : "none";
+    });
+  }
+
+  feed.addEventListener("mouseover", e => {
+    if (e.target.tagName === "IMG" && e.target.dataset.user) {
+      const user = JSON.parse(e.target.dataset.user);
+      const rect = e.target.getBoundingClientRect();
+      profilePopup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+      profilePopup.style.left = `${rect.left + window.scrollX}px`;
+      document.getElementById("popupName").textContent = `@${user.username}`;
+      document.getElementById("popupBio").textContent = user.bio;
+      profilePopup.classList.remove("hidden");
+    }
+  });
+
+  feed.addEventListener("mouseout", e => {
+    if (e.target.tagName === "IMG" && e.target.dataset.user) {
+      profilePopup.classList.add("hidden");
+    }
+  });
+</script>
+
+</body>
+</html>

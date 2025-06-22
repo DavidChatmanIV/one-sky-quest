@@ -2,40 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>One Sky Quest</title>
   <link rel="stylesheet" href="style.css" />
-  <meta name="description" content="Book flights, hotels, and curated trips with One Sky Quest. Plan smarter, travel better.">
-<meta name="keywords" content="travel, flights, hotels, vacation deals, travel planner">
-<meta property="og:image" content="link-to-thumbnail.jpg" />
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
+  <meta name="description" content="Book flights, hotels, and curated trips with One Sky Quest. Plan smarter, travel better." />
+  <meta name="theme-color" content="#1e3a8a" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 </head>
-<body>
-  
-  <!-- Navbar -->
-<header>
-  <nav class="navbar">
-    <div class="logo-group">
-  <img src="/images/logo.jpg" alt="One Sky Quest Logo" class="logo-img" />
-      <span class="logo-text">One Sky Quest</span>
+
+<body class="bg-white text-gray-900">
+
+  <!-- 🌟 Welcome Banner -->
+  <div id="welcomeBanner" class="hidden text-center text-xl font-semibold text-sky-700 py-3 bg-sky-100 border-b border-sky-300 shadow-sm"></div>
+
+  <!-- 🔹 Navbar -->
+  <header class="bg-white shadow">
+    <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <!-- Logo -->
+      <div class="flex items-center space-x-2">
+        <img src="images/logo.jpg" alt="One Sky Quest Logo" class="w-8 h-8 rounded" />
+        <span class="text-2xl font-bold"><span class="text-blue-600">One</span> <span class="text-sky-500">Sky</span> <span class="text-orange-500">Quest</span></span>
+      </div>
+
+      <!-- Links -->
+      <ul class="flex flex-wrap gap-5 items-center text-gray-800 font-medium">
+        <li><a href="booking.html?tab=flights">Flights</a></li>
+        <li><a href="booking.html?tab=hotels">Hotels</a></li>
+        <li><a href="booking.html?tab=packages">Packages</a></li>
+        <li><a href="booking.html?tab=cars">Cars</a></li>
+        <li><a href="booking.html?tab=cruises">Cruises</a></li>
+        <li><a href="booking.html" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Book</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#saved-trips">Saved Trips</a></li>
+        <li><a href="#" onclick="openAuthModal()">👤 Login</a></li>
+        <li><a href="#" onclick="logoutUser()">🚪 Logout</a></li>
+        <li><button id="theme-toggle">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- 🔻 Hero Section -->
+  <section class="relative text-center text-white">
+    <!-- Background Image -->
+    <img src="images/beach-hero.jpg" alt="Beach Background" class="w-full h-[70vh] object-cover" />
+
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/30 flex flex-col justify-center items-center px-4 pt-28 space-y-6">
+      
+      <!-- Welcome message -->
+      <div id="welcomeMessage" class="text-xl font-semibold text-white" data-aos="fade-down" data-aos-delay="100"></div>
+
+      <!-- Main Title -->
+      <div data-aos="fade-up" data-aos-delay="200">
+        <h1 class="text-4xl md:text-5xl font-bold mb-2">Discover Your Next Adventure</h1>
+        <p class="text-base md:text-lg text-blue-100">
+          🌍 Plan Smarter. Travel Better. One Sky, Endless Adventures.
+        </p>
+      </div>
+
+      <!-- Booking Tabs -->
+      <div class="flex flex-wrap gap-4 justify-center" data-aos="fade-up" data-aos-delay="300">
+        <button class="tab-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">✈️ Flights</button>
+        <button class="tab-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🏨 Hotels</button>
+        <button class="tab-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🎁 Packages</button>
+        <button class="tab-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🚗 Cars</button>
+        <button class="tab-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🛳️ Cruises</button>
+      </div>
+
+      <!-- Search Form -->
+      <div class="bg-white/80 p-6 rounded-lg shadow-md backdrop-blur-sm text-gray-900 flex flex-wrap gap-4 justify-center" data-aos="fade-up" data-aos-delay="400">
+        <input type="text" placeholder="e.g. JFK" class="p-2 rounded border w-40" />
+        <input type="text" placeholder="e.g. LAX" class="p-2 rounded border w-40" />
+        <input type="date" class="p-2 rounded border w-40" />
+        <input type="date" class="p-2 rounded border w-40" />
+        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">🔍 Search</button>
+      </div>
+
+      <!-- Explore Button -->
+      <button class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700" data-aos="fade-up" data-aos-delay="500">
+        Start Exploring
+      </button>
     </div>
+  </section>
 
-    <ul class="nav-links">
-      <li><a href="#flights">Flights</a></li>
-      <li><a href="#hotels">Hotels</a></li>
-      <li><a href="#packages">Packages</a></li>
-      <li><a href="#">Cars</a></li>
-      <li><a href="#">Cruises</a></li>
-      <li><a href="#" class="btn-small">Book</a></li>
-      <li><a href="#contact">Contact</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#saved-trips">Saved Trips</a></li>
-      <li><a href="#" onclick="openAuthModal()">👤 Login</a></li>
-    </ul>
+  <!-- AOS Script -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      AOS.init();
+    });
+  </script>
 
-    <div class="theme-toggle" id="theme-toggle">🌙</div>
-  </nav>
-</header>
-<!-- navbar -->
+</body>
+</html>
+
 
 <!-- Auth Modal -->
 <div id="authModal" class="auth-modal">
@@ -58,80 +121,7 @@
     </form>
   </div>
 </div>
-<!-- Discover -->
-<section class="hero">
-  <div class="hero-content">
-    <h1>Discover Your Next Adventure</h1>
-    <p class="hero-subtext">🌍 Plan Smarter. Travel Better. One Sky, Endless Adventures.</p>
-    <!-- Tab Buttons -->
-    <div class="tab-buttons">
-      <button class="tab-btn active" data-tab="flights-form">✈️ Flights</button>
-      <button class="tab-btn" data-tab="hotels-form">🏨 Hotels</button>
-      <button class="tab-btn" data-tab="packages-form">🎁 Packages</button>
-      <button class="tab-btn" data-tab="cars-form">🚗 Cars</button>
-      <button class="tab-btn" data-tab="cruises-form">🚢 Cruises</button>
-    </div>
-
-    <!-- Tabs Content -->
-
-    <!-- Flight tab -->
-    <form id="homeSearchForm" class="search-form tab-content active">
-  <div class="form-row">
-    <input type="text" id="homeFrom" placeholder="e.g. JFK" required />
-    <input type="text" id="homeTo" placeholder="e.g. LAX" required />
-  </div>
-  <div class="form-row">
-    <input type="date" id="homeDeparture" required />
-    <input type="date" id="homeReturn" required />
-  </div>
-  <button type="submit" class="search-btn">🔍 Search</button>
-</form>
-
-    <!-- Hotels tab -->
-    <div class="tab-content" id="hotels-form">
-      <form class="search-form">
-        <div class="form-row">
-        <input type="text" name="location" placeholder="City or Hotel Name" required />
-    <input type="date" name="check-in" required />
-    <input type="date" name="check-out" required />
-    <button type="submit" class="search-btn">Search Hotels</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Packages Tab -->
-    <div class="tab-content" id="packages-form">
-  <form class="search-form">
-    <input type="text" name="destination" placeholder="Destination" required />
-    <input type="date" name="start-date" required />
-    <input type="date" name="end-date" required />
-    <input type="number" name="travelers" placeholder="Travelers" min="1" required />
-    <button type="submit" class="search-btn">Find Packages</button>
-  </form>
-</div>
-
-<!-- Cars Tab -->
-<div class="tab-content" id="cars-form">
-  <form class="search-form">
-    <input type="text" name="pickup-location" placeholder="Pick-up Location" required />
-    <input type="date" name="pickup-date" required />
-    <input type="date" name="return-date" required />
-    <button type="submit" class="search-btn">Find Cars</button>
-  </form>
-</div>
-
-<!-- Cruises Tab -->
-<div class="tab-content" id="cruises-form">
-  <form class="search-form">
-    <input type="text" name="cruise-destination" placeholder="Cruise Destination" required />
-    <input type="date" name="cruise-start" required />
-    <input type="date" name="cruise-end" required />
-    <button type="submit" class="search-btn">Find Cruises</button>
-  </form>
-</div>
 <!-- Tabs Content -->
-
-    <a href="#destinations" class="explore-btn">Start Exploring</a>
 
     <datalist id="airport-list">
       <option value="JFK - John F. Kennedy International Airport">
@@ -147,7 +137,87 @@
   </div>
 </section>
 
-<!-- ai trip builder -->
+<!-- 🏀 Team Quest Modal -->
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- ✅ AOS Animation CSS (Optional, if used) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+<!-- ✅ AOS Animation CSS (Optional, if used) -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+  <body class="bg-gray-50 text-gray-800">
+    <!-- ✅ Trigger Button Section -->
+    <div class="text-center mt-6">
+      <button
+        onclick="showTeamQuestModal()"
+        class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded animate-fade-in"
+      >
+        🏆 Team Travel?
+      </button>
+    </div>
+
+  <!-- ✅ Modal -->
+  <div id="teamQuestModal"
+    class="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-md flex items-center justify-center hidden">
+    <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full animate-fade-in">
+      <h2 class="text-2xl font-extrabold text-blue-700 mb-2">🏀 Play Hard. Stay Easy?</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        Planning a tournament trip? We'll help you find hotels with pools, lounges, and space to meet up.
+      </p>
+
+      <form id="teamQuestForm" class="space-y-4">
+        <select id="sport" class="w-full p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required>
+          <option value="">Select Sport</option>
+          <option>Basketball</option>
+          <option>Football</option>
+          <option>Soccer</option>
+          <option>Volleyball</option>
+          <option>Track & Field</option>
+          <option>Lacrosse</option>
+          <option>Cheerleading</option>
+        </select>
+
+        <!-- Location -->
+        <input type="text" id="eventLocation" placeholder="Tournament City or Venue"
+          class="w-full p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required />
+
+        <!-- 🗓️ Date Range -->
+        <div class="flex gap-4">
+          <input type="date" id="startDate"
+            class="w-1/2 p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required />
+          <input type="date" id="endDate"
+            class="w-1/2 p-3 rounded-xl border border-gray-300 bg-white shadow-sm" required />
+        </div>
+
+        <!-- 📝 Notes -->
+        <textarea id="parentSchedule" placeholder="Type your child's game schedule here..."
+          class="w-full p-3 rounded-xl border border-gray-300 bg-white shadow-sm" rows="4"></textarea>
+
+        <!-- 📎 File Upload -->
+        <input type="file" id="scheduleUpload"
+          class="w-full file:rounded-xl file:border file:border-gray-300 file:shadow-sm file:px-4 file:py-2"
+          accept=".pdf,.doc,.docx,.jpg,.png" />
+
+        <!-- Submit -->
+        <button type="submit"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition">
+          🔍 Find Team-Friendly Hotels
+        </button>
+      </form>
+
+      <button onclick="closeTeamQuestModal()"
+        class="mt-4 text-sm text-blue-500 hover:text-blue-700 underline block text-center">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+<!-- 🏀 Team Quest Modal -->
+
+<!-- ✨ AI Trip Builder Section -->
 <section class="ai-trip-builder" id="ai-builder">
   <div class="ai-content">
     <h2>✨ Build Your Perfect Trip with AI</h2>
@@ -171,6 +241,18 @@
     <div id="ai-results" style="margin-top: 2rem;"></div>
   </div>
 </section>
+
+<!-- ✅ Avatar Assistant -->
+<div id="travelAssistant" class="fixed bottom-6 right-6 z-50">
+  <img src="/images/questy.png" alt="Questy" class="w-20 h-20 rounded-full shadow-lg animate-bounce cursor-pointer" onclick="toggleAssistant()" />
+</div>
+
+<!-- Assistant Dialogue Box -->
+<div id="assistantBox" class="hidden fixed bottom-28 right-6 bg-white shadow-lg p-4 rounded-xl max-w-sm">
+  <p id="assistantResponse" class="text-gray-800 text-sm mb-2">Hi! I’m Questy, your travel buddy 🌍 Where do you want to go?</p>
+  <input type="text" id="userQuery" placeholder="Ask me anything..." class="w-full p-2 border rounded mb-2" />
+  <button onclick="handleAssistantQuery()" class="bg-blue-600 text-white px-4 py-2 rounded w-full hover:bg-blue-700">Ask</button>
+</div>
 <!-- ai trip builder -->
 
 
@@ -640,14 +722,66 @@
 
   <!-- Search Results -->
 
-<!-- ❤️ Saved Trips Section -->
-<section id="saved-trips" class="saved-trips-section">
-  <h2>❤️ Your Saved Trips</h2>
-  <div id="savedTripsGrid" class="deals-grid">
-    <!-- Dynamic saved trip cards will be rendered here -->
-    <button class="save-btn" onclick="toggleSaveTrip(this, 'Paris Getaway', '$899', 'https://example.com/paris.jpg')">❤️</button>
+<!-- save trip/xp system -->
+
+<!-- 🎖 Gamified XP Tracker -->
+<div class="bg-white shadow-md rounded-xl p-6 mb-6 max-w-2xl mx-auto text-center">
+  <!-- XP Stats & Badge Display -->
+  <div class="flex items-center gap-4 justify-center mb-4">
+    <img id="xpBadgeIcon" class="w-16 h-16 rounded-full shadow" src="images/badges/badge-1.png" alt="XP Badge" />
+    <div class="text-left">
+      <div id="xpLevel" class="text-blue-600 font-bold text-lg">Level 1: New Explorer</div>
+      <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+        <div id="xpProgressBar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%;"></div>
+      </div>
+      <div class="text-sm mt-1 text-gray-600">
+        XP: <span id="xpPoints">0</span> / 100
+      </div>
+    </div>
   </div>
-</section>
+
+  <!-- 🏅 Badge Collection -->
+<div class="bg-white shadow-md rounded-xl p-6 mt-6 max-w-2xl mx-auto">
+  <h3 class="text-lg font-bold mb-4 text-blue-800">🎖 Badge Collection</h3>
+  <div class="grid grid-cols-3 gap-4">
+    <div class="text-center" id="badge-1">
+      <img src="images/badges/badge-1.jpg" alt="New Explorer" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">New Explorer</p>
+    </div>
+    <div class="text-center" id="badge-2">
+      <img src="images/badges/badge-2.jpg" alt="Wanderer" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">Wanderer</p>
+    </div>
+    <div class="text-center" id="badge-3">
+      <img src="images/badges/badge-3.jpg" alt="Trailblazer" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">Trailblazer</p>
+    </div>
+    <div class="text-center" id="badge-4">
+      <img src="images/badges/badge-4.jpg" alt="Globetrotter" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">Globetrotter</p>
+    </div>
+    <div class="text-center" id="badge-5">
+      <img src="images/badges/badge-5.jpg" alt="Jet Setter" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">Jet Setter</p>
+    </div>
+    <div class="text-center" id="badge-6">
+      <img src="images/badges/badge-6.jpg" alt="World Builder" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">World Builder</p>
+    </div>
+  </div>
+</div>
+
+  <!-- Flair Icon -->
+  <div class="mb-4 text-3xl">❤️</div>
+
+  <!-- XP Action Buttons -->
+  <div class="flex justify-center gap-4 flex-wrap">
+    <button onclick="addXP(15)" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-md transition">✈️ Save Trip</button>
+    <button onclick="addXP(30)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition">🧭 Submit Hidden Gem</button>
+  </div>
+</div>
+
+<!-- save trip/xp system -->
 
 <!-- 👤 User Dashboard -->
 <section class="user-dashboard" id="dashboard">
@@ -681,67 +815,6 @@
 
   </div>
 </section>
-
-  <!-- 🌍 Traveler Stories & Itineraries -->
-<section class="social-feed" id="travel-stories">
-  <div class="feed-container">
-    <h2>🌍 Traveler Stories & Itineraries</h2>
-    <p class="feed-subtext">See what others are exploring — or share your own adventure below.</p>
-
-    <form id="itineraryForm" enctype="multipart/form-data">
-      <input type="text" placeholder="Trip Title (e.g. Backpacking Peru)" required />
-      <textarea placeholder="Key Highlights (e.g. Day 1: Machu Picchu, Day 2: Cusco...)" rows="4" required></textarea>
-
-      <select id="itineraryTravelType" required>
-        <option value="">Who did you travel with?</option>
-        <option value="solo">Solo Trip</option>
-        <option value="group">Group Trip</option>
-      </select>
-
-      <input type="number" id="itineraryGroupSizeInput" placeholder="Group Size (e.g. 5)" min="1" style="display: none;" />
-
-      <input type="number" placeholder="Estimated Budget ($)" min="0" required />
-      <input type="file" accept="image/*" required />
-
-      <button type="submit" class="search-btn">Submit Itinerary</button>
-    </form>
-
-    <p id="itineraryConfirm" style="display: none; margin-top: 1rem; color: #0077ff;">
-      Your itinerary has been submitted! ✈️
-    </p>
-  </div>
-
-  <!-- 📸 Story Gallery -->
-  <div class="story-gallery">
-    <div class="story-card">
-      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80" alt="Amalfi Coast" />
-      <div class="story-details">
-        <h4>🇮🇹 Amalfi Coast Getaway</h4>
-        <p>"Breathtaking views, wine by the sea, and hidden beach caves! Day 1 was unreal."</p>
-        <span class="tag">#Italy #SummerTrip #Romantic</span>
-      </div>
-    </div>
-
-    <div class="story-card">
-      <img src="https://images.unsplash.com/photo-1589395831447-cb3e5b5abcf9?auto=format&fit=crop&w=1000&q=80" alt="Tokyo Adventure" />
-      <div class="story-details">
-        <h4>🇯🇵 Tokyo Solo Adventure</h4>
-        <p>"Explored hidden ramen shops, joined a night market tour, and even visited a temple by sunrise!"</p>
-        <span class="tag">#Japan #SoloTravel #HiddenGems</span>
-      </div>
-    </div>
-
-    <div class="story-card">
-      <img src="https://images.unsplash.com/photo-1603575443985-cdc5e94b15f0?auto=format&fit=crop&w=1000&q=80" alt="Paris Itinerary" />
-      <div class="story-details">
-        <h4>🇫🇷 3-Day Paris Itinerary</h4>
-        <p>"Day 1: Louvre & Seine Cruise. Day 2: Montmartre + wine tasting. Day 3: Versailles & croissants. C’est la vie!"</p>
-        <span class="tag">#Paris #WeekendEscape #CulturalTrip</span>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- 🌍 Traveler Stories & Itineraries -->
 
   <!-- User Reviews / Testimonials Section -->
 <section class="testimonials" id="testimonials">
@@ -827,64 +900,6 @@
   </div>
 </section>
 
-<!-- 📝 Share Your Itinerary -->
-<section class="itinerary-submission" id="post-itinerary">
-  <div class="submission-container">
-    <h2>📝 Share Your Itinerary</h2>
-    <p class="submission-subtext">Let the One Sky Quest community explore your travel plans, tips, and style — solo or group!</p>
-
-    <!-- Sample Itinerary 1 -->
-    <div class="itinerary-card">
-      <img src="https://images.unsplash.com/photo-1582719478148-dfacc645d0b5?auto=format&fit=crop&w=1000&q=80" alt="Thailand Itinerary" />
-      <div class="itinerary-details">
-        <h4>🇹🇭 7-Day Thailand Adventure</h4>
-        <p><strong>Highlights:</strong> Bangkok street food, Phi Phi Islands, Chiang Mai temples</p>
-        <p><strong>Budget:</strong> $1,200 | <strong>Group Size:</strong> 3 friends</p>
-        <button class="explore-btn">View Full Itinerary</button>
-      </div>
-    </div>
-
-    <!-- Sample Itinerary 2 -->
-    <div class="itinerary-card">
-      <img src="https://images.unsplash.com/photo-1590490350373-d1bb62fb3b3c?auto=format&fit=crop&w=1000&q=80" alt="NYC Itinerary" />
-      <div class="itinerary-details">
-        <h4>🗽 NYC in 4 Days</h4>
-        <p><strong>Highlights:</strong> Broadway, Central Park picnic, Empire State Building at night</p>
-        <p><strong>Budget:</strong> $900 | <strong>Group Size:</strong> Couple</p>
-        <button class="explore-btn">View Full Itinerary</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 📸 Share Your Travel Story -->
-<section class="story-submission" id="post-story">
-  <div class="submission-container">
-    <h2>📸 Share Your Travel Story</h2>
-    <p class="submission-subtext">Inspire others with your solo or group travel experience — include highlights, a photo, and how you traveled!</p>
-
-    <form id="storyForm" enctype="multipart/form-data">
-      <input type="text" placeholder="Trip Title (e.g. Iceland Solo Escape)" required />
-      <textarea placeholder="Your story (highlights, surprises, etc.)" rows="4" required></textarea>
-
-      <select id="travelType" required>
-        <option value="">Who did you travel with?</option>
-        <option value="solo">Solo Trip</option>
-        <option value="group">Group Trip</option>
-      </select>
-
-      <input type="number" id="groupSizeInput" placeholder="Group Size (e.g. 4)" min="1" style="display: none;" />
-      <input type="text" placeholder="#hashtags (e.g. #Europe #Backpacking)" />
-      <input type="file" accept="image/*" required />
-      <button type="submit" class="search-btn">Post My Story</button>
-    </form>
-
-    <p id="storyConfirm" style="display: none; margin-top: 1rem; color: #0077ff;">
-      Thanks for sharing your journey! 🌍
-    </p>
-  </div>
-</section>
-
 <!-- Social & Community Features -->
 
   <!-- Legal & Info Section -->
@@ -967,46 +982,53 @@
     });
 
 // AI Trip Builder JavaScript
-document.addEventListener("DOMContentLoaded", () => {
-  const aiForm = document.getElementById("ai-form");
-  const aiResults = document.getElementById("ai-results");
+let assistantVisible = false;
 
-  if (aiForm) {
-    aiForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const destination = aiForm.querySelector("input[type='text']").value.trim();
-      const budget = aiForm.querySelector("input[type='number']").value.trim();
-      const vibe = aiForm.querySelector("select").value;
-
-      if (!destination || !budget || !vibe) {
-        aiResults.innerHTML = `<p style="color: red;">Please fill out all fields to generate a trip.</p>`;
-        return;
-      }
-
-      // Example AI logic simulation (can later connect to real API)
-      const mockSuggestions = {
-        relaxing: ["Bali", "Maldives", "Tulum"],
-        adventurous: ["Patagonia", "New Zealand", "Swiss Alps"],
-        romantic: ["Paris", "Santorini", "Venice"],
-        cultural: ["Kyoto", "Cairo", "Rome"]
-      };
-
-      const pick = mockSuggestions[vibe] || ["Somewhere special"];
-      const random = pick[Math.floor(Math.random() * pick.length)];
-
-      aiResults.innerHTML = `
-        <div class="ai-suggestion">
-          <h3>Your AI-Recommended Trip ✨</h3>
-          <p><strong>Destination:</strong> ${destination || random}</p>
-          <p><strong>Budget:</strong> $${budget}</p>
-          <p><strong>Vibe:</strong> ${vibe.charAt(0).toUpperCase() + vibe.slice(1)}</p>
-          <p>Plan includes flights, stays, and experiences tailored for <em>${vibe}</em> travelers.</p>
-        </div>
-      `;
-    });
+  function toggleAssistant() {
+    const box = document.getElementById("assistantBox");
+    assistantVisible = !assistantVisible;
+    box.classList.toggle("hidden", !assistantVisible);
   }
-});
+
+  function handleAssistantQuery() {
+    const input = document.getElementById("userQuery").value.toLowerCase();
+    const responseBox = document.getElementById("assistantResponse");
+
+    if (input.includes("july") && input.includes("1000")) {
+      responseBox.textContent = "Try Bali, Portugal, or Colombia 🇵🇹🇨🇴! All under $1000 in July.";
+      playAnimation("celebrate");
+    } else if (input.includes("hidden gem")) {
+      responseBox.textContent = "Hidden Gem Alert! 🇮🇸 Snaefellsnes Peninsula in Iceland is magical.";
+      playAnimation("wave");
+    } else {
+      responseBox.textContent = "Let me think... 🤔 Try using filters or explore trending places!";
+      playAnimation("nod");
+    }
+
+    document.getElementById("userQuery").value = "";
+  }
+
+  function playAnimation(type) {
+    const avatar = document.querySelector("#travelAssistant img");
+    avatar.classList.remove("animate-bounce");
+
+    switch (type) {
+      case "nod":
+        avatar.classList.add("animate-pulse");
+        break;
+      case "wave":
+        avatar.classList.add("animate-spin");
+        break;
+      case "celebrate":
+        avatar.classList.add("animate-bounce");
+        break;
+    }
+
+    setTimeout(() => {
+      avatar.classList.remove("animate-pulse", "animate-spin", "animate-bounce");
+    }, 1500);
+  }
+  
 // AI Trip Builder JavaScript
 
 // Last-Minute Escapes JavaScript
@@ -1259,10 +1281,6 @@ if (packingForm) {
 }
 // Trip Planner Packing List Logic
 
-// Post story //
-document.getElementById('storyModal').style.display = 'block';
-// Post story //
-
 // Language & Culture Toolkit Logic
 
     // Language & Culture Toolkit Logic
@@ -1324,41 +1342,6 @@ if (groupBudgetForm) {
   });
 }
 // Group Budget Calculator Logic
-
-// Traveler Stories & Itineraries
-  document.getElementById("travelType").addEventListener("change", function () {
-    const groupInput = document.getElementById("groupSizeInput");
-    groupInput.style.display = this.value === "group" ? "block" : "none";
-  });
-
-  document.getElementById("storyForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    document.getElementById("storyConfirm").style.display = "block";
-    setTimeout(() => {
-      document.getElementById("storyConfirm").style.display = "none";
-      this.reset();
-      document.getElementById("groupSizeInput").style.display = "none";
-    }, 3000);
-  });
-// Traveler Stories & Itineraries
-
-
-/// Itinerary submission confirm (already in place)
-const itineraryForm = document.getElementById("itineraryForm");
-const itineraryConfirm = document.getElementById("itineraryConfirm");
-
-if (itineraryForm) {
-  itineraryForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    itineraryForm.reset();
-    itineraryGroupSizeInput.style.display = "none";
-    itineraryConfirm.style.display = "block";
-    setTimeout(() => {
-      itineraryConfirm.style.display = "none";
-    }, 4000);
-  });
-}
-/// Itinerary submission confirm (already in place)
 
 // Cookie Consent Logic
 const cookieBanner = document.getElementById("cookieBanner");
@@ -1431,7 +1414,7 @@ function toggleSaveTrip(btn, title, price, image) {
       title,
       price,
       image,
-      source: 'homepage' // 🔥 Mark as saved from homepage
+      source: 'index' // 🔥 Mark as saved from homepage
     });
     btn.classList.add('saved');
     heartIcon.textContent = '❤️';
@@ -1439,6 +1422,54 @@ function toggleSaveTrip(btn, title, price, image) {
 
   localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
 }
+
+let currentXP = parseInt(localStorage.getItem("xpPoints")) || 0;
+let level = Math.floor(currentXP / 100) + 1;
+
+function updateXPUI() {
+  const xpPointsElem = document.getElementById("xpPoints");
+  const xpProgress = document.getElementById("xpProgressBar");
+  const xpLevelElem = document.getElementById("xpLevel");
+
+  const xpInLevel = currentXP % 100;
+  xpPointsElem.textContent = xpInLevel;
+  xpProgress.style.width = `${xpInLevel}%`;
+  xpLevelElem.textContent = `Level ${level}: ${getLevelTitle(level)}`;
+  localStorage.setItem("xpPoints", currentXP);
+}
+
+function getLevelTitle(level) {
+  const titles = [
+    "New Explorer", "Wanderer", "Seasoned Traveler",
+    "Adventurer", "Globetrotter", "World Builder"
+  ];
+  return titles[Math.min(level - 1, titles.length - 1)];
+}
+
+function addXP(amount) {
+  currentXP += amount;
+  level = Math.floor(currentXP / 100) + 1;
+  updateXPUI();
+  showXPToast(`+${amount} XP earned!`);
+  checkForBadgeUnlock();
+}
+
+function showXPToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "fixed top-6 right-6 bg-green-600 text-white px-5 py-3 rounded-lg shadow-xl z-[9999] animate-bounce";
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+function checkForBadgeUnlock() {
+  if (currentXP % 100 === 0 && currentXP !== 0) {
+    alert(`🎉 Congrats! You’ve reached Level ${level} and unlocked a new badge!`);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", updateXPUI);
+
 
 // Save Trip / Heart Icon Logic
 
@@ -1466,6 +1497,70 @@ function showRegister() {
 }
 // login and Register
 
+// welcome back
+
+// Theme toggle logic (optional if already elsewhere)
+document.getElementById("theme-toggle")?.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+});
+
+// Welcome Back Banner Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const welcomeDiv = document.getElementById("welcomeMessage");
+  const storedUser = localStorage.getItem("oneSkyUser");
+
+  if (storedUser && welcomeDiv) {
+    welcomeDiv.innerHTML = `❤️ Welcome Back, <span class="font-bold">${storedUser}</span>! Let's explore the world together. ✈️`;
+  }
+
+  // Example: simulate login for now
+  const loginForm = document.getElementById("loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fakeName = "David"; // replace with dynamic input later
+      localStorage.setItem("oneSkyUser", fakeName);
+      welcomeDiv.innerHTML = `❤️ Welcome Back, <span class="font-bold">${fakeName}</span>! Let's explore the world together. ✈️`;
+      closeAuthModal?.();
+    });
+  }
+});
+
+// Logout clears name
+function logoutUser() {
+  localStorage.removeItem("oneSkyUser");
+  location.reload();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  AOS.init();
+});
+
+// XP
+function updateXPUI() {
+  const xpPointsElem = document.getElementById("xpPoints");
+  const xpProgress = document.getElementById("xpProgressBar");
+  const xpLevelElem = document.getElementById("xpLevel");
+  const badgeIcon = document.getElementById("xpBadgeIcon");
+
+  const xpInLevel = currentXP % 100;
+  level = Math.floor(currentXP / 100) + 1;
+
+  // Update UI
+  xpPointsElem.textContent = xpInLevel;
+  xpProgress.style.width = `${xpInLevel}%`;
+  xpLevelElem.textContent = `Level ${level}: ${getLevelTitle(level)}`;
+  badgeIcon.src = getBadgeIcon(level);
+
+  // Save XP
+  localStorage.setItem("xpPoints", currentXP);
+}
+
+function getBadgeIcon(level) {
+  // You’ll need to prepare these badge images ahead of time
+  return `/images/badges/badge-${Math.min(level, 6)}.png`;
+}
+// welcome back
 //  Dashboard //
 function renderDashboardLinks() {
   const dashboardList = document.getElementById('dashboard-saved-links');
@@ -1671,6 +1766,41 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCruises(); // Initial load
 });
 // Cruises
+
+// Team Quest
+
+function showTeamQuestModal() {
+  document.getElementById("teamQuestModal").classList.remove("hidden");
+}
+
+//  Close Modal
+function closeTeamQuestModal() {
+  document.getElementById("teamQuestModal").classList.add("hidden");
+
+  // Reset form and validation state
+  const form = document.getElementById("teamQuestForm");
+  if (form) {
+    form.reset();
+    [...form.elements].forEach(el => el.classList.remove("invalid"));
+  }
+}
+
+// Handle Form Submission
+document.getElementById("teamQuestForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const sport = document.getElementById("sport").value;
+  const location = document.getElementById("eventLocation").value;
+  const date = document.getElementById("eventDate").value;
+
+  const formData = { sport, location, date };
+  localStorage.setItem("teamQuestData", JSON.stringify(formData));
+
+  // Redirect to booking.html with query string
+  window.location.href = `booking.html?sport=${sport}&location=${encodeURIComponent(location)}&date=${date}`;
+});
+
+// Team Quest
 
 //  Contact Form
 const contactForm = document.getElementById("contactForm");

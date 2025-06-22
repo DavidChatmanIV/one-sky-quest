@@ -6,9 +6,13 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 // Models
 const Booking = require("./models/Booking");
 const Contact = require("./models/Contact");
+const Profile = require("./models/profile");
 
 // Routes
 const flightRoutes = require("./routes/flight.routes");
@@ -18,23 +22,22 @@ const carRoutes = require("./routes/car.routes");
 const cruiseRoutes = require("./routes/cruise.route");
 const bookingRoutes = require("./routes/booking.routes");
 const placeRoutes = require("./routes/placeroutes");
-const authRoutes = require("./routes/auth.routes"); // ✅ NEW: Auth route
-
-const app = express();
-const PORT = process.env.PORT || 3000;
+const authRoutes = require("./routes/auth.routes");
+const adminProtectedRoutes = require("./routes/adminProtected");
+const adminRoutes = require("./routes/adminProtected")
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// MongoDB connection
+// MongoDB Connection
 mongoose
-.connect(process.env.MONGO_URI, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-})
-.then(() => console.log("✅ Connected to MongoDB"))
-.catch((err) => console.error("❌ MongoDB connection error:", err));
+  })
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // Serve frontend statically (optional for full-stack apps)
 app.use(express.static(path.join(__dirname, "../frontend")));
@@ -42,8 +45,9 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 // ✅ Modular Routes
 app.use("/api", authRoutes); // 🔐 Login, Register (user/admin)
 app.use("/api", bookingRoutes); // 📋 Bookings
+app.use("/api/admin", adminRoutes); // 🔐 Admin-only protected endpoints
 
-// Other Routes
+// 🧭 Other Routes
 app.use("/api/flights", flightRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/packages", packageRoutes);
@@ -53,18 +57,35 @@ app.use("/api/places", placeRoutes);
 
 // 📬 Contact Form
 app.post("/contact", async (req, res) => {
-try {
+  try {
     const { name, email, message } = req.body;
     const newContact = new Contact({ name, email, message });
     await newContact.save();
     res.send("Thank you for contacting us!");
-} catch (err) {
+  } catch (err) {
     console.error("Contact error:", err);
     res.status(500).send("Contact form failed. Try again.");
-}
+  }
 });
 
-// Start server
+// 🧑‍✈️ Profile Route
+app.get("/api/profile/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const profile = await Profile.findOne({ username });
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error("Profile fetch error:", err);
+    res.status(500).json({ message: "Server error fetching profile." });
+  }
+});
+
+// 🚀 Start Server
 app.listen(PORT, () => {
-console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

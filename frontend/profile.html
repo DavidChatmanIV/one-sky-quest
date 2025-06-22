@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>One Sky Quest – Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="/images/favicon.png" />
+  <style>
+    .locked {
+      filter: grayscale(1);
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- 🌄 Profile Banner -->
+  <div class="relative h-56 bg-cover bg-center" style="background-image: url('/images/banner.jpg');">
+    <div class="absolute inset-0 bg-black/30"></div>
+  </div>
+
+  <!-- 🧑‍🦱 Avatar + User Info -->
+  <div class="max-w-6xl mx-auto -mt-20 relative z-10 p-4">
+    <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <img src="/images/user-avatar.jpg" alt="Profile" class="w-24 h-24 rounded-full border-4 border-white shadow-md object-cover"/>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">David Martienz <span class="text-blue-600">✔️</span></h2>
+          <p class="text-sm text-gray-600">Explorer • <span id="xpPoints">0</span> points</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-full">Follow</button>
+        <button class="bg-gray-100 px-4 py-2 rounded-full">Message</button>
+        <button class="bg-gray-200 px-4 py-2 rounded-full">+ Add Trip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🧭 Tabs -->
+  <nav class="max-w-6xl mx-auto mt-4 border-b border-gray-300 px-4">
+    <ul class="flex space-x-6 text-sm font-medium text-gray-600">
+      <li><a href="#" class="pb-2 border-b-2 border-blue-600 text-blue-600">Overview</a></li>
+      <li><a href="#">My Trips</a></li>
+      <li><a href="#">Stories</a></li>
+      <li><a href="#">Media</a></li>
+      <li><a href="#">Reviews</a></li>
+      <li><a href="#">Wishlist</a></li>
+      <li><a href="#">Settings</a></li>
+    </ul>
+  </nav>
+
+  <!-- 📄 Main Section -->
+  <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-4 mt-6">
+    <!-- Left Column -->
+    <section>
+      <!-- 🎖 XP Tracker -->
+      <div class="bg-white rounded-xl shadow p-4 mb-6">
+        <div class="flex items-center gap-4">
+          <img id="xpBadgeIcon" class="w-16 h-16 rounded-full shadow" src="/images/badges/badge-1.jpg" alt="XP Badge"/>
+          <div>
+            <h3 id="xpLevel" class="text-blue-600 font-semibold text-lg">Level 1: New Explorer</h3>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+              <div id="xpProgressBar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%;"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">XP: <span id="xpPointsInline">0</span> / 100</p>
+          </div>
+        </div>
+        <div class="mt-4 flex gap-4">
+          <button onclick="addXP(15)" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-md transition">✈️ Save Trip</button>
+          <button onclick="addXP(30)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition">🧭 Submit Hidden Gem</button>
+        </div>
+      </div>
+
+      <!-- 🏅 Badges -->
+<div class="bg-white shadow-md rounded-xl p-6 mt-6">
+  <h3 class="text-lg font-bold mb-4 text-blue-800">🎖 Badge Collection</h3>
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    <div class="text-center" id="badge-1">
+      <img src="/images/badges/badge-1.jpg" alt="New Explorer" class="w-16 h-16 mx-auto badge-img" />
+      <p class="text-sm mt-1">New Explorer</p>
+    </div>
+    <div class="text-center" id="badge-2">
+      <img src="/images/badges/badge-2.jpg" alt="Wanderer" class="w-16 h-16 mx-auto badge-img locked" />
+      <p class="text-sm mt-1">Wanderer</p>
+    </div>
+    <div class="text-center" id="badge-3">
+      <img src="/images/badges/badge-3.jpg" alt="Trailblazer" class="w-16 h-16 mx-auto badge-img locked" />
+      <p class="text-sm mt-1">Trailblazer</p>
+    </div>
+    <div class="text-center" id="badge-4">
+      <img src="/images/badges/badge-4.jpg" alt="Globetrotter" class="w-16 h-16 mx-auto badge-img locked" />
+      <p class="text-sm mt-1">Globetrotter</p>
+    </div>
+    <div class="text-center" id="badge-5">
+      <img src="/images/badges/badge-5.jpg" alt="Jet Setter" class="w-16 h-16 mx-auto badge-img locked" />
+      <p class="text-sm mt-1">Jet Setter</p>
+    </div>
+    <div class="text-center" id="badge-6">
+      <img src="/images/badges/badge-6.jpg" alt="World Builder" class="w-16 h-16 mx-auto badge-img locked" />
+      <p class="text-sm mt-1">World Builder</p>
+    </div>
+  </div>
+</div>
+    </section>
+
+    <!-- Right Column -->
+    <section>
+      <div class="bg-white rounded-xl shadow p-4 mb-6">
+        <h3 class="font-semibold text-gray-700 mb-2">Bio</h3>
+        <p class="text-gray-600 text-sm">Travel enthusiast and adventure seeker. Exploring the world one destination at a time.</p>
+        <p class="text-sm mt-2 text-gray-500">📍 United States</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4 mb-6">
+        <h3 class="font-semibold text-gray-700 mb-2">Recent Activity</h3>
+        <p>🏟️ Last Trip: <strong>Japan 2024</strong></p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4">
+        <h3 class="font-semibold text-gray-700 mb-4">🌏 Dream Destinations</h3>
+        <div class="flex gap-4">
+          <img src="/images/italy.jpg" alt="Italy" class="w-24 h-16 rounded-md object-cover" />
+          <img src="/images/peru.jpg" alt="Peru" class="w-24 h-16 rounded-md object-cover" />
+          <img src="/images/nz.jpg" alt="New Zealand" class="w-24 h-16 rounded-md object-cover" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Top 8 Friends -->
+  <!-- 👥 Top 8 Friends -->
+<div class="bg-white shadow-md rounded-xl p-6 mt-6">
+  <h3 class="text-lg font-bold mb-4 text-sky-800">👥 Top 8 Friends</h3>
+  <div id="topFriends" class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center"></div>
+</div>
+
+
+  <!-- XP + Badge Script -->
+  <script>
+    let currentXP = 0;
+    let level = 1;
+
+    function getBadgeIcon(level) {
+      const badgeLevel = Math.min(level, 6);
+      return "/images/badges/badge-" + badgeLevel + ".jpg";
+    }
+
+    function getLevelTitle(level) {
+      const titles = ["New Explorer", "Wanderer", "Trailblazer", "Globetrotter", "Jet Setter", "World Builder"];
+      return titles[Math.min(level - 1, titles.length - 1)];
+    }
+
+    function updateXPUI() {
+      level = Math.floor(currentXP / 100) + 1;
+      document.getElementById("xpPoints").textContent = currentXP;
+      document.getElementById("xpPointsInline").textContent = currentXP;
+      document.getElementById("xpLevel").textContent = `Level ${level}: ${getLevelTitle(level)}`;
+      document.getElementById("xpProgressBar").style.width = `${currentXP % 100}%`;
+      document.getElementById("xpBadgeIcon").src = getBadgeIcon(level);
+
+      updateBadgeCollection(level);
+      checkForBadgeUnlock();
+    }
+
+    function addXP(amount) {
+      currentXP += amount;
+      updateXPUI();
+    }
+
+    function updateBadgeCollection(level) {
+      for (let i = 1; i <= 6; i++) {
+        const badge = document.getElementById(`badge-${i}`).querySelector("img");
+        if (i <= level) badge.classList.remove("locked");
+        else badge.classList.add("locked");
+      }
+    }
+
+    function checkForBadgeUnlock() {
+      if (currentXP % 100 === 0 && currentXP !== 0) {
+        const badgeIcon = document.getElementById("xpBadgeIcon");
+        badgeIcon.classList.add("animate-bounce", "ring-4", "ring-yellow-400");
+
+        setTimeout(() => {
+          badgeIcon.classList.remove("animate-bounce", "ring-4", "ring-yellow-400");
+        }, 3000);
+      }
+    }
+
+    <div id="badgeCollection" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+
+  const badgeTitles = ["New Explorer", "Wanderer", "Trailblazer", "Globetrotter", "Jet Setter", "World Builder"];
+  const badgeCollection = document.getElementById("badgeCollection");
+
+  badgeTitles.forEach((title, i) => {
+    badgeCollection.innerHTML += `
+      <div class="text-center" id="badge-${i + 1}">
+        <img src="/images/badges/badge-${i + 1}.jpg" alt="${title}" class="w-16 h-16 mx-auto badge-img locked" />
+        <p class="text-sm mt-1">${title}</p>
+      </div>
+    `;
+  });
+
+  </script>
+</body>
+</html>
