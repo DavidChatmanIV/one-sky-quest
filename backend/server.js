@@ -1,20 +1,21 @@
 require("dotenv").config();
 
-// Dependencies
+// 📦 Dependencies
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Models
+// 📂 Models (optional, useful if seeding or preloading)
 const Booking = require("./models/Booking");
 const Contact = require("./models/Contact");
 const Profile = require("./models/profile");
 
-// Routes
+// 🛣️ Routes
 const flightRoutes = require("./routes/flight.routes");
 const hotelRoutes = require("./routes/hotel.routes");
 const packageRoutes = require("./routes/package.routes");
@@ -23,14 +24,15 @@ const cruiseRoutes = require("./routes/cruise.route");
 const bookingRoutes = require("./routes/booking.routes");
 const placeRoutes = require("./routes/placeroutes");
 const authRoutes = require("./routes/auth.routes");
-const adminProtectedRoutes = require("./routes/adminProtected");
-const adminRoutes = require("./routes/adminProtected")
+const adminRoutes = require("./routes/adminProtected");
+const userRoutes = require("./routes/user.routes"); // for saved trips, etc.
 
-// Middleware
+// 🔧 Middleware
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// MongoDB Connection
+// 🔌 MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -39,15 +41,21 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Serve frontend statically (optional for full-stack apps)
-app.use(express.static(path.join(__dirname, "../frontend")));
+// 📁 Serve frontend (optional – for full-stack deployment)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+  app.get("*", (_, res) =>
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"))
+  );
+}
 
-// ✅ Modular Routes
-app.use("/api", authRoutes); // 🔐 Login, Register (user/admin)
-app.use("/api", bookingRoutes); // 📋 Bookings
-app.use("/api/admin", adminRoutes); // 🔐 Admin-only protected endpoints
+// 📌 Core API Routes
+app.use("/api", authRoutes); // Login, register, etc.
+app.use("/api", bookingRoutes); // Public + admin bookings
+app.use("/api/admin", adminRoutes); // Admin dashboard protected routes
+app.use("/api/admin/users", userRoutes); // Saved trips & admin user list
 
-// 🧭 Other Routes
+// 🌍 Travel Routes
 app.use("/api/flights", flightRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/packages", packageRoutes);
@@ -55,7 +63,7 @@ app.use("/api/cars", carRoutes);
 app.use("/api/cruises", cruiseRoutes);
 app.use("/api/places", placeRoutes);
 
-// 📬 Contact Form
+// 📬 Contact Form Submission
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -68,7 +76,7 @@ app.post("/contact", async (req, res) => {
   }
 });
 
-// 🧑‍✈️ Profile Route
+// 👤 Get Public Profile by Username
 app.get("/api/profile/:username", async (req, res) => {
   try {
     const { username } = req.params;
@@ -85,7 +93,7 @@ app.get("/api/profile/:username", async (req, res) => {
   }
 });
 
-// 🚀 Start Server
+// 🚀 Start the Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

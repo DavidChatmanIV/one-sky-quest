@@ -1,35 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, message, Card } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 const AdminLogin = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const onFinish = async (values) => {
-    setLoading(true);
+  // ✅ Auto-redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    if (token) navigate("/admin/dashboard");
+  }, [navigate]);
 
+  const handleLogin = async ({ email, password }) => {
+    setLoading(true);
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
-        message.success("Welcome Admin! ✅");
-        localStorage.setItem("token", data.token); // Store JWT
-        window.location.href = "/admin/dashboard"; // Redirect
-      } else {
-        message.error(data.message || "Login failed ❌");
-      }
+      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      localStorage.setItem("admin_token", data.token);
+      message.success("✅ Login successful!");
+      navigate("/admin/dashboard");
     } catch (err) {
-      message.error("Server error. Please try again.");
+      message.error(`❌ ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -42,30 +47,30 @@ const AdminLogin = () => {
         bordered
         className="w-full max-w-md"
       >
-        <Form
-          name="admin_login"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          layout="vertical"
-        >
+        <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
-            name="username"
-            label="Admin Username"
-            rules={[{ required: true, message: "Please enter your username!" }]}
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, type: "email", message: "Enter your email" },
+            ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="admin@example.com" />
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="admin@oneskyquest.com"
+            />
           </Form.Item>
 
           <Form.Item
             name="password"
             label="Password"
-            rules={[{ required: true, message: "Please enter your password!" }]}
+            rules={[{ required: true, message: "Enter your password" }]}
           >
             <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
+            <Button type="primary" htmlType="submit" block loading={loading}>
               Log In
             </Button>
           </Form.Item>
