@@ -1,4 +1,6 @@
+import React from "react";
 import { Form, Input, Button, Typography, message } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
@@ -18,19 +20,30 @@ const AdminLogin = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <Title level={3}>Admin Login</Title>
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <Title level={3} className="text-center mb-6">
+          Admin Login
+        </Title>
         <Form layout="vertical" onFinish={handleLogin}>
-          <Form.Item label="Email" name="email" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
           <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true }]}
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Please enter your email" }]}
           >
-            <Input.Password />
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="admin@oneskyquest.com"
+            />
           </Form.Item>
+
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please enter your password" }]}
+          >
+            <Input.Password prefix={<LockOutlined />} placeholder="admin123" />
+          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               Log In

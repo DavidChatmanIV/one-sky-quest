@@ -1,31 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminLogin from "./components/AdminLogin";
-import ProfilePage from "./pages/ProfilePage";
-import PreviewGallery from "./pages/PreviewGallery";
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import AppRoutes from "./AppRoutes";
 
-function App() {
+const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<AdminLogin />} />
-        <Route
-          path="/profile"
-          element={
-            <ProfilePage
-              user={{
-                name: "Anna",
-                avatar: "/images/anna.png",
-                bio: "Sky kid",
-                location: "Santa Fe",
-                points: 230,
-              }}
-            />
-          }
-        />
-        <Route path="/preview" element={<PreviewGallery />} />
-      </Routes>
+      <>
+        <Navbar />
+        <AppRoutes />
+      </>
     </Router>
   );
-}
+};
 
 export default App;
