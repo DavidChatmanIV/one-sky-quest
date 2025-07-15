@@ -1,9 +1,16 @@
 import React from "react";
 import { Typography, Row, Col, Button } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Paragraph } = Typography;
 
 const SocialCommunity = () => {
+  const navigate = useNavigate();
+
+  const handleJoinClick = () => {
+    navigate("/questfeed");
+  };
+
   return (
     <section style={{ background: "#fafafa", padding: "60px 20px" }}>
       <Row justify="center">
@@ -16,7 +23,7 @@ const SocialCommunity = () => {
             adventures. One Sky Quest isn’t just a platform — it's a movement.
           </Paragraph>
           <div style={{ textAlign: "center", marginTop: 24 }}>
-            <Button type="primary" size="large">
+            <Button type="primary" size="large" onClick={handleJoinClick}>
               Join the Quest Feed
             </Button>
           </div>

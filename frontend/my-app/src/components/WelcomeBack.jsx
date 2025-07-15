@@ -1,28 +1,33 @@
 import React from "react";
-import { Typography, Avatar, Space, Button } from "antd";
+import { Typography, Avatar, Button } from "antd";
 
-const { Title, Paragraph } = Typography;
+const { Text } = Typography;
 
-const WelcomeBack = ({
-  name = "Traveler",
-  avatar = "/images/default-avatar.png",
-}) => {
+const WelcomeBack = () => {
   return (
-    <section
-      className="py-10 px-4 text-center"
-      style={{ backgroundColor: "#e6f7ff" }}
-    >
-      <Space direction="vertical" size="middle" align="center">
-        <Avatar src={avatar} size={100} />
-        <Title level={2}>👋 Welcome Back, {name}!</Title>
-        <Paragraph>
-          Ready to pick up where you left off? Let’s plan your next big journey.
-        </Paragraph>
-        <Button type="primary" size="large">
+    <div className="bg-blue-50 border-b border-gray-200 py-3 px-6 w-full">
+      <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <Avatar
+            size={40}
+            style={{ backgroundColor: "#dbeafe", color: "#1e3a8a" }}
+          >
+            👤
+          </Avatar>
+          <div>
+            <Text strong className="text-lg">
+              👋 Welcome Back, David!
+            </Text>
+            <p className="text-xs text-gray-500 m-0">
+              Let's plan your next big journey.
+            </p>
+          </div>
+        </div>
+        <Button size="small" type="default">
           View Saved Trips
         </Button>
-      </Space>
-    </section>
+      </div>
+    </div>
   );
 };
 

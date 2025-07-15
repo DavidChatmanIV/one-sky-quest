@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
+
 const Booking = require("../models/Booking");
 const sendConfirmationEmail = require("../utils/sendConfirmationEmail");
-const verifyAdmin = require("../middleware/verifyAdmin");
+const verifyAdmin = require("../middleware/verifyAdminToken"); // ✅ Match actual filename
 
 // ✈️ PUBLIC: Create a new booking
 router.post("/book", async (req, res) => {
@@ -21,7 +22,7 @@ router.post("/book", async (req, res) => {
       booking: newBooking,
     });
   } catch (err) {
-    console.error("Booking error:", err);
+    console.error("❌ Booking creation error:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -43,22 +44,23 @@ router.get("/bookings", verifyAdmin, async (req, res) => {
 
     res.json(formatted);
   } catch (err) {
-    console.error("Dashboard error:", err);
+    console.error("❌ Admin booking fetch error:", err);
     res.status(500).json({ message: "Failed to load bookings" });
   }
 });
 
-// 🔐 ADMIN: Delete a booking by ID
+// 🔐 ADMIN: Delete a booking
 router.delete("/book/:id", verifyAdmin, async (req, res) => {
   try {
     await Booking.findByIdAndDelete(req.params.id);
     res.json({ message: "Booking deleted ✅" });
   } catch (err) {
+    console.error("❌ Booking delete error:", err);
     res.status(500).json({ message: "Delete failed." });
   }
 });
 
-// 🔐 ADMIN: Update a booking by ID
+// 🔐 ADMIN: Update a booking
 router.put("/book/:id", verifyAdmin, async (req, res) => {
   try {
     const updated = await Booking.findByIdAndUpdate(req.params.id, req.body, {
@@ -66,6 +68,7 @@ router.put("/book/:id", verifyAdmin, async (req, res) => {
     });
     res.json(updated);
   } catch (err) {
+    console.error("❌ Booking update error:", err);
     res.status(500).json({ message: "Update failed." });
   }
 });

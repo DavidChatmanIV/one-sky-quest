@@ -42,31 +42,30 @@ const dealsData = {
   ],
 };
 
+const tabItems = Object.entries(dealsData).map(([key, deals]) => ({
+  key,
+  label: key.charAt(0).toUpperCase() + key.slice(1),
+  children: (
+    <Row gutter={[16, 16]} justify="center">
+      {deals.map((deal, index) => (
+        <Col key={index} xs={24} sm={12} md={8}>
+          <Card
+            cover={<img alt={deal.title} src={deal.image} />}
+            className="hover:scale-105 transition-transform duration-300"
+          >
+            <Card.Meta title={deal.title} description={deal.price} />
+          </Card>
+        </Col>
+      ))}
+    </Row>
+  ),
+}));
+
 const ExploreDeals = () => {
   return (
     <section className="bg-gray-100 py-12 px-6 text-center">
       <Title level={3}>🔎 Explore Travel Deals by Type</Title>
-      <Tabs defaultActiveKey="flights" centered>
-        {Object.entries(dealsData).map(([key, deals]) => (
-          <Tabs.TabPane
-            tab={key.charAt(0).toUpperCase() + key.slice(1)}
-            key={key}
-          >
-            <Row gutter={[16, 16]} justify="center">
-              {deals.map((deal, index) => (
-                <Col key={index} xs={24} sm={12} md={8}>
-                  <Card
-                    cover={<img alt={deal.title} src={deal.image} />}
-                    className="hover:scale-105 transition-transform duration-300"
-                  >
-                    <Card.Meta title={deal.title} description={deal.price} />
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </Tabs.TabPane>
-        ))}
-      </Tabs>
+      <Tabs defaultActiveKey="flights" centered items={tabItems} />
     </section>
   );
 };

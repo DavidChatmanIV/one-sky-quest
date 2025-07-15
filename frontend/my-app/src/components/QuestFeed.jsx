@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Avatar, Typography, Button } from "antd";
 import { MessageOutlined, HeartOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Paragraph } = Typography;
 
@@ -26,6 +27,12 @@ const mockPosts = [
 ];
 
 const QuestFeed = () => {
+  const navigate = useNavigate();
+
+  const handleDMClick = () => {
+    navigate("/dm"); // ✅ Programmatic navigation
+  };
+
   return (
     <section className="py-10 px-4 bg-gray-50" id="quest-feed">
       <Title level={2} className="text-center mb-6">
@@ -40,14 +47,25 @@ const QuestFeed = () => {
           <Card key={post.id} bordered hoverable>
             <Card.Meta
               avatar={<Avatar src={post.avatar} />}
-              title={`${post.username} • ${post.destination}`}
-              description={post.content}
+              title={
+                <span className="font-semibold">
+                  @{post.username} •{" "}
+                  <span className="text-gray-500">{post.destination}</span>
+                </span>
+              }
+              description={
+                <Paragraph className="mt-2 mb-0">{post.content}</Paragraph>
+              }
             />
             <div className="flex justify-between mt-4 px-2">
               <Button type="text" icon={<HeartOutlined />}>
                 {post.likes}
               </Button>
-              <Button type="text" icon={<MessageOutlined />}>
+              <Button
+                type="text"
+                icon={<MessageOutlined />}
+                onClick={handleDMClick}
+              >
                 {post.comments}
               </Button>
             </div>

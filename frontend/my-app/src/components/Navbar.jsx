@@ -1,76 +1,99 @@
-import React from "react";
-import { Layout, Menu } from "antd";
-import {
-  HomeOutlined,
-  GiftOutlined,
-  CarOutlined,
-  RocketOutlined,
-  PhoneOutlined,
-  UserOutlined,
-  LoginOutlined,
-  LogoutOutlined,
-  BookOutlined,
-} from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Layout, Avatar, Dropdown, Badge } from "antd";
+import { UserOutlined, MoreOutlined, BellOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import Notifications from "./Notifications";
 
 const { Header } = Layout;
 
 const Navbar = () => {
-  return (
-    <Header className="flex items-center justify-between bg-white px-6 shadow z-50 sticky top-0 w-full">
-      {/* Logo and Brand */}
-      <div className="flex items-center space-x-3">
-        <img
-          src="/image/logo.png"
-          alt="One Sky Quest Logo"
-          className="h-10 w-10 object-contain"
-        />
-        <span className="text-xl font-bold text-gray-800">
-          One <span className="text-blue-600">Sky</span>{" "}
-          <span className="text-orange-500">Quest</span>
-        </span>
-      </div>
+  const [unreadCount, setUnreadCount] = useState(0);
 
-      {/* Navigation */}
-      <Menu
-        mode="horizontal"
-        className="flex-1 justify-center font-medium bg-white"
-        selectable={false}
-      >
-        <Menu.Item key="flights" icon={<RocketOutlined />}>
-          <Link to="/flights">Flights</Link>
-        </Menu.Item>
-        <Menu.Item key="hotels" icon={<HomeOutlined />}>
-          <Link to="/hotels">Hotels</Link>
-        </Menu.Item>
-        <Menu.Item key="packages" icon={<GiftOutlined />}>
-          <Link to="/packages">Packages</Link>
-        </Menu.Item>
-        <Menu.Item key="cars" icon={<CarOutlined />}>
-          <Link to="/cars">Cars</Link>
-        </Menu.Item>
-        <Menu.Item key="cruises" icon={<RocketOutlined />}>
-          <Link to="/cruises">Cruises</Link>
-        </Menu.Item>
-        <Menu.Item key="book" icon={<BookOutlined />}>
-          <Link to="/booking">Book</Link>
-        </Menu.Item>
-        <Menu.Item key="contact" icon={<PhoneOutlined />}>
-          <Link to="/contact">Contact</Link>
-        </Menu.Item>
-        <Menu.Item key="about">
-          <Link to="/about">About</Link>
-        </Menu.Item>
-        <Menu.Item key="saved">
-          <Link to="/saved">Saved Trips</Link>
-        </Menu.Item>
-        <Menu.Item key="login" icon={<LoginOutlined />}>
-          <Link to="/login">Login</Link>
-        </Menu.Item>
-        <Menu.Item key="logout" icon={<LogoutOutlined />}>
-          <Link to="/logout">Logout</Link>
-        </Menu.Item>
-      </Menu>
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await fetch("/api/notifications");
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+      const data = await res.json();
+      const unread = data.filter((n) => !n.read).length;
+      setUnreadCount(unread);
+    } catch (err) {
+      console.error("🔴 Failed to load notifications:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const profileMenuItems = [
+    { key: "profile", label: <Link to="/profile">👤 My Profile</Link> },
+    { key: "trips", label: <Link to="/saved-trips">💾 Saved Trips</Link> },
+    {
+      key: "logout",
+      label: <span>🚪 Logout</span>,
+      onClick: () => console.log("Logging out..."),
+    },
+  ];
+
+  const moreMenuItems = [
+    { key: "about", label: <Link to="/about">ℹ️ About</Link> },
+  ];
+
+  return (
+    <Header
+      className="!bg-white !text-black shadow-md border-b border-gray-200 px-4 sm:px-6 py-2"
+      style={{ position: "sticky", top: 0, zIndex: 1000, width: "100%" }}
+    >
+      <div className="flex justify-between items-center">
+        {/* 🌐 Brand */}
+        <div className="flex items-center gap-6">
+          <Link to="/" className="text-xl font-bold !text-blue-600">
+            One <span className="!text-orange-500">Sky</span> Quest
+          </Link>
+
+          {/* 🧭 Main Navigation */}
+          <nav className="hidden md:flex gap-4 text-sm font-medium">
+            <Link to="/">🏠 Home</Link>
+            <Link to="/booking">📅 Booking</Link>
+            <Link to="/questfeed">🗺️ Quest Feed</Link>
+            <Link to="/saved-excursions">💾 My Excursions</Link>
+          </nav>
+        </div>
+
+        {/* 🔧 Tools */}
+        <div className="hidden lg:flex gap-4 text-sm font-medium text-gray-600 items-center">
+          <span>Flights</span>
+          <span>Hotels</span>
+          <span>Packages</span>
+          <span>Cars</span>
+          <span>Cruises</span>
+
+          {/* 🔔 Notifications */}
+          <Dropdown
+            menu={{ items: [] }}
+            popupRender={() => <Notifications />}
+            placement="bottomRight"
+            trigger={["click"]}
+            overlayStyle={{ zIndex: 1500 }}
+          >
+            <Badge count={unreadCount} size="small" offset={[0, 5]}>
+              <BellOutlined style={{ fontSize: 20, cursor: "pointer" }} />
+            </Badge>
+          </Dropdown>
+
+          {/* ⋯ More Menu */}
+          <Dropdown menu={{ items: moreMenuItems }} trigger={["click"]}>
+            <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
+          </Dropdown>
+
+          {/* 👤 Profile Avatar Dropdown */}
+          <Dropdown menu={{ items: profileMenuItems }} trigger={["click"]}>
+            <Avatar icon={<UserOutlined />} className="ml-2 cursor-pointer" />
+          </Dropdown>
+        </div>
+      </div>
     </Header>
   );
 };

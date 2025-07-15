@@ -30,7 +30,7 @@ const TravelCalendarChecklist = () => {
         <Col xs={24} md={12}>
           <Card
             title="🗓️ Travel Calendar"
-            bordered
+            variant="outlined" // ✅ fixed
             style={{ borderRadius: 12 }}
           >
             <Calendar fullscreen={false} />
@@ -38,7 +38,11 @@ const TravelCalendarChecklist = () => {
         </Col>
 
         <Col xs={24} md={10}>
-          <Card title="✔️ Trip Checklist" bordered style={{ borderRadius: 12 }}>
+          <Card
+            title="✔️ Trip Checklist"
+            variant="outlined" // ✅ fixed
+            style={{ borderRadius: 12 }}
+          >
             {checklistItems.map((item, idx) => (
               <Checkbox key={idx} style={{ display: "block", marginBottom: 8 }}>
                 {item}

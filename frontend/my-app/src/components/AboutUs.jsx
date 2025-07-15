@@ -7,7 +7,7 @@ const AboutUs = () => {
   return (
     <section className="bg-white py-12 px-4 text-center">
       <div className="max-w-4xl mx-auto">
-        <Card bordered className="shadow-lg">
+        <Card variant="outlined" className="shadow-lg">
           <Title level={2}>About One Sky Quest</Title>
           <Paragraph>
             One Sky Quest was born from the idea that travel should be seamless,
