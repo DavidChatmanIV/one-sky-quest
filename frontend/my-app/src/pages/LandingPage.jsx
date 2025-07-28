@@ -26,6 +26,8 @@ import AboutUs from "../components/AboutUs";
 import ContactUs from "../components/ContactUs";
 import SocialCommunity from "../components/SocialCommunity";
 import InfoPolicies from "../components/InfoPolicies";
+import TutorialModal from "../components/TutorialModal";
+import FeedbackForm from "../components/FeedbackForm"; // ✅ Added
 
 // 🔹 Layout Wrapper
 import PageLayout from "../components/PageLayout";
@@ -33,31 +35,12 @@ import PageLayout from "../components/PageLayout";
 const LandingPage = () => {
   return (
     <PageLayout>
-      {/* ✅ Moved Welcome Banner ABOVE Hero */}
+      {/* 🔹 Welcome Banner */}
       <WelcomeBack name="David" birthday="1992-05-11" />
-
-      {/* 🔹 Hero Section */}
-      <section className="flex flex-col justify-center items-center text-center py-20 px-6 bg-gradient-to-br from-sky-50 via-white to-indigo-100">
-        <h1 className="text-5xl font-bold mb-4 text-indigo-700 drop-shadow-sm">
-          🌍 Discover Your Next Adventure
-        </h1>
-        <p className="text-xl mb-6 max-w-2xl">
-          Book smarter. Travel freer. Earn XP as you explore the world. Welcome
-          to the future of travel.
-        </p>
-        <Link to="/booking">
-          <Button
-            size="large"
-            type="primary"
-            className="bg-indigo-600 hover:bg-indigo-700"
-          >
-            ✈️ Start Your Quest
-          </Button>
-        </Link>
-      </section>
-
-      {/* 🔹 Main Sections */}
+      <TutorialModal />
       <DiscoverAdventure />
+
+      {/* 🔹 Core Sections */}
       <TeamTravel />
       <TravelAssistant />
       <SmartTravelTools />
@@ -88,7 +71,7 @@ const LandingPage = () => {
         </p>
       </section>
 
-      {/* 🔹 CTA */}
+      {/* 🔹 Final CTA */}
       <section className="text-center py-10 bg-white">
         <h2 className="text-2xl font-bold mb-4">Ready to Quest?</h2>
         <Link to="/profile">
@@ -97,6 +80,9 @@ const LandingPage = () => {
           </Button>
         </Link>
       </section>
+
+      {/* 🔹 Feedback Form */}
+      <FeedbackForm />
 
       {/* 🔹 Footer */}
       <footer className="bg-gray-800 text-white py-6 text-center">

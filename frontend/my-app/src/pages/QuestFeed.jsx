@@ -1,164 +1,181 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Avatar, Card, Input, Button, Typography, Tooltip, Space } from "antd";
 import {
-  Avatar,
-  Button,
-  Card,
-  Col,
-  Input,
-  Layout,
-  Row,
-  Tag,
-  Tooltip,
-  Typography,
-} from "antd";
-import {
+  SmileOutlined,
   MessageOutlined,
-  RetweetOutlined,
-  StarOutlined,
+  SendOutlined,
+  HomeOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
 
 const { Title, Text, Paragraph } = Typography;
-const { Header, Content } = Layout;
 
 const samplePosts = [
   {
     id: 1,
-    user: {
-      username: "davidchatman",
-      avatar: "/images/avatar-default.jpg",
-      bio: "Full-stack dev & world explorer",
-    },
-    location: "Tokyo, Japan",
-    time: "2h",
-    text: "Just had the best ramen ever 🍜✨",
-    tags: ["#Tokyo", "#FoodieFinds"],
+    user: "Jayden",
+    avatar: "/images/users/jayden.jpg",
+    content: "Just landed in Tokyo ✈️ Can't wait to explore!",
+    reactions: 3,
+    comments: ["Enjoy it!", "Take pics for us! 📸"],
   },
   {
     id: 2,
-    user: {
-      username: "skybound",
-      avatar: "/images/avatar-default.jpg",
-      bio: "Chasing sunsets and skyviews",
-    },
-    location: "Paris, France",
-    time: "3h",
-    text: "Clouds were unreal today 🌥️",
-    tags: ["#SkySnaps", "#HiddenGems"],
+    user: "Zara",
+    avatar: "/images/users/zara.jpg",
+    content: "Sunsets in Santorini never get old 🌅",
+    reactions: 7,
+    comments: [],
   },
 ];
 
 const QuestFeed = () => {
-  const [tagCounts, setTagCounts] = useState({});
-  const [activeTag, setActiveTag] = useState(null);
+  const [posts, setPosts] = useState(samplePosts);
+  const [postContent, setPostContent] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  useEffect(() => {
-    const tagMap = {};
-    samplePosts.forEach((post) => {
-      post.tags.forEach((tag) => {
-        tagMap[tag] = (tagMap[tag] || 0) + 1;
-      });
-    });
-    setTagCounts(tagMap);
-  }, []);
-
-  const filteredPosts = activeTag
-    ? samplePosts.filter((post) => post.tags.includes(activeTag))
-    : samplePosts;
+  const handlePost = () => {
+    if (!postContent.trim()) return;
+    const newEntry = {
+      id: posts.length + 1,
+      user: "David",
+      avatar: "/images/users/david.jpg",
+      content: postContent,
+      reactions: 0,
+      comments: [],
+    };
+    setPosts([newEntry, ...posts]);
+    setPostContent("");
+    setShowEmojiPicker(false);
+  };
 
   return (
-    <Layout className="bg-gray-100 min-h-screen">
-      <Header className="flex justify-between items-center bg-white px-6 shadow-sm">
-        <Title level={3} className="!mb-0">
-          One Sky Quest
-        </Title>
-        <div className="flex gap-6 text-base">
-          <a href="/index.html">Home</a>
-          <a href="/dm.html">DMs</a>
-          <a href="/profile.html">Profile</a>
+    <div
+      className="min-h-screen bg-cover bg-center p-4"
+      style={{ backgroundImage: "url('/images/questfeed-bg.png')" }}
+    >
+      <div className="max-w-3xl mx-auto backdrop-blur-md bg-white/80 p-6 rounded-xl shadow-xl">
+        {/* 🔹 Navigation Links */}
+        <div className="flex justify-between items-center mb-4">
+          <Link
+            to="/"
+            className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
+          >
+            <HomeOutlined className="mr-1" />
+            Home
+          </Link>
+          <Link
+            to="/profile"
+            className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
+          >
+            <UserOutlined className="mr-1" />
+            Profile
+          </Link>
         </div>
-      </Header>
 
-      <Content className="px-4 md:px-24 py-8">
-        {/* Post Creator */}
-        <Card className="mb-6 max-w-2xl mx-auto">
-          <Input.TextArea placeholder="Share your travel update..." rows={4} />
-          <Button type="primary" className="mt-2">
-            Post
-          </Button>
+        <Title level={2} className="text-center text-indigo-700 drop-shadow">
+          🌐 Quest Feed
+        </Title>
+        <Paragraph className="text-center text-gray-600 mb-4">
+          Share your journey. Connect with travelers. Earn XP for engaging. 🧭
+        </Paragraph>
+
+        {/* 🔹 Post Composer */}
+        <Card className="mb-6">
+          <Input.TextArea
+            rows={3}
+            value={postContent}
+            onChange={(e) => setPostContent(e.target.value)}
+            placeholder="Where are you off to? ✍️"
+            showCount
+            maxLength={280}
+          />
+          <div className="mt-2 flex justify-between items-center">
+            <Button
+              icon={<SmileOutlined />}
+              onClick={() => setShowEmojiPicker((prev) => !prev)}
+            >
+              Emoji
+            </Button>
+            <Button
+              type="primary"
+              icon={<SendOutlined />}
+              onClick={handlePost}
+              disabled={!postContent.trim()}
+              className="bg-indigo-600 hover:bg-indigo-700"
+            >
+              Post
+            </Button>
+          </div>
+
+          {/* 🔹 Emoji Picker */}
+          {showEmojiPicker && (
+            <div className="mt-2 max-w-xs rounded-xl border border-gray-300 shadow-md">
+              <Picker
+                data={data}
+                onEmojiSelect={(emoji) => {
+                  setPostContent((prev) => prev + emoji.native);
+                  setShowEmojiPicker(false); // Auto-close after selection
+                }}
+                theme="light"
+                emojiSize={20}
+                maxFrequentRows={2}
+                previewPosition="none"
+              />
+            </div>
+          )}
         </Card>
 
-        <Row gutter={[24, 24]}>
-          <Col xs={24} md={16}>
-            {filteredPosts.map((post) => (
-              <Card key={post.id} className="mb-4 shadow-md">
-                <div className="flex items-center mb-3 gap-3">
-                  <Tooltip title={post.user.bio}>
-                    <Avatar
-                      src={post.user.avatar}
-                      size={48}
-                      alt={post.user.username}
+        {/* 🔹 Posts Feed */}
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          {posts.map((post) => (
+            <Card key={post.id} className="w-full shadow-sm">
+              <div className="flex items-center gap-3 mb-2">
+                <Avatar src={post.avatar} />
+                <Text strong>{post.user}</Text>
+              </div>
+              <Paragraph>{post.content}</Paragraph>
+
+              <div className="flex items-center justify-between">
+                <Space>
+                  <Tooltip title="React">
+                    <Button
+                      shape="circle"
+                      icon={<SmileOutlined />}
+                      size="small"
                     />
                   </Tooltip>
-                  <div>
-                    <Text strong>@{post.user.username}</Text>
-                    <div className="text-xs text-gray-500">
-                      {post.time} · {post.location}
-                    </div>
-                  </div>
-                </div>
-                <Paragraph>{post.text}</Paragraph>
-                <div className="flex gap-4 mt-3 text-gray-600 text-sm">
-                  <span>
-                    <MessageOutlined /> Comment
-                  </span>
-                  <span>
-                    <RetweetOutlined /> ReQuest
-                  </span>
-                  <span>
-                    <StarOutlined /> Quest Point
-                  </span>
-                </div>
-                <div className="mt-2">
-                  {post.tags.map((tag) => (
-                    <Tag
-                      key={tag}
-                      color="blue"
-                      className="cursor-pointer"
-                      onClick={() => setActiveTag(tag)}
-                    >
-                      {tag}
-                    </Tag>
+                  <Tooltip title="Comment">
+                    <Button
+                      shape="circle"
+                      icon={<MessageOutlined />}
+                      size="small"
+                    />
+                  </Tooltip>
+                  <Tooltip title="Likes">
+                    <Text type="secondary">👍 {post.reactions}</Text>
+                  </Tooltip>
+                </Space>
+                <Text type="secondary">{post.comments.length} comments</Text>
+              </div>
+
+              {post.comments.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {post.comments.map((comment, idx) => (
+                    <Text key={idx} type="secondary" className="block">
+                      💬 {comment}
+                    </Text>
                   ))}
                 </div>
-              </Card>
-            ))}
-          </Col>
-
-          <Col xs={24} md={8}>
-            <Card>
-              <Title level={5}>🌍 Trending Tags</Title>
-              {Object.entries(tagCounts)
-                .sort((a, b) => b[1] - a[1])
-                .map(([tag, count]) => (
-                  <Tag
-                    key={tag}
-                    color="geekblue"
-                    className="cursor-pointer mb-2"
-                    onClick={() => setActiveTag(tag)}
-                  >
-                    {tag} ({count})
-                  </Tag>
-                ))}
-              {activeTag && (
-                <Button type="link" onClick={() => setActiveTag(null)}>
-                  Clear Filter
-                </Button>
               )}
             </Card>
-          </Col>
-        </Row>
-      </Content>
-    </Layout>
+          ))}
+        </Space>
+      </div>
+    </div>
   );
 };
 

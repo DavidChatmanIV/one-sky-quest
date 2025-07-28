@@ -11,19 +11,27 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"), // 🔗 Use @ to import from /src
+      "@": path.resolve(__dirname, "src"), // Use @ for clean imports
     },
   },
   server: {
+    host: "localhost",
+    port: 5173,
+    strictPort: true,
+    historyApiFallback: true, //  React Router SPA support
+
     hmr: {
-      overlay: false, // 🔧 Optional: disable full-screen error overlay
+      protocol: "ws",
+      host: "localhost",
+      port: 5173,
+      overlay: false, // Optional: disable full-screen overlay on HMR errors
     },
+
     proxy: {
       "/api": {
-        target: "http://localhost:3000", // 🔌 Backend API proxy
+        target: "http://localhost:5000", // ✅ Point to your actual backend port
         changeOrigin: true,
       },
     },
-    historyApiFallback: true, 
   },
 });

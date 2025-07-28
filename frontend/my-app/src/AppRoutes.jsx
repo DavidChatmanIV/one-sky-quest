@@ -1,3 +1,4 @@
+// AppRoutes.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
@@ -10,7 +11,10 @@ import QuestFeed from "./pages/QuestFeed";
 import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
+import MembershipPage from "./pages/MembershipPage";
 import NotFound from "./pages/NotFound";
+import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage"; 
 
 // 🔹 Components
 import SavedExcursions from "./components/excursions/SavedExcursions";
@@ -20,20 +24,20 @@ const AppRoutes = () => (
     {/* 🔹 Main Pages */}
     <Route path="/" element={<LandingPage />} />
     <Route path="/booking" element={<BookingPage />} />
-    <Route path="/questfeed" element={<QuestFeed />} />
     <Route path="/profile" element={<ProfilePage />} />
+    <Route path="/questfeed" element={<QuestFeed />} />
     <Route path="/dm" element={<DmPage />} />
     <Route path="/dashboard" element={<Dashboard />} />
+    <Route path="/membership" element={<MembershipPage />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="/about" element={<About />} />
-
-    {/* 🔹 Extras */}
+    <Route path="/signup" element={<SignupPage />} />
+    <Route path="/login" element={<LoginPage />} /> 
+    {/* 🔸 Extra Tools */}
     <Route path="/saved-excursions" element={<SavedExcursions />} />
-
-    {/* 🔁 Redirect old index.html to root */}
+    {/* 🔁 Redirect index.html to "/" */}
     <Route path="/index.html" element={<Navigate to="/" replace />} />
-
-    {/* ⚠️ Catch-All 404 Page */}
+    {/* ⚠️ 404 Fallback */}
     <Route path="*" element={<NotFound />} />
   </Routes>
 );

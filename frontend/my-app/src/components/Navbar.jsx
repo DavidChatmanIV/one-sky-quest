@@ -1,17 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Avatar, Dropdown, Badge } from "antd";
-import { UserOutlined, MoreOutlined, BellOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Layout, Avatar, Dropdown, Badge, Button, Typography } from "antd";
+import {
+  HomeOutlined,
+  CompassOutlined,
+  StarOutlined,
+  MessageOutlined,
+  UserOutlined,
+  BellOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import { Link, useLocation } from "react-router-dom";
 import Notifications from "./Notifications";
 
 const { Header } = Layout;
+const { Text } = Typography;
+
+// 🔗 Navigation Links
+const navLinks = [
+  { path: "/", label: "Home", icon: <HomeOutlined /> },
+  { path: "/questfeed", label: "Feed", icon: <CompassOutlined /> },
+  { path: "/profile", label: "Profile", icon: <UserOutlined /> },
+  { path: "/dm", label: "DMs", icon: <MessageOutlined /> },
+  { path: "/booking", label: "Book", icon: <StarOutlined /> },
+];
 
 const Navbar = () => {
+  const { pathname } = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  // 🔔 Fetch unread notification count
   const fetchUnreadCount = async () => {
     try {
-      const res = await fetch("/api/notifications");
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch("/api/notifications", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
       const data = await res.json();
       const unread = data.filter((n) => !n.read).length;
@@ -23,75 +53,128 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
+    const interval = setInterval(fetchUnreadCount, 30000); // every 30 sec
     return () => clearInterval(interval);
   }, []);
 
+  // 👤 Profile Menu
   const profileMenuItems = [
     { key: "profile", label: <Link to="/profile">👤 My Profile</Link> },
     { key: "trips", label: <Link to="/saved-trips">💾 Saved Trips</Link> },
     {
       key: "logout",
       label: <span>🚪 Logout</span>,
-      onClick: () => console.log("Logging out..."),
+      onClick: () => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      },
     },
   ];
 
+  // ⋯ More Menu
   const moreMenuItems = [
     { key: "about", label: <Link to="/about">ℹ️ About</Link> },
   ];
 
   return (
     <Header
-      className="!bg-white !text-black shadow-md border-b border-gray-200 px-4 sm:px-6 py-2"
-      style={{ position: "sticky", top: 0, zIndex: 1000, width: "100%" }}
+      className="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-md border-b border-white/40 shadow-md"
+      style={{ padding: "0.5rem 1rem" }}
     >
-      <div className="flex justify-between items-center">
-        {/* 🌐 Brand */}
-        <div className="flex items-center gap-6">
-          <Link to="/" className="text-xl font-bold !text-blue-600">
-            One <span className="!text-orange-500">Sky</span> Quest
-          </Link>
+      <div className="flex justify-between items-center max-w-7xl mx-auto">
+        {/* 🌍 Brand */}
+        <Link
+          to="/"
+          className="text-2xl font-extrabold text-indigo-700 hover:text-indigo-900 tracking-wide"
+        >
+          🌍 One <span className="text-orange-500">Sky</span> Quest
+        </Link>
 
-          {/* 🧭 Main Navigation */}
-          <nav className="hidden md:flex gap-4 text-sm font-medium">
-            <Link to="/">🏠 Home</Link>
-            <Link to="/booking">📅 Booking</Link>
-            <Link to="/questfeed">🗺️ Quest Feed</Link>
-            <Link to="/saved-excursions">💾 My Excursions</Link>
-          </nav>
+        {/* 🔹 Navigation Links */}
+        <div className="flex gap-5 items-center">
+          {navLinks.map(({ path, label, icon }) => {
+            const isActive = pathname === path;
+            return (
+              <Link
+                key={path}
+                to={path}
+                className={`relative text-sm flex flex-col items-center justify-center ${
+                  isActive
+                    ? "text-indigo-700 font-semibold"
+                    : "text-gray-500 hover:text-indigo-600"
+                }`}
+              >
+                <span className="text-lg">{icon}</span>
+                <span>{label}</span>
+                {isActive && (
+                  <span className="absolute -bottom-1 w-full h-1 bg-indigo-600 rounded-full animate-pulse"></span>
+                )}
+              </Link>
+            );
+          })}
         </div>
 
-        {/* 🔧 Tools */}
-        <div className="hidden lg:flex gap-4 text-sm font-medium text-gray-600 items-center">
-          <span>Flights</span>
-          <span>Hotels</span>
-          <span>Packages</span>
-          <span>Cars</span>
-          <span>Cruises</span>
+        {/* 🔧 User Tools */}
+        <div className="hidden md:flex items-center gap-4 text-sm text-gray-600">
+          {/* ✅ Show Sign Up / Login if not logged in */}
+          {!isLoggedIn && (
+            <>
+              <Link to="/signup">
+                <Button size="small" type="primary">
+                  ✍️ Sign Up
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button size="small" type="default">
+                  🔑 Log In
+                </Button>
+              </Link>
+            </>
+          )}
 
           {/* 🔔 Notifications */}
-          <Dropdown
-            menu={{ items: [] }}
-            popupRender={() => <Notifications />}
-            placement="bottomRight"
-            trigger={["click"]}
-            overlayStyle={{ zIndex: 1500 }}
-          >
-            <Badge count={unreadCount} size="small" offset={[0, 5]}>
-              <BellOutlined style={{ fontSize: 20, cursor: "pointer" }} />
-            </Badge>
-          </Dropdown>
+          {isLoggedIn && (
+            <Dropdown
+              menu={{ items: [] }}
+              popupRender={() => <Notifications />}
+              trigger={["click"]}
+              overlayStyle={{ zIndex: 1500 }}
+            >
+              <Badge count={unreadCount} size="small" offset={[0, 5]}>
+                <BellOutlined style={{ fontSize: 20, cursor: "pointer" }} />
+              </Badge>
+            </Dropdown>
+          )}
 
-          {/* ⋯ More Menu */}
+          {/* ⋯ More */}
           <Dropdown menu={{ items: moreMenuItems }} trigger={["click"]}>
             <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
           </Dropdown>
 
-          {/* 👤 Profile Avatar Dropdown */}
-          <Dropdown menu={{ items: profileMenuItems }} trigger={["click"]}>
-            <Avatar icon={<UserOutlined />} className="ml-2 cursor-pointer" />
-          </Dropdown>
+          {/* 👤 Profile Dropdown */}
+          {isLoggedIn && (
+            <Dropdown menu={{ items: profileMenuItems }} trigger={["click"]}>
+              <Avatar icon={<UserOutlined />} className="cursor-pointer" />
+            </Dropdown>
+          )}
+
+          {/* 💳 Membership */}
+          <Link to="/membership">
+            <Button size="small" type="default">
+              💳 View Plans
+            </Button>
+          </Link>
+
+          {/* 🔁 Replay Tutorial */}
+          <Button
+            size="small"
+            onClick={() => {
+              localStorage.removeItem("osq_tutorial_seen");
+              window.location.reload();
+            }}
+          >
+            🔁 Replay Tutorial
+          </Button>
         </div>
       </div>
     </Header>

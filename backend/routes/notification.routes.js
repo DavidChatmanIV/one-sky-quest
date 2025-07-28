@@ -2,6 +2,21 @@ const express = require("express");
 const router = express.Router();
 const Notification = require("../models/Notification");
 
+// 🧪 Optional: Fake notifications for fallback/dev mode
+const fakeNotifications = [
+  {
+    message: "🛫 Your trip to Tokyo is confirmed!",
+    read: false,
+    createdAt: new Date(),
+  },
+  {
+    message: "🎖️ You earned the Globetrotter badge!",
+    read: false,
+    createdAt: new Date(),
+  },
+  { message: "📨 New message from Zara", read: true, createdAt: new Date() },
+];
+
 // 📌 POST /api/notifications — Create a new notification
 router.post("/", async (req, res) => {
   try {
@@ -32,6 +47,9 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
+
+    // Uncomment below to use fake data during development
+    // return res.status(200).json(fakeNotifications);
 
     const notifications = await Notification.find()
       .sort({ createdAt: -1 })
