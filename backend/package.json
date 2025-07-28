@@ -11,13 +11,21 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ant-design/icons": "^6.0.0",
+    "antd": "^5.26.1",
     "aos": "^2.3.4",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
+<<<<<<< HEAD
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "helmet": "^8.1.0",
+=======
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "framer-motion": "^12.18.1",
+>>>>>>> origin/fresh-start
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.0.3",
     "nodemailer": "^7.0.3",

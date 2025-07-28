@@ -626,6 +626,17 @@ body.dark-theme .ai-trip-form button:hover {
   background-color: #0077cc;
 }
 
+/* badges */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px 4px rgba(255, 215, 0, 0.7); }
+  50% { box-shadow: 0 0 20px 10px rgba(255, 215, 0, 1); }
+}
+
+.badge-glow {
+  animation: glow 1.5s ease-in-out infinite;
+}
+
+/* badges */
 
 /* Featured Destinations */
 .featured-destinations {

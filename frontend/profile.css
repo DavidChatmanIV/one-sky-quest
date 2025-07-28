@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.tab-btn.active {
+@apply border-b-2 border-blue-500 text-blue-600;
+}

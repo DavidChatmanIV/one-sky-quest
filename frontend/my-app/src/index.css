@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🔄 Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
+  background-color: #f9f9f9;
+  color: #222;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ✨ Section Layout Control */
+section {
+  padding: 4rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 6rem; /* ⬅️ Ensures Navbar is not overlapped */
+}
+
+/* 💡 Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 📦 Buttons */
+button {
+  border-radius: 8px;
+}
+
+/* 🔧 Ant Design Fixes */
+.ant-btn {
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+}
+
+.ant-typography {
+  margin-bottom: 1rem;
+}
+
+/* ✅ Navbar Display Fix */
+.ant-layout-header {
+  position: relative;
+  z-index: 1000;
+}
+
+/* 🎯 Animation for Dropdowns */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out;
+}

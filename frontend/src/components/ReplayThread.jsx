@@ -7,7 +7,11 @@ const ReplyThread = ({ replies }) => (
         <p className="text-sm">{reply.text}</p>
     </div>
     ))}
+<<<<<<< HEAD
 </div>
+=======
+  </div>
+>>>>>>> origin/fresh-start
 );
 
 export default ReplyThread;

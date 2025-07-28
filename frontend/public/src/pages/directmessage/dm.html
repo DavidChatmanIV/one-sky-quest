@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DM – One Sky Quest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="/src/js/dm.js"></script>
+</head>
+<body class="bg-blue-50 text-gray-900">
+
+<main class="flex h-screen overflow-hidden">
+  <!-- Sidebar -->
+  <aside class="w-1/3 bg-white border-r border-blue-200 flex flex-col">
+    <div class="p-4 flex items-center justify-between border-b border-blue-100">
+      <h2 class="font-bold text-sky-600 text-xl">💬 Messages</h2>
+      <button class="text-sm text-sky-600 hover:underline" onclick="startNewChat()">+ New</button>
+    </div>
+
+    <!-- Search -->
+    <div class="p-3 border-b border-blue-100">
+      <input
+        type="text"
+        placeholder="Search..."
+        class="w-full px-3 py-2 rounded-full border border-blue-300 focus:ring-2 focus:ring-sky-300 outline-none"
+      />
+    </div>
+
+    <!-- Conversation List -->
+    <ul id="conversationList" class="flex-1 overflow-y-auto p-2 space-y-2">
+      <li class="p-3 rounded-lg hover:bg-blue-100 cursor-pointer" onclick="loadConversation('SkyBot')">
+        <div class="font-semibold text-sky-700">🌍 SkyBot</div>
+        <div class="text-sm text-gray-500">Need help?</div>
+      </li>
+      <li class="p-3 rounded-lg hover:bg-blue-100 cursor-pointer" onclick="loadConversation('Questy')">
+        <div class="font-semibold text-sky-700">🧭 Questy</div>
+        <div class="text-sm text-gray-500">Ready to explore?</div>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Chat -->
+  <section class="flex-1 flex flex-col">
+    <!-- Header -->
+    <div class="bg-white p-4 border-b border-blue-100 shadow text-lg font-semibold text-sky-700" id="chatWith">
+      Select a conversation
+    </div>
+
+    <!-- Messages -->
+    <div id="chatWindow" class="flex-1 p-4 overflow-y-auto space-y-3 bg-blue-50">
+      <!-- JS will insert message bubbles here -->
+    </div>
+
+    <!-- Input -->
+    <form id="messageForm" class="p-4 bg-white border-t border-blue-100 flex items-center">
+      <input
+        type="text"
+        id="messageInput"
+        placeholder="Message..."
+        class="flex-1 px-4 py-2 rounded-full border border-blue-300 focus:ring-2 focus:ring-sky-300 outline-none"
+      />
+      <button
+        type="submit"
+        class="ml-3 bg-sky-500 text-white px-5 py-2 rounded-full hover:bg-sky-600 transition"
+      >
+        Send
+      </button>
+    </form>
+  </section>
+</main>
+
+<script>
+  const chatWindow = document.getElementById("chatWindow");
+  const chatWith = document.getElementById("chatWith");
+  const form = document.getElementById("messageForm");
+  const input = document.getElementById("messageInput");
+
+  const mockConversations = {
+    SkyBot: [
+      { from: "bot", text: "Hi there! 👋 How can I help you today?" },
+      { from: "user", text: "What’s a great place to go in July?" },
+      { from: "bot", text: "✨ Try Bali, Greece, or Japan for summer adventures!" }
+    ],
+    Questy: [
+      { from: "bot", text: "Hey explorer! 🌍 Where are you heading next?" },
+      { from: "user", text: "Somewhere with beaches and no crowds." },
+      { from: "bot", text: "🏝️ Check out Seychelles or hidden coves in Portugal!" }
+    ]
+  };
+
+  let currentUser = null;
+
+  function loadConversation(user) {
+    chatWith.textContent = `Chat with ${user}`;
+    chatWindow.innerHTML = ""; // Clear previous messages
+    currentUser = user;
+
+    mockConversations[user].forEach(msg => {
+      const msgWrapper = document.createElement("div");
+      msgWrapper.className = "flex gap-2 items-end " + (msg.from === "user" ? "justify-end" : "");
+
+      const avatar = document.createElement("img");
+      avatar.src = msg.from === "user" ? "/images/avatar-david.png" : "/images/avatar-bot.png";
+      avatar.className = "w-8 h-8 rounded-full mt-1";
+
+      const bubble = document.createElement("div");
+      bubble.textContent = msg.text;
+      bubble.className =
+        "max-w-xs px-4 py-2 rounded-2xl text-sm shadow " +
+        (msg.from === "user" ? "bg-sky-500 text-white" : "bg-white text-gray-800");
+
+      if (msg.from === "user") {
+        msgWrapper.appendChild(bubble);
+        msgWrapper.appendChild(avatar);
+      } else {
+        msgWrapper.appendChild(avatar);
+        msgWrapper.appendChild(bubble);
+      }
+
+      chatWindow.appendChild(msgWrapper);
+    });
+
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function startNewChat() {
+    alert("New chat feature coming soon!"); // Placeholder
+  }
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message || !currentUser) return;
+
+    const userWrapper = document.createElement("div");
+    userWrapper.className = "flex gap-2 items-end justify-end";
+
+    const userAvatar = document.createElement("img");
+    userAvatar.src = "/images/avatar-david.png";
+    userAvatar.className = "w-8 h-8 rounded-full mt-1";
+
+    const userBubble = document.createElement("div");
+    userBubble.className =
+      "max-w-xs px-4 py-2 rounded-2xl text-sm shadow bg-sky-500 text-white";
+    userBubble.textContent = message;
+
+    userWrapper.appendChild(userBubble);
+    userWrapper.appendChild(userAvatar);
+    chatWindow.appendChild(userWrapper);
+
+    input.value = "";
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  });
+</script>
+
+</body>
+</html>

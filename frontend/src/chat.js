@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const socket = io(); 
+=======
+const socket = io();
+>>>>>>> origin/fresh-start
 
 const inbox = document.getElementById("inbox");
 const chatWindow = document.getElementById("chatWindow");
@@ -11,6 +15,7 @@ let currentConversationId = null;
 
 // 1. Load conversations
 fetch(`/api/dm/conversations/${currentUser}`, {
+<<<<<<< HEAD
 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 })
 .then((res) => res.json())
@@ -24,6 +29,21 @@ headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     inbox.appendChild(div);
     });
 });
+=======
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+})
+  .then((res) => res.json())
+  .then((conversations) => {
+    conversations.forEach((conv) => {
+      const participant = conv.participants.find((p) => p._id !== currentUser);
+      const div = document.createElement("div");
+      div.className = "conversation";
+      div.textContent = `Chat with ${participant?.username || "Unknown"}`;
+      div.onclick = () => openChat(conv._id);
+      inbox.appendChild(div);
+    });
+  });
+>>>>>>> origin/fresh-start
 
 // 2. Open chat window and join socket room
 function openChat(convoId) {
