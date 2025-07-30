@@ -8,8 +8,7 @@ const ConversationSchema = new mongoose.Schema(
       default: "",
     },
   },
-  { timestamps: true } // Auto-manage createdAt & updatedAt
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Conversation", ConversationSchema);
-
