@@ -1,4 +1,3 @@
-// AppRoutes.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
@@ -12,12 +11,13 @@ import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import MembershipPage from "./pages/MembershipPage";
-import NotFound from "./pages/NotFound";
 import SignupPage from "./pages/SignupPage";
-import LoginPage from "./pages/LoginPage"; 
+import LoginPage from "./pages/LoginPage";
+import TeamTravelPage from "./pages/TeamTravelPage"; 
 
 // 🔹 Components
 import SavedExcursions from "./components/excursions/SavedExcursions";
+import NotFound from "./pages/NotFound";
 
 const AppRoutes = () => (
   <Routes>
@@ -32,7 +32,8 @@ const AppRoutes = () => (
     <Route path="/contact" element={<Contact />} />
     <Route path="/about" element={<About />} />
     <Route path="/signup" element={<SignupPage />} />
-    <Route path="/login" element={<LoginPage />} /> 
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/team-travel" element={<TeamTravelPage />} /> 
     {/* 🔸 Extra Tools */}
     <Route path="/saved-excursions" element={<SavedExcursions />} />
     {/* 🔁 Redirect index.html to "/" */}

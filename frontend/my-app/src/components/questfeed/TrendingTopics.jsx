@@ -7,7 +7,7 @@ import {
   CheckOutlined,
 } from "@ant-design/icons";
 
-// Sample trending data (replace with API call later)
+// Sample data (you can later replace this with real API data)
 const trendingTags = [
   { tag: "#Tokyo", posts: 124, xpBoost: true },
   { tag: "#HiddenGem", posts: 90, xpBoost: true },
@@ -40,8 +40,12 @@ const TrendingTopics = ({ onTagSelect }) => {
           <FireOutlined /> Trending Now
         </span>
       }
-      className="shadow-md rounded-lg"
-      style={{ marginTop: 32 }}
+      style={{
+        marginTop: 24,
+        background: "#ffffff",
+        borderRadius: 12,
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+      }}
     >
       <List
         size="small"

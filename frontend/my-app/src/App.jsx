@@ -1,6 +1,7 @@
 import React from "react";
 import AppRoutes from "./AppRoutes";
 import CookieBanner from "./components/CookieBanner";
+import { AssistantProvider } from "./context/AssistantContext";
 
 const App = () => {
   return (
@@ -11,4 +12,10 @@ const App = () => {
   );
 };
 
-export default App;
+export default function AppRoot() {
+  return (
+    <AssistantProvider>
+      <App />
+    </AssistantProvider>
+  );
+}

@@ -1,0 +1,96 @@
+/* 🔷 Main Feed Section Wrapper */
+.quest-feed {
+  background-color: #fefefe; /* Updated from #fffaf3 for smoother white */
+  padding: 48px 20px;
+}
+
+/* 🔷 Feed Card Style */
+.feed-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  padding: 20px;
+  transition: all 0.25s ease;
+}
+
+.feed-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 🔷 Username & Meta */
+.username {
+  color: #f59e0b;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.feed-meta {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* 🔷 Content */
+.feed-content {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+/* 🔷 Reactions Row */
+.reactions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 🔷 Sidebar Styling */
+.sidebar-wrapper {
+  background-color: #f0f9ff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* 🔷 XP Boost Tag */
+.tag-xp-boost {
+  animation: glowPulse 1.5s infinite ease-in-out;
+  background-color: #fffbe6 !important;
+  border: 1px solid #ffe58f !important;
+  color: #d48806 !important;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0px rgba(250, 173, 20, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(250, 173, 20, 0.9);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(250, 173, 20, 0.6);
+  }
+}
+
+/* 🔷 Mobile Tweaks */
+@media (max-width: 768px) {
+  .feed-card {
+    padding: 16px;
+  }
+
+  .username {
+    font-size: 1rem;
+  }
+
+  .feed-meta {
+    font-size: 0.75rem;
+  }
+
+  .reactions {
+    gap: 6px;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Button,
@@ -11,25 +11,45 @@ import {
   Input,
   message,
   Card,
+  Space,
+  Tag,
+  theme,
+  Select,
 } from "antd";
 import {
   UserOutlined,
-  PlusOutlined,
   MessageOutlined,
   UserAddOutlined,
+  HolderOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
+
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import PageLayout from "../components/PageLayout";
 import ThemeSelector from "../components/profile/ThemeSelector";
-import AvatarCustomizer from "../components/profile/AvatarCustomizer";
 import ProfileMusic from "../components/profile/ProfileMusic";
 import ReferralBox from "../components/profile/ReferralBox";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
-const badgeTitles = [
+// ------------------- constants -------------------
+const BADGE_TITLES = [
   "New Explorer",
   "Wanderer",
   "Trailblazer",
@@ -38,207 +58,487 @@ const badgeTitles = [
   "World Builder",
 ];
 
-const top8Sample = [
-  { name: "Emily", img: "/images/users/emily.jpg" },
-  { name: "Jayden", img: "/images/users/jayden.jpg" },
-  { name: "Luna", img: "/images/users/luna.jpg" },
-  { name: "Kai", img: "/images/users/kai.jpg" },
-  { name: "Zara", img: "/images/users/zara.jpg" },
-  { name: "Leo", img: "/images/users/leo.jpg" },
-  { name: "Ava", img: "/images/users/ava.jpg" },
-  { name: "Noah", img: "/images/users/noah.jpg" },
+const TOP8_SAMPLE = [
+  { id: "Emily", name: "Emily", img: "/images/users/emily.jpg" },
+  { id: "Jayden", name: "Jayden", img: "/images/users/jayden.jpg" },
+  { id: "Luna", name: "Luna", img: "/images/users/luna.jpg" },
+  { id: "Kai", name: "Kai", img: "/images/users/kai.jpg" },
+  { id: "Zara", name: "Zara", img: "/images/users/zara.jpg" },
+  { id: "Leo", name: "Leo", img: "/images/users/leo.jpg" },
+  { id: "Ava", name: "Ava", img: "/images/users/ava.jpg" },
+  { id: "Noah", name: "Noah", img: "/images/users/noah.jpg" },
 ];
 
-const showXpToast = (xp, reason) => {
-  message.success(`+${xp} XP earned for ${reason}!`);
+const BORDER_STYLES = {
+  None: { border: "2px solid rgba(0,0,0,0.06)" },
+  Glow: {
+    border: "2px solid #60a5fa",
+    boxShadow: "0 0 0 3px rgba(96,165,250,0.25)",
+  },
+  Gold: {
+    border: "2px solid #eab308",
+    boxShadow: "0 0 0 3px rgba(234,179,8,0.20)",
+  },
+  Rose: {
+    border: "2px solid #f43f5e",
+    boxShadow: "0 0 0 3px rgba(244,63,94,0.20)",
+  },
 };
 
+// ------------------- helpers -------------------
+const showXpToast = (xp, reason) => {
+  if (reason) message.success(`+${xp} XP earned for ${reason}!`);
+  else message.success(`+${xp} XP earned!`);
+};
+
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+const levelFromXp = (xp) => Math.floor(xp / 100) + 1;
+const progressToNext = (xp) => xp % 100;
+const xpToNext = (xp) => 100 - progressToNext(xp);
+
+// ------------------- section wrapper -------------------
+const Section = ({ title, subtitle, extra, children }) => {
+  const { token } = theme.useToken();
+  return (
+    <Card
+      className="rounded-2xl"
+      style={{ borderRadius: token.borderRadiusLG, overflow: "hidden" }}
+      bodyStyle={{ padding: 16 }}
+    >
+      <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
+        <Col>
+          <Space direction="vertical" size={0}>
+            <Title level={4} style={{ margin: 0 }}>
+              {title}
+            </Title>
+            {subtitle ? (
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                {subtitle}
+              </Text>
+            ) : null}
+          </Space>
+        </Col>
+        <Col>{extra}</Col>
+      </Row>
+      {children}
+    </Card>
+  );
+};
+
+// ------------------- Sortable friend -------------------
+const SortableFriend = ({ friend }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: friend.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    touchAction: "none",
+    cursor: "grab",
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="flex flex-col items-center"
+    >
+      <div
+        style={{
+          position: "relative",
+          width: 80,
+          height: 80,
+          borderRadius: "50%",
+          border: "3px solid rgba(24, 144, 255, 0.25)",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#fff",
+          transition: "transform .2s ease",
+        }}
+        className="hover:scale-110"
+      >
+        <HolderOutlined
+          style={{
+            position: "absolute",
+            top: 6,
+            left: 6,
+            fontSize: 14,
+            color: "rgba(0,0,0,0.4)",
+          }}
+        />
+        <Avatar
+          size={72}
+          src={friend.img}
+          alt={friend.name}
+          style={{ background: "#f5f5f5" }}
+        />
+      </div>
+      <Text style={{ marginTop: 6, fontSize: 12, fontWeight: 500 }}>
+        {friend.name}
+      </Text>
+    </div>
+  );
+};
+
+// ------------------- Page -------------------
 const ProfilePage = () => {
+  const { token } = theme.useToken();
+
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
   const [status, setStatus] = useState(
-    "\ud83c\udf0d Exploring the world one trip at a time..."
+    "🌍 Exploring the world one trip at a time..."
   );
-  const [theme, setTheme] = useState({
+  const [themeChoice, setThemeChoice] = useState({
     bg: "bg-white",
     font: "font-sans text-gray-800",
   });
+
+  // avatar at top (like socials)
   const [avatar, setAvatar] = useState({
     avatarUrl: null,
-    borderFx: "ring-2 ring-pink-500 animate-pulse",
+    borderStyle: "Glow",
   });
 
-  const user = {
-    username: "David",
-    referralCode: "ONE_DAVID123",
-    referralsCount: 3,
-  };
+  // Top 8 reorderable list
+  const [top8, setTop8] = useState(TOP8_SAMPLE);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const user = useMemo(
+    () => ({
+      username: "David",
+      referralCode: "ONE_DAVID123",
+      referralsCount: 3,
+    }),
+    []
+  );
 
   const handleAddXp = (amount, reason = "") => {
-    setXp((prevXp) => {
-      const newXp = prevXp + amount;
-      const newLevel = Math.floor(newXp / 100) + 1;
-      if (newLevel > level) {
-        setLevel(newLevel);
-        message.success(`\ud83c\udf89 Level Up! You reached Level ${newLevel}`);
+    setXp((prev) => {
+      const nx = prev + amount;
+      const nl = levelFromXp(nx);
+      if (nl > level) {
+        setLevel(nl);
+        message.success(`🎉 Level Up! You reached Level ${nl}`);
       }
-      if (reason) showXpToast(amount, reason);
-      return newXp;
+      if (amount > 0) showXpToast(amount, reason);
+      return nx;
     });
   };
 
-  const getLevelTitle = (lvl) =>
-    badgeTitles[Math.min(lvl - 1, badgeTitles.length - 1)];
+  // Real actions → XP
+  const handleShareMemory = () => handleAddXp(20, "sharing a travel memory");
+  const handleSendMessage = () => handleAddXp(5, "sending a message");
+  const handleAddFriend = () => handleAddXp(25, "adding a friend");
 
-  const getBadgeIcon = (lvl) =>
-    `/images/badges/badge-${Math.min(lvl, badgeTitles.length)}.jpg`;
+  // inline avatar edit (upload + border select)
+  const fileInputRef = useRef(null);
+  const onPickFile = () => fileInputRef.current?.click();
+  const onFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      message.error("Please choose an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatar((prev) => ({ ...prev, avatarUrl: reader.result }));
+      handleAddXp(10, "customizing avatar");
+      message.success("Avatar updated!");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const levelTitle = useMemo(() => {
+    const idx = Math.max(0, Math.min(level - 1, BADGE_TITLES.length - 1));
+    return BADGE_TITLES[idx];
+  }, [level]);
+
+  const onDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = top8.findIndex((f) => f.id === active.id);
+    const newIndex = top8.findIndex((f) => f.id === over.id);
+    setTop8(arrayMove(top8, oldIndex, newIndex));
+    handleAddXp(5, "reordering Top 8");
+  };
+
+  // clamp percent to 0–100 and reuse
+  const percentToNext = clamp(progressToNext(xp), 0, 100);
 
   return (
     <PageLayout>
       <section
-        className={`px-4 md:px-10 py-8 bg-white min-h-screen text-gray-800 space-y-10 ${theme.font}`}
+        className={`px-4 md:px-10 py-16 min-h-screen ${themeChoice.font}`}
+        style={{ background: token.colorBgLayout, color: token.colorText }}
       >
-        {/* Profile Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+        {/* ------------------- TOP PROFILE SECTION (avatar + XP + actions + music) ------------------- */}
+        <Card
+          className="rounded-2xl shadow-sm"
+          bodyStyle={{ padding: 16 }}
+          style={{ borderRadius: token.borderRadiusLG }}
         >
-          <Card className="rounded-2xl shadow-lg p-6">
-            <Row gutter={[16, 16]} align="middle">
-              <Col
-                xs={24}
-                md={6}
-                className="flex justify-center md:justify-start"
-              >
-                <Avatar
-                  size={120}
-                  icon={!avatar.avatarUrl && <UserOutlined />}
-                  src={avatar.avatarUrl}
-                  className={`transition-all duration-500 ${avatar.borderFx}`}
-                />
-              </Col>
-              <Col xs={24} md={18}>
-                <Title level={2} className="font-bold text-gray-800">
-                  👋 Welcome back,{" "}
-                  <span className="text-blue-600">{user?.username}</span>
-                </Title>
-                <Text className="text-md text-gray-600 italic">
-                  Level {level} —{" "}
-                  <span className="font-semibold">{getLevelTitle(level)}</span>
-                </Text>
+          <Row align="top" gutter={[24, 12]}>
+            {/* LEFT: Avatar + XP ring + quick edit */}
+            <Col flex="none">
+              <div style={{ position: "relative", width: 128, height: 128 }}>
                 <Progress
-                  percent={xp % 100}
-                  showInfo={false}
-                  strokeColor={{ "0%": "#108ee9", "100%": "#87d068" }}
-                  className="transition-all duration-700 mt-2"
+                  type="dashboard"
+                  percent={percentToNext}
+                  size={128}
+                  strokeWidth={10}
+                  trailColor={token.colorFillQuaternary}
+                  strokeColor={token.colorPrimary}
                 />
-                <div className="mt-3 flex gap-2 flex-wrap">
-                  <Button
-                    icon={<PlusOutlined />}
-                    onClick={() => handleAddXp(10)}
-                    className="bg-blue-500 text-white hover:bg-blue-600 rounded-full"
-                  >
-                    ✨ +10 XP
-                  </Button>
-                  <Button
-                    icon={<PlusOutlined />}
-                    onClick={() => handleAddXp(20, "sharing a travel memory")}
-                    className="bg-pink-500 text-white hover:bg-pink-600 rounded-full"
-                  >
-                    📸 Share Travel Memory
-                  </Button>
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "grid",
+                    placeItems: "center",
+                  }}
+                >
+                  <Avatar
+                    size={88}
+                    icon={!avatar.avatarUrl && <UserOutlined />}
+                    src={avatar.avatarUrl}
+                    className="transition-all duration-300"
+                    style={{
+                      borderRadius: "9999px",
+                      background: "#f8fafc",
+                      ...(BORDER_STYLES[avatar.borderStyle] ||
+                        BORDER_STYLES.None),
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Inline avatar controls */}
+              <Space direction="vertical" size={6} style={{ marginTop: 8 }}>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={onFile}
+                  style={{ display: "none" }}
+                />
+                <Button icon={<UploadOutlined />} onClick={onPickFile}>
+                  Change Avatar
+                </Button>
+                <div>
+                  <Text type="secondary" style={{ marginRight: 8 }}>
+                    Border:
+                  </Text>
+                  <Select
+                    size="small"
+                    value={avatar.borderStyle}
+                    style={{ width: 140 }}
+                    onChange={(val) =>
+                      setAvatar((p) => ({ ...p, borderStyle: val }))
+                    }
+                    options={Object.keys(BORDER_STYLES).map((k) => ({
+                      value: k,
+                      label: k,
+                    }))}
+                  />
+                </div>
+              </Space>
+            </Col>
+
+            {/* RIGHT: Level tags, progress bar, actions, and 🎵 Profile Music */}
+            <Col flex="auto">
+              <Space direction="vertical" size={8} style={{ width: "100%" }}>
+                <Space wrap>
+                  <Tag color="blue">Level {level}</Tag>
+                  <Tag color="green">{levelTitle}</Tag>
+                  <Text type="secondary">{xpToNext(xp)} XP to next level</Text>
+                </Space>
+
+                <Progress
+                  percent={percentToNext}
+                  showInfo={false}
+                  strokeColor={token.colorSuccess}
+                />
+
+                <Space wrap>
+                  <Button onClick={handleShareMemory}>Share Memory</Button>
                   <Tooltip title="Send a message">
-                    <Button icon={<MessageOutlined />} />
+                    <Button
+                      icon={<MessageOutlined />}
+                      onClick={handleSendMessage}
+                      aria-label="Send message"
+                    />
                   </Tooltip>
                   <Tooltip title="Add friend">
-                    <Button icon={<UserAddOutlined />} />
+                    <Button
+                      icon={<UserAddOutlined />}
+                      onClick={handleAddFriend}
+                      aria-label="Add friend"
+                    />
                   </Tooltip>
-                </div>
-              </Col>
-            </Row>
-          </Card>
-        </motion.div>
+                </Space>
 
-        {/* Status Input */}
-        <Card className="rounded-xl shadow-md p-4">
-          <Title level={4}>✍️ Status</Title>
+                <Divider style={{ margin: 8 }} />
+
+                {/* 🎵 Profile Music lives here */}
+                <ProfileMusic />
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+
+        <Divider style={{ margin: "24px 0" }} />
+
+        {/* ------------------- STATUS ------------------- */}
+        <Section
+          title="✍️ Status"
+          subtitle="Let friends know your vibe."
+          extra={
+            <Text type="secondary">{140 - (status?.length || 0)} left</Text>
+          }
+        >
           <Input.TextArea
             rows={2}
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
             maxLength={140}
-            showCount
+            onChange={(e) => setStatus(e.target.value)}
             placeholder="What's your current vibe? 🧘‍♂️✈️🔥"
-            className="mt-2"
+            aria-label="Status message"
           />
-        </Card>
+        </Section>
 
-        {/* Referral System */}
-        <ReferralBox user={user} />
+        {/* ------------------- REFERRALS ------------------- */}
+        <Section
+          title="🎁 Referral Rewards"
+          subtitle="Invite friends. Earn XP and perks."
+        >
+          <ReferralBox user={user} />
+        </Section>
 
-        {/* Theme Picker */}
-        <ThemeSelector onThemeChange={setTheme} />
+        {/* ------------------- THEME (left) + KEEP EXPLORING (right) ------------------- */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={12}>
+            <Section title="🎨 Theme" subtitle="Make it feel like home.">
+              <ThemeSelector onThemeChange={setThemeChoice} />
+            </Section>
+          </Col>
 
-        {/* Avatar Customizer */}
-        <AvatarCustomizer onAvatarChange={setAvatar} />
+          <Col xs={24} md={12}>
+            <Card
+              className="rounded-2xl shadow-sm"
+              bodyStyle={{ padding: 16 }}
+              style={{ borderRadius: token.borderRadiusLG, height: "100%" }}
+            >
+              <Title level={4} style={{ margin: 0 }}>
+                Keep exploring. Keep leveling.
+              </Title>
+              <Paragraph type="secondary" style={{ margin: "6px 0 12px" }}>
+                Post a memory, invite a friend, or customize your profile to
+                earn XP.
+              </Paragraph>
+              <Space wrap>
+                <Button
+                  type="primary"
+                  onClick={() => handleAddXp(15, "updating profile")}
+                >
+                  Update Profile (+15 XP)
+                </Button>
+                <Button onClick={() => handleAddXp(25, "inviting a friend")}>
+                  Invite a Friend (+25 XP)
+                </Button>
+              </Space>
+            </Card>
+          </Col>
+        </Row>
 
-        <Divider />
+        {/* ------------------- TOP 8 (sortable) ------------------- */}
+        <Section
+          title="🌟 Top 8 Friends"
+          subtitle="Drag to reorder your travel circle."
+        >
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onDragEnd}
+          >
+            <SortableContext
+              items={top8.map((f) => f.id)}
+              strategy={rectSortingStrategy}
+            >
+              <Row gutter={[12, 16]} justify="start">
+                {top8.map((friend) => (
+                  <Col xs={8} sm={6} md={4} key={friend.id}>
+                    <SortableFriend friend={friend} />
+                  </Col>
+                ))}
+              </Row>
+            </SortableContext>
+          </DndContext>
+        </Section>
 
-        {/* Top 8 Friends */}
-        <Card className="rounded-xl shadow-md p-4">
-          <Title level={4}>🌟 Top 8 Friends</Title>
-          <Row gutter={[12, 12]} justify="center">
-            {top8Sample.map((friend, idx) => (
-              <Col xs={8} sm={6} md={4} key={idx} className="text-center">
-                <Tooltip title={`View ${friend.name}'s profile`}>
-                  <Avatar
-                    size={72}
-                    src={friend.img}
-                    className="border-[3px] border-indigo-500 hover:scale-110 rounded-full transition-transform duration-300"
-                  />
-                </Tooltip>
-                <Text className="block mt-2 font-semibold">{friend.name}</Text>
-              </Col>
-            ))}
-          </Row>
-        </Card>
-
-        <Divider />
-
-        {/* Badges */}
-        <Card className="rounded-xl shadow-md p-4">
-          <Title level={4}>🎖️ Badges</Title>
-          <Row gutter={[16, 16]} justify="start">
-            {badgeTitles.map((title, index) => (
-              <Col key={index}>
-                <Tooltip title={`Earned at Level ${index + 1}`}>
+        {/* ------------------- BADGES ------------------- */}
+        <Section title="🎖️ Badges" subtitle="Milestones you’ve unlocked.">
+          <Row gutter={[12, 12]}>
+            {BADGE_TITLES.map((title, index) => {
+              const lvl = index + 1;
+              const isCurrent = level === lvl;
+              return (
+                <Col xs={12} sm={8} md={6} lg={4} key={index}>
                   <Card
                     hoverable
-                    className={`rounded-xl shadow-md w-[160px] text-center ${
-                      level === index + 1
-                        ? "border-2 border-yellow-400 animate-pulse"
-                        : ""
-                    }`}
+                    bodyStyle={{ padding: 8, textAlign: "center" }}
+                    style={{
+                      borderRadius: token.borderRadiusLG,
+                      border: isCurrent
+                        ? `2px solid ${token.colorWarningBorder}`
+                        : undefined,
+                      boxShadow: isCurrent
+                        ? "0 6px 20px rgba(0,0,0,0.08)"
+                        : undefined,
+                    }}
                   >
                     <img
-                      src={getBadgeIcon(index + 1)}
+                      src={`/images/badges/badge-${lvl}.jpg`}
                       alt={title}
-                      className="rounded-t-xl"
+                      style={{
+                        width: "100%",
+                        borderRadius: token.borderRadiusLG,
+                      }}
                     />
-                    <div className="py-2 font-semibold text-sm">{title}</div>
+                    <div
+                      style={{
+                        padding: "8px 4px",
+                        fontWeight: 600,
+                        fontSize: 13,
+                      }}
+                    >
+                      {title}
+                    </div>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Earned at Level {lvl}
+                    </Text>
                   </Card>
-                </Tooltip>
-              </Col>
-            ))}
+                </Col>
+              );
+            })}
           </Row>
-        </Card>
-
-        {/* Profile Music */}
-        <Card className="rounded-xl shadow-sm p-4 bg-gradient-to-r from-pink-100 to-blue-100">
-          <Title level={4}>🎵 Add Profile Music</Title>
-          <ProfileMusic />
-        </Card>
+        </Section>
       </section>
     </PageLayout>
   );

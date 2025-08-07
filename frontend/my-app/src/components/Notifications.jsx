@@ -1,35 +1,60 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Badge,
-  Dropdown,
-  List,
   Button,
-  Avatar,
-  Typography,
+  Dropdown,
   Empty,
+  List,
+  Tabs,
+  Tooltip,
+  Typography,
   Spin,
+  Avatar,
 } from "antd";
 import {
   BellOutlined,
+  CheckCircleOutlined,
+  DeleteOutlined,
   GiftOutlined,
   MessageOutlined,
-  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { motion as MotionDiv } from "framer-motion";
 
 const { Text } = Typography;
 
+// 🟡 Icon map for types
 const iconMap = {
   xp: <GiftOutlined className="text-green-500" />,
   trip: <CheckCircleOutlined className="text-blue-500" />,
   message: <MessageOutlined className="text-purple-500" />,
 };
 
-const Notifications = () => {
+// 🕒 Time ago formatter
+const timeAgo = (date) => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (diff < 60) return `${diff}s`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+  return `${Math.floor(diff / 86400)}d`;
+};
+
+// 🧠 Filter by tab
+const byTab = (items, key) => {
+  if (key === "mentions") return items.filter((i) => i.type === "mention");
+  if (key === "system") return items.filter((i) => i.type === "system");
+  return items;
+};
+
+export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [activeKey, setActiveKey] = useState("all");
+  const [busy, setBusy] = useState(false);
+  const panelRef = useRef(null);
 
+  // 🔄 Fetch notifications
   const fetchNotifications = async () => {
     try {
       const res = await fetch("/api/notifications");
@@ -43,52 +68,113 @@ const Notifications = () => {
     }
   };
 
+  // ✅ Mark all as read
   const markAllAsRead = async () => {
     try {
+      setBusy(true);
       await fetch("/api/notifications/read-all", { method: "PUT" });
-      fetchNotifications();
+      await fetchNotifications();
     } catch (err) {
       console.error("❌ Failed to mark all as read:", err);
+    } finally {
+      setBusy(false);
     }
   };
 
+  // ❌ Clear all
+  const clearAll = async () => {
+    try {
+      setBusy(true);
+      await fetch("/api/notifications/clear", { method: "DELETE" });
+      await fetchNotifications();
+    } catch (err) {
+      console.error("❌ Failed to clear notifications:", err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // 🟢 Fetch on open
   useEffect(() => {
     if (visible) {
       fetchNotifications();
+      const t = setTimeout(() => panelRef.current?.focus(), 0);
+      return () => clearTimeout(t);
     }
   }, [visible]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  // 🔢 Count unread
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.read).length,
+    [notifications]
+  );
+  const filtered = useMemo(
+    () => byTab(notifications, activeKey),
+    [notifications, activeKey]
+  );
 
+  // 📥 Dropdown Panel
   const dropdownContent = (
     <MotionDiv
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="bg-white w-[320px] max-h-[400px] overflow-y-auto p-3 shadow-lg rounded-md"
+      className="bg-white w-[320px] max-h-[420px] overflow-y-auto p-3 shadow-lg rounded-md"
+      tabIndex={-1}
+      ref={panelRef}
     >
       <div className="flex justify-between items-center mb-2">
-        <Text strong className="text-base">
-          🔔 Notifications
-        </Text>
-        <Button size="small" type="text" onClick={markAllAsRead}>
-          Mark All as Read
-        </Button>
+        <Tabs
+          activeKey={activeKey}
+          onChange={setActiveKey}
+          size="small"
+          items={[
+            {
+              key: "all",
+              label: `All ${unreadCount ? `(${unreadCount})` : ""}`,
+            },
+            { key: "mentions", label: "Mentions" },
+            { key: "system", label: "System" },
+          ]}
+        />
+        <div className="flex gap-1">
+          <Tooltip title="Mark all as read">
+            <Button
+              icon={<CheckCircleOutlined />}
+              type="text"
+              onClick={markAllAsRead}
+              disabled={busy || unreadCount === 0}
+            />
+          </Tooltip>
+          <Tooltip title="Clear all">
+            <Button
+              icon={<DeleteOutlined />}
+              type="text"
+              danger
+              onClick={clearAll}
+              disabled={busy || notifications.length === 0}
+            />
+          </Tooltip>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center p-4">
+      {/* 🔄 States */}
+      {loading || busy ? (
+        <div className="flex justify-center py-6">
           <Spin />
         </div>
-      ) : notifications.length === 0 ? (
-        <Empty description="You're all caught up!" />
+      ) : filtered.length === 0 ? (
+        <Empty
+          description="You're all caught up!"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        />
       ) : (
         <List
           itemLayout="horizontal"
-          dataSource={notifications}
+          dataSource={filtered}
           renderItem={(item) => (
             <List.Item
-              className={!item.read ? "bg-gray-100 px-2 rounded-sm" : "px-2"}
+              className={!item.read ? "bg-gray-50 rounded-md px-2" : "px-2"}
             >
               <List.Item.Meta
                 avatar={
@@ -104,7 +190,7 @@ const Notifications = () => {
                       {item.message}
                     </Text>
                     <Text className="text-xs text-gray-400">
-                      {new Date(item.createdAt).toLocaleString()}
+                      {timeAgo(item.createdAt)} ago
                     </Text>
                   </>
                 }
@@ -116,6 +202,7 @@ const Notifications = () => {
     </MotionDiv>
   );
 
+  // 🔔 Trigger
   return (
     <Dropdown
       overlay={dropdownContent}
@@ -129,6 +216,4 @@ const Notifications = () => {
       </Badge>
     </Dropdown>
   );
-};
-
-export default Notifications;
+}

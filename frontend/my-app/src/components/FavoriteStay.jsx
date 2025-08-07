@@ -1,61 +1,74 @@
 import React from "react";
-import { Typography, Row, Col, Card, Tag, Button } from "antd";
+import { Card, Button, Tag, Typography, Row, Col } from "antd";
 
 const { Title, Paragraph } = Typography;
 
-const featuredStays = [
+const stays = [
   {
-    title: "✨ Santorini Cliffside Villa",
-    location: "Greece",
-    img: "https://source.unsplash.com/500x300/?santorini,villa",
     tag: "Luxury",
+    emoji: "✨",
+    title: "Santorini Cliffside Villa",
+    location: "Greece",
+    image: "/images/santorini.jpg",
   },
   {
-    title: "🏜️ Desert Dome Retreat",
-    location: "Utah, USA",
-    img: "https://source.unsplash.com/500x300/?desert,glamping",
     tag: "Glamping",
+    emoji: "🏕️",
+    title: "Desert Dome Retreat",
+    location: "Utah, USA",
+    image: "/images/desert-dome.jpg",
   },
   {
-    title: "🏔️ Alpine Chalet Hideaway",
-    location: "Switzerland",
-    img: "https://source.unsplash.com/500x300/?alps,chalet",
     tag: "Cozy",
+    emoji: "🏔️",
+    title: "Alpine Chalet Hideaway",
+    location: "Switzerland",
+    image: "/images/alpine-chalet.jpg",
   },
 ];
 
 const FavoriteStay = () => {
   return (
-    <section className="py-14 px-4 bg-white" data-aos="fade-up">
-      <div className="text-center mb-12">
+    <section style={{ padding: "2rem" }}>
+      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
         <Title level={2}>🌟 Discover Your New Favorite Stay</Title>
-        <Paragraph>
+        <Paragraph style={{ color: "#555" }}>
           Handpicked properties designed for dream getaways and unforgettable
           experiences.
         </Paragraph>
       </div>
 
       <Row gutter={[24, 24]} justify="center">
-        {featuredStays.map((stay, index) => (
+        {stays.map((stay, index) => (
           <Col xs={24} sm={12} md={8} key={index}>
             <Card
               hoverable
               cover={
                 <img
-                  src={stay.img}
                   alt={stay.title}
+                  src={stay.image}
                   style={{
-                    height: 200,
+                    height: "200px",
                     objectFit: "cover",
-                    borderRadius: "12px 12px 0 0",
+                    borderTopLeftRadius: "8px",
+                    borderTopRightRadius: "8px",
                   }}
                 />
               }
+              style={{
+                borderRadius: "8px",
+              }}
             >
-              <Tag color="gold">{stay.tag}</Tag>
-              <Title level={4}>{stay.title}</Title>
-              <Paragraph type="secondary">{stay.location}</Paragraph>
-              <Button type="primary" size="small">
+              <Tag color="gold" style={{ borderRadius: "12px" }}>
+                {stay.emoji} {stay.tag}
+              </Tag>
+              <Title level={4} style={{ marginTop: "0.5rem" }}>
+                {stay.emoji} {stay.title}
+              </Title>
+              <Paragraph style={{ color: "#777", marginBottom: "1rem" }}>
+                {stay.location}
+              </Paragraph>
+              <Button type="primary" block>
                 View Stay
               </Button>
             </Card>

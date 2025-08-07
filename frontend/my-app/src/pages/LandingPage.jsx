@@ -1,11 +1,15 @@
 import React from "react";
 import { Button } from "antd";
 import { Link } from "react-router-dom";
+import "../styles/LandingPage.css";
+
+// 🔹 Animation Wrapper
+import FadeInSection from "../components/animations/FadeInSection";
 
 // 🔹 Section Components
 import WelcomeBack from "../components/WelcomeBack";
 import DiscoverAdventure from "../components/DiscoverAdventure";
-import TeamTravel from "../components/TeamTravel";
+import TeamTravelSection from "../components/TeamTravelSection";
 import TravelAssistant from "../components/TravelAssistant";
 import SmartTravelTools from "../components/SmartTravelTools";
 import ExploreDeals from "../components/ExploreDeals";
@@ -19,7 +23,6 @@ import FeaturedDestination from "../components/FeaturedDestination";
 import HiddenGemFinder from "../components/HiddenGemFinder";
 import TravelCalendarChecklist from "../components/TravelCalendarChecklist";
 import GroupBudgetCalculator from "../components/GroupBudgetCalculator";
-import BuildMyDreamTrip from "../components/BuildMyDreamTrip";
 import SearchResults from "../components/SearchResults";
 import Testimonials from "../components/Testimonials";
 import AboutUs from "../components/AboutUs";
@@ -27,7 +30,7 @@ import ContactUs from "../components/ContactUs";
 import SocialCommunity from "../components/SocialCommunity";
 import InfoPolicies from "../components/InfoPolicies";
 import TutorialModal from "../components/TutorialModal";
-import FeedbackForm from "../components/FeedbackForm"; // ✅ Added
+import FeedbackForm from "../components/FeedbackForm";
 
 // 🔹 Layout Wrapper
 import PageLayout from "../components/PageLayout";
@@ -35,61 +38,129 @@ import PageLayout from "../components/PageLayout";
 const LandingPage = () => {
   return (
     <PageLayout>
-      {/* 🔹 Welcome Banner */}
+      {/* 🔹 Welcome Message */}
       <WelcomeBack name="David" birthday="1992-05-11" />
       <TutorialModal />
-      <DiscoverAdventure />
 
-      {/* 🔹 Core Sections */}
-      <TeamTravel />
-      <TravelAssistant />
-      <SmartTravelTools />
-      <ExploreDeals />
-      <Excursions />
-      <LastMinuteAndUniqueStays />
-      <FavoriteStay />
-      <BudgetTracker />
-      <RealTimeAlerts />
-      <UniqueStays />
-      <FeaturedDestination />
-      <HiddenGemFinder />
-      <TravelCalendarChecklist />
-      <GroupBudgetCalculator />
-      <BuildMyDreamTrip />
-      <SearchResults />
-      <Testimonials />
-      <SocialCommunity />
+      {/* 🔹 Discover Adventure (NO CHANGES) */}
+      <FadeInSection>
+        <DiscoverAdventure />
+      </FadeInSection>
 
-      {/* 🔹 XP Banner */}
-      <section className="py-12 text-center bg-gradient-to-r from-purple-200 via-pink-100 to-orange-100">
-        <h2 className="text-2xl font-semibold mb-2">
-          💥 Earn XP Every Time You Travel
-        </h2>
-        <p>
-          Unlock exclusive badges, perks, and trip rewards. Your journey just
-          got gamified.
-        </p>
-      </section>
+      {/* 🔹 Travel Tools & Planning */}
+      <FadeInSection>
+        <TeamTravelSection />
+      </FadeInSection>
+
+      <FadeInSection>
+        <TravelAssistant />
+      </FadeInSection>
+
+      <FadeInSection>
+        <SmartTravelTools />
+      </FadeInSection>
+
+      {/* 🔹 Deals, Stays & Budget */}
+      <FadeInSection>
+        <ExploreDeals />
+      </FadeInSection>
+
+      <FadeInSection>
+        <Excursions />
+      </FadeInSection>
+
+      <FadeInSection>
+        <LastMinuteAndUniqueStays />
+      </FadeInSection>
+
+      <FadeInSection>
+        <FavoriteStay />
+      </FadeInSection>
+
+      <FadeInSection>
+        <UniqueStays />
+      </FadeInSection>
+
+      {/* 🔹 Planning Add-ons */}
+      <FadeInSection>
+        <BudgetTracker />
+      </FadeInSection>
+
+      <FadeInSection>
+        <RealTimeAlerts />
+      </FadeInSection>
+
+      <FadeInSection>
+        <TravelCalendarChecklist />
+      </FadeInSection>
+
+      <FadeInSection>
+        <GroupBudgetCalculator />
+      </FadeInSection>
+
+      <FadeInSection>
+        <SearchResults />
+      </FadeInSection>
+
+      {/* 🔹 Discovery Features */}
+      <FadeInSection>
+        <FeaturedDestination />
+      </FadeInSection>
+
+      <FadeInSection>
+        <HiddenGemFinder />
+      </FadeInSection>
+
+      {/* 🔹 Community Features */}
+      <FadeInSection>
+        <SocialCommunity />
+      </FadeInSection>
+
+      {/* 🔹 Testimonials */}
+      <FadeInSection>
+        <Testimonials />
+      </FadeInSection>
+
+      {/* 🔹 XP Rewards Banner */}
+      <FadeInSection>
+        <section
+          className="section alt osq-hero text-center"
+          style={{ padding: "3rem 0" }}
+        >
+          <h2 className="text-2xl font-semibold mb-2">
+            💥 Earn XP Every Time You Travel
+          </h2>
+          <p className="text-muted">
+            Unlock exclusive badges, perks, and trip rewards. Your journey just
+            got gamified.
+          </p>
+        </section>
+      </FadeInSection>
 
       {/* 🔹 Final CTA */}
-      <section className="text-center py-10 bg-white">
-        <h2 className="text-2xl font-bold mb-4">Ready to Quest?</h2>
-        <Link to="/profile">
-          <Button type="primary" className="bg-blue-600 hover:bg-blue-700">
-            🚀 Create Your Profile
-          </Button>
-        </Link>
-      </section>
+      <FadeInSection>
+        <section
+          className="section text-center"
+          style={{ padding: "2.5rem 0" }}
+        >
+          <h2 className="text-2xl font-bold mb-4">Ready to Quest?</h2>
+          <Link to="/profile">
+            <Button type="primary" size="large" className="shadow-soft">
+              🚀 Create Your Profile
+            </Button>
+          </Link>
+        </section>
+      </FadeInSection>
 
       {/* 🔹 Feedback Form */}
       <FeedbackForm />
 
       {/* 🔹 Footer */}
-      <footer className="bg-gray-800 text-white py-6 text-center">
+      <footer className="footer text-center" style={{ padding: "1.5rem 0" }}>
         <p className="mb-2">
           &copy; {new Date().getFullYear()} One Sky Quest. All rights reserved.
         </p>
-        <div className="flex justify-center gap-4">
+        <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
           <Link to="/about" className="hover:underline">
             About
           </Link>

@@ -1,44 +1,80 @@
 import React from "react";
-import { Typography, Card, Row, Col } from "antd";
+import { Typography, Card, Row, Col, Button } from "antd";
 
 const { Title, Paragraph } = Typography;
 
 const stays = [
   {
     title: "Treehouse in Costa Rica 🌴",
-    description: "Live among the trees with stunning views of the rainforest.",
-    image: "https://source.unsplash.com/400x250/?treehouse,nature",
+    desc: "Live among the trees with stunning views of the rainforest.",
+    image: "/images/treehouse-costa-rica.jpg",
   },
   {
     title: "Glass Igloo in Finland ❄️",
-    description: "Sleep under the stars and Northern Lights in comfort.",
-    image: "https://source.unsplash.com/400x250/?igloo,finland",
+    desc: "Sleep under the stars and Northern Lights in comfort.",
+    image: "/images/glass-igloo-finland.jpg",
   },
 ];
 
-const UniqueStay = () => {
+const UniqueStays = () => {
   return (
-    <section style={{ padding: "60px 20px", background: "#f7f7f7" }}>
-      <Title level={2} style={{ textAlign: "center" }}>
-        🌟 Explore Unique Stays
-      </Title>
-      <Paragraph
-        style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 40px" }}
-      >
-        Find extraordinary accommodations that turn every night into an
-        experience.
-      </Paragraph>
+    <section style={{ background: "#f8f9fa", padding: "60px 20px" }}>
+      <div style={{ textAlign: "center", marginBottom: 40 }}>
+        <Title level={2} style={{ marginBottom: 8 }}>
+          🌟 Explore Unique Stays
+        </Title>
+        <Paragraph style={{ maxWidth: 600, margin: "0 auto", fontSize: 16 }}>
+          Find extraordinary accommodations that turn every night into an
+          experience.
+        </Paragraph>
+      </div>
+
       <Row gutter={[24, 24]} justify="center">
-        {stays.map((stay, idx) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={idx}>
-            <Card hoverable cover={<img alt={stay.title} src={stay.image} />}>
-              <Card.Meta title={stay.title} description={stay.description} />
+        {stays.map((stay, index) => (
+          <Col xs={24} sm={12} md={8} key={index}>
+            <Card
+              hoverable
+              cover={
+                <img
+                  src={stay.image}
+                  alt={stay.title}
+                  style={{
+                    height: 200,
+                    objectFit: "cover",
+                    borderTopLeftRadius: 12,
+                    borderTopRightRadius: 12,
+                  }}
+                />
+              }
+              style={{
+                borderRadius: 12,
+                overflow: "hidden",
+                transition: "transform 0.3s ease",
+              }}
+              bodyStyle={{ padding: "16px 20px" }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "scale(1.03)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+            >
+              <Title level={4} style={{ marginBottom: 8 }}>
+                {stay.title}
+              </Title>
+              <Paragraph type="secondary">{stay.desc}</Paragraph>
             </Card>
           </Col>
         ))}
       </Row>
+
+      <div style={{ textAlign: "center", marginTop: 40 }}>
+        <Button type="primary" size="large">
+          View More Unique Stays
+        </Button>
+      </div>
     </section>
   );
 };
 
-export default UniqueStay;
+export default UniqueStays;
