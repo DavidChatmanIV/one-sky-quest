@@ -19,17 +19,19 @@ import {
   MessageOutlined,
 } from "@ant-design/icons";
 import { motion as MotionDiv } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const { Text } = Typography;
 
-// 🟡 Icon map for types
+/* icon per notification type */
 const iconMap = {
   xp: <GiftOutlined className="text-green-500" />,
   trip: <CheckCircleOutlined className="text-blue-500" />,
   message: <MessageOutlined className="text-purple-500" />,
 };
 
-// 🕒 Time ago formatter
+/* small relative-time helper */
 const timeAgo = (date) => {
   const d = typeof date === "string" ? new Date(date) : date;
   const diff = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -39,7 +41,7 @@ const timeAgo = (date) => {
   return `${Math.floor(diff / 86400)}d`;
 };
 
-// 🧠 Filter by tab
+/* tab filtering */
 const byTab = (items, key) => {
   if (key === "mentions") return items.filter((i) => i.type === "mention");
   if (key === "system") return items.filter((i) => i.type === "system");
@@ -53,48 +55,51 @@ export default function Notifications() {
   const [activeKey, setActiveKey] = useState("all");
   const [busy, setBusy] = useState(false);
   const panelRef = useRef(null);
+  const navigate = useNavigate();
 
-  // 🔄 Fetch notifications
+  /* initial fetch when panel opens */
   const fetchNotifications = async () => {
     try {
       const res = await fetch("/api/notifications");
       if (!res.ok) throw new Error("Failed to fetch notifications");
       const data = await res.json();
-      setNotifications(data);
+      setNotifications(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("❌ Failed to load notifications:", err);
+      console.error("❌ load notifications:", err);
+      toast.error("Could not load notifications");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Mark all as read
   const markAllAsRead = async () => {
     try {
       setBusy(true);
       await fetch("/api/notifications/read-all", { method: "PUT" });
       await fetchNotifications();
+      toast.success("Marked all as read");
     } catch (err) {
-      console.error("❌ Failed to mark all as read:", err);
+      console.error("❌ mark all as read:", err);
+      toast.error("Could not mark all as read");
     } finally {
       setBusy(false);
     }
   };
 
-  // ❌ Clear all
   const clearAll = async () => {
     try {
       setBusy(true);
       await fetch("/api/notifications/clear", { method: "DELETE" });
       await fetchNotifications();
+      toast("Notifications cleared", { icon: "🧹" });
     } catch (err) {
-      console.error("❌ Failed to clear notifications:", err);
+      console.error("❌ clear notifications:", err);
+      toast.error("Could not clear notifications");
     } finally {
       setBusy(false);
     }
   };
 
-  // 🟢 Fetch on open
   useEffect(() => {
     if (visible) {
       fetchNotifications();
@@ -103,7 +108,78 @@ export default function Notifications() {
     }
   }, [visible]);
 
-  // 🔢 Count unread
+  /* ✅ Realtime via WebSocket with safe close (no try/catch, no linter warnings) */
+  useEffect(() => {
+    if (!visible) return;
+
+    let ws; // current socket
+    let reconnectTimer; // timeout id
+    let tries = 0; // backoff counter
+
+    const url =
+      (location.protocol === "https:" ? "wss://" : "ws://") +
+      location.host +
+      "/ws/notifications";
+
+    const safeClose = () => {
+      if (
+        ws &&
+        (ws.readyState === WebSocket.OPEN ||
+          ws.readyState === WebSocket.CONNECTING)
+      ) {
+        ws.close();
+      }
+    };
+
+    const connect = () => {
+      ws = new WebSocket(url);
+
+      ws.onopen = () => {
+        tries = 0;
+      };
+
+      ws.onmessage = (evt) => {
+        try {
+          const payload = JSON.parse(evt.data);
+          if (payload.type === "new" && payload.data) {
+            setNotifications((prev) => [payload.data, ...prev]);
+            // optional toast preview
+            toast(payload.data?.title || "New notification", { icon: "🔔" });
+          } else if (payload.type === "bulk" && Array.isArray(payload.data)) {
+            setNotifications(payload.data);
+          } else if (payload.type === "update" && payload.data?.id) {
+            setNotifications((prev) =>
+              prev.map((n) => (n.id === payload.data.id ? payload.data : n))
+            );
+          } else if (payload.type === "clear") {
+            setNotifications([]);
+          }
+        } catch (e) {
+          console.warn("WS message parse error:", e);
+        }
+      };
+
+      ws.onclose = () => {
+        tries = Math.min(tries + 1, 5);
+        const delay = Math.min(8000, 500 * 2 ** tries);
+        reconnectTimer = window.setTimeout(connect, delay);
+      };
+
+      // Guard-close; no try/catch needed
+      ws.onerror = () => {
+        safeClose();
+      };
+    };
+
+    connect();
+
+    return () => {
+      if (reconnectTimer) window.clearTimeout(reconnectTimer);
+      safeClose();
+    };
+  }, [visible]);
+
+  /* derived values */
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.read).length,
     [notifications]
@@ -113,15 +189,35 @@ export default function Notifications() {
     [notifications, activeKey]
   );
 
-  // 📥 Dropdown Panel
-  const dropdownContent = (
+  /* per-item click: optimistic mark-as-read + navigate if route present */
+  const handleItemClick = (item) => {
+    try {
+      if (item?.id && !item.read) {
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === item.id ? { ...n, read: true } : n))
+        );
+        fetch(`/api/notifications/${encodeURIComponent(item.id)}/read`, {
+          method: "PUT",
+        }).catch(() => {});
+      }
+      if (item?.route && typeof item.route === "string") {
+        setVisible(false);
+        navigate(item.route);
+      }
+    } catch (e) {
+      console.warn("onNotificationClick error:", e);
+    }
+  };
+
+  /* custom dropdown content */
+  const dropdownPanel = (
     <MotionDiv
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
-      className="bg-white w-[320px] max-h-[420px] overflow-y-auto p-3 shadow-lg rounded-md"
-      tabIndex={-1}
+      transition={{ duration: 0.22 }}
       ref={panelRef}
+      tabIndex={-1}
+      className="bg-white w-[90vw] max-w-[360px] max-h-[70vh] overflow-y-auto p-3 shadow-lg rounded-md"
     >
       <div className="flex justify-between items-center mb-2">
         <Tabs
@@ -158,7 +254,6 @@ export default function Notifications() {
         </div>
       </div>
 
-      {/* 🔄 States */}
       {loading || busy ? (
         <div className="flex justify-center py-6">
           <Spin />
@@ -174,7 +269,13 @@ export default function Notifications() {
           dataSource={filtered}
           renderItem={(item) => (
             <List.Item
-              className={!item.read ? "bg-gray-50 rounded-md px-2" : "px-2"}
+              className={`px-2 rounded-md ${
+                !item.read ? "bg-gray-50" : ""
+              } cursor-pointer`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleItemClick(item);
+              }}
             >
               <List.Item.Meta
                 avatar={
@@ -202,14 +303,13 @@ export default function Notifications() {
     </MotionDiv>
   );
 
-  // 🔔 Trigger
   return (
     <Dropdown
-      overlay={dropdownContent}
       trigger={["click"]}
       placement="bottomRight"
       open={visible}
-      onOpenChange={(flag) => setVisible(flag)}
+      onOpenChange={setVisible}
+      dropdownRender={() => dropdownPanel}
     >
       <Badge count={unreadCount} size="small">
         <BellOutlined className="text-xl cursor-pointer" />

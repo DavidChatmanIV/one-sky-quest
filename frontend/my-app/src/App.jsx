@@ -2,15 +2,22 @@ import React from "react";
 import AppRoutes from "./AppRoutes";
 import CookieBanner from "./components/CookieBanner";
 import { AssistantProvider } from "./context/AssistantContext";
+import { Toaster } from "react-hot-toast";
 
-const App = () => {
+function App() {
   return (
     <>
+      {/* Your main routes */}
       <AppRoutes />
-      <CookieBanner /> {/* Displayed at bottom of all pages */}
+
+      {/* Cookie consent banner */}
+      <CookieBanner />
+
+      {/* Toast notifications */}
+      <Toaster position="top-right" />
     </>
   );
-};
+}
 
 export default function AppRoot() {
   return (

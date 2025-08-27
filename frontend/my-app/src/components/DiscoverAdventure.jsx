@@ -1,35 +1,58 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Button, Input, DatePicker } from "antd";
-import { CompassOutlined, SearchOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Typography, Button } from "antd";
+import {
+  SendOutlined,
+  HomeOutlined,
+  GiftOutlined,
+  CarOutlined,
+  CompassOutlined,
+  ExperimentOutlined, // simple, built-in icon for Cruises
+} from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import "../styles/DiscoverAdventure.css";
 
-const { Title, Paragraph } = Typography;
-const { RangePicker } = DatePicker;
-const categories = ["Flights", "Hotels", "Packages", "Cars", "Cruises"];
+// Correct sibling imports
+import FlightSearchForm from "./Booking/FlightSearchForm.jsx";
+import StaySearchForm from "./Booking/StaySearchForm.jsx";
+import PackageFilterForm from "./Booking/PackageFilterForm.jsx";
+import CarSearchForm from "./Booking/CarSearchForm.jsx";
+import CruiseSearchForm from "./Booking/CruiseSearchForm.jsx";
 
-const DiscoverAdventure = () => {
+const { Title, Paragraph } = Typography;
+
+const CATEGORY_META = [
+  { key: "flights", label: "Flights", icon: <SendOutlined /> },
+  { key: "hotels", label: "Hotels", icon: <HomeOutlined /> },
+  { key: "packages", label: "Packages", icon: <GiftOutlined /> },
+  { key: "cars", label: "Cars", icon: <CarOutlined /> },
+  { key: "cruises", label: "Cruises", icon: <ExperimentOutlined /> }, // replaced ShipOutlined
+];
+
+export default function DiscoverAdventure() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [dates, setDates] = useState(null);
-
-  const navigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState("flights");
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), 120);
     return () => clearTimeout(t);
   }, []);
 
-  const handleSubmit = (e) => {
-    e?.preventDefault?.();
-    const params = new URLSearchParams();
-    if (from) params.set("from", from.trim());
-    if (to) params.set("to", to.trim());
-    if (dates?.[0]) params.set("start", dates[0].format("YYYY-MM-DD"));
-    if (dates?.[1]) params.set("end", dates[1].format("YYYY-MM-DD"));
-    navigate(`/booking?${params.toString()}`);
+  const renderForm = () => {
+    switch (activeCategory) {
+      case "flights":
+        return <FlightSearchForm />;
+      case "hotels":
+        return <StaySearchForm />;
+      case "packages":
+        return <PackageFilterForm />;
+      case "cars":
+        return <CarSearchForm />;
+      case "cruises":
+        return <CruiseSearchForm />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -57,56 +80,33 @@ const DiscoverAdventure = () => {
           </Button>
         </Link>
 
-        <div className="category-buttons">
-          {categories.map((label) => (
+        {/* Simple category pills */}
+        <div
+          className="category-buttons"
+          role="tablist"
+          aria-label="Search type"
+        >
+          {CATEGORY_META.map(({ key, label, icon }) => (
             <Button
-              key={label}
-              type="primary"
-              icon={<CompassOutlined />}
-              className="category-btn"
+              key={key}
+              role="tab"
+              aria-selected={activeCategory === key}
+              onClick={() => setActiveCategory(key)}
+              type={activeCategory === key ? "primary" : "default"}
+              icon={icon}
+              className={`category-btn ${
+                activeCategory === key ? "category-btn--active" : ""
+              }`}
             >
               {label}
             </Button>
           ))}
         </div>
 
-        {/* 🔎 Pill-style, single-row search */}
-        <form
-          className="search-form search-form--inline search-form--pill"
-          onSubmit={handleSubmit}
-          aria-label="Search trips"
-        >
-          <Input
-            placeholder="e.g. JFK"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            className="search-input"
-            allowClear
-            aria-label="From"
-          />
-          <Input
-            placeholder="e.g. LAX"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className="search-input"
-            allowClear
-            aria-label="To"
-          />
-          <RangePicker
-            className="date-picker"
-            onChange={(vals) => setDates(vals)}
-            allowClear
-            aria-label="Dates"
-          />
-          <Button
-            htmlType="submit"
-            type="primary"
-            icon={<SearchOutlined />}
-            className="search-btn"
-          >
-            Search
-          </Button>
-        </form>
+        {/* Swapped search panel */}
+        <div className="search-form" aria-live="polite">
+          {renderForm()}
+        </div>
 
         <div className="scroll-indicator">↓ Scroll to explore</div>
 
@@ -115,6 +115,7 @@ const DiscoverAdventure = () => {
             size="small"
             className="toggle-btn"
             onClick={() => setIsDarkMode(!isDarkMode)}
+            icon={<CompassOutlined />}
           >
             {isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
           </Button>
@@ -122,6 +123,4 @@ const DiscoverAdventure = () => {
       </div>
     </section>
   );
-};
-
-export default DiscoverAdventure;
+}

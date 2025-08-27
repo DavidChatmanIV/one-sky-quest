@@ -1,30 +1,69 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 
-const AssistantContext = createContext({
+const STORAGE_KEY = "osq_assistant";
+const AssistantCtx = createContext({
+  // modern, normalized value
   assistant: "sora",
+  // legacy alias (Title Case) if any component still reads it
+  selectedAssistant: "Sora",
+  // setter
   setAssistant: () => {},
 });
 
-export const AssistantProvider = ({ children }) => {
-  const [assistant, setAssistant] = useState("sora");
+function normalizeIn(name) {
+  // accepts "sora" | "Sora" | "questy" | "Questy"
+  const n = String(name || "").toLowerCase();
+  return n === "questy" ? "questy" : "sora";
+}
 
-  // Load on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("assistant");
-    if (saved) setAssistant(saved);
-  }, []);
+function toTitle(n) {
+  return n === "questy" ? "Questy" : "Sora";
+}
 
-  // Persist on change
+export function AssistantProvider({ children, initial = "sora" }) {
+  const [assistant, setAssistantState] = useState(() => {
+    if (typeof window === "undefined") return normalizeIn(initial);
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return normalizeIn(stored || initial);
+    } catch {
+      return normalizeIn(initial);
+    }
+  });
+
+  // persist to localStorage
   useEffect(() => {
-    localStorage.setItem("assistant", assistant);
-    document.documentElement.dataset.assistant = assistant; // optional: CSS theme hooks
+    try {
+      localStorage.setItem(STORAGE_KEY, assistant);
+    } catch {
+      /* ignore */
+    }
   }, [assistant]);
 
-  return (
-    <AssistantContext.Provider value={{ assistant, setAssistant }}>
-      {children}
-    </AssistantContext.Provider>
-  );
-};
+  const setAssistant = (name) => setAssistantState(normalizeIn(name));
 
-export const useAssistant = () => useContext(AssistantContext);
+  const value = useMemo(
+    () => ({
+      assistant, // "sora" | "questy"  ← use this going forward
+      selectedAssistant: toTitle(assistant), // legacy alias ("Sora" | "Questy")
+      setAssistant, // accepts either case
+    }),
+    [assistant]
+  );
+
+  return (
+    <AssistantCtx.Provider value={value}>{children}</AssistantCtx.Provider>
+  );
+}
+
+export function useAssistant() {
+  return useContext(AssistantCtx);
+}
+
+export default AssistantCtx;

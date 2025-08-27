@@ -1,5 +1,6 @@
 import React from "react";
 import { Typography, Button } from "antd";
+import { Link } from "react-router-dom";
 
 const { Title, Paragraph } = Typography;
 
@@ -16,9 +17,11 @@ const TeamTravel = () => {
           reunion — we’ll help you find accommodations and flights that match
           everyone’s schedule.
         </Paragraph>
-        <Button type="default" size="middle">
-          Help Me Coordinate
-        </Button>
+        <Link to="/team-travel">
+          <Button type="default" size="middle">
+            Help Me Coordinate
+          </Button>
+        </Link>
       </div>
     </section>
   );

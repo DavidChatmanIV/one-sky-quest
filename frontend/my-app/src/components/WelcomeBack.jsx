@@ -102,7 +102,7 @@ export default function WelcomeBack({ userId }) {
   } = state.data || {};
 
   return (
-    <Card className="welcomeCard fadeIn" bodyStyle={{ padding: 20 }}>
+    <Card className="welcomeCard fadeIn" styles={{ body: { padding: 20 } }}>
       <Space
         align="start"
         style={{ width: "100%", justifyContent: "space-between" }}
@@ -143,7 +143,8 @@ export default function WelcomeBack({ userId }) {
         <Progress percent={progress} status="active" showInfo />
       </div>
 
-      <style jsx>{`
+      {/* styled-jsx removed; standard style tag works in plain React */}
+      <style>{`
         .fadeIn {
           opacity: 0;
           transform: translateY(6px);

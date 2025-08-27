@@ -3,9 +3,6 @@ import { Button } from "antd";
 import { Link } from "react-router-dom";
 import "../styles/LandingPage.css";
 
-// 🔹 Animation Wrapper
-import FadeInSection from "../components/animations/FadeInSection";
-
 // 🔹 Section Components
 import WelcomeBack from "../components/WelcomeBack";
 import DiscoverAdventure from "../components/DiscoverAdventure";
@@ -35,6 +32,17 @@ import FeedbackForm from "../components/FeedbackForm";
 // 🔹 Layout Wrapper
 import PageLayout from "../components/PageLayout";
 
+// 🔹 Animation Wrapper
+import FadeInSection from "../components/animations/FadeInSection";
+
+// Helper for in-page scrolling
+const goToSection = (id) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
+
 const LandingPage = () => {
   return (
     <PageLayout>
@@ -42,73 +50,47 @@ const LandingPage = () => {
       <WelcomeBack name="David" birthday="1992-05-11" />
       <TutorialModal />
 
-      {/* 🔹 Discover Adventure (NO CHANGES) */}
+      {/* 🔹 Discover Adventure */}
       <FadeInSection>
-        <DiscoverAdventure />
+        <section id="discover" className="section-anchor">
+          <DiscoverAdventure />
+        </section>
       </FadeInSection>
 
       {/* 🔹 Travel Tools & Planning */}
       <FadeInSection>
-        <TeamTravelSection />
+        <section id="team-travel" className="section-anchor">
+          <TeamTravelSection />
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <TravelAssistant />
+        <section id="ai-builder" className="section-anchor">
+          <TravelAssistant />
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <SmartTravelTools />
-      </FadeInSection>
-
-      {/* 🔹 Deals, Stays & Budget */}
-      <FadeInSection>
-        <ExploreDeals />
+        <section id="explore-deals" className="section-anchor">
+          <ExploreDeals />
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <Excursions />
+        <section id="unique-stays" className="section-anchor">
+          <UniqueStays />
+        </section>
       </FadeInSection>
 
       <FadeInSection>
-        <LastMinuteAndUniqueStays />
+        <section id="last-minute" className="section-anchor">
+          <LastMinuteAndUniqueStays />
+        </section>
       </FadeInSection>
 
-      <FadeInSection>
-        <FavoriteStay />
-      </FadeInSection>
-
-      <FadeInSection>
-        <UniqueStays />
-      </FadeInSection>
-
-      {/* 🔹 Planning Add-ons */}
-      <FadeInSection>
-        <BudgetTracker />
-      </FadeInSection>
-
-      <FadeInSection>
-        <RealTimeAlerts />
-      </FadeInSection>
-
-      <FadeInSection>
-        <TravelCalendarChecklist />
-      </FadeInSection>
-
-      <FadeInSection>
-        <GroupBudgetCalculator />
-      </FadeInSection>
-
-      <FadeInSection>
-        <SearchResults />
-      </FadeInSection>
-
-      {/* 🔹 Discovery Features */}
+      {/* 🔹 Featured Section */}
       <FadeInSection>
         <FeaturedDestination />
-      </FadeInSection>
-
-      <FadeInSection>
-        <HiddenGemFinder />
       </FadeInSection>
 
       {/* 🔹 Community Features */}
@@ -161,22 +143,37 @@ const LandingPage = () => {
           &copy; {new Date().getFullYear()} One Sky Quest. All rights reserved.
         </p>
         <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
-          <Link to="/about" className="hover:underline">
+          <button
+            onClick={() => goToSection("about")}
+            className="hover:underline"
+          >
             About
-          </Link>
-          <Link to="/contact" className="hover:underline">
+          </button>
+          <button
+            onClick={() => goToSection("contact")}
+            className="hover:underline"
+          >
             Contact
-          </Link>
-          <Link to="/questfeed" className="hover:underline">
+          </button>
+          <button
+            onClick={() => goToSection("questfeed")}
+            className="hover:underline"
+          >
             Quest Feed
-          </Link>
+          </button>
         </div>
       </footer>
 
       {/* 🔹 Info & Legal */}
-      <AboutUs />
-      <ContactUs />
-      <InfoPolicies />
+      <section id="about">
+        <AboutUs />
+      </section>
+      <section id="contact">
+        <ContactUs />
+      </section>
+      <section id="policies">
+        <InfoPolicies />
+      </section>
     </PageLayout>
   );
 };

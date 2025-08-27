@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from "react";
 import {
   Typography,
@@ -24,9 +25,11 @@ import {
   CoffeeOutlined,
   ScheduleOutlined,
 } from "@ant-design/icons";
+import { useAssistant } from "../context/AssistantContext";
 
 const { Title, Paragraph, Text } = Typography;
 
+/* ---------- Options ---------- */
 const BUDGET_OPTIONS = [
   { label: "$100", value: 100 },
   { label: "$500", value: 500 },
@@ -57,23 +60,67 @@ const FOOD_PLAN_OPTIONS = [
   { label: "Room service focused", value: "room-service" },
 ];
 
-const mockGeneratePlan = async ({ destination, budget = 0, vibe }) => {
-  await new Promise((r) => setTimeout(r, 800));
+/* ---------- Demo generator (simple, feels intelligent) ---------- */
+const mockGeneratePlan = async (params) => {
+  const {
+    destination,
+    budget = 0,
+    vibe,
+    tripDays = 3,
+    flightClass = "economy",
+    activityLevel = "minimal",
+    travelType = "solo",
+    travelers = 1,
+    foodPlan = "pay-per-meal",
+  } = params;
+
+  // Tiny multipliers to make the demo feel “alive”
+  const classMult =
+    {
+      basic: 0.9,
+      economy: 1.0,
+      "premium-economy": 1.25,
+      business: 1.8,
+      first: 2.4,
+    }[flightClass] ?? 1;
+
+  const activityMult =
+    {
+      none: 0.85,
+      minimal: 1.0,
+      moderate: 1.2,
+      high: 1.5,
+    }[activityLevel] ?? 1;
+
+  const foodMult =
+    {
+      "pay-per-meal": 1.0,
+      "room-service": 1.25,
+      "all-inclusive": 1.35,
+    }[foodPlan] ?? 1;
+
+  const people =
+    travelType === "group" ? Math.max(Number(travelers) || 2, 2) : 1;
+  const basePerDay = Math.max(
+    80,
+    Math.min(budget || 1000, 6000) / Math.max(tripDays, 1)
+  );
+  const estPerPerson = basePerDay * classMult * activityMult * foodMult;
+  const estTrip = estPerPerson * tripDays * people;
+
+  // Fake price band
+  const low = Math.round(estTrip * 0.85);
+  const high = Math.round(estTrip * 1.15);
+  const fmt = (n) => n.toLocaleString();
+
+  await new Promise((r) => setTimeout(r, 700));
   return {
     title: `Your ${vibe || "personalized"} trip to ${destination}`,
-    summary: "Here’s a starter plan tailored to your vibe, budget, and time.",
-    estCost:
-      budget >= 5000
-        ? "$4,000–$6,500"
-        : budget >= 2500
-        ? "$2,100–$3,400"
-        : budget >= 1000
-        ? "$950–$1,400"
-        : budget >= 500
-        ? "$450–$700"
-        : "$120–$280",
+    summary:
+      "Here’s a starter plan tailored to your vibe, budget, and time. Refine it anytime with AI.",
+    estCost: `$${fmt(low)} – $${fmt(high)}`,
     bullets: [
-      `Stay in a highly rated ${
+      `Stay in a ${
         budget >= 1000 ? "boutique" : "budget-friendly"
       } hotel near the center`,
       vibe === "adventurous"
@@ -85,32 +132,44 @@ const mockGeneratePlan = async ({ destination, budget = 0, vibe }) => {
         : vibe === "party"
         ? "Nightlife district pass + late check-out"
         : "Top museums + local market",
-      "Use public transit / day pass to cut costs",
+      "Use public transit/day pass to cut costs",
     ],
     tags: [
+      travelType,
       vibe || "custom",
-      budget >= 1000 ? "premium" : "value",
+      budget >= 2500 ? "premium" : "value",
       destination?.toLowerCase?.() || "",
     ],
   };
 };
 
-const TravelAssistant = () => {
+/* ---------- Component ---------- */
+export default function TravelAssistant() {
+  const { assistant = "Sora" } = useAssistant();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [travelType, setTravelType] = useState("solo");
+
+  // Reactively show/hide travelers based on form value
+  const travelType = Form.useWatch("travelType", form) || "solo";
+
+  const PrimaryIcon = assistant === "Questy" ? RocketOutlined : RobotOutlined;
+  const primaryLabel = loading
+    ? "Generating"
+    : assistant === "Questy"
+    ? "Quick Generate"
+    : "Generate My Trip";
 
   const handleFinish = async (values) => {
-    setError(null);
-    setLoading(true);
-    setResult(null);
     try {
+      setError(null);
+      setLoading(true);
+      setResult(null);
       const data = await mockGeneratePlan(values);
       setResult(data);
     } catch (e) {
-      console.error("Trip generation failed:", e);
+      console.error(e);
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -119,7 +178,6 @@ const TravelAssistant = () => {
 
   const resetForm = () => {
     form.resetFields();
-    setTravelType("solo");
     setResult(null);
     setError(null);
   };
@@ -135,9 +193,10 @@ const TravelAssistant = () => {
         activityLevel: "minimal",
         tripDays: 3,
         travelType: "solo",
+        travelers: 1,
       },
       friendsTrip: {
-        destination: "Cancun",
+        destination: "Cancún",
         budget: 2500,
         vibe: "relaxing",
         flightClass: "premium-economy",
@@ -156,47 +215,54 @@ const TravelAssistant = () => {
         activityLevel: "minimal",
         tripDays: 7,
         travelType: "solo",
+        travelers: 1,
       },
     };
     const values = presets[preset];
     form.setFieldsValue(values);
-    setTravelType(values.travelType);
     setResult(null);
     setError(null);
   };
 
-  const cardClass = useMemo(
-    () =>
-      [
-        "w-full",
-        "max-w-2xl",
-        "p-6",
-        "shadow-lg",
-        "bg-white",
-        "rounded-2xl",
-        "border",
-        "border-gray-100",
-      ].join(" "),
+  // Nice defaults
+  const initialValues = useMemo(
+    () => ({
+      destination: "",
+      budget: 1000,
+      vibe: "relaxing",
+      flightClass: "economy",
+      foodPlan: "pay-per-meal",
+      activityLevel: "minimal",
+      tripDays: 5,
+      travelType: "solo",
+      travelers: 1,
+    }),
     []
   );
 
   return (
     <section
-      id="ai-trip-builder"
+      id="ai-builder"
       className="w-full py-12 px-4 bg-gray-50"
       aria-label="AI Trip Builder"
     >
       <div className="flex flex-col items-center justify-center">
-        <Card className={cardClass} bordered={false}>
+        <Card
+          className="w-full max-w-2xl p-6 shadow-lg bg-white rounded-2xl border border-gray-100"
+          bordered={false}
+        >
           <Title level={4} className="text-center">
             ✨ Build Your Perfect Trip with AI
           </Title>
+          <Paragraph className="text-center mb-2">
+            You’re using <b>{assistant}</b>. Switch anytime in the navbar.
+          </Paragraph>
           <Paragraph className="text-center mb-4">
             Plan smarter with personalized recommendations — tailored to your
             vibe, budget, and goals.
           </Paragraph>
 
-          {/* Quick Prefill Presets */}
+          {/* Quick Prefill */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 mb-6">
             <Text type="secondary">Quick Prefill:</Text>
             <Space wrap>
@@ -213,7 +279,13 @@ const TravelAssistant = () => {
           </div>
 
           {error && (
-            <Alert type="error" message={error} showIcon className="mb-4" />
+            <Alert
+              role="status"
+              type="error"
+              message={error}
+              showIcon
+              className="mb-4"
+            />
           )}
 
           <Form
@@ -222,19 +294,9 @@ const TravelAssistant = () => {
             onFinish={handleFinish}
             requiredMark={false}
             className="space-y-2"
-            initialValues={{
-              destination: "",
-              budget: 1000,
-              vibe: "relaxing",
-              flightClass: "economy",
-              foodPlan: "pay-per-meal",
-              activityLevel: "minimal",
-              tripDays: 5,
-              travelType: "solo",
-              travelers: 1,
-            }}
+            initialValues={initialValues}
           >
-            {/* BASIC (clean + minimal) */}
+            {/* BASIC */}
             <Form.Item
               name="destination"
               label={<Text strong>Destination</Text>}
@@ -250,13 +312,10 @@ const TravelAssistant = () => {
             </Form.Item>
 
             <Form.Item
-              label={<Text strong>Travel Type</Text>}
               name="travelType"
+              label={<Text strong>Travel Type</Text>}
             >
-              <Radio.Group
-                onChange={(e) => setTravelType(e.target.value)}
-                size="large"
-              >
+              <Radio.Group size="large">
                 <Radio.Button value="solo">
                   <UserOutlined /> Solo
                 </Radio.Button>
@@ -294,16 +353,9 @@ const TravelAssistant = () => {
                 { required: true, message: "Select trip length in days" },
               ]}
             >
-              <InputNumber
-                min={1}
-                max={30}
-                className="w-full"
-                size="large"
-                placeholder="How many days?"
-              />
+              <InputNumber min={1} max={30} className="w-full" size="large" />
             </Form.Item>
 
-            {/* Essentials continued */}
             <Form.Item
               name="flightClass"
               label={
@@ -316,7 +368,7 @@ const TravelAssistant = () => {
               <Select size="large" options={FLIGHT_CLASS_OPTIONS} />
             </Form.Item>
 
-            {/* ADVANCED (collapsed by default to reduce clutter) */}
+            {/* ADVANCED */}
             <Collapse
               className="bg-white"
               items={[
@@ -402,12 +454,12 @@ const TravelAssistant = () => {
             <Space.Compact block className="mt-3">
               <Button
                 type="primary"
-                icon={<RobotOutlined />}
+                icon={<PrimaryIcon />}
                 size="large"
                 htmlType="submit"
                 loading={loading}
               >
-                {loading ? "Generating" : "Generate My Trip"}
+                {primaryLabel}
               </Button>
               <Button
                 size="large"
@@ -454,6 +506,4 @@ const TravelAssistant = () => {
       </div>
     </section>
   );
-};
-
-export default TravelAssistant;
+}

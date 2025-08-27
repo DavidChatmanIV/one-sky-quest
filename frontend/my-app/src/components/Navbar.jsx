@@ -1,317 +1,301 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
+import { Layout, Dropdown, Button, Space, Avatar, Badge } from "antd";
 import {
-  Layout,
-  Avatar,
-  Dropdown,
-  Badge,
-  Button,
-  Typography,
-  Grid,
-  Space,
-} from "antd";
-import {
-  HomeOutlined,
+  BookOutlined,
   CompassOutlined,
   StarOutlined,
-  MessageOutlined,
-  UserOutlined,
-  BellOutlined,
-  MoreOutlined,
+  ThunderboltOutlined,
+  RocketOutlined,
+  FlagOutlined,
   DownOutlined,
-  CrownOutlined,
+  UserOutlined,
+  InfoCircleOutlined,
+  LogoutOutlined,
+  LoginOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
-import { Link, useLocation } from "react-router-dom";
-import Notifications from "./Notifications";
-import { useAssistant } from "../context/AssistantContext.jsx";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Notifications from "./Notifications.jsx";
+import { useAssistant } from "../context/AssistantContext.jsx"; 
 import "../styles/Navbar.css";
 
 const { Header } = Layout;
-const { Text } = Typography;
-const { useBreakpoint } = Grid;
 
-const navLinks = [
-  { path: "/", label: "Home", icon: <HomeOutlined /> },
-  { path: "/questfeed", label: "Feed", icon: <CompassOutlined /> },
-  { path: "/profile", label: "Profile", icon: <UserOutlined /> },
-  { path: "/dm", label: "DMs", icon: <MessageOutlined /> },
-  { path: "/booking", label: "Book", icon: <StarOutlined /> },
-  { path: "/membership", label: "Plans", icon: <CrownOutlined /> },
-];
+/* ---------- Routes ---------- */
+const PATHS = {
+  booking: "/booking",
+  feed: "/questfeed",
+  profile: "/profile",
+  uniqueStays: "/unique-stays",
+  lastMinute: "/last-minute",
+  buildTripAI: "/build-trip#ai-builder",
+  teamTravel: "/team-travel",
+  membership: "/membership",
+};
 
-const assistantOptions = [
+/* Primary (center) */
+const PRIMARY = [
+  { path: PATHS.booking, label: "Book", icon: <BookOutlined /> },
+  { path: PATHS.feed, label: "Feed", icon: <CompassOutlined /> },
+  { path: PATHS.uniqueStays, label: "Unique Stays", icon: <StarOutlined /> },
   {
-    key: "sora",
-    label: (
-      <div className="osq-option">
-        <img src="/assets/sora.png" alt="Sora" className="osq-avatar" />
-        <div className="osq-meta">
-          <div className="osq-name">Sora</div>
-          <div className="osq-sub">Chill & Helpful</div>
-        </div>
-      </div>
-    ),
-  },
-  {
-    key: "questy",
-    label: (
-      <div className="osq-option">
-        <img src="/assets/questy.png" alt="Questy" className="osq-avatar" />
-        <div className="osq-meta">
-          <div className="osq-name">Questy</div>
-          <div className="osq-sub">Fun & Fast-Paced</div>
-        </div>
-      </div>
-    ),
+    path: PATHS.lastMinute,
+    label: "Last-Minute",
+    icon: <ThunderboltOutlined />,
   },
 ];
 
-const Navbar = () => {
-  const { pathname } = useLocation();
-  const { assistant, setAssistant } = useAssistant();
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [showTutorialModal, setShowTutorialModal] = useState(false);
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
+/* ---------- Helpers ---------- */
+const initials = (name = "") =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p?.[0]?.toUpperCase() ?? "")
+    .join("") || "U";
+const firstName = (name = "") =>
+  (name.trim().split(/\s+/)[0] || "").slice(0, 16);
+const safeJSON = (s, fb = null) => {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return fb;
+  }
+};
 
-  const isLoggedIn = !!localStorage.getItem("token");
+/* Navbar*/
+export default function Navbar({
+  onOpenTutorial,
+  user: userProp = null, // { name, avatarUrl } | null
+  onLogin, // optional: () => void
+  onLogout, // optional: () => void
+} = {}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { assistant = "sora", setAssistant = () => {} } = useAssistant() ?? {};
 
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
+  // ----- Auth fallbacks (work even without a real backend yet) -----
+  const goLogin =
+    onLogin ??
+    (() => {
+      navigate("/login");
+    });
+
+  const goLogout =
+    onLogout ??
+    (() => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const res = await fetch("/api/notifications", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-        const data = await res.json();
-        const unread = data.filter((n) => !n.read).length;
-        setUnreadCount(unread);
+        localStorage.removeItem("osq_token");
+        localStorage.removeItem("osq_user");
+        sessionStorage.clear();
+        // If you set a cookie for auth, expire it as well:
+        // document.cookie = "osq_token=; Max-Age=0; path=/";
       } catch (err) {
-        console.error("🔴 Failed to load notifications:", err.message);
+        // keep catch non-empty to satisfy eslint(no-empty)
+        console.warn("Logout cleanup failed:", err);
+      } finally {
+        navigate("/");
       }
-    };
+    });
 
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // If no prop user, infer from localStorage so the menu/UI still works pre-auth
+  const token = userProp ? true : !!localStorage.getItem("osq_token");
+  const inferredUser = safeJSON(localStorage.getItem("osq_user"), null);
+  const user = userProp || (token && inferredUser) || null;
+  const isAuthed = !!user || !!token;
 
-  useEffect(() => {
-    const saved = localStorage.getItem("osq_assistant");
-    if (saved) setAssistant(saved);
-  }, [setAssistant]);
+  const isActive = (p) =>
+    p === "/" ? location.pathname === "/" : location.pathname.startsWith(p);
 
-  useEffect(() => {
-    localStorage.setItem("osq_assistant", assistant);
-  }, [assistant]);
-
-  // ✅ Auto-show tutorial once per login
-  useEffect(() => {
-    if (isLoggedIn && !localStorage.getItem("osq_tutorial_seen")) {
-      setShowTutorialModal(true);
-      localStorage.setItem("osq_tutorial_seen", "true");
-    }
-  }, [isLoggedIn]);
-
-  const profileMenuItems = [
-    { key: "profile", label: <Link to="/profile">👤 My Profile</Link> },
-    { key: "trips", label: <Link to="/saved-trips">💾 Saved Trips</Link> },
-    {
-      key: "logout",
-      label: <span>🚪 Logout</span>,
-      onClick: () => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      },
-    },
+  const assistantMenuItems = [
+    { key: "sora", label: "Sora (Calm & Helpful)" },
+    { key: "questy", label: "Questy (Fun & Fast)" },
   ];
 
-  const moreMenuItems = [
-    { key: "about", label: <Link to="/about">ℹ️ About</Link> },
-  ];
+  // ---- Account dropdown items + click handler (AntD v5 style) ----
+  const accountItems = useMemo(() => {
+    return isAuthed
+      ? [
+          {
+            key: "profile",
+            label: <Link to={PATHS.profile}>Profile</Link>,
+            icon: <UserOutlined />,
+          },
+          { key: "settings", label: "Settings", icon: <SettingOutlined /> },
+          { type: "divider" },
+          { key: "logout", label: "Log out", icon: <LogoutOutlined /> },
+        ]
+      : [
+          { key: "login", label: "Log in", icon: <LoginOutlined /> },
+          {
+            key: "signup",
+            label: <Link to="/signup">Sign up</Link>,
+            icon: <UserOutlined />,
+          },
+        ];
+  }, [isAuthed]);
 
-  const assistantMenuItems = assistantOptions.map((o) => ({
-    key: o.key,
-    label: o.label,
-    onClick: () => setAssistant(o.key),
-  }));
+  const onAccountClick = ({ key }) => {
+    if (key === "login") return goLogin();
+    if (key === "logout") return goLogout();
+    if (key === "profile") return navigate(PATHS.profile);
+    if (key === "settings") return navigate("/settings");
+    if (key === "signup") return navigate("/signup");
+  };
 
   return (
-    <>
-      <Header
-        className="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-md border-b border-white/40 shadow-md"
-        style={{ padding: "0.5rem 1rem" }}
-      >
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
-          {/* 🌍 Brand */}
-          <Link
-            to="/"
-            className="text-2xl font-extrabold text-indigo-700 hover:text-indigo-900 tracking-wide"
-          >
-            🌍 One <span className="text-orange-500">Sky</span> Quest
+    <div>
+      {/* ===== Top bar ===== */}
+      <Header className="osq-header">
+        <div className="osq-header-grid">
+          {/* Left: Brand */}
+          <Link to="/" className="logo-link" aria-label="One Sky Quest">
+            <Avatar size={28} style={{ background: "#1677ff" }}>
+              🌍
+            </Avatar>
+            <span className="logo-text">One Sky Quest</span>
           </Link>
 
-          {/* 🔹 Navigation Links */}
-          <div className="flex gap-5 items-center">
-            {navLinks.map(({ path, label, icon }) => {
-              const isActive = pathname === path;
-              return (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`relative text-sm flex flex-col items-center justify-center ${
-                    isActive
-                      ? "text-indigo-700 font-semibold"
-                      : "text-gray-500 hover:text-indigo-600"
-                  }`}
-                >
-                  <span className="text-lg">{icon}</span>
-                  <span>{label}</span>
-                  {isActive && (
-                    <span className="absolute -bottom-1 w-full h-1 bg-indigo-600 rounded-full animate-pulse"></span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+          {/* Center: Primary */}
+          <nav aria-label="Primary" className="osq-nav">
+            <ul className="nav-list">
+              {PRIMARY.map((l) => (
+                <li key={l.path} className="nav-item">
+                  <Link
+                    to={l.path}
+                    className={`nav-link ${isActive(l.path) ? "active" : ""}`}
+                    title={l.label}
+                  >
+                    <span className="nav-icon">{l.icon}</span>
+                    <span className="nav-label">{l.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-          {/* 🔧 User Tools */}
-          <div className="hidden md:flex items-center gap-4 text-sm text-gray-600">
-            {!isLoggedIn ? (
-              <>
-                <Link to="/signup">
-                  <Button size="small" type="primary">
-                    ✍️ Sign Up
-                  </Button>
-                </Link>
-                <Link to="/login">
-                  <Button size="small" type="default">
-                    🔑 Log In
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                {/* 🔔 Notifications */}
-                <Dropdown
-                  menu={{ items: [] }}
-                  popupRender={() => <Notifications />}
-                  trigger={["click"]}
-                  overlayStyle={{ zIndex: 1500 }}
-                >
-                  <Badge count={unreadCount} size="small" offset={[0, 5]}>
-                    <BellOutlined style={{ fontSize: 20, cursor: "pointer" }} />
-                  </Badge>
-                </Dropdown>
-
-                {/* ⋯ More Menu */}
-                <Dropdown menu={{ items: moreMenuItems }} trigger={["click"]}>
-                  <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
-                </Dropdown>
-
-                {/* 👤 Profile Menu */}
-                <Dropdown
-                  menu={{ items: profileMenuItems }}
-                  trigger={["click"]}
-                >
-                  <Avatar icon={<UserOutlined />} className="cursor-pointer" />
-                </Dropdown>
-
-                {/* 💳 View Plans */}
-                <Link to="/membership">
-                  <Button size="small" type="default">
-                    💳 View Plans
-                  </Button>
-                </Link>
-
-                {/* 🔁 Replay Tutorial */}
-                <Button
-                  size="small"
-                  onClick={() => {
-                    console.log("✅ Replay Tutorial clicked");
-                    localStorage.removeItem("osq_tutorial_seen");
-                    setShowTutorialModal(true);
-                  }}
-                >
-                  🔁 Replay Tutorial
-                </Button>
-              </>
-            )}
-
-            {/* 🤖 Assistant Switcher */}
+          {/* Right: Account + Assistant + Notifs + CTA */}
+          <div className="osq-right">
+            {/* Account (Login / Avatar dropdown) */}
             <Dropdown
-              menu={{ items: assistantMenuItems }}
               trigger={["click"]}
-              placement={isMobile ? "bottom" : "bottomRight"}
+              menu={{ items: accountItems, onClick: onAccountClick }}
             >
-              <button
-                type="button"
-                className="osq-assistant-btn"
-                aria-label="Choose assistant"
-              >
-                <Space size={8}>
-                  <img
-                    src={
-                      assistant === "sora"
-                        ? "/assets/sora.png"
-                        : "/assets/questy.png"
-                    }
-                    alt={assistant}
-                    className="osq-avatar osq-avatar--current"
-                  />
-                  {!isMobile && (
-                    <Text className="osq-assistant-text">
-                      {assistant === "sora" ? "Sora" : "Questy"}
-                    </Text>
+              <Button className="nav-button account-btn">
+                <Space size={6}>
+                  {isAuthed ? (
+                    <Avatar size={20} src={user?.avatarUrl}>
+                      {initials(user?.name)}
+                    </Avatar>
+                  ) : (
+                    <Avatar
+                      size={20}
+                      style={{ background: "#f1f5f9", color: "#334155" }}
+                    >
+                      <LoginOutlined />
+                    </Avatar>
                   )}
-                  <DownOutlined className="osq-caret" />
+                  <span className="account-name hide-sm">
+                    {isAuthed ? firstName(user?.name || "Account") : "Log in"}
+                  </span>
+                  <DownOutlined style={{ fontSize: 10, opacity: 0.7 }} />
                 </Space>
-              </button>
+              </Button>
             </Dropdown>
+
+            {/* Assistant switcher */}
+            <Dropdown
+              trigger={["click"]}
+              menu={{
+                selectedKeys: [assistant],
+                items: assistantMenuItems,
+                onClick: ({ key }) => setAssistant?.(key),
+              }}
+            >
+              <Button className="nav-button">
+                <Space size={6}>
+                  <Avatar size={20} style={{ background: "#e6f4ff" }}>
+                    {assistant === "questy" ? "Q" : "S"}
+                  </Avatar>
+                  <span className="hide-sm">
+                    {assistant === "questy" ? "Questy" : "Sora"}
+                  </span>
+                  <DownOutlined style={{ fontSize: 10, opacity: 0.7 }} />
+                </Space>
+              </Button>
+            </Dropdown>
+
+            <Badge offset={[-2, 6]}>
+              <Notifications />
+            </Badge>
+
+            <Button
+              type="primary"
+              className="start-btn"
+              icon={<RocketOutlined />}
+              onClick={() => navigate(PATHS.buildTripAI)}
+            >
+              Start Planning
+            </Button>
           </div>
         </div>
       </Header>
 
-      {/* 🔁 Tutorial Modal */}
-      {showTutorialModal && (
-        <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center px-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl relative">
-            <button
-              className="absolute top-2 right-3 text-gray-400 hover:text-black text-lg"
-              onClick={() => setShowTutorialModal(false)}
-            >
-              ✖
-            </button>
-            <h2 className="text-xl font-bold mb-2">
-              Welcome to One Sky Quest ✈️
-            </h2>
-            <p className="text-gray-700 mb-4">
-              This short tutorial will walk you through trip planning, booking,
-              and earning XP!
-            </p>
-            <ul className="list-disc list-inside text-sm text-gray-600 mb-4">
-              <li>Explore deals on the homepage</li>
-              <li>Use “Build My Trip” for smart planning</li>
-              <li>Bookmark trips and share with friends</li>
-              <li>Earn XP, badges, and unlock hidden perks</li>
-              <li>Smart Budget Tracker</li>
+      {/* ===== Sub-bar ===== */}
+      <div className="osq-subbar">
+        <div className="subbar-inner">
+          <nav aria-label="Secondary">
+            <ul className="subnav-list">
+              <li className="subnav-item">
+                <Link
+                  to={PATHS.teamTravel}
+                  className={`subnav-link ${
+                    isActive(PATHS.teamTravel) ? "active" : ""
+                  }`}
+                >
+                  <span className="subnav-icon">
+                    <FlagOutlined />
+                  </span>
+                  <span>Team Travel</span>
+                </Link>
+              </li>
+              <li className="subnav-item">
+                <Link
+                  to={PATHS.profile}
+                  className={`subnav-link ${
+                    isActive(PATHS.profile) ? "active" : ""
+                  }`}
+                >
+                  <span className="subnav-icon">
+                    <UserOutlined />
+                  </span>
+                  <span>Profile</span>
+                </Link>
+              </li>
+              <li className="subnav-item">
+                <Link to={PATHS.membership} className="subnav-link">
+                  <span className="subnav-icon">
+                    <StarOutlined />
+                  </span>
+                  <span>Membership</span>
+                </Link>
+              </li>
+              <li className="subnav-item">
+                <button
+                  type="button"
+                  className="subnav-link"
+                  onClick={() => onOpenTutorial?.()}
+                >
+                  <span className="subnav-icon">
+                    <InfoCircleOutlined />
+                  </span>
+                  <span>Tutorial</span>
+                </button>
+              </li>
             </ul>
-            <div className="text-right">
-              <Button
-                type="primary"
-                onClick={() => setShowTutorialModal(false)}
-              >
-                Got it!
-              </Button>
-            </div>
-          </div>
+          </nav>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
-};
-
-export default Navbar;
+}

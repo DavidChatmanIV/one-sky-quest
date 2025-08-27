@@ -3,7 +3,7 @@ const router = express.Router();
 
 const Booking = require("../models/Booking");
 const sendConfirmationEmail = require("../utils/sendConfirmationEmail");
-const verifyAdmin = require("../middleware/verifyAdminToken"); // ✅ Match actual filename
+const verifyAdmin = require("../middleware/verifyAdminToken");
 
 // ✈️ PUBLIC: Create a new booking
 router.post("/book", async (req, res) => {
