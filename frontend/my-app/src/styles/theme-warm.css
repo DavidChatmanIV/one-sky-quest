@@ -1,0 +1,12 @@
+:root[data-theme="warm"] {
+  /* Backgrounds */
+  --bg-card: #fffaf2;
+  --border-soft: rgba(20, 20, 20, 0.12);
+
+  /* Text */
+  --text-default: #0f172a;   /* dark slate for body text */
+  --text-muted: #475569;     /* slate-600 for secondary text */
+
+  /* Accent (for usernames, highlights, links) */
+  --accent-primary: #ff7a45;
+}

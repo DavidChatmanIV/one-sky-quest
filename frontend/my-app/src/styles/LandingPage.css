@@ -1,105 +1,403 @@
-.section {
-  padding: 4rem 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
+/* =========================================================
+   One Sky Quest — LandingPage.css (FULL, UPDATED)
+   ========================================================= */
+
+/* ---------- Theme fallbacks ---------- */
+:root{
+  --bg-start:#0f1020; --bg-mid:#231a3a; --bg-end:#3a2430;
+  --surface:#1e2039; --surface-2:#2a2c4b; --glass:rgba(255,255,255,.06);
+  --text-1:#f4f6fb; --text-2:#c9cbe3; --text-dim:rgba(255,255,255,.65);
+  --cta:#ff8a2a; --cta-2:#ffa94d; --cta-hover:#ff7a00;
+  --shadow:0 10px 30px rgba(0,0,0,.30);
 }
 
-.alt {
-  background-color: var(--color-surface-alt, #f5f7fa);
+/* =========================================================
+   PAGE LAYOUT & SPACING
+   ========================================================= */
+.landing-wrap { max-width: 1180px; margin: 0 auto; padding: 8px 16px 24px; }
+.landing-hero { margin-bottom: 8px; }
+.hero-grid    { margin-top: 8px; }
+
+.landing-footer-cta {
+  margin-top: 8px; padding: 8px 0 16px;
+  display: flex; justify-content: center; gap: 12px;
+}
+.landing-footer-cta.compact { margin-top: 6px; padding: 6px 0 14px; }
+.landing-footer-cta .ant-btn {
+  height: 36px; border-radius: 10px; padding: 0 14px; font-weight: 600;
 }
 
-.text-center {
-  text-align: center;
+/* =========================================================
+   TITLES, TEXT & LINKS ON DARK
+   ========================================================= */
+.ant-typography h1,
+.ant-typography h2,
+.ant-typography h3,
+.ant-typography h4,
+.ant-typography h5,
+.title-white { color: #ffffff !important; }
+.muted-on-dark { color: rgba(255, 255, 255, 0.86) !important; }
+.hero-greeting { color: #ffffff !important; }
+
+/* =========================================================
+   SMART SEARCH ROW (tabs + inputs + button)
+   ========================================================= */
+.osq-search-row {
+  position: relative;
+  padding: 8px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 8px 28px rgba(0,0,0,.30);
+  overflow: hidden;
+}
+.osq-search-row > * { position: relative; }
+.osq-search-row > *:not(:last-child)::after {
+  content: ""; position: absolute; top: 8px; bottom: 8px; right: -5px; width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,.14), transparent);
+  pointer-events: none;
 }
 
-.text-muted {
-  color: #666;
+/* tabs */
+.osq-search-tabs { position: relative; z-index: 2; }
+.osq-search-tabs .ant-tabs-nav { margin: 0 0 8px; }
+.osq-search-tabs .ant-tabs-tab { padding: 6px 10px; border-radius: 10px; }
+
+/* 🔧 Force tab text & icons to white for readability */
+.osq-search-tabs .ant-tabs-tab-btn,
+.osq-search-tabs .ant-tabs-tab-btn .anticon,
+.osq-search-tabs .ant-tabs-tab-btn .anticon svg {
+  color:#fff !important; fill: currentColor !important;
 }
 
-.hero {
-  background: linear-gradient(
-      to bottom right,
-      rgba(0, 123, 255, 0.05),
-      rgba(255, 255, 255, 0.9)
-    ),
-    url("/images/hero-bg.jpg") center/cover no-repeat;
-  padding: 6rem 1rem 4rem;
-  border-bottom: 2px solid #eaeaea;
+.osq-search-tabs .ant-tabs-tab:hover .ant-tabs-tab-btn { background: rgba(255,255,255,.12); }
+.osq-search-tabs .ant-tabs-ink-bar { height: 3px; border-radius: 999px; }
+.osq-search-tabs .ant-tabs-tab:not(.ant-tabs-tab-active) .ant-tabs-tab-btn { opacity: .98; }
+
+/* unified controls */
+.osq-where,
+.osq-date .ant-picker,
+.osq-travelers-btn,
+.osq-search-btn {
+  height: 44px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.10) !important;
+  color: var(--text-1);
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
 }
 
-.hero h1 {
-  font-size: 2.75rem;
-  line-height: 1.2;
-  color: #000;
+/* inputs & placeholders */
+.osq-where .ant-input-prefix { color: var(--text-2); margin-inline-end: 8px; }
+.osq-where input::placeholder,
+.osq-date .ant-picker-input > input::placeholder { color: var(--text-dim); }
+.osq-where input,
+.osq-date .ant-picker-input > input { color: var(--text-1); }
+
+/* hover / focus */
+.osq-where:hover,
+.osq-date .ant-picker:hover,
+.osq-travelers-btn:hover {
+  background: rgba(255,255,255,.14) !important;
+  border-color: rgba(255,255,255,.22) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.28);
+}
+.osq-where:focus-within,
+.osq-date .ant-picker-focused,
+.osq-travelers-btn:focus,
+.osq-travelers-btn:focus-visible {
+  outline: none;
+  border-color: rgba(255,255,255,.32) !important;
+  box-shadow: 0 6px 22px rgba(0,0,0,.35), 0 0 0 3px rgba(255,255,255,.10);
+  transform: translateY(-1px);
 }
 
-.hero p {
-  font-size: 1.1rem;
-  color: #444;
-  max-width: 600px;
-  margin: 0 auto 1.5rem;
+/* primary search button */
+.osq-search-btn {
+  background: var(--cta) !important;
+  border-color: var(--cta) !important;
+  color: #0b1220 !important;
+  font-weight: 800;
+}
+.osq-search-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+/* dropdowns */
+.ant-select-dropdown,
+.ant-picker-dropdown {
+  background: rgba(14,18,32,.96) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
+  backdrop-filter: blur(8px);
+  animation: osq-fade .12s ease-out;
+}
+@keyframes osq-fade { from {opacity:0; transform: translateY(-2px)} to {opacity:1} }
+.ant-select-item { color: var(--text-1); }
+.ant-select-item-option-active { background: rgba(255,255,255,.08) !important; }
+
+/* responsive search */
+@media (max-width: 992px) {
+  .osq-search-row.is-5cols { grid-template-columns: 1fr 1fr 1fr; }
+  .osq-search-row.is-4cols { grid-template-columns: 1fr 1fr; }
+  .osq-search-row > *::after { display: none; }
+  .osq-search-btn { grid-column: 1 / -1; }
+}
+@media (max-width: 575px) {
+  .osq-search-row { grid-template-columns: 1fr !important; }
+  .osq-search-row > *::after { display: none; }
 }
 
-/* -----------------------------
-   Button Enhancements
-------------------------------*/
-.shadow-soft {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease;
+/* =========================================================
+   CARD SYSTEM
+   ========================================================= */
+.osq-card,
+.ant-card.osq-card {
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,.30) !important;
+  backdrop-filter: blur(6px) !important;
+  transform: none !important;
+  transition: background .18s ease, box-shadow .18s ease !important;
+}
+.ant-card.osq-card .ant-card-body { background: transparent !important; }
+
+.osq-card:hover,
+.ant-card.osq-card:hover {
+  background: rgba(255,255,255,.08) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.34) !important;
+  transform: none !important;
 }
 
-.shadow-soft:hover {
+/* optional bright mode */
+.card-bright,
+.ant-card.card-bright {
+  background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.13)) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 22px rgba(0,0,0,.32) !important;
+  color:#f4f6fb !important;
+  backdrop-filter: blur(12px) saturate(140%);
+  transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+}
+.card-bright:hover,
+.ant-card.card-bright:hover {
+  background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.18)) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.45) !important;
   transform: translateY(-2px);
 }
 
-/* -----------------------------
-   Footer Styling
-------------------------------*/
-.footer {
-  background-color: #f5f5f5;
-  border-top: 1px solid #ddd;
-  font-size: 0.95rem;
+/* divider */
+.divider-soft {
+  height: 1px; border: 0; margin: 10px 0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.14), transparent);
 }
 
-.footer a {
-  color: #333;
-  text-decoration: none;
+/* chips */
+.osq-chip, .card-chip {
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+  color:#f4f6fb;
+  border-radius:12px;
+  padding:10px 12px;
+  transition: background .18s ease, box-shadow .18s ease;
+}
+.osq-chip:hover, .card-chip:hover {
+  background: rgba(255,255,255,.14);
+  box-shadow: 0 6px 18px rgba(0,0,0,.28);
 }
 
-.footer a:hover {
-  text-decoration: underline;
+/* =========================================================
+   CTA ROWS & BUTTONS
+   ========================================================= */
+.ai-cta-row {
+  margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap;
+}
+.ai-cta-row .ant-btn {
+  min-width: 160px; font-weight: 600; text-align: center;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+@media (max-width: 575px) {
+  .ai-cta-row { flex-direction: column; }
+  .ai-cta-row .ant-btn { width: 100%; }
+}
+.ai-cta-row .ant-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
 }
 
-/* -----------------------------
-   Section Divider (Optional Wave)
-------------------------------*/
-.section + .section {
-  position: relative;
-  margin-top: 0;
+/* orange CTA buttons */
+.btn-orange {
+  background: linear-gradient(180deg, var(--cta), var(--cta-2)) !important;
+  border: none !important; color: #0e0a1f !important;
+  font-weight: 600; border-radius: 10px; padding: 8px 16px;
+  height: auto;
+  box-shadow: 0 6px 20px rgba(255,138,42,0.35);
+}
+.btn-orange:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.btn-pill{ border-radius:999px !important; padding:4px 10px !important; height:auto; line-height:1; }
+
+/* =========================================================
+   ONE SKY PERKS (tile version)
+   ========================================================= */
+.osq-card.perk-tiles {
+  padding: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.05)),
+    radial-gradient(160% 140% at 20% 0%, rgba(255,138,42,.14), transparent 60%),
+    radial-gradient(160% 140% at 80% 100%, rgba(255,180,120,.10), transparent 60%) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+.perk-tiles h3 { margin: 0 0 4px; color:#fff; font-weight:700; }
+.perk-sub { margin: 0 0 14px; color: rgba(255,255,255,.86); }
+
+.perk-tiles-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 12px;
+}
+@media (max-width: 980px){ .perk-tiles-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 600px){ .perk-tiles-grid{ grid-template-columns: 1fr; } }
+
+.perk-tile{
+  display:grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04)),
+    radial-gradient(120% 120% at 20% 0%, rgba(255,138,42,.16), transparent 60%),
+    radial-gradient(120% 120% at 80% 100%, rgba(255,180,120,.10), transparent 60%);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: 0 6px 18px rgba(0,0,0,.22) inset, 0 6px 16px rgba(0,0,0,.16);
+  color:#f4f6fb;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.perk-tile:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.24), 0 0 0 1px rgba(255,255,255,.08) inset;
+}
+.perk-emoji{ font-size:18px; line-height:1; }
+.perk-copy{ display:flex; flex-direction:column; gap:2px; min-width: 0; }
+.perk-title{ font-weight:700; color:#fff; }
+.perk-desc{ color:rgba(255,255,255,.88); font-size:13px; }
+
+/* =========================================================
+   TEXT COLOR FIX (force white in cards; orange CTAs keep dark text)
+   ========================================================= */
+.osq-card, .osq-card * { color: #f4f6fb !important; }
+.osq-card .ant-typography-secondary,
+.osq-card .muted-on-dark,
+.osq-card .ant-list-item-meta-description { color: rgba(255,255,255,.82) !important; }
+.osq-card a { color: #ffd29a !important; }
+.osq-card .ant-btn {
+  color: #f4f6fb !important;
+  border-color: rgba(255,255,255,.25) !important;
+  background: transparent !important;
+}
+.osq-card .ant-btn:hover {
+  border-color: rgba(255,255,255,.45) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+.btn-orange { color: #0e0a1f !important; }  /* keep CTAs readable */
+
+/* =========================================================
+   Pills, Tabs & Chips readability + Active tab pop
+   ========================================================= */
+.pill, .ant-tag.pill {
+  color: #fff !important;
+  background: rgba(255,255,255,.10) !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 4px 12px;
 }
 
-.section + .section::before {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 80px;
-  background: url("/images/wave-divider.svg") center/cover no-repeat;
-  position: absolute;
-  top: -80px;
-  left: 0;
-  z-index: 1;
+.osq-search-tabs .ant-tabs-tab-btn {
+  color: #fff !important;
+  font-weight: 600;
+  transition: background .2s ease, color .2s ease;
+  border-radius: 12px;
+  padding: 6px 14px;
+}
+.osq-search-tabs .ant-tabs-tab:hover .ant-tabs-tab-btn { background: rgba(255,255,255,.12); }
+.osq-search-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  background: linear-gradient(180deg, var(--cta), var(--cta-2)) !important;
+  color: #0e0a1f !important;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(255,138,42,0.45);
 }
 
-@media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2rem;
-  }
+.osq-chip, .card-chip {
+  color: #fff !important;
+  background: rgba(255,255,255,.10) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+}
+.osq-chip:hover, .card-chip:hover {
+  background: rgba(255,255,255,.18) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+.osq-where input::placeholder,
+.osq-date .ant-picker-input > input::placeholder { color: rgba(255,255,255,.75) !important; }
 
-  .hero p {
-    font-size: 1rem;
-  }
+/* =========================================================
+   Smart Plan AI strip — readable on dark
+   ========================================================= */
 
-  .section {
-    padding: 2.5rem 1rem;
+/* make ALL text in the strip white by default */
+.smart-plan-ai,
+.smart-plan-ai *,
+.smart-plan-ai .ant-typography,
+.smart-plan-ai .ant-typography * { color: #ffffff !important; }
+
+/* subtle glass behind strip */
+.smart-plan-ai {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 10px !important;
+  padding: 6px 10px !important;
+}
+
+/* label next to the switch */
+.smart-plan-ai .smart-plan-label { font-weight: 600; letter-spacing: .1px; }
+
+/* AntD Switch */
+.smart-plan-ai .ant-switch { background: rgba(255,255,255,.28) !important; }
+.smart-plan-ai .ant-switch-checked { background: var(--cta) !important; }
+.smart-plan-ai .ant-switch-inner { color: #0e0a1f !important; font-weight: 600; }
+.smart-plan-ai .ant-switch-handle::before { background: #fff !important; }
+
+/* AntD Segmented / chips in the strip */
+.smart-plan-ai .ant-segmented-item-label { color: #fff !important; }
+.smart-plan-ai .ant-segmented-item-selected {
+  background: linear-gradient(180deg, var(--cta), var(--cta-2)) !important;
+  box-shadow: 0 4px 12px rgba(255,138,42,.35);
+  border-radius: 999px;
+}
+.smart-plan-ai .ant-segmented-item-selected .ant-segmented-item-label { color: #0e0a1f !important; }
+
+/* “Search • Earn +50 XP” pill */
+.osq-search-row .earn-xp {
+  background: linear-gradient(180deg, var(--cta), var(--cta-2)) !important;
+  color: #0e0a1f !important;
+  border: none !important;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(255,138,42,.35);
+}
+.osq-search-row .earn-xp * { color: #0e0a1f !important; }
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .osq-card, .card-bright, .ant-card.osq-card, .ant-card.card-bright,
+  .osq-chip, .card-chip, .ai-cta-row .ant-btn, .perk-tile {
+    transition: none !important; transform: none !important;
   }
 }

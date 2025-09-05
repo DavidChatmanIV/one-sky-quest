@@ -1,96 +1,219 @@
-/* 🔷 Main Feed Section Wrapper */
-.quest-feed {
-  background-color: #fefefe; /* Updated from #fffaf3 for smoother white */
-  padding: 48px 20px;
+/* ========= One Sky Quest — Quest Feed (Welcoming) ========= */
+:root{
+  --bg-start:#130e24; --bg-mid:#2a1b45; --bg-end:#3a2430;
+  --text-1:#f4f6fb; --text-2:#c9cbe3;
+  --cta:#ff8a2a; --cta-2:#ffa94d;
+  --glass:rgba(255,255,255,.06); --glass-2:rgba(255,255,255,.10);
+  --border-soft:rgba(255,255,255,.10);
+  --shadow:0 18px 40px rgba(0,0,0,.40);
+  --r-lg:16px; --r-sm:12px;
 }
 
-/* 🔷 Feed Card Style */
-.feed-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
-  padding: 20px;
-  transition: all 0.25s ease;
+.qf-wrap{
+  color:var(--text-1);
+  background:
+    radial-gradient(900px 700px at 10% -120px, #2b1e4b 0%, transparent 60%),
+    radial-gradient(900px 700px at 90% -120px, #3a2430 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-start), var(--bg-mid) 40%, var(--bg-end));
+  min-height:100vh;
+  padding:14px 18px 64px;
 }
 
-.feed-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+/* ---------- Top bar ---------- */
+.qf-topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap;
+  gap:16px; margin-bottom:12px;
 }
 
-/* 🔷 Username & Meta */
-.username {
-  color: #f59e0b;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 4px;
+.home-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px; border-radius:12px;
+  background:var(--glass);
+  color:var(--text-1);
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow);
+  font-weight:600; font-size:14px;
+  transition:background .2s ease, transform .2s ease, border-color .2s ease;
 }
+.home-btn:hover{ background:var(--glass-2); transform:translateY(-1px); }
 
-.feed-meta {
-  font-size: 0.9rem;
-  color: #999;
-}
-
-/* 🔷 Content */
-.feed-content {
-  font-size: 1rem;
-  color: #333;
-  margin-top: 6px;
-  margin-bottom: 12px;
-}
-
-/* 🔷 Reactions Row */
-.reactions {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
+/* ---- Animated Tab Switcher ---- */
+.qf-switch{
+  position: relative;
+  display: inline-flex;
   gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow);
+  flex: 0 0 auto;
 }
 
-/* 🔷 Sidebar Styling */
-.sidebar-wrapper {
-  background-color: #f0f9ff;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+.qf-tab{
+  position: relative;
+  z-index: 1;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color .18s ease, transform .18s ease;
+}
+.qf-tab:hover{ color: var(--text-1); transform: translateY(-1px); }
+.qf-tab:focus-visible{
+  outline: 2px solid var(--cta-2);
+  outline-offset: 2px;
+}
+.qf-tab.is-active{ color: #1b0f05; } /* dark text on the gradient pill */
+.qf-tab-ico{ margin-right: 6px; opacity: .9; }
+
+/* sliding pill sized to active tab */
+.qf-switch-indicator{
+  position: absolute;
+  top: 6px; left: 6px; height: calc(100% - 12px);
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--cta), var(--cta-2));
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  transition: transform .22s cubic-bezier(.2,.8,.2,1),
+              width .22s cubic-bezier(.2,.8,.2,1);
 }
 
-/* 🔷 XP Boost Tag */
-.tag-xp-boost {
-  animation: glowPulse 1.5s infinite ease-in-out;
-  background-color: #fffbe6 !important;
-  border: 1px solid #ffe58f !important;
-  color: #d48806 !important;
+/* (optional) reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .qf-tab:hover{ transform:none; }
+  .qf-switch-indicator{ transition: none; }
 }
 
-@keyframes glowPulse {
-  0% {
-    box-shadow: 0 0 0px rgba(250, 173, 20, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(250, 173, 20, 0.9);
-  }
-  100% {
-    box-shadow: 0 0 0px rgba(250, 173, 20, 0.6);
-  }
+/* ---------- Header ---------- */
+.qf-header{ margin:4px 0 8px; }
+.qf-title{
+  font-size:28px; font-weight:800; letter-spacing:.2px; margin:0;
+  background:linear-gradient(90deg, var(--cta), var(--cta-2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.qf-subtitle{ margin:4px 0 0; color:var(--text-2); font-size:15px; }
+
+/* ---------- Greeting ---------- */
+.greeting-banner{
+  margin:16px 0 18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow);
+  border-radius:18px;
+  padding:14px 18px;
+}
+.greeting-text{ margin:0; font-weight:700; font-size:24px; color:var(--text-1); }
+
+/* ---------- Grid ---------- */
+.qf-grid{
+  display:grid; grid-template-columns: 1fr 360px; gap:18px;
+}
+@media (max-width: 992px){
+  .qf-grid{ grid-template-columns: 1fr; }
 }
 
-/* 🔷 Mobile Tweaks */
-@media (max-width: 768px) {
-  .feed-card {
-    padding: 16px;
-  }
+/* ---------- Cards ---------- */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+  border:1px solid var(--border-soft);
+  border-radius:18px; box-shadow:var(--shadow);
+  color:var(--text-1);
+}
 
-  .username {
-    font-size: 1rem;
-  }
+/* ---------- Composer ---------- */
+.composer{ padding:14px; }
+.composer-input{
+  width:100%; border:none; outline:none;
+  background:transparent; color:var(--text-1);
+  font-size:15px; padding:10px 8px;
+}
+.composer-actions{
+  margin-top:10px; display:flex; align-items:center; justify-content:space-between;
+}
+.composer-icons{ opacity:.85; display:flex; gap:10px; font-size:18px; }
+.cta-btn{
+  padding:8px 14px; border:none; border-radius:10px;
+  background:linear-gradient(90deg, var(--cta), var(--cta-2));
+  color:#1b0f05; font-weight:800; cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+}
+.cta-btn:hover{ filter:brightness(1.03); }
 
-  .feed-meta {
-    font-size: 0.75rem;
-  }
+/* ---------- Feed item ---------- */
+.feed{ padding:14px; }
+.feed-head{ display:flex; gap:12px; align-items:center; }
+.avatar{
+  width:36px; height:36px; border-radius:999px; background:var(--glass-2);
+  display:inline-flex; align-items:center; justify-content:center; font-weight:700;
+}
+.meta{ display:flex; flex-direction:column; gap:2px; }
+.name-row{ display:flex; align-items:center; gap:6px; }
+.name{ font-weight:700; }
+.verified{ color:#7dd3fc; }
+.handle, .date{ color:var(--text-2); font-size:13px; }
+.dot{ color:var(--text-2); }
 
-  .reactions {
-    gap: 6px;
-  }
+.location{ color:var(--text-2); font-size:13px; }
+.feed-text{ margin:12px 0; color:var(--text-1); }
+
+.feed-tags{ display:flex; gap:8px; flex-wrap:wrap; }
+.tag{
+  font-size:12px; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.10); border:1px solid var(--border-soft);
+  color:var(--text-1);
+}
+
+.feed-footer{
+  margin-top:12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.link{
+  background:transparent; border:none; color:var(--text-2);
+  cursor:pointer; padding:4px 0;
+}
+.link:hover{ color:var(--text-1); }
+.xp-pill{
+  margin-left:auto; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.12); border:1px solid var(--border-soft);
+  font-weight:700; color:var(--text-1);
+}
+
+/* ---------- Sidebar ---------- */
+.panel{ padding:14px; }
+.panel-title{ margin:0 0 10px; font-size:16px; font-weight:700; color:var(--text-1); }
+.chip-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.hashtag{
+  font-size:12px; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.10); border:1px solid var(--border-soft);
+  color:var(--text-1);
+}
+.hot-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.hot-list li{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.08);
+  border:1px solid var(--border-soft);
+}
+.delta{
+  padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.16);
+  font-weight:700; color:var(--text-1);
+}
+
+/* ---------- Floating Action Button ---------- */
+.fab{
+  position:fixed; right:22px; bottom:22px; width:48px; height:48px;
+  border-radius:999px; border:none; cursor:pointer;
+  background:linear-gradient(90deg, var(--cta), var(--cta-2));
+  color:#1b0f05; font-size:22px; font-weight:900;
+  box-shadow:var(--shadow);
+}
+.fab:hover{ filter:brightness(1.05); }
+
+/* Accessibility: ensure text contrast in cards */
+.card, .composer-input, .feed-text, .panel-title, .hashtag, .tag, .delta {
+  color: var(--text-1);
 }

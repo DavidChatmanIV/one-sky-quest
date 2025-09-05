@@ -1,70 +1,132 @@
-import React, { useState } from "react";
-import { Typography, Form, Input, Button, DatePicker, message } from "antd";
-import MultiRoomBooking from "../components/Booking/MultiRoomBooking";
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  DatePicker,
+  Button,
+  Typography,
+  Space,
+} from "antd";
+import {
+  HomeOutlined,
+  TeamOutlined,
+  CalendarOutlined,
+  EnvironmentOutlined,
+} from "@ant-design/icons";
 
-const { Title } = Typography;
+import "../styles/team-travel.css";
 
-const TeamTravelPage = () => {
+const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
+
+export default function TeamTravelPage() {
   const [form] = Form.useForm();
-  const [travelers, setTravelers] = useState(null);
-  const [showRooms, setShowRooms] = useState(false);
-  const [, contextHolder] = message.useMessage();
 
-  const handleGenerate = () => {
-    const values = form.getFieldsValue();
-    if (!values.travelers || values.travelers < 1) {
-      message.error("Please enter a valid number of travelers.");
-      return;
-    }
-    setTravelers(values.travelers);
-    setShowRooms(true);
-    message.success("Team trip setup started! Now assign your rooms.");
+  const onFinish = (values) => {
+    // TODO: wire to your generator logic
+    console.log("Team travel values:", values);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4 sm:px-8 md:px-16">
-      <Title level={2} className="text-center mb-8">
-        🧳 Team Travel Planner
-      </Title>
+    <div className="tt-wrap">
+      {/* Top bar with Home */}
+      <div className="tt-header">
+        <Space size={10} className="tt-left">
+          <Link to="/" className="tt-home-btn">
+            <HomeOutlined />
+            <span>Home</span>
+          </Link>
+          <div className="tt-sep" />
+          <Text className="tt-breadcrumb">Team Travel</Text>
+        </Space>
+      </div>
 
-      <Form
-        form={form}
-        layout="vertical"
-        className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md"
-      >
-        <Form.Item label="Team / Family Name" name="groupName">
-          <Input placeholder="E.g., Johnson Family Reunion" />
-        </Form.Item>
+      <main className="tt-main">
+        <Card className="tt-card" bordered={false}>
+          <div className="tt-title">
+            <TeamOutlined />
+            <Title level={2} className="tt-h2">
+              Team Travel Planner
+            </Title>
+          </div>
 
-        <Form.Item label="Number of Travelers" name="travelers">
-          <Input type="number" min={1} placeholder="10" />
-        </Form.Item>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            requiredMark={false}
+            className="tt-form"
+            initialValues={{ travelers: 10 }}
+          >
+            <Form.Item
+              name="groupName"
+              label="Team / Family Name"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter a team or family name",
+                },
+              ]}
+            >
+              <Input
+                size="large"
+                placeholder="E.g., Johnson Family Reunion"
+                className="tt-input"
+              />
+            </Form.Item>
 
-        <Form.Item label="Destination" name="destination">
-          <Input placeholder="E.g., Cancun, Mexico" />
-        </Form.Item>
+            <Form.Item
+              name="travelers"
+              label="Number of Travelers"
+              rules={[
+                { required: true, message: "Please enter the group size" },
+              ]}
+            >
+              <InputNumber
+                size="large"
+                min={1}
+                className="tt-input-number"
+                placeholder="10"
+              />
+            </Form.Item>
 
-        <Form.Item label="Preferred Travel Dates" name="dates">
-          <DatePicker.RangePicker className="w-full" />
-        </Form.Item>
+            <Form.Item
+              name="destination"
+              label="Destination"
+              rules={[{ required: true, message: "Please add a destination" }]}
+            >
+              <Input
+                size="large"
+                prefix={<EnvironmentOutlined />}
+                placeholder="E.g., Cancun, Mexico"
+                className="tt-input"
+              />
+            </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" size="large" block onClick={handleGenerate}>
-            Generate Options
-          </Button>
-        </Form.Item>
-      </Form>
+            <Form.Item
+              name="dates"
+              label="Preferred Travel Dates"
+              rules={[{ required: true, message: "Choose a date range" }]}
+            >
+              <RangePicker
+                size="large"
+                className="tt-range"
+                suffixIcon={<CalendarOutlined />}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
 
-      {/* 🛏️ Room Planner appears only after Generate */}
-      {showRooms && travelers && (
-        <div className="max-w-4xl mx-auto mt-12">
-          <MultiRoomBooking totalGuests={travelers} />
-        </div>
-      )}
-
-      {contextHolder}
+            <Form.Item>
+              <Button htmlType="submit" size="large" className="tt-submit">
+                Generate Options
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </main>
     </div>
   );
-};
-
-export default TeamTravelPage;
+}

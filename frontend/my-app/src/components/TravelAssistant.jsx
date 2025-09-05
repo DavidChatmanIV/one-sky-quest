@@ -1,58 +1,15 @@
+import React, { useState } from "react";
+import { Typography, Form, Input, Button, Select, Collapse, Space } from "antd";
+import { HomeOutlined, RocketOutlined, RobotOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { useAssistant } from "../context/AssistantContext"; 
+import "../styles/SmartPlan.css";
 
-import React, { useMemo, useState } from "react";
-import {
-  Typography,
-  Input,
-  Select,
-  Button,
-  Card,
-  Form,
-  Divider,
-  Tag,
-  Space,
-  Alert,
-  Radio,
-  InputNumber,
-  Tooltip,
-  Collapse,
-} from "antd";
-import {
-  RobotOutlined,
-  ReloadOutlined,
-  TeamOutlined,
-  UserOutlined,
-  RocketOutlined,
-  CoffeeOutlined,
-  ScheduleOutlined,
-} from "@ant-design/icons";
-import { useAssistant } from "../context/AssistantContext";
+const { Title, Text } = Typography;
+const { Option } = Select;
 
-const { Title, Paragraph, Text } = Typography;
-
-/* ---------- Options ---------- */
-const BUDGET_OPTIONS = [
-  { label: "$100", value: 100 },
-  { label: "$500", value: 500 },
-  { label: "$1,000+", value: 1000 },
-  { label: "$2,500+", value: 2500 },
-  { label: "$5,000+", value: 5000 },
-];
-
-const VIBE_OPTIONS = [
-  { label: "🌴 Relaxing", value: "relaxing" },
-  { label: "⛰️ Adventurous", value: "adventurous" },
-  { label: "💖 Romantic", value: "romantic" },
-  { label: "🏛️ Cultural", value: "cultural" },
-  { label: "🎉 Nightlife/Party", value: "party" },
-];
-
-const FLIGHT_CLASS_OPTIONS = [
-  { label: "Basic Economy", value: "basic" },
-  { label: "Economy", value: "economy" },
-  { label: "Premium Economy", value: "premium-economy" },
-  { label: "Business", value: "business" },
-  { label: "First Class", value: "first" },
-];
+/* ------------ Options ------------ */
+const FLIGHT_CLASSES = ["Economy", "Premium Economy", "Business", "First"];
 
 const FOOD_PLAN_OPTIONS = [
   { label: "All-inclusive", value: "all-inclusive" },
@@ -60,450 +17,193 @@ const FOOD_PLAN_OPTIONS = [
   { label: "Room service focused", value: "room-service" },
 ];
 
-/* ---------- Demo generator (simple, feels intelligent) ---------- */
-const mockGeneratePlan = async (params) => {
-  const {
-    destination,
-    budget = 0,
-    vibe,
-    tripDays = 3,
-    flightClass = "economy",
-    activityLevel = "minimal",
-    travelType = "solo",
-    travelers = 1,
-    foodPlan = "pay-per-meal",
-  } = params;
-
-  // Tiny multipliers to make the demo feel “alive”
-  const classMult =
-    {
-      basic: 0.9,
-      economy: 1.0,
-      "premium-economy": 1.25,
-      business: 1.8,
-      first: 2.4,
-    }[flightClass] ?? 1;
-
-  const activityMult =
-    {
-      none: 0.85,
-      minimal: 1.0,
-      moderate: 1.2,
-      high: 1.5,
-    }[activityLevel] ?? 1;
-
-  const foodMult =
-    {
-      "pay-per-meal": 1.0,
-      "room-service": 1.25,
-      "all-inclusive": 1.35,
-    }[foodPlan] ?? 1;
-
-  const people =
-    travelType === "group" ? Math.max(Number(travelers) || 2, 2) : 1;
-  const basePerDay = Math.max(
-    80,
-    Math.min(budget || 1000, 6000) / Math.max(tripDays, 1)
-  );
-  const estPerPerson = basePerDay * classMult * activityMult * foodMult;
-  const estTrip = estPerPerson * tripDays * people;
-
-  // Fake price band
-  const low = Math.round(estTrip * 0.85);
-  const high = Math.round(estTrip * 1.15);
-  const fmt = (n) => n.toLocaleString();
-
-  await new Promise((r) => setTimeout(r, 700));
-  return {
-    title: `Your ${vibe || "personalized"} trip to ${destination}`,
-    summary:
-      "Here’s a starter plan tailored to your vibe, budget, and time. Refine it anytime with AI.",
-    estCost: `$${fmt(low)} – $${fmt(high)}`,
-    bullets: [
-      `Stay in a ${
-        budget >= 1000 ? "boutique" : "budget-friendly"
-      } hotel near the center`,
-      vibe === "adventurous"
-        ? "Guided outdoor excursion"
-        : vibe === "relaxing"
-        ? "Spa afternoon + sunset spot"
-        : vibe === "romantic"
-        ? "Scenic dinner + evening walk"
-        : vibe === "party"
-        ? "Nightlife district pass + late check-out"
-        : "Top museums + local market",
-      "Use public transit/day pass to cut costs",
-    ],
-    tags: [
-      travelType,
-      vibe || "custom",
-      budget >= 2500 ? "premium" : "value",
-      destination?.toLowerCase?.() || "",
-    ],
-  };
-};
-
-/* ---------- Component ---------- */
+/* ------------ Component ------------ */
 export default function TravelAssistant() {
-  const { assistant = "Sora" } = useAssistant();
+  const { assistant } = useAssistant();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
 
-  // Reactively show/hide travelers based on form value
-  const travelType = Form.useWatch("travelType", form) || "solo";
+  // NEW: which preset is selected
+  const [selectedPreset, setSelectedPreset] = useState(null);
 
-  const PrimaryIcon = assistant === "Questy" ? RocketOutlined : RobotOutlined;
-  const primaryLabel = loading
-    ? "Generating"
-    : assistant === "Questy"
-    ? "Quick Generate"
-    : "Generate My Trip";
-
-  const handleFinish = async (values) => {
-    try {
-      setError(null);
-      setLoading(true);
-      setResult(null);
-      const data = await mockGeneratePlan(values);
-      setResult(data);
-    } catch (e) {
-      console.error(e);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetForm = () => {
-    form.resetFields();
-    setResult(null);
-    setError(null);
-  };
-
-  const applyPreset = (preset) => {
+  // NEW: apply preset & highlight
+  const applyPreset = (key) => {
     const presets = {
-      soloWeekend: {
-        destination: "Miami",
-        budget: 1000,
-        vibe: "party",
-        flightClass: "economy",
-        foodPlan: "pay-per-meal",
-        activityLevel: "minimal",
-        tripDays: 3,
-        travelType: "solo",
-        travelers: 1,
+      solo: {
+        destination: "Paris",
+        days: 3,
+        flightClass: "Economy",
       },
-      friendsTrip: {
-        destination: "Cancún",
-        budget: 2500,
-        vibe: "relaxing",
-        flightClass: "premium-economy",
-        foodPlan: "all-inclusive",
-        activityLevel: "moderate",
-        tripDays: 5,
-        travelType: "group",
-        travelers: 4,
+      friends: {
+        destination: "Barcelona",
+        days: 5,
+        flightClass: "Economy",
       },
-      luxuryEscape: {
-        destination: "Tokyo",
-        budget: 5000,
-        vibe: "cultural",
-        flightClass: "business",
-        foodPlan: "room-service",
-        activityLevel: "minimal",
-        tripDays: 7,
-        travelType: "solo",
-        travelers: 1,
+      luxury: {
+        destination: "Maldives",
+        days: 7,
+        flightClass: "Business",
       },
     };
-    const values = presets[preset];
-    form.setFieldsValue(values);
-    setResult(null);
-    setError(null);
+    form.setFieldsValue(presets[key] || {});
+    setSelectedPreset(key);
   };
 
-  // Nice defaults
-  const initialValues = useMemo(
-    () => ({
-      destination: "",
-      budget: 1000,
-      vibe: "relaxing",
-      flightClass: "economy",
-      foodPlan: "pay-per-meal",
-      activityLevel: "minimal",
-      tripDays: 5,
-      travelType: "solo",
-      travelers: 1,
-    }),
-    []
-  );
+  const onFinish = (values) => {
+    console.log("Trip form:", values);
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1500); // mock API delay
+  };
 
   return (
-    <section
-      id="ai-builder"
-      className="w-full py-12 px-4 bg-gray-50"
-      aria-label="AI Trip Builder"
-    >
-      <div className="flex flex-col items-center justify-center">
-        <Card
-          className="w-full max-w-2xl p-6 shadow-lg bg-white rounded-2xl border border-gray-100"
-          bordered={false}
+    <div className="ta-wrap">
+      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        {/* Home Button */}
+        <Link to="/" className="ta-home">
+          <HomeOutlined /> Home
+        </Link>
+
+        {/* Heading */}
+        <Title level={3} style={{ color: "white", margin: 0 }}>
+          ✨ Build Your Perfect Trip with AI
+        </Title>
+        <Text style={{ color: "rgba(255,255,255,0.85)" }}>
+          You’re using <b>{assistant.toLowerCase()}</b>. Switch anytime in the
+          navbar.
+        </Text>
+
+        {/* Quick start */}
+        <div className="ta-prefills ta-quickstart">
+          <Text style={{ color: "rgba(255,255,255,0.7)" }}>
+            Quick start <i>(optional)</i>
+          </Text>
+          <Space wrap>
+            <Button
+              className={selectedPreset === "solo" ? "active" : ""}
+              onClick={() => applyPreset("solo")}
+            >
+              Solo Travel
+            </Button>
+            <Button
+              className={selectedPreset === "friends" ? "active" : ""}
+              onClick={() => applyPreset("friends")}
+            >
+              Friends Trip
+            </Button>
+            <Button
+              className={selectedPreset === "luxury" ? "active" : ""}
+              onClick={() => applyPreset("luxury")}
+            >
+              Luxury Escape
+            </Button>
+          </Space>
+          <Text type="secondary" style={{ color: "rgba(255,255,255,0.6)" }}>
+            Or skip this and fill in the fields below.
+          </Text>
+        </div>
+
+        {/* Form */}
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          className="ta-glass"
         >
-          <Title level={4} className="text-center">
-            ✨ Build Your Perfect Trip with AI
-          </Title>
-          <Paragraph className="text-center mb-2">
-            You’re using <b>{assistant}</b>. Switch anytime in the navbar.
-          </Paragraph>
-          <Paragraph className="text-center mb-4">
-            Plan smarter with personalized recommendations — tailored to your
-            vibe, budget, and goals.
-          </Paragraph>
-
-          {/* Quick Prefill */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 mb-6">
-            <Text type="secondary">Quick Prefill:</Text>
-            <Space wrap>
-              <Button size="small" onClick={() => applyPreset("soloWeekend")}>
-                Solo Weekend
-              </Button>
-              <Button size="small" onClick={() => applyPreset("friendsTrip")}>
-                Friends Trip
-              </Button>
-              <Button size="small" onClick={() => applyPreset("luxuryEscape")}>
-                Luxury Escape
-              </Button>
-            </Space>
-          </div>
-
-          {error && (
-            <Alert
-              role="status"
-              type="error"
-              message={error}
-              showIcon
-              className="mb-4"
-            />
-          )}
-
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleFinish}
-            requiredMark={false}
-            className="space-y-2"
-            initialValues={initialValues}
+          <Form.Item
+            label={<span style={{ color: "white" }}>Destination</span>}
+            name="destination"
+            rules={[{ required: true, message: "Enter a destination" }]}
           >
-            {/* BASIC */}
-            <Form.Item
-              name="destination"
-              label={<Text strong>Destination</Text>}
-              rules={[
-                { required: true, message: "Please enter a destination" },
-              ]}
-            >
-              <Input
-                size="large"
-                placeholder="Where do you want to go? (e.g., Tokyo)"
-                allowClear
-              />
-            </Form.Item>
+            <Input placeholder="Where do you want to go? (e.g., Tokyo)" />
+          </Form.Item>
 
-            <Form.Item
-              name="travelType"
-              label={<Text strong>Travel Type</Text>}
-            >
-              <Radio.Group size="large">
-                <Radio.Button value="solo">
-                  <UserOutlined /> Solo
-                </Radio.Button>
-                <Radio.Button value="group">
-                  <TeamOutlined /> Group
-                </Radio.Button>
-              </Radio.Group>
-            </Form.Item>
+          <Form.Item
+            label={<span style={{ color: "white" }}>Trip Length (days)</span>}
+            name="days"
+            rules={[{ required: true, message: "Enter trip length" }]}
+          >
+            <Input placeholder="e.g., 5" type="number" />
+          </Form.Item>
 
-            {travelType === "group" && (
+          <Form.Item
+            label={<span style={{ color: "white" }}>Flight Class</span>}
+            name="flightClass"
+          >
+            <Select
+              placeholder="Select flight class"
+              popupClassName="ta-select-dark"
+            >
+              {FLIGHT_CLASSES.map((c) => (
+                <Option key={c} value={c}>
+                  {c}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Collapse ghost>
+            <Collapse.Panel
+              header={
+                <span style={{ color: "rgba(255,255,255,0.85)" }}>
+                  More options (budget, vibe, food, activity)
+                </span>
+              }
+              key="more"
+            >
               <Form.Item
-                name="travelers"
-                label={<Text strong>Number of Travelers</Text>}
-                rules={[{ required: true, message: "Add traveler count" }]}
+                label={<span style={{ color: "white" }}>Food Plan</span>}
+                name="foodPlan"
               >
-                <InputNumber
-                  min={2}
-                  max={20}
-                  className="w-full"
-                  size="large"
-                  placeholder="How many people?"
+                <Select
+                  placeholder="Select food plan"
+                  options={FOOD_PLAN_OPTIONS}
+                  popupClassName="ta-select-dark"
                 />
               </Form.Item>
-            )}
 
-            <Form.Item
-              name="tripDays"
-              label={
-                <span>
-                  Trip Length (days) <ScheduleOutlined />
-                </span>
-              }
-              tooltip="We’ll base stays around your number of days."
-              rules={[
-                { required: true, message: "Select trip length in days" },
-              ]}
-            >
-              <InputNumber min={1} max={30} className="w-full" size="large" />
-            </Form.Item>
+              <Form.Item
+                label={<span style={{ color: "white" }}>Budget Range</span>}
+                name="budget"
+              >
+                <Input placeholder="e.g., under $1000" />
+              </Form.Item>
 
-            <Form.Item
-              name="flightClass"
-              label={
-                <span>
-                  Flight Class <RocketOutlined />
-                </span>
-              }
-              tooltip="Filter flight options by cabin class."
-            >
-              <Select size="large" options={FLIGHT_CLASS_OPTIONS} />
-            </Form.Item>
+              <Form.Item
+                label={
+                  <span style={{ color: "white" }}>Preferred Activities</span>
+                }
+                name="activities"
+              >
+                <Input placeholder="e.g., hiking, museums, nightlife" />
+              </Form.Item>
+            </Collapse.Panel>
+          </Collapse>
 
-            {/* ADVANCED */}
-            <Collapse
-              className="bg-white"
-              items={[
-                {
-                  key: "advanced",
-                  label: (
-                    <Text strong>
-                      More options (budget, vibe, food, activity)
-                    </Text>
-                  ),
-                  children: (
-                    <div className="pt-2">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Form.Item
-                          name="budget"
-                          label={<Text strong>Your Budget</Text>}
-                        >
-                          <Select
-                            size="large"
-                            placeholder="Your Budget ($)"
-                            options={BUDGET_OPTIONS}
-                            allowClear
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          name="vibe"
-                          label={<Text strong>Trip Vibe</Text>}
-                        >
-                          <Select
-                            size="large"
-                            placeholder="Trip Vibe"
-                            options={VIBE_OPTIONS}
-                            allowClear
-                          />
-                        </Form.Item>
-                      </div>
-
-                      <Form.Item
-                        name="foodPlan"
-                        label={
-                          <span>
-                            Food & Dining <CoffeeOutlined />
-                          </span>
-                        }
-                        tooltip="Pick the style that fits your trip."
-                      >
-                        <Select size="large" options={FOOD_PLAN_OPTIONS} />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="activityLevel"
-                        label={
-                          <span>
-                            Activity Level{" "}
-                            <Tooltip title="Higher activity usually increases total cost (tours, gear, guides).">
-                              <Text type="secondary">(affects budget)</Text>
-                            </Tooltip>
-                          </span>
-                        }
-                      >
-                        <Radio.Group
-                          size="large"
-                          className="flex flex-col gap-2"
-                        >
-                          <Radio value="none">
-                            No activity — spa, rest, poolside
-                          </Radio>
-                          <Radio value="minimal">Minimal — light outings</Radio>
-                          <Radio value="moderate">
-                            Moderate — daily activities/tours
-                          </Radio>
-                          <Radio value="high">
-                            Highly Active — adventure, multi-day excursions
-                          </Radio>
-                        </Radio.Group>
-                      </Form.Item>
-                    </div>
-                  ),
-                },
-              ]}
-            />
-
-            <Space.Compact block className="mt-3">
+          <Form.Item>
+            <Space>
               <Button
                 type="primary"
-                icon={<PrimaryIcon />}
-                size="large"
                 htmlType="submit"
                 loading={loading}
+                icon={
+                  assistant === "Questy" ? (
+                    <RocketOutlined />
+                  ) : (
+                    <RobotOutlined />
+                  )
+                }
               >
-                {primaryLabel}
+                {loading
+                  ? "Generating..."
+                  : assistant === "Questy"
+                  ? "Quick Generate"
+                  : "Generate My Trip"}
               </Button>
-              <Button
-                size="large"
-                onClick={resetForm}
-                icon={<ReloadOutlined />}
-                disabled={loading}
-              >
-                Reset
-              </Button>
-            </Space.Compact>
-          </Form>
-
-          {result && (
-            <>
-              <Divider className="my-6" />
-              <Card bordered className="bg-gray-50">
-                <Title level={5} className="!mb-1">
-                  {result.title}
-                </Title>
-                <Paragraph className="!mb-2">{result.summary}</Paragraph>
-                <Paragraph className="!mb-1">
-                  <Text strong>Estimated Cost:</Text> {result.estCost}
-                </Paragraph>
-                <ul className="list-disc pl-5 mt-2">
-                  {result.bullets.map((b, i) => (
-                    <li key={i} className="mb-1">
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {result.tags?.map((t, i) => (
-                    <Tag key={`${t || "tag"}-${i}`}>{t}</Tag>
-                  ))}
-                </div>
-                <Space className="mt-4" wrap>
-                  <Button type="default">Save Trip</Button>
-                  <Button type="link">Refine with AI</Button>
-                </Space>
-              </Card>
-            </>
-          )}
-        </Card>
-      </div>
-    </section>
+              <Button htmlType="reset">Reset</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Space>
+    </div>
   );
 }

@@ -1,0 +1,171 @@
+/* --- Soft, readable glass surfaces (dark-friendly) --- */
+:root {
+  --osq-surface-1: 0.36; /* lightest / most transparent (hero/header) */
+  --osq-surface-2: 0.46; /* default (normal cards) */
+  --osq-surface-3: 0.58; /* denser (busy sections) */
+  --osq-surface-border: 0.22;
+  --osq-surface-shadow: 0.30;
+}
+
+/* Base surface */
+.osq-surface {
+  background-color: rgba(13, 18, 32, var(--osq-surface-2)) !important;
+  backdrop-filter: saturate(120%) blur(10px);
+  -webkit-backdrop-filter: saturate(120%) blur(10px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, var(--osq-surface-shadow)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, var(--osq-surface-border));
+  border-radius: 16px;
+}
+
+/* Density knobs */
+.osq-surface[data-surface="1"] { background-color: rgba(13,18,32, var(--osq-surface-1)) !important; }
+.osq-surface[data-surface="2"] { background-color: rgba(13,18,32, var(--osq-surface-2)) !important; }
+.osq-surface[data-surface="3"] { background-color: rgba(13,18,32, var(--osq-surface-3)) !important; }
+
+/* Readable text on tinted cards */
+.osq-surface,
+.osq-surface :where(h1,h2,h3,h4,h5,h6,p,span,small,li,label) {
+  color: rgba(255,255,255,0.92);
+}
+.osq-surface .ant-typography-secondary,
+.osq-surface .ant-typography p { color: rgba(255,255,255,0.75); }
+
+/* AntD Card tweaks */
+.osq-surface.ant-card {
+  --ant-color-bg-container: transparent;
+  background: transparent !important;
+}
+.osq-surface .ant-card-head {
+  background: transparent;
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+.osq-surface .ant-card-body { padding: 16px; }
+
+/* Optional polish: subtle hover lift */
+.osq-surface:hover {
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+  transform: translateY(-2px);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  will-change: transform, box-shadow;
+}
+@media (prefers-reduced-motion: reduce) {
+  .osq-surface:hover { transform: none; }
+}
+
+/* ========= Glass Tabs (bar + pill active, no heavy underline) ========= */
+.osq-surface :where(.ant-tabs-nav) {
+  background: transparent !important;
+  padding: 4px 6px;
+  border-radius: 12px;
+  margin-bottom: 0;
+}
+.osq-surface :where(.ant-tabs-nav::before) {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+.osq-surface :where(.ant-tabs-tab) {
+  margin: 0 4px;
+  border-radius: 10px;
+  transition: background .2s ease, color .2s ease;
+}
+.osq-surface :where(.ant-tabs-tab .ant-tabs-tab-btn) {  /* <-- fixed typo ) */
+  color: rgba(255,255,255,0.85);
+}
+.osq-surface :where(.ant-tabs-tab:hover .ant-tabs-tab-btn) {
+  color: rgba(255,255,255,0.95);
+}
+.osq-surface :where(.ant-tabs-tab-active) {
+  background: rgba(255,255,255,0.10);
+}
+.osq-surface :where(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+  color: #fff;
+  font-weight: 600;
+}
+/* hide blue underline */
+.osq-surface :where(.ant-tabs-ink-bar) {
+  background: transparent !important;
+}
+/* content area stays transparent */
+.osq-surface :where(.ant-tabs-content-holder) {
+  background: transparent;
+}
+
+/* === Make all text inside glass cards white (Top-8 style) === */
+.osq-surface,
+.osq-surface .ant-typography,
+.osq-surface .ant-card-head-title,
+.osq-surface .ant-card-extra,
+.osq-surface .ant-list-item,
+.osq-surface .ant-list-item-meta-description,
+.osq-surface .ant-descriptions-item-label,
+.osq-surface .ant-descriptions-item-content,
+.osq-surface .ant-badge-status-text,
+.osq-surface .ant-statistic-title,
+.osq-surface .ant-statistic-content,
+.osq-surface .ant-form-item,
+.osq-surface .ant-form-item-label > label,
+.osq-surface .ant-alert-message,
+.osq-surface .ant-alert-description {
+  color: rgba(255,255,255,0.92) !important;
+}
+
+/* “Secondary” text also white */
+.osq-surface .ant-typography-secondary,
+.osq-surface .ant-card-meta-description,
+.osq-surface .ant-descriptions-extra {
+  color: rgba(255,255,255,0.92) !important;
+}
+
+/* Inputs / textareas / selects inside glass */
+.osq-surface .ant-input,
+.osq-surface .ant-input-affix-wrapper,
+.osq-surface .ant-input-textarea,
+.osq-surface input,
+.osq-surface textarea,
+.osq-surface .ant-select-selector,
+.osq-surface .ant-select-selection-item,
+.osq-surface .ant-select-selection-placeholder {
+  color: #fff !important;
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.15) !important;
+}
+
+/* Focus states */
+.osq-surface .ant-input:focus,
+.osq-surface .ant-input-affix-wrapper-focused,
+.osq-surface .ant-select-focused .ant-select-selector,
+.osq-surface .ant-input:focus-within {
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08) !important;
+}
+
+/* Placeholders */
+.osq-surface .ant-input::placeholder,
+.osq-surface input::placeholder,
+.osq-surface textarea::placeholder {
+  color: rgba(255,255,255,0.70) !important;
+}
+
+/* Small helper text (e.g., Guestbook timestamps) */
+.osq-surface small { color: rgba(255,255,255,0.85) !important; }
+
+/* Odds & ends */
+.osq-surface .ant-divider-inner-text,
+.osq-surface .ant-breadcrumb,
+.osq-surface .ant-tag {
+  color: rgba(255,255,255,0.92) !important;
+}
+
+/* ======== Solid CHIP helpers for level/status badges ======== */
+.osq-surface .chip {
+  border: 0;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 2px 10px;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+}
+.osq-surface .chip--blue  { background: #3b82f6; } /* Level */
+.osq-surface .chip--green { background: #22c55e; } /* Title */

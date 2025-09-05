@@ -1,0 +1,24 @@
+/* container + grid spacing */
+.landing-wrap { max-width: 1180px; margin: 0 auto; padding: 8px 16px 24px; }
+.section-gap { margin-top: 12px; }
+
+/* hero card */
+.hero-card { padding: 20px; border-radius: 18px; }
+.hero-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; line-height: 1.1; }
+.hero-sub { color: rgba(255,255,255,0.85); }
+
+/* chips row */
+.pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+.pill {
+  display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+  background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14);
+  font-weight:600; font-size:13px; color:#fff;
+}
+
+/* search bar */
+.hero-search { display:flex; gap:10px; align-items:center; }
+.hero-search .search-input {
+  flex:1; height:42px; border-radius:12px; border:1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06); color:#fff; padding:0 12px;
+}
+.hero-search .search-btn { height:42px; border-radius:10px; }

@@ -1,51 +1,554 @@
-.booking-page {
-  background-color: #fffaf3;
-  padding: 64px 20px;
+/* =========================
+  BookingPage.css — OSQ THEME (FINAL)
+  ========================= */
+:root{
+  --bg-start:#0f1020;
+  --bg-mid:#231a3a;
+  --bg-end:#3a2430;
+  --surface:#1e2039;
+  --surface-2:#2a2c4b;
+  --glass:rgba(255,255,255,.06);
+  --text:#f4f6fb;
+  --muted:#c9cbe3;
+  --cta:#ff8a2a;
+  --cta-2:#ffa94d;
+  --cta-hover:#ff7a00;
+  --focus:#6aa8ff; /* legacy */
+  --success:#18b26a;
+  --danger:#ff5a5a;
+  --shadow:0 10px 30px rgba(0,0,0,.30);
+  --radius-xl:18px;
+  --radius-lg:14px;
 }
 
-.booking-form {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  max-width: 800px;
-  margin: 0 auto;
+/* Page gradient + spacing */
+.booking-page{
+  background:
+    radial-gradient(1200px 700px at 20% -10%, #2b1c46 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-start), var(--bg-mid), var(--bg-end));
+  color: var(--text);
+  min-height: 100vh;
+  padding: 40px 16px 56px;
 }
 
-.booking-form h2 {
-  color: #ef4444;
-  font-size: 2rem;
-  margin-bottom: 24px;
+/* Constrain content width */
+.booking-page .ant-row,
+.booking-page .booking-header,
+.booking-page > .ant-tabs,
+.booking-page > .ant-divider,
+.booking-page .content-wrap{
+  max-width: 1180px;
+  margin-inline: auto;
 }
 
-.booking-form label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: #333;
-}
+/* Header */
+.booking-header h2.ant-typography{ color: var(--text); letter-spacing:.2px; margin-bottom: 6px; }
+.booking-header .ant-typography{ color: var(--muted); }
 
+/* ---------- Glass blocks ---------- */
+.osq-glass,
+.booking-form{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-xl);
+}
+.booking-form{ padding: 20px 16px; max-width: 880px; }
+
+/* Dark inputs + brand focus */
 .booking-form input,
-.booking-form select {
+.booking-form select{ background:#101226; color:var(--text); border:1px solid var(--surface-2); }
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-page .ant-input-affix-wrapper-focused,
+.booking-page .ant-picker-focused,
+.booking-page .ant-select-focused .ant-select-selector,
+.booking-page .ant-input:focus,
+.booking-page .ant-picker .ant-picker-input > input:focus{
+  outline:none;
+  border-color: var(--cta) !important;
+  box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important;
+}
+
+/* CTA button (orange) */
+.booking-form button,
+.osq-cta,
+:where(.ant-btn).ant-btn-primary{
+  background: linear-gradient(180deg, var(--cta-2), var(--cta));
+  border-color: transparent; color:#1b0f07;
+  border-radius:12px; box-shadow:0 6px 16px rgba(255,138,42,.28);
+}
+.booking-form button:hover,
+.osq-cta:hover,
+:where(.ant-btn).ant-btn-primary:hover{
+  background: linear-gradient(180deg, var(--cta), var(--cta-hover));
+  color:#140b06;
+}
+
+/* ---------- Tabs = centered pill bar ---------- */
+.booking-tabs{ display:flex; justify-content:center; margin-bottom:16px; }
+:where(.ant-tabs).ant-tabs-top > .ant-tabs-nav{ margin:8px auto 12px; max-width:1180px; justify-content:center; }
+:where(.ant-tabs .ant-tabs-nav-list){
+  background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);
+  padding:6px; border-radius:999px;
+}
+:where(.ant-tabs .ant-tabs-tab){ color:var(--muted); border-radius:999px; padding:6px 12px; }
+:where(.ant-tabs .ant-tabs-tab.ant-tabs-tab-active){ color:var(--text); background:rgba(255,255,255,.10); }
+
+/* ---------- Titles & Labels ---------- */
+.booking-page .ant-card-head-title,
+.booking-page .ant-collapse-header,
+.booking-page .ant-collapse-header .ant-collapse-header-text{ color:#fff !important; }
+.ant-form-item-label > label{ color:#fff !important; }
+
+/* Placeholders & typed text */
+.ant-input::placeholder,
+.ant-picker-input input::placeholder,
+.ant-select-selection-placeholder{ color:#fff !important; opacity:0.9; }
+.ant-input,
+.ant-picker-input input,
+.ant-select-selector{ color:#fff !important; background-color:transparent !important; }
+
+/* ---------- Select (control dark) ---------- */
+.booking-page .ant-select-selector{
+  color:#fff !important; background:transparent !important; border-color:var(--surface-2);
+}
+.booking-page .ant-select-selection-placeholder,
+.booking-page .ant-select-selection-item{ color:#fff !important; }
+.booking-page .ant-select-arrow .anticon,
+.booking-page .ant-select-clear,
+.booking-page .ant-select-suffix .anticon{ color:#fff !important; opacity:1 !important; }
+.booking-page .ant-select-open .ant-select-selector{
+  border-color:var(--cta) !important; box-shadow:0 0 0 2px rgba(255,138,42,0.35) !important;
+}
+
+/* ---------- Select dropdown overlays ---------- */
+/* Light dropdown — default */
+.booking-page .ant-select-dropdown:not(.osq-dark-dropdown){
+  background:#ffffff !important;
+  border:1px solid var(--surface-2);
+  border-radius:var(--radius-xl);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.booking-page .ant-select-dropdown:not(.osq-dark-dropdown) .ant-select-item{
+  color:#1b1b1b !important; background:transparent !important; font-weight:500; padding:8px 12px;
+}
+.booking-page .ant-select-dropdown:not(.osq-dark-dropdown) .ant-select-item-option-active{
+  background:rgba(0,0,0,.06) !important; color:#000 !important;
+}
+.booking-page .ant-select-dropdown:not(.osq-dark-dropdown) .ant-select-item-option-selected{
+  background:linear-gradient(90deg, var(--cta-2), var(--cta)) !important;
+  color:#1b0f07 !important; box-shadow:none !important; border-radius:0;
+}
+
+/* Dark dropdown — opt-in via dropdownClassName/popupClassName */
+.osq-dark-dropdown{
+  background:#141628 !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-radius:var(--radius-xl) !important;
+  box-shadow:var(--shadow) !important;
+  overflow:hidden !important;
+}
+.osq-dark-dropdown .ant-select-item{ color:var(--text) !important; background:transparent !important; }
+.osq-dark-dropdown .ant-select-item-option-active{ background:rgba(255,255,255,.08) !important; }
+.osq-dark-dropdown .ant-select-item-option-selected{
+  background:linear-gradient(90deg, var(--cta-2), var(--cta)) !important; color:#1b0f07 !important;
+}
+
+/* Cards (listings) */
+:where(.ant-card){ border-radius:var(--radius-xl); background:#f3efe9; border:none; box-shadow:0 8px 18px rgba(0,0,0,.08); }
+@media (prefers-color-scheme: dark){ .booking-page :where(.ant-card){ background:#f3efe9; } }
+
+/* Budget/side glass */
+.osq-budget-card, .budget-card, .booking-page .ant-col-md-8 > .ant-card{
+  background:var(--surface); border:1px solid rgba(255,255,255,.10);
+  color:var(--text); border-radius:var(--radius-xl); box-shadow:var(--shadow);
+}
+
+/* Segmented */
+:where(.ant-segmented){ background:#101226; border-radius:999px; }
+:where(.ant-segmented-item-selected){ background:rgba(255,255,255,.12); color:var(--text); }
+
+/* Input Numbers */
+:where(.ant-input-number){
+  width:100%; background:#101226; border:1px solid var(--surface-2);
+  color:var(--text); border-radius:10px;
+}
+:where(.ant-input-number:hover, .ant-input-number:focus, .ant-input-number-focused){
+  border-color:var(--cta) !important; box-shadow:0 0 0 2px rgba(255,138,42,0.35) !important;
+}
+
+/* Progress */
+:where(.ant-progress .ant-progress-bg){ background:linear-gradient(90deg, #6aa8ff, #4b87d9); }
+:where(.ant-progress .ant-progress-trail){ background:#2a2c4b; }
+
+/* Tags for status */
+:where(.ant-tag).ant-tag-green{ background:#153f2d; border-color:#1d6b4c; color:#95f2c8; }
+:where(.ant-tag).ant-tag-red{ background:#3f1b1b; border-color:#7d2c2c; color:#ffbaba; }
+
+/* Dividers */
+.booking-page .ant-divider{ border-block-start:1px solid rgba(255,255,255,.08); }
+
+/* Sticky right column */
+@media (min-width:768px){
+  .booking-page .ant-col-md-8 > .ant-card{ position:sticky; top:64px; }
+}
+
+/* Density helpers */
+.booking-page { --osq-vspace:12px; --osq-card-pad:12px; }
+.osq-pad-s{ padding:var(--osq-card-pad) !important; }
+.osq-gap-s{ margin-bottom:var(--osq-vspace) !important; }
+.osq-mb-4{ margin-bottom:4px !important; }
+.osq-mb-12{ margin-bottom:12px !important; }
+.osq-mt-12{ margin-top:12px !important; }
+.osq-block{ display:block; }
+
+.booking-page .booking-header{ margin-bottom:8px; }
+.booking-page .ant-tabs-nav{ margin:0 0 8px !important; }
+.booking-page .ant-tabs-content-holder{ padding-top:0 !important; }
+
+.booking-page .osq-card{ border-radius:12px !important; }
+.booking-page .ant-form-item{ margin-bottom:8px !important; }
+
+.booking-page .ant-input,
+.booking-page .ant-select-selector,
+.booking-page .ant-picker,
+.booking-page .ant-input-affix-wrapper{ min-height:36px; }
+
+.booking-page .ant-list-split .ant-list-item{ padding:8px 0 !important; }
+.booking-page .ant-divider-horizontal{ margin:12px 0 !important; }
+
+.osq-listings{ max-height:62vh; overflow:auto; padding-right:6px; }
+.osq-listings::-webkit-scrollbar{ width:6px; }
+.osq-listings::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.18); border-radius:8px; }
+
+/* ---------- (Legacy) Cruise Search card class) ---------- */
+.booking-page .cruise-search-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-xl);
+  color: var(--text);
+}
+.booking-page .cruise-search-card:where(.ant-card){
+  background: transparent; border: 1px solid rgba(255,255,255,.10); border-radius: var(--radius-xl);
+  box-shadow: var(--shadow); color: var(--text);
+}
+.booking-page .cruise-search-card:where(.ant-card) .ant-card-body{ padding: 20px 16px; }
+
+/* ---------- Unified OSQ search card (preferred) ---------- */
+.booking-page .osq-search-card.ant-card,
+.booking-page .osq-search-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-radius: var(--radius-xl) !important;
+  color: var(--text) !important;
+}
+.booking-page .osq-search-card.ant-card .ant-card-body{ padding: 20px 16px !important; }
+
+/* Fields inside any OSQ search card */
+.booking-page .osq-search-card input,
+.booking-page .osq-search-card .ant-input,
+.booking-page .osq-search-card .ant-picker,
+.booking-page .osq-search-card .ant-select-selector,
+.booking-page .osq-search-card .ant-input-affix-wrapper{
+  background:#101226 !important; border:1px solid var(--surface-2) !important; color:#fff !important;
+}
+.booking-page .osq-search-card input::placeholder,
+.booking-page .osq-search-card .ant-picker-input input::placeholder,
+.booking-page .osq-search-card .ant-select-selection-placeholder{ color:#fff !important; opacity:.9 !important; }
+.booking-page .osq-search-card .anticon,
+.booking-page .osq-search-card .ant-picker-suffix,
+.booking-page .osq-search-card .ant-select-arrow .anticon{ color:#fff !important; opacity:1 !important; }
+/* Brand focus ring */
+.booking-page .osq-search-card .ant-input:focus,
+.booking-page .osq-search-card .ant-picker-focused,
+.booking-page .osq-search-card .ant-select-focused .ant-select-selector,
+.booking-page .osq-search-card .ant-input-affix-wrapper-focused{
+  border-color: var(--cta) !important; box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important;
+}
+
+/* Segmented controls inside any search card */
+.booking-page .osq-search-card :where(.ant-segmented){ background:#101226 !important; border-radius:999px !important; }
+.booking-page .osq-search-card :where(.ant-segmented-item-selected){ background:rgba(255,255,255,.12) !important; color:#fff !important; }
+
+/* Primary action button inside any search card */
+.booking-page .osq-search-card :where(.ant-btn).ant-btn-primary{
+  background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
+  border-color: transparent !important;
+  color:#1b0f07 !important;
+  border-radius:12px !important;
+  box-shadow:0 6px 16px rgba(255,138,42,.28) !important;
+}
+.booking-page .osq-search-card :where(.ant-btn).ant-btn-primary:hover{
+  background: linear-gradient(180deg, var(--cta), var(--cta-hover)) !important;
+  color:#140b06 !important;
+}
+
+/* Required asterisk visibility */
+.booking-page .osq-search-card .ant-form-item-required::before{ color: var(--cta) !important; }
+
+/* ==== CRUISE: last-resort override ==== */
+#cruiseSearchCard,
+#cruiseSearchCard.ant-card,
+#cruiseSearchCard .ant-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-radius: var(--radius-xl) !important;
+  color: var(--text) !important;
+}
+#cruiseSearchCard .ant-card-body{ background: transparent !important; padding: 20px 16px !important; }
+#cruiseSearchCard input,
+#cruiseSearchCard .ant-input,
+#cruiseSearchCard .ant-picker,
+#cruiseSearchCard .ant-select-selector,
+#cruiseSearchCard .ant-input-affix-wrapper{ background:#101226 !important; border:1px solid var(--surface-2) !important; color:#fff !important; }
+#cruiseSearchCard input::placeholder,
+#cruiseSearchCard .ant-picker-input input::placeholder,
+#cruiseSearchCard .ant-select-selection-placeholder{ color:#fff !important; opacity:.9 !important; }
+#cruiseSearchCard .anticon,
+#cruiseSearchCard .ant-picker-suffix,
+#cruiseSearchCard .ant-select-arrow .anticon{ color:#fff !important; opacity:1 !important; }
+#cruiseSearchCard .ant-input:focus,
+#cruiseSearchCard .ant-picker-focused,
+#cruiseSearchCard .ant-select-focused .ant-select-selector,
+#cruiseSearchCard .ant-input-affix-wrapper-focused{ border-color: var(--cta) !important; box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important; }
+#cruiseSearchCard :where(.ant-btn).ant-btn-primary{
+  background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
+  border-color: transparent !important;
+  color:#1b0f07 !important;
+  border-radius:12px !important;
+  box-shadow:0 6px 16px rgba(255,138,42,.28) !important;
+}
+#cruiseSearchCard :where(.ant-btn).ant-btn-primary:hover{
+  background: linear-gradient(180deg, var(--cta), var(--cta-hover)) !important; color:#140b06 !important;
+}
+
+/* ---- Packages numeric inputs: show digits + steppers ---- */
+.osq-packages-form input,
+.osq-packages-form .ant-input-number-input{
+  color: var(--text) !important;
+  font-variant-numeric: tabular-nums;
+}
+.osq-packages-form .ant-input-number-handler-wrap{
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* -------- Package card media (cover) -------- */
+.pkg-media{
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  background: #1b1e31;
+}
+.pkg-media img{
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.02);
+  position: relative;
+  z-index: 0;
+}
+.pkg-media::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.35) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.pkg-ribbon{
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+.booking-page .ant-card-cover{ margin: 0; }
+.booking-page .ant-card-cover > *{
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+/* --- Base chips (fallback for non-Ant usage) --- */
+.pkg-chip{
+  border:1px solid rgba(255,255,255,.18) !important;
+  color:var(--text) !important;
+  background:rgba(0,0,0,.28) !important;
+}
+.pkg-chip--save{
+  background:linear-gradient(180deg, rgba(255,183,77,.22), rgba(255,138,42,.18)) !important;
+  border-color:rgba(255,183,77,.35) !important;
+  color:#ffe3bd !important;
+}
+.pkg-chip--rating{
+  background:rgba(106,168,255,.20) !important;
+  border-color:rgba(106,168,255,.35) !important;
+  color:#e2edff !important;
+}
+.pkg-chip--xp{
+  background:rgba(186,140,255,.22) !important;
+  border-color:rgba(186,140,255,.35) !important;
+  color:#efe6ff !important;
+}
+
+/* =========================================================
+   SIMPLE CHIP CONTRAST FIX — keep LAST to win cascade
+   ========================================================= */
+.booking-page .ant-tag.pkg-chip{
+  background: rgba(20,22,40,.92) !important;
+  background-color: rgba(20,22,40,.92) !important;  /* beats Ant background-color */
+  color: #fff !important;
+  border-color: rgba(255,255,255,.22) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.35) !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.4);
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+  letter-spacing: .2px;
+  padding: 2px 8px !important;
+}
+.booking-page .ant-tag.pkg-chip .anticon{ color: inherit !important; margin-right:4px; }
+
+/* brand variants */
+.booking-page .ant-tag.pkg-chip.pkg-chip--save{
+  background: linear-gradient(180deg, var(--cta-2,#ffa94d), var(--cta,#ff8a2a)) !important;
+  background-color: var(--cta,#ff8a2a) !important;
+  color:#1b0f07 !important;
+  border-color: transparent !important;
+}
+.booking-page .ant-tag.pkg-chip.pkg-chip--rating{
+  background: rgba(76,120,211,.95) !important;
+  background-color: rgba(76,120,211,.95) !important;
+  border-color: rgba(76,120,211,1) !important;
+}
+.booking-page .ant-tag.pkg-chip.pkg-chip--xp{
+  background: rgba(186,140,255,.95) !important;
+  background-color: rgba(186,140,255,.95) !important;
+  border-color: rgba(186,140,255,1) !important;
+}
+
+/* ======================
+   UNIFIED SEARCH (NEW)
+   ====================== */
+.unified-search{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-xl);
   padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 1rem;
+  margin-top: 12px;
 }
 
-.booking-form button {
-  background-color: #f59e0b;
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
+/* Top right “Smart Plan AI” caption */
+.us-header{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  margin-bottom:6px;
+  color:#9aa4c2;
 }
 
-.booking-form button:hover {
-  background-color: #ef4444;
+/* Tabs (pills) */
+.unified-search .ant-tabs-nav{ margin-bottom:8px; }
+.unified-tabs .ant-tabs-tab{
+  background: rgba(255,255,255,.04);
+  border-radius:999px;
+  padding-inline:12px;
+  color: var(--muted);
+}
+.unified-tabs .ant-tabs-tab.ant-tabs-tab-active{
+  color: var(--text);
+  background: rgba(255,255,255,.10);
+}
+
+/* Inputs inside the bar */
+.unified-search .ant-input-affix-wrapper,
+.unified-search .ant-picker,
+.unified-search .ant-select-selector{
+  background:#101226 !important;
+  border:1px solid var(--surface-2) !important;
+  color:#fff !important;
+  min-height:36px;
+}
+.unified-search .ant-input::placeholder,
+.unified-search .ant-picker-input input::placeholder,
+.unified-search .ant-select-selection-placeholder{ color:#fff !important; opacity:.9 !important; }
+.unified-search .anticon,
+.unified-search .ant-picker-suffix,
+.unified-search .ant-select-arrow .anticon{ color:#fff !important; opacity:1 !important; }
+
+/* Brand focus */
+.unified-search .ant-input:focus,
+.unified-search .ant-picker-focused,
+.unified-search .ant-select-focused .ant-select-selector,
+.unified-search .ant-input-affix-wrapper-focused{
+  border-color: var(--cta) !important;
+  box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important;
+}
+
+/* Primary action */
+.unified-search :where(.ant-btn).ant-btn-primary{
+  background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
+  border-color: transparent !important;
+  color:#1b0f07 !important;
+  border-radius:12px !important;
+  box-shadow:0 6px 16px rgba(255,138,42,.28) !important;
+}
+.unified-search :where(.ant-btn).ant-btn-primary:hover{
+  background: linear-gradient(180deg, var(--cta), var(--cta-hover)) !important;
+  color:#140b06 !important;
+}
+
+/* Responsive: stack fields nicely on small screens */
+@media (max-width: 768px){
+  .unified-search{ padding:10px; }
+  .unified-tabs .ant-picker,
+  .unified-tabs .ant-select,
+  .unified-tabs .ant-input-affix-wrapper{ width:100%; }
+}
+
+/* Hero headline – warm, welcoming, on brand */
+.hero-title{
+  margin: 2px 0 10px;
+  font-weight: 800;
+  font-size: clamp(28px, 4.2vw, 44px);
+  letter-spacing: .2px;
+  line-height: 1.15;
+  background: linear-gradient(90deg,#fff 0%, #ffe2bf 25%, #ffc274 50%, #fff 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 12px rgba(255,138,42,.12);
+}
+
+/* Smart Plan AI chips */
+.us-smart-row .ant-tag{
+  transition: transform .08s ease, box-shadow .12s ease;
+}
+.us-smart-row .ant-tag:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
 }

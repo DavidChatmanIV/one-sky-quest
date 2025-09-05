@@ -1,113 +1,170 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Typography, message, Card } from "antd";
+import React, { useEffect, useMemo } from "react";
+import {
+  Card,
+  Form,
+  Row,
+  Col,
+  Select,
+  Input,
+  DatePicker,
+  InputNumber,
+  Button,
+  Tag,
+} from "antd";
+import { RocketOutlined, HomeOutlined, GiftOutlined } from "@ant-design/icons";
 
-const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
-const BookingForm = () => {
-  const [loading, setLoading] = useState(false);
+const BUNDLE_TYPES = [
+  { label: "✈️ Flight + 🏨 Hotel", value: "flight_hotel" },
+  { label: "✈️ Flight + 🏨 Hotel + 🚗 Car", value: "flight_hotel_car" },
+  { label: "🏨 Hotel + 🚗 Car", value: "hotel_car" },
+];
+
+export default function PackageSearchForm({ onSearch }) {
   const [form] = Form.useForm();
 
-  const handleSubmit = async (values) => {
-    const { name, email, tripDetails } = values;
-    setLoading(true);
+  const DEFAULTS = useMemo(
+    () => ({
+      bundleType: "flight_hotel",
+      origin: "EWR",
+      destination: "MIA",
+      travelers: 2,
+      rooms: 1,
+      dates: null,
+    }),
+    []
+  );
 
-    try {
-      const res = await fetch("/api/bookings/book", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          tripDetails,
-          type: "hotel", // can be dynamic later
-        }),
-      });
+  useEffect(() => {
+    onSearch?.(DEFAULTS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Booking failed");
-
-      message.success(data.message || "✅ Booking confirmed!");
-      localStorage.setItem(
-        "savedTrips",
-        JSON.stringify([
-          ...JSON.parse(localStorage.getItem("savedTrips") || "[]"),
-          { name, email, tripDetails },
-        ])
-      );
-
-      form.resetFields();
-    } catch (err) {
-      console.error("Booking error:", err);
-      message.error("❌ There was a problem booking your trip.");
-    } finally {
-      setLoading(false);
-    }
+  const submit = async () => {
+    const values = await form.validateFields();
+    onSearch?.(values);
   };
 
   return (
     <Card
-      className="max-w-2xl mx-auto shadow-lg"
-      bodyStyle={{ padding: "2rem" }}
+      bordered={false}
+      className="osq-packages-form osq-search-card"
+      style={{ background: "var(--surface, #141628)" }}
+      bodyStyle={{ padding: 16 }}
     >
-      <Title level={3} className="text-center mb-6">
-        🗓️ Book Your Trip
-      </Title>
-
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleSubmit}
-        className="space-y-4"
+        onFinish={submit}
+        initialValues={DEFAULTS}
+        validateTrigger="onBlur"
       >
-        <Form.Item
-          name="name"
-          label="Your Name"
-          rules={[{ required: true, message: "Please enter your name" }]}
-        >
-          <Input placeholder="Your Name" size="large" />
-        </Form.Item>
+        <Row gutter={12}>
+          <Col xs={24} md={8}>
+            <Form.Item
+              name="bundleType"
+              label="Bundle"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={BUNDLE_TYPES}
+                suffixIcon={<GiftOutlined />}
+                popupMatchSelectWidth={240}
+                dropdownClassName="osq-dark-dropdown"
+                popupClassName="osq-dark-dropdown"
+                getPopupContainer={(trigger) => trigger.parentNode}
+              />
+            </Form.Item>
+          </Col>
 
-        <Form.Item
-          name="email"
-          label="Your Email"
-          rules={[
-            { required: true, message: "Please enter your email" },
-            { type: "email", message: "Enter a valid email address" },
-          ]}
-        >
-          <Input placeholder="Your Email" size="large" />
-        </Form.Item>
+          <Col xs={12} md={4}>
+            <Form.Item
+              name="origin"
+              label="From"
+              tooltip="City or airport"
+              rules={[{ required: true, message: "Enter an origin" }]}
+            >
+              <Input prefix={<RocketOutlined />} placeholder="EWR" />
+            </Form.Item>
+          </Col>
 
-        <Form.Item
-          name="tripDetails"
-          label="Trip Details"
-          rules={[{ required: true, message: "Enter trip details" }]}
-        >
-          <Input.TextArea
-            placeholder="Trip Details..."
-            rows={4}
-            size="large"
-            className="resize-none"
-          />
-        </Form.Item>
+          <Col xs={12} md={4}>
+            <Form.Item
+              name="destination"
+              label="To"
+              tooltip="City or airport"
+              rules={[{ required: true, message: "Enter a destination" }]}
+            >
+              <Input prefix={<HomeOutlined />} placeholder="MIA" />
+            </Form.Item>
+          </Col>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            size="large"
-            loading={loading}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            Book Now
-          </Button>
-        </Form.Item>
+          <Col xs={24} md={8}>
+            <Form.Item name="dates" label="Dates">
+              <RangePicker
+                allowEmpty={[true, true]}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={12}>
+          <Col xs={12} md={4}>
+            <Form.Item
+              name="travelers"
+              label="Travelers"
+              rules={[{ required: true, message: "Enter travelers" }]}
+            >
+              <InputNumber
+                min={1}
+                max={12}
+                step={1}
+                precision={0}
+                controls
+                keyboard
+                inputMode="numeric"
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+          </Col>
+
+          <Col xs={12} md={4}>
+            <Form.Item
+              name="rooms"
+              label="Rooms"
+              rules={[{ required: true, message: "Enter rooms" }]}
+            >
+              <InputNumber
+                min={1}
+                max={8}
+                step={1}
+                precision={0}
+                controls
+                keyboard
+                inputMode="numeric"
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} md={16} style={{ display: "flex", alignItems: "end" }}>
+            <div style={{ width: "100%", display: "flex", gap: 8 }}>
+              <Tag style={{ alignSelf: "center" }} color="orange">
+                Bundled deals save vs. booking separately
+              </Tag>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ marginLeft: "auto" }}
+              >
+                Find Packages
+              </Button>
+            </div>
+          </Col>
+        </Row>
       </Form>
     </Card>
   );
-};
-
-export default BookingForm;
+}

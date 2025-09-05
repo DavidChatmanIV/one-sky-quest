@@ -1,181 +1,134 @@
-import React from "react";
-import { Button } from "antd";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Typography, Tag, Row, Col, Space, Avatar } from "antd";
+import PageLayout from "../components/PageLayout";
+import TutorialModal from "../components/TutorialModal";
+import SearchBar from "../components/SearchBar";
+
+// ⬇️ landing cards (adjust paths if you placed them differently)
+import {
+  XPLevelCard,
+  SavedTripsCard,
+  QuestFeedPreview,
+  AIPlannerCard,
+  TrendingDestinations,
+  AISuggestsCard,
+  OneSkyPerksCard,
+} from "../components/landing";
 import "../styles/LandingPage.css";
 
-// 🔹 Section Components
-import WelcomeBack from "../components/WelcomeBack";
-import DiscoverAdventure from "../components/DiscoverAdventure";
-import TeamTravelSection from "../components/TeamTravelSection";
-import TravelAssistant from "../components/TravelAssistant";
-import SmartTravelTools from "../components/SmartTravelTools";
-import ExploreDeals from "../components/ExploreDeals";
-import Excursions from "../components/excursions/Excursions";
-import LastMinuteAndUniqueStays from "../components/LastMinuteAndUniqueStays";
-import FavoriteStay from "../components/FavoriteStay";
-import BudgetTracker from "../components/BudgetTracker";
-import RealTimeAlerts from "../components/RealTimeAlerts";
-import UniqueStays from "../components/UniqueStays";
-import FeaturedDestination from "../components/FeaturedDestination";
-import HiddenGemFinder from "../components/HiddenGemFinder";
-import TravelCalendarChecklist from "../components/TravelCalendarChecklist";
-import GroupBudgetCalculator from "../components/GroupBudgetCalculator";
-import SearchResults from "../components/SearchResults";
-import Testimonials from "../components/Testimonials";
-import AboutUs from "../components/AboutUs";
-import ContactUs from "../components/ContactUs";
-import SocialCommunity from "../components/SocialCommunity";
-import InfoPolicies from "../components/InfoPolicies";
-import TutorialModal from "../components/TutorialModal";
-import FeedbackForm from "../components/FeedbackForm";
+const { Title, Text } = Typography;
 
-// 🔹 Layout Wrapper
-import PageLayout from "../components/PageLayout";
+/* Greeting (timezone-aware) */
+function useGreeting(name = "Traveler") {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return { text: `Good morning, ${name}`, emoji: "🌅" };
+  if (h >= 12 && h < 17)
+    return { text: `Good afternoon, ${name}`, emoji: "☀️" };
+  if (h >= 17 && h < 21) return { text: `Good evening, ${name}`, emoji: "🌆" };
+  return { text: `Good night, ${name}`, emoji: "🌙" };
+}
 
-// 🔹 Animation Wrapper
-import FadeInSection from "../components/animations/FadeInSection";
+export default function LandingPage() {
+  // state for the search bar
+  const [values, setValues] = useState({
+    where: "",
+    start: "",
+    end: "",
+    guests: "2 adults · 1 room",
+  });
 
-// Helper for in-page scrolling
-const goToSection = (id) => {
-  const element = document.getElementById(id);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-};
+  const handleSearch = () => {
+    console.log("Searching with:", values);
+    // TODO: navigate(`/booking?${new URLSearchParams(values).toString()}`)
+  };
 
-const LandingPage = () => {
+  // demo data (swap with live later)
+  const userName = "David";
+  const { text: greeting, emoji } = useGreeting(userName);
+  const stats = { xp: 560, saved: 3, newItems: 1 };
+  const trips = [
+    { city: "Paris", range: "Jan 15 – Jan 22", cta: "Dates" },
+    { city: "Tokyo", range: "Feb 2 – Feb 10", cta: "Who’s going" },
+  ];
+  const feedItem = {
+    name: "Cara",
+    text: "visited Chiang Mai recently. Incredible street food and temples!",
+    time: "2h ago",
+    avatar: undefined,
+  };
+  const trending = [
+    { key: "lisbon", city: "Lisbon", price: "$120" },
+    { key: "carmen", city: "Playa Del Carmen", price: "$256" },
+    { key: "bali", city: "Bali", price: "$556" },
+  ];
+
   return (
     <PageLayout>
-      {/* 🔹 Welcome Message */}
-      <WelcomeBack name="David" birthday="1992-05-11" />
       <TutorialModal />
 
-      {/* 🔹 Discover Adventure */}
-      <FadeInSection>
-        <section id="discover" className="section-anchor">
-          <DiscoverAdventure />
-        </section>
-      </FadeInSection>
+      <div className="landing-wrap">
+        {/* ===== Hero ===== */}
+        <section className="landing-hero osq-hero-minimal">
+          <Title className="hero-greeting title-white">
+            {greeting} <span className="wave">{emoji}</span>
+          </Title>
 
-      {/* 🔹 Travel Tools & Planning */}
-      <FadeInSection>
-        <section id="team-travel" className="section-anchor">
-          <TeamTravelSection />
-        </section>
-      </FadeInSection>
+          {/* small stat pills */}
+          <div className="hero-stats">
+            <Tag className="pill">
+              <Avatar size="small" style={{ background: "transparent" }}>
+                🌀
+              </Avatar>
+              <span className="pill-text">XP {stats.xp}</span>
+            </Tag>
+            <Tag className="pill">{stats.saved} saved trips</Tag>
+            <Tag className="pill">{stats.newItems} new</Tag>
+          </div>
 
-      <FadeInSection>
-        <section id="ai-builder" className="section-anchor">
-          <TravelAssistant />
-        </section>
-      </FadeInSection>
+          {/* smooth search */}
+          <SearchBar
+            values={values}
+            setValues={setValues}
+            onSearch={handleSearch}
+          />
 
-      <FadeInSection>
-        <section id="explore-deals" className="section-anchor">
-          <ExploreDeals />
-        </section>
-      </FadeInSection>
-
-      <FadeInSection>
-        <section id="unique-stays" className="section-anchor">
-          <UniqueStays />
-        </section>
-      </FadeInSection>
-
-      <FadeInSection>
-        <section id="last-minute" className="section-anchor">
-          <LastMinuteAndUniqueStays />
-        </section>
-      </FadeInSection>
-
-      {/* 🔹 Featured Section */}
-      <FadeInSection>
-        <FeaturedDestination />
-      </FadeInSection>
-
-      {/* 🔹 Community Features */}
-      <FadeInSection>
-        <SocialCommunity />
-      </FadeInSection>
-
-      {/* 🔹 Testimonials */}
-      <FadeInSection>
-        <Testimonials />
-      </FadeInSection>
-
-      {/* 🔹 XP Rewards Banner */}
-      <FadeInSection>
-        <section
-          className="section alt osq-hero text-center"
-          style={{ padding: "3rem 0" }}
-        >
-          <h2 className="text-2xl font-semibold mb-2">
-            💥 Earn XP Every Time You Travel
-          </h2>
-          <p className="text-muted">
-            Unlock exclusive badges, perks, and trip rewards. Your journey just
-            got gamified.
-          </p>
-        </section>
-      </FadeInSection>
-
-      {/* 🔹 Final CTA */}
-      <FadeInSection>
-        <section
-          className="section text-center"
-          style={{ padding: "2.5rem 0" }}
-        >
-          <h2 className="text-2xl font-bold mb-4">Ready to Quest?</h2>
-          <Link to="/profile">
-            <Button type="primary" size="large" className="shadow-soft">
-              🚀 Create Your Profile
-            </Button>
-          </Link>
-        </section>
-      </FadeInSection>
-
-      {/* 🔹 Feedback Form */}
-      <FeedbackForm />
-
-      {/* 🔹 Footer */}
-      <footer className="footer text-center" style={{ padding: "1.5rem 0" }}>
-        <p className="mb-2">
-          &copy; {new Date().getFullYear()} One Sky Quest. All rights reserved.
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
-          <button
-            onClick={() => goToSection("about")}
-            className="hover:underline"
+          {/* grid content */}
+          <Row
+            gutter={[20, 20]}
+            className="hero-grid"
+            style={{ marginTop: 16 }}
           >
-            About
-          </button>
-          <button
-            onClick={() => goToSection("contact")}
-            className="hover:underline"
-          >
-            Contact
-          </button>
-          <button
-            onClick={() => goToSection("questfeed")}
-            className="hover:underline"
-          >
-            Quest Feed
-          </button>
-        </div>
-      </footer>
+            {/* left column */}
+            <Col xs={24} lg={12} xl={14}>
+              <Row gutter={[20, 20]}>
+                <Col xs={24}>
+                  <XPLevelCard level="Globetrotter" percent={80} />
+                </Col>
+                <Col xs={24}>
+                  <SavedTripsCard trips={trips} />
+                </Col>
+                <Col xs={24}>
+                  <QuestFeedPreview item={feedItem} />
+                </Col>
+              </Row>
+            </Col>
 
-      {/* 🔹 Info & Legal */}
-      <section id="about">
-        <AboutUs />
-      </section>
-      <section id="contact">
-        <ContactUs />
-      </section>
-      <section id="policies">
-        <InfoPolicies />
-      </section>
+            {/* right column */}
+            <Col xs={24} lg={12} xl={10}>
+              <Space direction="vertical" style={{ width: "100%" }} size={20}>
+                <AIPlannerCard />
+                <TrendingDestinations items={trending} />
+                <AISuggestsCard />
+              </Space>
+            </Col>
+          </Row>
+        </section>
+
+        {/* perks section */}
+        <section id="perks" style={{ marginTop: 24 }}>
+          <OneSkyPerksCard />
+        </section>
+      </div>
     </PageLayout>
   );
-};
-
-export default LandingPage;
+}
