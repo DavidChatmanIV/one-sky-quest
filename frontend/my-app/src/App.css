@@ -23,12 +23,8 @@
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -37,10 +33,18 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
+.card { padding: 2em; }
+.read-the-docs { color: #888; }
 
-.read-the-docs {
-  color: #888;
+/* Gradient CTA button used across OSQ */
+.osq-gradient-btn {
+  background: linear-gradient(90deg, #ff8a2a, #ffa94d) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(255, 138, 42, 0.35) !important;
+}
+.osq-gradient-btn:hover,
+.osq-gradient-btn:focus {
+  background: linear-gradient(90deg, #ff7a00, #ffb36b) !important;
+  color: #fff !important;
 }

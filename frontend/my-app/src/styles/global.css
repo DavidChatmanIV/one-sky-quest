@@ -1,10 +1,12 @@
 /* ============================================
-  One Sky Quest – Global Styles
+  One Sky Quest – Global Styles (MERGED)
    ============================================ */
 
 /* ===== Root Tokens (fallbacks if theme.css hasn’t loaded yet) ===== */
 :root {
   --nav-h: 72px;
+
+  /* text & surfaces */
   --text-1: #f4f6fb;
   --text-2: #c9cbe3;
   --glass: rgba(255, 255, 255, 0.06);
@@ -15,36 +17,56 @@
   --cta: #ff8a2a;
   --cta-2: #ffa94d;
 
-  /* background (night) */
-  --body-bg: #0f1020;
-  --body-glow: radial-gradient(1200px 800px at 20% -120px, #2b1e4b 0%, #1b1530 32%, #0f1020 80%),
-              linear-gradient(180deg, #0f1020 0%, #231a3a 55%, #3a2430 100%);
-  --body-glow-opacity: 1;
+  /* NEW: global background stops used by the body gradient */
+  --bg-start: #0f1020;
+  --bg-mid:   #231a3a;
+  --bg-end:   #3a2430;
+
+  /* buttons */
+  --cta-glow: rgba(255,138,42,.40);
+  --btn-glass: rgba(255,255,255,.08);
+  --btn-glass-hover: rgba(255,255,255,.12);
+  --btn-border: rgba(255,255,255,.16);
+  --btn-text: #ffffff;
 }
 
-/* ===== Body & Global Background ===== */
+/* ===========================
+   Base page background lives on <body>, not inner wrappers
+   =========================== */
+html, body, #root { height: 100%; }
+
 body {
-  background: var(--body-bg);
+  margin: 0;
   color: var(--text-1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* stacked radials + FINAL linear base (no transparent holes) */
+  background:
+    radial-gradient(1000px 700px at 10% -120px, #2b1e4b 0%, rgba(43,30,75,0) 60%),
+    radial-gradient(1000px 700px at 90% -120px, #3a2430 0%, rgba(58,36,48,0) 60%),
+    linear-gradient(180deg, var(--bg-start) 0%, var(--bg-mid) 40%, var(--bg-end) 100%);
+  background-color: var(--bg-mid);         /* solid fallback */
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed; /* keeps paint steady on scroll */
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: var(--body-glow);
-  opacity: var(--body-glow-opacity);
-  z-index: -1;
-  pointer-events: none;
+/* Make inner sections transparent so the body gradient shows through */
+.landing-wrap,
+.qf-wrap,
+.booking-wrap,
+.passport-wrap {
+  background: transparent;
 }
 
-/* Light mode (if you ever toggle themes) */
+/* ===========================
+   Optional Light Mode (if you toggle themes)
+   =========================== */
 [data-theme="day"] {
-  --body-bg: #f6f7fb;
-  --body-glow: linear-gradient(160deg, #e5ecff, #fdf4e7, #ffe6c8);
-  --body-glow-opacity: 0.45;
+  --bg-start: #f3f6ff;
+  --bg-mid:   #f9efe1;
+  --bg-end:   #ffe6c8;
+
   --text-1: #1a2433;
   --text-2: #4a5a73;
 }
@@ -113,14 +135,6 @@ p, span, li {
 }
 
 /* ===== Global Button Palette ===== */
-:root {
-  --cta-glow: rgba(255,138,42,.40);
-  --btn-glass: rgba(255,255,255,.08);
-  --btn-glass-hover: rgba(255,255,255,.12);
-  --btn-border: rgba(255,255,255,.16);
-  --btn-text: #ffffff;
-}
-
 .ant-btn-primary,
 .start-btn,
 .osq-btn-primary {
@@ -130,7 +144,6 @@ p, span, li {
   box-shadow: 0 8px 24px var(--cta-glow) !important;
   font-weight: 600;
 }
-
 .ant-btn-primary:hover,
 .start-btn:hover,
 .osq-btn-primary:hover {

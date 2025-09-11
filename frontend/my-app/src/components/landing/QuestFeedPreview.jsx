@@ -1,47 +1,57 @@
 import React from "react";
-import { Card, Space, Typography, Avatar } from "antd";
-import { Link } from "react-router-dom";
-import { ArrowRightOutlined } from "@ant-design/icons";
+import { Card, Typography, List, Avatar, Button, Space } from "antd";
 
 const { Text } = Typography;
 
-export default function QuestFeedPreview({
-  item = {
-    name: "Cara",
-    text: "visited Chiang Mai recently. Incredible street food and temples!",
-    time: "2h ago",
-    avatar: undefined,
-  },
-}) {
+export default function QuestFeedCard({ onOpenFeed }) {
+  const items = [
+    {
+      id: 1,
+      user: "Cara",
+      ago: "2h",
+      text: "Visited Chiang Mai—street food and temples!",
+    },
+    {
+      id: 2,
+      user: "Leo",
+      ago: "5h",
+      text: "Booked Tokyo for Feb—who’s going?",
+    },
+  ];
+
   return (
     <Card
-      variant="borderless"
-      className="osq-card"
-      styles={{ body: { padding: 16 } }}
+      className="osq-card quest-feed"
+      bordered={false}
+      bodyStyle={{ padding: 16 }}
     >
-      <Space direction="vertical" style={{ width: "100%" }} size={8}>
-        <Text type="secondary">Quest Feed</Text>
-        <Space align="start">
-          <Avatar src={item.avatar} />
-          <div>
-            <Text strong>{item.name}</Text>
-            <div>
-              <Text>
-                {item.text}{" "}
-                <span role="img" aria-label="pin">
-                  📌
-                </span>
-              </Text>
-            </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {item.time}
-            </Text>
-          </div>
-        </Space>
-        <Link to="/feed">
-          Open Feed <ArrowRightOutlined />
-        </Link>
+      <Space
+        style={{ width: "100%", justifyContent: "space-between" }}
+        align="center"
+      >
+        <Text strong>Quest Feed</Text>
+        <Button type="link" onClick={onOpenFeed}>
+          Open Feed →
+        </Button>
       </Space>
+
+      <List
+        itemLayout="horizontal"
+        dataSource={items}
+        renderItem={(it) => (
+          <List.Item>
+            <List.Item.Meta
+              avatar={<Avatar>{it.user[0]}</Avatar>}
+              title={<Text strong>{it.user}</Text>}
+              description={
+                <Text type="secondary">
+                  {it.text} • {it.ago} ago
+                </Text>
+              }
+            />
+          </List.Item>
+        )}
+      />
     </Card>
   );
 }

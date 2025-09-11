@@ -1,22 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
 import { Typography, Tag, Row, Col, Space, Avatar } from "antd";
 import PageLayout from "../components/PageLayout";
 import TutorialModal from "../components/TutorialModal";
-import SearchBar from "../components/SearchBar";
+import UnifiedSearchBar from "../components/UnifiedSearchBar";
 
-// ⬇️ landing cards (adjust paths if you placed them differently)
 import {
   XPLevelCard,
   SavedTripsCard,
   QuestFeedPreview,
-  AIPlannerCard,
-  TrendingDestinations,
   AISuggestsCard,
   OneSkyPerksCard,
+  UniqueStaysCard,
+  LimitedDealsCard,
+  BuildMyDreamGetaway,
+  TeamTravelCard,
 } from "../components/landing";
+
 import "../styles/LandingPage.css";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 /* Greeting (timezone-aware) */
 function useGreeting(name = "Traveler") {
@@ -29,22 +31,10 @@ function useGreeting(name = "Traveler") {
 }
 
 export default function LandingPage() {
-  // state for the search bar
-  const [values, setValues] = useState({
-    where: "",
-    start: "",
-    end: "",
-    guests: "2 adults · 1 room",
-  });
-
-  const handleSearch = () => {
-    console.log("Searching with:", values);
-    // TODO: navigate(`/booking?${new URLSearchParams(values).toString()}`)
-  };
-
-  // demo data (swap with live later)
   const userName = "David";
   const { text: greeting, emoji } = useGreeting(userName);
+
+  // demo data
   const stats = { xp: 560, saved: 3, newItems: 1 };
   const trips = [
     { city: "Paris", range: "Jan 15 – Jan 22", cta: "Dates" },
@@ -54,13 +44,59 @@ export default function LandingPage() {
     name: "Cara",
     text: "visited Chiang Mai recently. Incredible street food and temples!",
     time: "2h ago",
-    avatar: undefined,
   };
-  const trending = [
-    { key: "lisbon", city: "Lisbon", price: "$120" },
-    { key: "carmen", city: "Playa Del Carmen", price: "$256" },
-    { key: "bali", city: "Bali", price: "$556" },
+
+  const uniqueItems = [
+    {
+      id: "tree",
+      title: "Treehouse",
+      image: "/img/treehouse.jpg",
+      badge: "Eco",
+    },
+    {
+      id: "igloo",
+      title: "Glass Igloo",
+      image: "/img/igloo.jpg",
+      badge: "Aurora",
+    },
+    {
+      id: "villa",
+      title: "Cliff Villa",
+      image: "/img/villa.jpg",
+      badge: "Ocean",
+    },
   ];
+
+  const limitedDeals = [
+    {
+      id: "lis",
+      city: "Lisbon",
+      price: "$120",
+      endsAt: Date.now() + 12 * 3600e3,
+      discountPct: 35,
+    },
+    {
+      id: "pdc",
+      city: "Playa Del Carmen",
+      price: "$256",
+      endsAt: Date.now() + 12 * 3600e3,
+      discountPct: 50,
+    },
+    {
+      id: "bali",
+      city: "Bali",
+      price: "$516",
+      endsAt: Date.now() + 12 * 3600e3,
+      discountPct: 40,
+    },
+  ];
+
+  const aiPick = {
+    city: "Bangkok",
+    reason: "great value for food + night markets",
+    dates: "Oct 12–17",
+    underBudgetPct: 18,
+  };
 
   return (
     <PageLayout>
@@ -85,14 +121,29 @@ export default function LandingPage() {
             <Tag className="pill">{stats.newItems} new</Tag>
           </div>
 
-          {/* smooth search */}
-          <SearchBar
-            values={values}
-            setValues={setValues}
-            onSearch={handleSearch}
-          />
+          {/* unified tabbed search */}
+          <UnifiedSearchBar />
 
-          {/* grid content */}
+          {/* ===== Smart Tools Row ===== */}
+          <Row
+            gutter={[20, 20]}
+            style={{ marginTop: 16 }}
+            className="smart-row"
+          >
+            <Col xs={24} md={12} xl={8}>
+              <UniqueStaysCard items={uniqueItems} />
+            </Col>
+            <Col xs={24} md={12} xl={8}>
+              <LimitedDealsCard deals={limitedDeals} />
+            </Col>
+            <Col xs={24} xl={8}>
+              <BuildMyDreamGetaway
+                onOpen={() => console.log("Launch AI Trip Builder")}
+              />
+            </Col>
+          </Row>
+
+          {/* ===== Main grid (compact) ===== */}
           <Row
             gutter={[20, 20]}
             className="hero-grid"
@@ -100,25 +151,31 @@ export default function LandingPage() {
           >
             {/* left column */}
             <Col xs={24} lg={12} xl={14}>
-              <Row gutter={[20, 20]}>
-                <Col xs={24}>
-                  <XPLevelCard level="Globetrotter" percent={80} />
-                </Col>
-                <Col xs={24}>
-                  <SavedTripsCard trips={trips} />
-                </Col>
-                <Col xs={24}>
-                  <QuestFeedPreview item={feedItem} />
-                </Col>
-              </Row>
+              {/* stack the cards vertically with proper spacing */}
+              <Space direction="vertical" size={20} style={{ width: "100%" }}>
+                <XPLevelCard level="Globetrotter" percent={80} />
+                <SavedTripsCard trips={trips} />
+                {/* Team Travel sits directly UNDER Saved Trips (separate card) */}
+                <TeamTravelCard
+                  onStart={() => console.log("Start Team Trip")}
+                  onOpenMap={() => console.log("Open Team Travel mini-map")}
+                />
+              </Space>
             </Col>
 
             {/* right column */}
             <Col xs={24} lg={12} xl={10}>
               <Space direction="vertical" style={{ width: "100%" }} size={20}>
-                <AIPlannerCard />
-                <TrendingDestinations items={trending} />
-                <AISuggestsCard />
+                <AISuggestsCard
+                  title="AI Suggests"
+                  userName={userName}
+                  pick={aiPick}
+                  onSeePlan={() => console.log("See AI plan")}
+                  onViewDeals={() => console.log("View all deals")}
+                  onEditProfile={() => console.log("Create / Edit Profile")}
+                  onQuickPick={(t) => console.log("Quick pick:", t)}
+                />
+                <QuestFeedPreview item={feedItem} />
               </Space>
             </Col>
           </Row>

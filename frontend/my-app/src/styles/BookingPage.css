@@ -1,554 +1,256 @@
-/* =========================
-  BookingPage.css — OSQ THEME (FINAL)
-  ========================= */
+/* =============================
+   File: src/styles/BookingPage.css
+   ============================= */
+
+/* ---- Theme tokens ---- */
 :root{
-  --bg-start:#0f1020;
-  --bg-mid:#231a3a;
-  --bg-end:#3a2430;
-  --surface:#1e2039;
-  --surface-2:#2a2c4b;
-  --glass:rgba(255,255,255,.06);
-  --text:#f4f6fb;
-  --muted:#c9cbe3;
-  --cta:#ff8a2a;
-  --cta-2:#ffa94d;
-  --cta-hover:#ff7a00;
-  --focus:#6aa8ff; /* legacy */
-  --success:#18b26a;
-  --danger:#ff5a5a;
-  --shadow:0 10px 30px rgba(0,0,0,.30);
-  --radius-xl:18px;
-  --radius-lg:14px;
+  --bg-start:#0f1020; --bg-mid:#2a1b45; --bg-end:#3a2430;
+  --surface:#1b1c33; --surface-2:#24264a; --glass:rgba(255,255,255,.06);
+  --text-1:#f4f6fb; --text-2:#c9cbe3; --muted:rgba(255,255,255,.70);
+  --cta:#ff8a2a; --cta-2:#ffa94d; --cta-hover:#ff7a00;
+  --ok:#18b26a; --warn:#f1c40f; --danger:#ff5a5a;
+  --shadow-lg:0 18px 40px rgba(0,0,0,.35);
+  --shadow-md:0 10px 28px rgba(0,0,0,.28);
+  --r-lg:16px; --r-md:12px; --r-sm:10px;
 }
 
-/* Page gradient + spacing */
+/* ---------- Page ---------- */
 .booking-page{
+  min-height:100vh; color:var(--text-1);
   background:
-    radial-gradient(1200px 700px at 20% -10%, #2b1c46 0%, transparent 60%),
+    radial-gradient(900px 700px at 10% -120px, #2b1e4b 0%, transparent 60%),
+    radial-gradient(900px 700px at 90% -120px, #3a2430 0%, transparent 60%),
     linear-gradient(180deg, var(--bg-start), var(--bg-mid), var(--bg-end));
-  color: var(--text);
-  min-height: 100vh;
-  padding: 40px 16px 56px;
 }
+.booking-wrap{ max-width:1180px; margin:0 auto; padding:18px 16px 48px; }
 
-/* Constrain content width */
-.booking-page .ant-row,
-.booking-page .booking-header,
-.booking-page > .ant-tabs,
-.booking-page > .ant-divider,
-.booking-page .content-wrap{
-  max-width: 1180px;
-  margin-inline: auto;
-}
+/* Floating Home button (always visible, aligned to container) */
+.home-fab{
+  position: fixed;
+  top: 18px;
+  right: max(16px, calc((100vw - 1180px)/2 + 16px));
+  z-index: 1000;
 
-/* Header */
-.booking-header h2.ant-typography{ color: var(--text); letter-spacing:.2px; margin-bottom: 6px; }
-.booking-header .ant-typography{ color: var(--muted); }
-
-/* ---------- Glass blocks ---------- */
-.osq-glass,
-.booking-form{
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: var(--radius-xl);
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:700;
+  color:var(--text-1);
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 8px 18px rgba(0,0,0,.28);
+  text-decoration:none;
+  backdrop-filter:saturate(140%) blur(6px);
+  transition:transform .15s ease, background .15s ease, box-shadow .15s ease, opacity .2s ease;
 }
-.booking-form{ padding: 20px 16px; max-width: 880px; }
-
-/* Dark inputs + brand focus */
-.booking-form input,
-.booking-form select{ background:#101226; color:var(--text); border:1px solid var(--surface-2); }
-.booking-form input:focus,
-.booking-form select:focus,
-.booking-page .ant-input-affix-wrapper-focused,
-.booking-page .ant-picker-focused,
-.booking-page .ant-select-focused .ant-select-selector,
-.booking-page .ant-input:focus,
-.booking-page .ant-picker .ant-picker-input > input:focus{
-  outline:none;
-  border-color: var(--cta) !important;
-  box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important;
-}
-
-/* CTA button (orange) */
-.booking-form button,
-.osq-cta,
-:where(.ant-btn).ant-btn-primary{
-  background: linear-gradient(180deg, var(--cta-2), var(--cta));
-  border-color: transparent; color:#1b0f07;
-  border-radius:12px; box-shadow:0 6px 16px rgba(255,138,42,.28);
-}
-.booking-form button:hover,
-.osq-cta:hover,
-:where(.ant-btn).ant-btn-primary:hover{
-  background: linear-gradient(180deg, var(--cta), var(--cta-hover));
-  color:#140b06;
-}
-
-/* ---------- Tabs = centered pill bar ---------- */
-.booking-tabs{ display:flex; justify-content:center; margin-bottom:16px; }
-:where(.ant-tabs).ant-tabs-top > .ant-tabs-nav{ margin:8px auto 12px; max-width:1180px; justify-content:center; }
-:where(.ant-tabs .ant-tabs-nav-list){
-  background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);
-  padding:6px; border-radius:999px;
-}
-:where(.ant-tabs .ant-tabs-tab){ color:var(--muted); border-radius:999px; padding:6px 12px; }
-:where(.ant-tabs .ant-tabs-tab.ant-tabs-tab-active){ color:var(--text); background:rgba(255,255,255,.10); }
-
-/* ---------- Titles & Labels ---------- */
-.booking-page .ant-card-head-title,
-.booking-page .ant-collapse-header,
-.booking-page .ant-collapse-header .ant-collapse-header-text{ color:#fff !important; }
-.ant-form-item-label > label{ color:#fff !important; }
-
-/* Placeholders & typed text */
-.ant-input::placeholder,
-.ant-picker-input input::placeholder,
-.ant-select-selection-placeholder{ color:#fff !important; opacity:0.9; }
-.ant-input,
-.ant-picker-input input,
-.ant-select-selector{ color:#fff !important; background-color:transparent !important; }
-
-/* ---------- Select (control dark) ---------- */
-.booking-page .ant-select-selector{
-  color:#fff !important; background:transparent !important; border-color:var(--surface-2);
-}
-.booking-page .ant-select-selection-placeholder,
-.booking-page .ant-select-selection-item{ color:#fff !important; }
-.booking-page .ant-select-arrow .anticon,
-.booking-page .ant-select-clear,
-.booking-page .ant-select-suffix .anticon{ color:#fff !important; opacity:1 !important; }
-.booking-page .ant-select-open .ant-select-selector{
-  border-color:var(--cta) !important; box-shadow:0 0 0 2px rgba(255,138,42,0.35) !important;
-}
-
-/* ---------- Select dropdown overlays ---------- */
-/* Light dropdown — default */
-.booking-page .ant-select-dropdown:not(.osq-dark-dropdown){
-  background:#ffffff !important;
-  border:1px solid var(--surface-2);
-  border-radius:var(--radius-xl);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-.booking-page .ant-select-dropdown:not(.osq-dark-dropdown) .ant-select-item{
-  color:#1b1b1b !important; background:transparent !important; font-weight:500; padding:8px 12px;
-}
-.booking-page .ant-select-dropdown:not(.osq-dark-dropdown) .ant-select-item-option-active{
-  background:rgba(0,0,0,.06) !important; color:#000 !important;
-}
-.booking-page .ant-select-dropdown:not(.osq-dark-dropdown) .ant-select-item-option-selected{
-  background:linear-gradient(90deg, var(--cta-2), var(--cta)) !important;
-  color:#1b0f07 !important; box-shadow:none !important; border-radius:0;
-}
-
-/* Dark dropdown — opt-in via dropdownClassName/popupClassName */
-.osq-dark-dropdown{
-  background:#141628 !important;
-  border:1px solid rgba(255,255,255,.10) !important;
-  border-radius:var(--radius-xl) !important;
-  box-shadow:var(--shadow) !important;
-  overflow:hidden !important;
-}
-.osq-dark-dropdown .ant-select-item{ color:var(--text) !important; background:transparent !important; }
-.osq-dark-dropdown .ant-select-item-option-active{ background:rgba(255,255,255,.08) !important; }
-.osq-dark-dropdown .ant-select-item-option-selected{
-  background:linear-gradient(90deg, var(--cta-2), var(--cta)) !important; color:#1b0f07 !important;
-}
-
-/* Cards (listings) */
-:where(.ant-card){ border-radius:var(--radius-xl); background:#f3efe9; border:none; box-shadow:0 8px 18px rgba(0,0,0,.08); }
-@media (prefers-color-scheme: dark){ .booking-page :where(.ant-card){ background:#f3efe9; } }
-
-/* Budget/side glass */
-.osq-budget-card, .budget-card, .booking-page .ant-col-md-8 > .ant-card{
-  background:var(--surface); border:1px solid rgba(255,255,255,.10);
-  color:var(--text); border-radius:var(--radius-xl); box-shadow:var(--shadow);
-}
-
-/* Segmented */
-:where(.ant-segmented){ background:#101226; border-radius:999px; }
-:where(.ant-segmented-item-selected){ background:rgba(255,255,255,.12); color:var(--text); }
-
-/* Input Numbers */
-:where(.ant-input-number){
-  width:100%; background:#101226; border:1px solid var(--surface-2);
-  color:var(--text); border-radius:10px;
-}
-:where(.ant-input-number:hover, .ant-input-number:focus, .ant-input-number-focused){
-  border-color:var(--cta) !important; box-shadow:0 0 0 2px rgba(255,138,42,0.35) !important;
-}
-
-/* Progress */
-:where(.ant-progress .ant-progress-bg){ background:linear-gradient(90deg, #6aa8ff, #4b87d9); }
-:where(.ant-progress .ant-progress-trail){ background:#2a2c4b; }
-
-/* Tags for status */
-:where(.ant-tag).ant-tag-green{ background:#153f2d; border-color:#1d6b4c; color:#95f2c8; }
-:where(.ant-tag).ant-tag-red{ background:#3f1b1b; border-color:#7d2c2c; color:#ffbaba; }
-
-/* Dividers */
-.booking-page .ant-divider{ border-block-start:1px solid rgba(255,255,255,.08); }
-
-/* Sticky right column */
-@media (min-width:768px){
-  .booking-page .ant-col-md-8 > .ant-card{ position:sticky; top:64px; }
-}
-
-/* Density helpers */
-.booking-page { --osq-vspace:12px; --osq-card-pad:12px; }
-.osq-pad-s{ padding:var(--osq-card-pad) !important; }
-.osq-gap-s{ margin-bottom:var(--osq-vspace) !important; }
-.osq-mb-4{ margin-bottom:4px !important; }
-.osq-mb-12{ margin-bottom:12px !important; }
-.osq-mt-12{ margin-top:12px !important; }
-.osq-block{ display:block; }
-
-.booking-page .booking-header{ margin-bottom:8px; }
-.booking-page .ant-tabs-nav{ margin:0 0 8px !important; }
-.booking-page .ant-tabs-content-holder{ padding-top:0 !important; }
-
-.booking-page .osq-card{ border-radius:12px !important; }
-.booking-page .ant-form-item{ margin-bottom:8px !important; }
-
-.booking-page .ant-input,
-.booking-page .ant-select-selector,
-.booking-page .ant-picker,
-.booking-page .ant-input-affix-wrapper{ min-height:36px; }
-
-.booking-page .ant-list-split .ant-list-item{ padding:8px 0 !important; }
-.booking-page .ant-divider-horizontal{ margin:12px 0 !important; }
-
-.osq-listings{ max-height:62vh; overflow:auto; padding-right:6px; }
-.osq-listings::-webkit-scrollbar{ width:6px; }
-.osq-listings::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.18); border-radius:8px; }
-
-/* ---------- (Legacy) Cruise Search card class) ---------- */
-.booking-page .cruise-search-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: var(--radius-xl);
-  color: var(--text);
-}
-.booking-page .cruise-search-card:where(.ant-card){
-  background: transparent; border: 1px solid rgba(255,255,255,.10); border-radius: var(--radius-xl);
-  box-shadow: var(--shadow); color: var(--text);
-}
-.booking-page .cruise-search-card:where(.ant-card) .ant-card-body{ padding: 20px 16px; }
-
-/* ---------- Unified OSQ search card (preferred) ---------- */
-.booking-page .osq-search-card.ant-card,
-.booking-page .osq-search-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)) !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  box-shadow: var(--shadow) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  border-radius: var(--radius-xl) !important;
-  color: var(--text) !important;
-}
-.booking-page .osq-search-card.ant-card .ant-card-body{ padding: 20px 16px !important; }
-
-/* Fields inside any OSQ search card */
-.booking-page .osq-search-card input,
-.booking-page .osq-search-card .ant-input,
-.booking-page .osq-search-card .ant-picker,
-.booking-page .osq-search-card .ant-select-selector,
-.booking-page .osq-search-card .ant-input-affix-wrapper{
-  background:#101226 !important; border:1px solid var(--surface-2) !important; color:#fff !important;
-}
-.booking-page .osq-search-card input::placeholder,
-.booking-page .osq-search-card .ant-picker-input input::placeholder,
-.booking-page .osq-search-card .ant-select-selection-placeholder{ color:#fff !important; opacity:.9 !important; }
-.booking-page .osq-search-card .anticon,
-.booking-page .osq-search-card .ant-picker-suffix,
-.booking-page .osq-search-card .ant-select-arrow .anticon{ color:#fff !important; opacity:1 !important; }
-/* Brand focus ring */
-.booking-page .osq-search-card .ant-input:focus,
-.booking-page .osq-search-card .ant-picker-focused,
-.booking-page .osq-search-card .ant-select-focused .ant-select-selector,
-.booking-page .osq-search-card .ant-input-affix-wrapper-focused{
-  border-color: var(--cta) !important; box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important;
-}
-
-/* Segmented controls inside any search card */
-.booking-page .osq-search-card :where(.ant-segmented){ background:#101226 !important; border-radius:999px !important; }
-.booking-page .osq-search-card :where(.ant-segmented-item-selected){ background:rgba(255,255,255,.12) !important; color:#fff !important; }
-
-/* Primary action button inside any search card */
-.booking-page .osq-search-card :where(.ant-btn).ant-btn-primary{
-  background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
-  border-color: transparent !important;
-  color:#1b0f07 !important;
-  border-radius:12px !important;
-  box-shadow:0 6px 16px rgba(255,138,42,.28) !important;
-}
-.booking-page .osq-search-card :where(.ant-btn).ant-btn-primary:hover{
-  background: linear-gradient(180deg, var(--cta), var(--cta-hover)) !important;
-  color:#140b06 !important;
-}
-
-/* Required asterisk visibility */
-.booking-page .osq-search-card .ant-form-item-required::before{ color: var(--cta) !important; }
-
-/* ==== CRUISE: last-resort override ==== */
-#cruiseSearchCard,
-#cruiseSearchCard.ant-card,
-#cruiseSearchCard .ant-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)) !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  box-shadow: var(--shadow) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  border-radius: var(--radius-xl) !important;
-  color: var(--text) !important;
-}
-#cruiseSearchCard .ant-card-body{ background: transparent !important; padding: 20px 16px !important; }
-#cruiseSearchCard input,
-#cruiseSearchCard .ant-input,
-#cruiseSearchCard .ant-picker,
-#cruiseSearchCard .ant-select-selector,
-#cruiseSearchCard .ant-input-affix-wrapper{ background:#101226 !important; border:1px solid var(--surface-2) !important; color:#fff !important; }
-#cruiseSearchCard input::placeholder,
-#cruiseSearchCard .ant-picker-input input::placeholder,
-#cruiseSearchCard .ant-select-selection-placeholder{ color:#fff !important; opacity:.9 !important; }
-#cruiseSearchCard .anticon,
-#cruiseSearchCard .ant-picker-suffix,
-#cruiseSearchCard .ant-select-arrow .anticon{ color:#fff !important; opacity:1 !important; }
-#cruiseSearchCard .ant-input:focus,
-#cruiseSearchCard .ant-picker-focused,
-#cruiseSearchCard .ant-select-focused .ant-select-selector,
-#cruiseSearchCard .ant-input-affix-wrapper-focused{ border-color: var(--cta) !important; box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important; }
-#cruiseSearchCard :where(.ant-btn).ant-btn-primary{
-  background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
-  border-color: transparent !important;
-  color:#1b0f07 !important;
-  border-radius:12px !important;
-  box-shadow:0 6px 16px rgba(255,138,42,.28) !important;
-}
-#cruiseSearchCard :where(.ant-btn).ant-btn-primary:hover{
-  background: linear-gradient(180deg, var(--cta), var(--cta-hover)) !important; color:#140b06 !important;
-}
-
-/* ---- Packages numeric inputs: show digits + steppers ---- */
-.osq-packages-form input,
-.osq-packages-form .ant-input-number-input{
-  color: var(--text) !important;
-  font-variant-numeric: tabular-nums;
-}
-.osq-packages-form .ant-input-number-handler-wrap{
-  display: block !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-/* -------- Package card media (cover) -------- */
-.pkg-media{
-  position: relative;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  background: #1b1e31;
-}
-.pkg-media img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transform: scale(1.02);
-  position: relative;
-  z-index: 0;
-}
-.pkg-media::after{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.35) 100%);
-  pointer-events: none;
-  z-index: 0;
-}
-.pkg-ribbon{
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  z-index: 1;
-}
-.booking-page .ant-card-cover{ margin: 0; }
-.booking-page .ant-card-cover > *{
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
-
-/* --- Base chips (fallback for non-Ant usage) --- */
-.pkg-chip{
-  border:1px solid rgba(255,255,255,.18) !important;
-  color:var(--text) !important;
-  background:rgba(0,0,0,.28) !important;
-}
-.pkg-chip--save{
-  background:linear-gradient(180deg, rgba(255,183,77,.22), rgba(255,138,42,.18)) !important;
-  border-color:rgba(255,183,77,.35) !important;
-  color:#ffe3bd !important;
-}
-.pkg-chip--rating{
-  background:rgba(106,168,255,.20) !important;
-  border-color:rgba(106,168,255,.35) !important;
-  color:#e2edff !important;
-}
-.pkg-chip--xp{
-  background:rgba(186,140,255,.22) !important;
-  border-color:rgba(186,140,255,.35) !important;
-  color:#efe6ff !important;
-}
-
-/* =========================================================
-   SIMPLE CHIP CONTRAST FIX — keep LAST to win cascade
-   ========================================================= */
-.booking-page .ant-tag.pkg-chip{
-  background: rgba(20,22,40,.92) !important;
-  background-color: rgba(20,22,40,.92) !important;  /* beats Ant background-color */
-  color: #fff !important;
-  border-color: rgba(255,255,255,.22) !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,.35) !important;
-  text-shadow: 0 1px 1px rgba(0,0,0,.4);
-  font-weight: 600 !important;
-  font-size: 12px !important;
-  line-height: 20px !important;
-  letter-spacing: .2px;
-  padding: 2px 8px !important;
-}
-.booking-page .ant-tag.pkg-chip .anticon{ color: inherit !important; margin-right:4px; }
-
-/* brand variants */
-.booking-page .ant-tag.pkg-chip.pkg-chip--save{
-  background: linear-gradient(180deg, var(--cta-2,#ffa94d), var(--cta,#ff8a2a)) !important;
-  background-color: var(--cta,#ff8a2a) !important;
-  color:#1b0f07 !important;
-  border-color: transparent !important;
-}
-.booking-page .ant-tag.pkg-chip.pkg-chip--rating{
-  background: rgba(76,120,211,.95) !important;
-  background-color: rgba(76,120,211,.95) !important;
-  border-color: rgba(76,120,211,1) !important;
-}
-.booking-page .ant-tag.pkg-chip.pkg-chip--xp{
-  background: rgba(186,140,255,.95) !important;
-  background-color: rgba(186,140,255,.95) !important;
-  border-color: rgba(186,140,255,1) !important;
-}
-
-/* ======================
-   UNIFIED SEARCH (NEW)
-   ====================== */
-.unified-search{
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: var(--radius-xl);
-  padding: 12px;
-  margin-top: 12px;
-}
-
-/* Top right “Smart Plan AI” caption */
-.us-header{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap:6px;
-  font-size:12px;
-  margin-bottom:6px;
-  color:#9aa4c2;
-}
-
-/* Tabs (pills) */
-.unified-search .ant-tabs-nav{ margin-bottom:8px; }
-.unified-tabs .ant-tabs-tab{
-  background: rgba(255,255,255,.04);
-  border-radius:999px;
-  padding-inline:12px;
-  color: var(--muted);
-}
-.unified-tabs .ant-tabs-tab.ant-tabs-tab-active{
-  color: var(--text);
-  background: rgba(255,255,255,.10);
-}
-
-/* Inputs inside the bar */
-.unified-search .ant-input-affix-wrapper,
-.unified-search .ant-picker,
-.unified-search .ant-select-selector{
-  background:#101226 !important;
-  border:1px solid var(--surface-2) !important;
-  color:#fff !important;
-  min-height:36px;
-}
-.unified-search .ant-input::placeholder,
-.unified-search .ant-picker-input input::placeholder,
-.unified-search .ant-select-selection-placeholder{ color:#fff !important; opacity:.9 !important; }
-.unified-search .anticon,
-.unified-search .ant-picker-suffix,
-.unified-search .ant-select-arrow .anticon{ color:#fff !important; opacity:1 !important; }
-
-/* Brand focus */
-.unified-search .ant-input:focus,
-.unified-search .ant-picker-focused,
-.unified-search .ant-select-focused .ant-select-selector,
-.unified-search .ant-input-affix-wrapper-focused{
-  border-color: var(--cta) !important;
-  box-shadow: 0 0 0 2px rgba(255,138,42,0.35) !important;
-}
-
-/* Primary action */
-.unified-search :where(.ant-btn).ant-btn-primary{
-  background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
-  border-color: transparent !important;
-  color:#1b0f07 !important;
-  border-radius:12px !important;
-  box-shadow:0 6px 16px rgba(255,138,42,.28) !important;
-}
-.unified-search :where(.ant-btn).ant-btn-primary:hover{
-  background: linear-gradient(180deg, var(--cta), var(--cta-hover)) !important;
-  color:#140b06 !important;
-}
-
-/* Responsive: stack fields nicely on small screens */
-@media (max-width: 768px){
-  .unified-search{ padding:10px; }
-  .unified-tabs .ant-picker,
-  .unified-tabs .ant-select,
-  .unified-tabs .ant-input-affix-wrapper{ width:100%; }
-}
-
-/* Hero headline – warm, welcoming, on brand */
-.hero-title{
-  margin: 2px 0 10px;
-  font-weight: 800;
-  font-size: clamp(28px, 4.2vw, 44px);
-  letter-spacing: .2px;
-  line-height: 1.15;
-  background: linear-gradient(90deg,#fff 0%, #ffe2bf 25%, #ffc274 50%, #fff 85%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 1px 12px rgba(255,138,42,.12);
-}
-
-/* Smart Plan AI chips */
-.us-smart-row .ant-tag{
-  transition: transform .08s ease, box-shadow .12s ease;
-}
-.us-smart-row .ant-tag:hover{
+.home-fab:hover{
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+  background: rgba(255,255,255,.16);
+  box-shadow: 0 12px 24px rgba(0,0,0,.32);
 }
+@media (max-width: 640px){
+  .home-fab{ top: 12px; right: 12px; padding: 6px 10px; border-radius: 10px; }
+}
+
+/* ---------- Hero (centered + animated) ---------- */
+.hero{ text-align:center; margin:44px auto 22px; max-width:820px; animation:fadeUp .6s ease both; }
+.hero h2{ margin:0 0 10px; font-size:clamp(20px,3vw,28px); font-weight:700; color:var(--text-1); opacity:.95; animation:fadeUp .7s ease both .05s; }
+.hero h1{
+  margin:0 0 12px; font-size:clamp(28px,4vw,48px); font-weight:800; line-height:1.1;
+  background:linear-gradient(90deg,#ffd69a,#fff,#ffd69a);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  position:relative; animation:fadeUp .7s ease both .08s;
+}
+.hero h1::after{
+  content:""; display:block; margin:10px auto 0; width:180px; height:2px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(255,214,154,0), rgba(255,214,154,.9), rgba(255,214,154,0));
+  box-shadow:0 0 12px rgba(255,214,154,.65); animation:glowPulse 2.4s ease-in-out infinite;
+}
+.hero .sub{ color:var(--text-2); font-size:clamp(14px,2.5vw,16px); opacity:.92; animation:fadeUp .7s ease both .12s; }
+
+/* ---------- Search shell ---------- */
+.search-shell{
+  position:relative; margin:0 auto 22px; max-width:960px;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+  border:1px solid rgba(255,255,255,.12); border-radius:22px; padding:14px;
+  box-shadow:var(--shadow-lg); backdrop-filter:saturate(140%) blur(10px);
+}
+.search-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px 6px 10px; }
+
+/* Tabs */
+.cat-tabs{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.cat-tabs .pill{
+  display:inline-flex; align-items:center; gap:6px; padding:8px 12px;
+  border-radius:999px; font-weight:600; font-size:13px;
+  color:var(--text-2); background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10); transition:all .18s ease; cursor:pointer;
+}
+.cat-tabs .pill:hover{ transform:translateY(-1px); background:rgba(255,255,255,.10); color:var(--text-1); }
+.cat-tabs .pill.active{ background:linear-gradient(90deg,#3a2c68,#3a2430); color:#fff; border-color:transparent; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+
+/* Smart Plan AI */
+.ai-toggle{
+  display:flex; align-items:center; gap:10px; color:var(--text-2);
+  font-size:13px; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
+}
+.ai-toggle .dot{ width:10px; height:10px; border-radius:50%; background:#40c9ff; box-shadow:0 0 12px rgba(64,201,255,.9); }
+
+/* Inputs */
+.search-grid{
+  display:grid; grid-template-columns:1.2fr .9fr .9fr .8fr; gap:10px;
+  padding:8px; background:rgba(0,0,0,.18); border-radius:16px;
+  border:1px solid rgba(255,255,255,.10); justify-content:center;
+}
+.search-grid .cell{
+  display:flex; align-items:center; gap:8px; padding:10px 12px; height:44px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  border-radius:12px; color:var(--text-1);
+}
+.search-grid .cell input{ flex:1; background:transparent; border:none; outline:none; color:var(--text-1); }
+.search-grid .cell .ant-select-selector,
+.search-grid .cell .ant-picker,
+.search-grid .cell .ant-input{ background:transparent !important; border:none !important; color:var(--text-1) !important; }
+
+.search-actions{ display:flex; gap:10px; align-items:center; justify-content:center; padding:8px 0 0; }
+.btn-search{
+  display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 18px; font-weight:700;
+  border-radius:12px; background:linear-gradient(180deg, var(--cta), var(--cta-2)); color:#1b1c33;
+  border:none; box-shadow:0 10px 24px rgba(255,138,42,.35); transition:transform .14s ease, box-shadow .14s ease; cursor:pointer;
+}
+.btn-search:hover{ transform:translateY(-1px); box-shadow:0 12px 28px rgba(255,138,42,.45); }
+.btn-ghost{
+  height:44px; padding:0 14px; border-radius:12px; font-weight:600; color:var(--text-1);
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); cursor:pointer;
+}
+.btn-ghost:hover{ background:rgba(255,255,255,.10); }
+
+/* Chips */
+.quick-chips{
+  display:flex; gap:8px; overflow:auto; padding:8px 2px 2px; margin-top:6px;
+  justify-content:center; scrollbar-width:none;
+}
+.quick-chips::-webkit-scrollbar{ display:none; }
+.chip{
+  white-space:nowrap; font-size:12px; font-weight:600; color:var(--text-1);
+  padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10); transition:background .15s ease, transform .15s ease; cursor:pointer;
+}
+.chip:hover{ background:rgba(255,255,255,.10); transform:translateY(-1px); }
+
+/* ---------- Sidebar / Budget ---------- */
+.sidebar-card{
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+  border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:14px;
+  box-shadow:var(--shadow-md); backdrop-filter:saturate(140%) blur(8px);
+  color:var(--text-1) !important;
+}
+.sidebar-card *{ color:var(--text-1) !important; }
+
+.sidebar-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.sidebar-title{ font-weight:800; letter-spacing:.2px; }
+
+.sidebar-mode{
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  border-radius:10px; overflow:hidden; margin:6px 0 10px;
+}
+.sidebar-mode button{
+  padding:8px 12px; font-weight:700; border:none; background:transparent; color:var(--text-2); cursor:pointer;
+}
+.sidebar-mode button.active{ background:rgba(255,255,255,.14); color:var(--text-1); }
+
+.budget-status{ display:flex; align-items:center; gap:8px; margin:10px 0 6px; color:var(--text-2) !important; font-size:13px; }
+.budget-status.ok{ color:var(--ok) !important; }
+.budget-status.warn{ color:var(--warn) !important; }
+.budget-status.over{ color:var(--danger) !important; }
+
+.progress{
+  width:100%; height:8px; border-radius:999px; overflow:hidden;
+  background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.12);
+}
+.progress > span{ display:block; height:100%; background:linear-gradient(90deg,#22e28a,#86efac); }
+
+/* Inline adjust panel */
+.sidebar-controls{
+  margin-top:12px; padding:10px; border-radius:12px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+}
+.control-row{
+  display:grid; grid-template-columns:140px 1fr; align-items:center;
+  gap:10px; margin-bottom:10px;
+}
+.control-row label{ color:var(--text-2); font-weight:600; }
+.control-hint{ color:var(--text-2); font-size:12px; margin-top:4px; }
+
+/* AntD inputs in sidebar: keep white text + themed rails */
+.ant-input-number-input, .ant-input-number, .ant-slider,
+.ant-input-number input, .ant-input, .ant-select-selector, .ant-typography {
+  color: var(--text-1) !important;
+}
+.ant-input-number, .ant-slider, .ant-input-number-outlined {
+  background: transparent !important;
+  border-color: rgba(255,255,255,.25) !important;
+}
+.ant-slider .ant-slider-rail { background: rgba(255,255,255,.15) !important; }
+.ant-slider .ant-slider-track { background: linear-gradient(90deg,#22e28a,#86efac) !important; }
+.ant-slider .ant-slider-handle::after { box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
+
+/* ---------- Results / Cards ---------- */
+.results{ margin-top:14px; }
+.results, .results *{ color:var(--text-1) !important; }
+
+.results-label, .results-label *{
+  color:var(--text-1) !important; font-weight:600; opacity:.92; text-align:center;
+}
+
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+  border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden;
+  box-shadow:var(--shadow-md); backdrop-filter:saturate(140%) blur(6px);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{ transform:translateY(-2px); box-shadow:0 16px 36px rgba(0,0,0,.34); border-color:rgba(255,255,255,.18); }
+.card .thumb{ aspect-ratio:16/10; background:#2b2d55; }
+.card .body{ padding:12px; }
+.card .title{ font-weight:800; font-size:18px; color:var(--text-1) !important; }
+.card .meta{ color:var(--text-2) !important; font-size:13px; }
+.tag{
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+  border-radius:8px; padding:4px 8px; font-size:12px; font-weight:600; color:var(--text-1) !important;
+}
+.tag.budget-ok{ background:rgba(34,226,138,.15); color:#22e28a !important; }
+.tag.budget-over{ background:rgba(255,90,90,.15); color:#ff5a5a !important; }
+
+/* ---------- AntD polish ---------- */
+.ant-btn-primary{ background:linear-gradient(180deg,var(--cta),var(--cta-2)); border:none; }
+.ant-btn-primary:hover{ background:var(--cta-hover); }
+.ant-input, .ant-picker, .ant-select-selector{ background:transparent !important; color:var(--text-1) !important; }
+.ant-select-selection-placeholder, .ant-input::placeholder{ color:var(--muted) !important; }
+
+/* ---------- Utils + Animations ---------- */
+.center{ display:flex; align-items:center; justify-content:center; }
+.hidden{ display:none !important; }
+
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+@keyframes glowPulse{ 0%,100%{ box-shadow:0 0 10px rgba(255,214,154,.55);} 50%{ box-shadow:0 0 18px rgba(255,214,154,.9);} }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; }
+}
+@media (max-width:1100px){ .search-grid{ grid-template-columns:1.3fr 1fr 1fr .8fr; } }
+@media (max-width:920px){
+  .search-head{ flex-wrap:wrap; }
+  .ai-toggle{ margin-left:auto; }
+  .search-grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:640px){
+  .hero{ margin:32px auto 12px; }
+  .search-shell{ padding:12px; border-radius:18px; }
+  .search-grid{ grid-template-columns:1fr; gap:8px; }
+  .search-actions{ justify-content:stretch; }
+  .btn-search, .btn-ghost{ flex:1; }
+}
+
+/* Keep Search button label dark for contrast */
+.btn-search, .btn-search *{ color:#1b1c33 !important; }

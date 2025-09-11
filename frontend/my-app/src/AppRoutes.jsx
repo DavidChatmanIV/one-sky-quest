@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
-
 import QuestFeedPage from "./pages/QuestFeed";
 import SkyVaultPage from "./pages/SkyVault";
 import MembershipPage from "./pages/Membership";
@@ -13,13 +12,9 @@ import TeamTravelPage from "./pages/TeamTravelPage";
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Home */}
       <Route path="/" element={<LandingPage />} />
-
-      {/* Core */}
       <Route path="/booking" element={<BookingPage />} />
 
-      {/* Connected routes */}
       <Route path="/feed" element={<QuestFeedPage />} />
       <Route path="/sky-vault" element={<SkyVaultPage />} />
       <Route path="/membership" element={<MembershipPage />} />
