@@ -9,6 +9,10 @@
   --text-1:#f4f6fb; --text-2:#c9cbe3; --text-dim:rgba(255,255,255,.65);
   --cta:#ff8a2a; --cta-2:#ffa94d; --cta-hover:#ff7a00;
   --shadow:0 10px 30px rgba(0,0,0,.30);
+
+  /* layout polish */
+  --lp-gap: 20px;        /* matches Row gutter */
+  --lp-radius: 16px;
 }
 
 /* =========================================================
@@ -78,7 +82,7 @@
 }
 .osq-search-tabs.osq-tabs-rounded .ant-segmented-item-selected .seg-item,
 .osq-search-tabs.osq-tabs-rounded .ant-segmented-item-selected .seg-text,
-.osq-search-tabs.osq-tabs-rounded .ant-segmented-item-selected .seg-emoji { color: #0e0a1f !important; }
+.osq-search-tabs.osq-tabs-rounded .seg-emoji { color: #0e0a1f !important; }
 .osq-search-tabs.osq-tabs-rounded .seg-item { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; }
 .osq-search-tabs.osq-tabs-rounded .seg-emoji { font-size: 18px; line-height: 1; }
 .osq-search-tabs.osq-tabs-rounded .ant-segmented-item:not(.ant-segmented-item-selected):hover { background: rgba(255,255,255,.10) !important; }
@@ -268,4 +272,121 @@
   .osq-chip, .card-chip, .ai-cta-row .ant-btn, .perk-tile {
     transition: none !important; transform: none !important;
   }
+}
+
+/* =========================================================
+   LAYOUT POLISH FOR TOP CARDS (equal heights & spacing)
+   ========================================================= */
+
+/* Ensure the AntD Col stretches and cards fill height */
+.smart-row > .ant-col,
+.hero-grid > .ant-col { display: flex; }
+.smart-row > .ant-col > .osq-card,
+.hero-grid > .ant-col > .osq-card {
+  flex: 1 1 auto;
+  height: 100%;
+  border-radius: var(--lp-radius);
+}
+
+/* Consistent padding / spacing for the hero area */
+.landing-hero.osq-hero-minimal { padding-top: 16px; padding-bottom: 8px; }
+
+/* Tighten the “quick stats” chips spacing slightly */
+.landing-hero .hero-stats .ant-tag { margin-right: 8px; margin-bottom: 8px; }
+
+/* Give the first row a little extra breathing room below */
+.smart-row { margin-bottom: calc(var(--lp-gap) - 4px); }
+
+/* Balance vertical rhythm in the next grid (kept at 8px) */
+.hero-grid { margin-top: 8px !important; }
+
+/* Optional: small max-heights for pill lists to keep rows aligned */
+.unique-stays .scroll-x, .deals .scroll-x { max-height: 120px; }
+
+/* Optional: make primary CTAs line up at bottom inside the card */
+.osq-card .ant-space { width: 100%; }
+.osq-card .ant-space-vertical { height: 100%; }
+.osq-card .ant-space-vertical > *:last-child { margin-top: auto; }
+
+/* ====== Responsive tweaks ====== */
+@media (min-width: 1200px) { .smart-row .ant-col { min-height: 220px; } }
+@media (max-width: 1199px) and (min-width: 768px) { .smart-row .ant-col { min-height: 220px; } }
+@media (max-width: 767px) {
+  .landing-hero.osq-hero-minimal { padding-top: 12px; }
+  .smart-row { margin-bottom: var(--lp-gap); }
+}
+
+/* ===== Stack that fills column and balances last card ===== */
+.stack-fill {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;          /* match your gutter */
+  flex: 1 1 auto;
+}
+.stack-fill > *:last-child {
+  margin-top: auto;   /* pin last card to the bottom */
+}
+
+/* =========================================================
+   XP LEVEL — HERO PLACEMENT (under greeting)
+   ========================================================= */
+
+.hero-xp {
+  max-width: 640px;            /* slim + centered like the mock */
+  margin: 8px auto 12px;       /* tight rhythm just under pills */
+}
+
+/* If XPLevelCard renders an Ant Card, keep it glassy & compact */
+.hero-xp .ant-card,
+.hero-xp .osq-card {
+  background: var(--glass) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: var(--lp-radius) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.hero-xp .ant-card-body {
+  padding: 10px 14px !important; /* compact like the mock */
+}
+
+/* Title row: ⚡ + "Globetrotter 80%" centered */
+.hero-xp .xp-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Progress bar looks like a thin Spotify-style bar */
+.hero-xp .ant-progress {
+  margin: 6px 0 0;
+}
+.hero-xp .ant-progress-outer { padding-inline: 0 !important; }
+.hero-xp .ant-progress-inner {
+  background: rgba(255,255,255,.18) !important;
+  border-radius: 999px !important;
+  height: 8px !important;
+}
+
+/* Gradient fill (purple → orange) */
+.hero-xp .ant-progress-bg {
+  height: 8px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #a855f7 0%, #ff8a2a 100%) !important;
+}
+
+/* Subtitle: “Earn XP with every booking” */
+.hero-xp .xp-hero-sub {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Responsive tweak: keep it comfy on small screens */
+@media (max-width: 575px) {
+  .hero-xp { max-width: 92%; }
+  .hero-xp .ant-card-body { padding: 10px 12px !important; }
 }

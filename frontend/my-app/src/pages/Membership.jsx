@@ -1,21 +1,103 @@
-import React from "react";
-import { Card, Button, Tag, Row, Col, Typography, Space } from "antd";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Card,
+  Button,
+  Tag,
+  Row,
+  Col,
+  Typography,
+  Space,
+  Switch,
+  Divider,
+  Tooltip,
+} from "antd";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CheckCircleOutlined,
   StarOutlined,
   RocketOutlined,
   HomeOutlined,
 } from "@ant-design/icons";
-
+import PageLayout from "../components/PageLayout";
 import "../styles/Membership.css";
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
-export default function Membership() {
+const PLANS = [
+  {
+    id: "free",
+    name: "Free Explorer",
+    monthly: 0,
+    yearly: 0,
+    tag: { text: "Free", color: "green" },
+    className: "m-card",
+    features: [
+      { icon: <CheckCircleOutlined />, text: "Access to booking & Quest Feed" },
+      { icon: <CheckCircleOutlined />, text: "Earn XP & unlock badges" },
+      { icon: <CheckCircleOutlined />, text: "Save up to 3 trips" },
+    ],
+    ctaText: "You’re on this plan",
+    disabled: true,
+  },
+  {
+    id: "standard",
+    name: "Standard Member",
+    monthly: 5,
+    yearly: 50, // ~2 months free
+    tag: { text: "Popular", color: "blue" },
+    className: "m-card m-popular",
+    features: [
+      { icon: <StarOutlined />, text: "All Free Explorer perks" },
+      { icon: <StarOutlined />, text: "Unlimited saved trips" },
+      { icon: <StarOutlined />, text: "2× XP Boost on bookings" },
+      { icon: <StarOutlined />, text: "Birthday travel perk" },
+    ],
+    ctaText: "Upgrade Now",
+  },
+  {
+    id: "premium",
+    name: "Premium Voyager",
+    monthly: 15,
+    yearly: 150, // ~2 months free
+    tag: { text: "Best Value", color: "gold" },
+    className: "m-card m-best",
+    features: [
+      { icon: <RocketOutlined />, text: "All Standard perks" },
+      { icon: <RocketOutlined />, text: "Exclusive deals & upgrades" },
+      { icon: <RocketOutlined />, text: "Priority support & concierge" },
+      { icon: <RocketOutlined />, text: "Weekly XP bonus" },
+    ],
+    ctaText: "Upgrade Now",
+  },
+];
+
+function Price({ amount, period }) {
   return (
-    <div className="m-wrap">
-      {/* top bar with Home */}
+    <Paragraph className="m-price" aria-label={`Price ${amount} per ${period}`}>
+      ${amount}/{period}
+    </Paragraph>
+  );
+}
+
+export default function MembershipPage() {
+  const navigate = useNavigate();
+  const [period, setPeriod] = useState("monthly"); // 'monthly' | 'yearly'
+  useEffect(() => {
+    const prev = document.title;
+    document.title = "One Sky Quest • Membership";
+    return () => (document.title = prev);
+  }, []);
+
+  const plans = useMemo(() => PLANS, []);
+
+  const handleUpgrade = (planId) => {
+    // Route stub you can implement later:
+    navigate(`/membership/checkout?plan=${planId}&period=${period}`);
+  };
+
+  return (
+    <PageLayout fullBleed={false} maxWidth={1180} className="m-wrap">
+      {/* Top bar */}
       <div className="m-top">
         <Title level={2} className="m-title">
           One Sky Quest Membership
@@ -25,18 +107,42 @@ export default function Membership() {
           upgrading your membership.
         </Paragraph>
 
-        <Link to="/" className="m-home-link">
-          <Button
-            type="primary"
-            size="large"
-            className="m-home-btn"
-            icon={<HomeOutlined />}
+        <div
+          className="m-top-actions"
+          style={{ display: "flex", gap: 12, flexWrap: "wrap" }}
+        >
+          <Link to="/" className="m-home-link" aria-label="Back to Home">
+            <Button
+              type="primary"
+              size="large"
+              className="m-home-btn"
+              icon={<HomeOutlined />}
+            >
+              Home
+            </Button>
+          </Link>
+
+          <div
+            className="m-billing-toggle"
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
           >
-            Home
-          </Button>
-        </Link>
+            <Text>Monthly</Text>
+            <Switch
+              checked={period === "yearly"}
+              onChange={(v) => setPeriod(v ? "yearly" : "monthly")}
+              aria-label="Toggle yearly billing"
+            />
+            <Space size={6} align="center">
+              <Text strong>Yearly</Text>
+              <Tooltip title="Save about 2 months vs monthly">
+                <Tag color="gold">Save more</Tag>
+              </Tooltip>
+            </Space>
+          </div>
+        </div>
       </div>
 
+      {/* Plans */}
       <div className="m-section">
         <Title level={3} className="m-h3">
           🌟 Membership Plans
@@ -46,91 +152,64 @@ export default function Membership() {
         </Paragraph>
 
         <Row gutter={[24, 24]} justify="center">
-          {/* Free */}
-          <Col xs={24} md={12} lg={8}>
-            <Card
-              title="Free Explorer"
-              bordered={false}
-              className="m-card"
-              extra={<Tag color="green">Free</Tag>}
-            >
-              <Paragraph className="m-price">$0/month</Paragraph>
-              <Space direction="vertical" size="middle" className="m-list">
-                <p>
-                  <CheckCircleOutlined /> Access to booking & Quest Feed
-                </p>
-                <p>
-                  <CheckCircleOutlined /> Earn XP & unlock badges
-                </p>
-                <p>
-                  <CheckCircleOutlined /> Save up to 3 trips
-                </p>
-                <Button type="primary" disabled block className="m-cta">
-                  You’re on this plan
-                </Button>
-              </Space>
-            </Card>
-          </Col>
+          {plans.map((p) => {
+            const amount = period === "monthly" ? p.monthly : p.yearly;
+            const label = period === "monthly" ? "month" : "year";
+            return (
+              <Col xs={24} md={12} lg={8} key={p.id}>
+                <Card
+                  title={p.name}
+                  bordered={false}
+                  className={p.className}
+                  extra={<Tag color={p.tag.color}>{p.tag.text}</Tag>}
+                >
+                  <Price amount={amount} period={label} />
 
-          {/* Standard */}
-          <Col xs={24} md={12} lg={8}>
-            <Card
-              title="Standard Member"
-              bordered={false}
-              className="m-card m-popular"
-              extra={<Tag color="blue">Popular</Tag>}
-            >
-              <Paragraph className="m-price">$5/month</Paragraph>
-              <Space direction="vertical" size="middle" className="m-list">
-                <p>
-                  <StarOutlined /> All Free Explorer perks
-                </p>
-                <p>
-                  <StarOutlined /> Unlimited saved trips
-                </p>
-                <p>
-                  <StarOutlined /> 2× XP Boost on bookings
-                </p>
-                <p>
-                  <StarOutlined /> Birthday travel perk
-                </p>
-                <Button type="primary" block className="m-cta">
-                  Upgrade Now
-                </Button>
-              </Space>
-            </Card>
-          </Col>
+                  <Space
+                    direction="vertical"
+                    size="middle"
+                    className="m-list"
+                    style={{ width: "100%" }}
+                  >
+                    <ul className="m-feature-list">
+                      {p.features.map((f, i) => (
+                        <li key={i}>
+                          {f.icon} <span>{f.text}</span>
+                        </li>
+                      ))}
+                    </ul>
 
-          {/* Premium */}
-          <Col xs={24} md={12} lg={8}>
-            <Card
-              title="Premium Voyager"
-              bordered={false}
-              className="m-card m-best"
-              extra={<Tag color="gold">Best Value</Tag>}
-            >
-              <Paragraph className="m-price">$15/month</Paragraph>
-              <Space direction="vertical" size="middle" className="m-list">
-                <p>
-                  <RocketOutlined /> All Standard perks
-                </p>
-                <p>
-                  <RocketOutlined /> Exclusive deals & upgrades
-                </p>
-                <p>
-                  <RocketOutlined /> Priority support & concierge
-                </p>
-                <p>
-                  <RocketOutlined /> Weekly XP bonus
-                </p>
-                <Button type="primary" block className="m-cta">
-                  Upgrade Now
-                </Button>
-              </Space>
-            </Card>
-          </Col>
+                    <Button
+                      type="primary"
+                      disabled={p.disabled}
+                      block
+                      className="m-cta"
+                      onClick={() => !p.disabled && handleUpgrade(p.id)}
+                    >
+                      {p.ctaText}
+                    </Button>
+                  </Space>
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
       </div>
-    </div>
+
+      <Divider />
+
+      {/* Quick notes */}
+      <section aria-label="Membership notes" style={{ marginTop: 8 }}>
+        <Space direction="vertical" size={4}>
+          <Text type="secondary">
+            Prices shown in USD. You can switch plans or cancel anytime.
+          </Text>
+          <Text type="secondary">
+            Yearly plans are billed up front and offer ~2 months free compared
+            to monthly.
+          </Text>
+        </Space>
+      </section>
+    </PageLayout>
   );
 }

@@ -38,10 +38,11 @@ export default function UniqueStaysCard({
 }) {
   return (
     <Card
-      bordered={false}
+      // bordered={false}                  // ❌ deprecated
+      variant="borderless" // ✅ v5 replacement
+      styles={{ body: { padding: 16 } }} // ✅ replace bodyStyle with styles.body
       className="card glass unique"
       loading={loading}
-      bodyStyle={{ padding: 16 }}
       style={{ height: "100%" }}
     >
       <Space direction="vertical" size={10} style={{ width: "100%" }}>
@@ -68,6 +69,7 @@ export default function UniqueStaysCard({
                   borderRadius: 12,
                   overflow: "hidden",
                   background: "var(--glass)",
+                  cursor: "pointer",
                 }}
               >
                 <Image
@@ -78,6 +80,7 @@ export default function UniqueStaysCard({
                   width="100%"
                   style={{ objectFit: "cover" }}
                 />
+
                 {it.badge && (
                   <Tag
                     color="purple"
@@ -92,6 +95,7 @@ export default function UniqueStaysCard({
                     {it.badge}
                   </Tag>
                 )}
+
                 <div
                   style={{
                     position: "absolute",
@@ -110,7 +114,7 @@ export default function UniqueStaysCard({
           ))}
         </Row>
 
-        <Button type="primary" block onClick={onBrowse}>
+        <Button type="primary" block onClick={onBrowse} disabled={loading}>
           Browse Unique Stays
         </Button>
       </Space>

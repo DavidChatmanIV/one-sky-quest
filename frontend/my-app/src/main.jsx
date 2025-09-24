@@ -1,11 +1,12 @@
-// src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-// App + context
-import AppRoot from "./App.jsx";
+// Providers
 import { AssistantProvider } from "./context";
+
+// Routes
+import AppRoutes from "./AppRoutes";
 
 /* ---------- CSS: Load Order ---------- */
 /** 1) Ant reset FIRST (normalize component defaults) */
@@ -33,7 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AssistantProvider>
       <BrowserRouter>
-        <AppRoot />
+        <AppRoutes />
       </BrowserRouter>
     </AssistantProvider>
   </React.StrictMode>

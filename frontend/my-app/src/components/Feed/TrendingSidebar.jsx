@@ -1,53 +1,75 @@
 import React from "react";
-import { Typography, Tag } from "antd";
-import { FireFilled } from "@ant-design/icons";
+import { Typography } from "antd";
 
-const { Title } = Typography;
+const { Text, Title } = Typography;
 
-export default function TrendingSidebar() {
-  const trending = [
-    "Japan",
-    "Kyoto",
-    "HiddenGem",
-    "Weekend",
-    "Sunsets",
-    "Foodie",
-  ];
-  const hotspots = [
-    { place: "Kyoto", pct: "+42%" },
-    { place: "Santorini", pct: "+31%" },
-    { place: "Puerto Rico", pct: "+24%" },
-    { place: "Seoul", pct: "+18%" },
-  ];
+const DEFAULT_TAGS = [
+  { tag: "Japan", count: 128 },
+  { tag: "Kyoto", count: 96 },
+  { tag: "HiddenGem", count: 75 },
+  { tag: "Weekend", count: 64 },
+  { tag: "Sunsets", count: 58 },
+  { tag: "Foodie", count: 51 },
+];
 
+const DEFAULT_HOTSPOTS = [
+  { name: "Kyoto", delta: "+42%" },
+  { name: "Santorini", delta: "+31%" },
+  { name: "Puerto Rico", delta: "+24%" },
+  { name: "Seoul", delta: "+18%" },
+];
+
+export default function TrendingSidebar({
+  tags = DEFAULT_TAGS,
+  hotspots = DEFAULT_HOTSPOTS,
+  onClear,
+}) {
   return (
-    <aside className="qf-side">
-      <div className="qf-sidecard qf-card">
-        <Title level={5} className="qf-side-title">
-          Trending <FireFilled />
-        </Title>
-        <div className="qf-trend-tags">
-          {trending.map((t) => (
-            <Tag key={t} className="qf-tag pill">
-              #{t}
-            </Tag>
+    <div className="sidebar-col">
+      {/* Trending */}
+      <section className="sidebar-widget qf-card">
+        <div className="sidebar-title">
+          <span>Trending 🔥</span>
+          <button className="clear-btn" onClick={onClear}>
+            Clear
+          </button>
+        </div>
+        <div className="trending-tags">
+          {tags.map(({ tag, count }) => (
+            <span key={tag} className="tag-pill">
+              #{tag} {count ? <small>· {count}</small> : null}
+            </span>
           ))}
         </div>
-      </div>
+      </section>
 
-      <div className="qf-sidecard qf-card">
-        <Title level={5} className="qf-side-title">
-          Today’s hotspots
-        </Title>
-        <div className="qf-hotspots">
+      {/* Hotspots */}
+      <section className="sidebar-widget qf-card">
+        <div className="sidebar-title">
+          <span>Today’s hotspots</span>
+        </div>
+        <div className="hotspots">
           {hotspots.map((h) => (
-            <div key={h.place} className="qf-hot">
-              <span>{h.place}</span>
-              <span className="qf-hot-pct">{h.pct}</span>
+            <div key={h.name} className="hotspot">
+              <span>{h.name}</span>
+              <small>{h.delta}</small>
             </div>
           ))}
         </div>
-      </div>
-    </aside>
+      </section>
+
+      {/* CTA / Submit tip (optional) */}
+      <section
+        className="sidebar-widget qf-card"
+        style={{ textAlign: "center" }}
+      >
+        <Title level={5} style={{ color: "#fff", marginBottom: 8 }}>
+          Submit a tip
+        </Title>
+        <Text style={{ color: "rgba(255,255,255,.85)" }}>
+          Found a deal or hidden gem? Share it with the community.
+        </Text>
+      </section>
+    </div>
   );
 }

@@ -4,6 +4,9 @@ import { Button, Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import "../styles/Navbar.css";
 
+//  Use the Link-based menu for reliable routing
+import BookMenu from "./BookMenu";
+
 export default function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -41,48 +44,7 @@ export default function Navbar() {
     }
   };
 
-  // Book dropdown
-  const bookMenu = {
-    items: [
-      {
-        key: "stays",
-        label: "Stays",
-        onClick: () => navigate("/booking?tab=stays"),
-      },
-      {
-        key: "flights",
-        label: "Flights",
-        onClick: () => navigate("/booking?tab=flights"),
-      },
-      {
-        key: "cars",
-        label: "Cars",
-        onClick: () => navigate("/booking?tab=cars"),
-      },
-      {
-        key: "cruises",
-        label: "Cruises",
-        onClick: () => navigate("/booking?tab=cruises"),
-      },
-      {
-        key: "packages",
-        label: "Packages",
-        onClick: () => navigate("/booking?tab=packages"),
-      },
-      {
-        key: "excursions",
-        label: "Excursions",
-        onClick: () => navigate("/booking?tab=excursions"),
-      },
-      {
-        key: "last",
-        label: "Last-Minute",
-        onClick: () => navigate("/booking?tab=last-minute"),
-      },
-    ],
-  };
-
-  // Membership dropdown
+  // 🔽 Membership dropdown (kept as-is)
   const membershipMenu = {
     items: [
       {
@@ -93,7 +55,7 @@ export default function Navbar() {
     ],
   };
 
-  // AI switcher dropdown
+  // 🔽 AI switcher dropdown (kept as-is)
   const aiMenu = {
     items: [
       { key: "Questy", label: "Questy" },
@@ -119,14 +81,10 @@ export default function Navbar() {
 
           {/* Desktop pillars */}
           <div className="nav-pillars-desktop">
-            <Dropdown menu={bookMenu} placement="bottomLeft">
-              <button
-                className={`nav-link ${isBooking ? "active" : ""}`}
-                type="button"
-              >
-                Book <DownOutlined className="chev" />
-              </button>
-            </Dropdown>
+            {/* Replaces old inline Dropdown with Link-based BookMenu */}
+            <BookMenu />
+            {/* highlight when on /booking */}
+            {isBooking && <span className="active-underline" />}
 
             <NavLink to="/feed" className="nav-link">
               Feed
@@ -221,6 +179,7 @@ export default function Navbar() {
       <div className={`mobile-panel ${mobileOpen ? "open" : ""}`}>
         <div className="mobile-panel-inner">
           <nav className="mobile-list">
+            {/* Keep Book as a simple button on mobile */}
             <button
               className={`mobile-item ${isBooking ? "active" : ""}`}
               onClick={() => navigate("/booking")}

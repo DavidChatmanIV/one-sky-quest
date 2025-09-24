@@ -1,459 +1,263 @@
-// =============================
-// File: src/pages/BookingPage.jsx
-// =============================
-import React, { useMemo, useState } from "react";
-import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Button,
-  Space,
-  Divider,
-  Input,
-  DatePicker,
-  Select,
-  Switch,
-  InputNumber,
-  Slider,
-} from "antd";
-
-// IMPORTANT: AntD reset BEFORE your CSS so overrides win
-import "antd/dist/reset.css";
+import React, { useMemo, useEffect, useRef, useCallback } from "react";
+import { Button, Tag, Typography } from "antd";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import PageLayout from "../components/PageLayout";
+import UnifiedSearchBar from "../components/UnifiedSearchBar";
 import "../styles/BookingPage.css";
 
-const { Title, Text } = Typography;
-const { RangePicker } = DatePicker;
+const { Title } = Typography;
+
+const TAB_KEYS = [
+  "stays",
+  "flights",
+  "cars",
+  "cruises",
+  "excursions",
+  "packages",
+  "last-minute",
+];
+
+const TAB_META = {
+  stays: { label: "Stays", emoji: "🏠" },
+  flights: { label: "Flights", emoji: "✈️" },
+  cars: { label: "Cars", emoji: "🚗" },
+  cruises: { label: "Cruises", emoji: "🛳️" },
+  excursions: { label: "Excursions", emoji: "🗺️" },
+  packages: { label: "Packages", emoji: "🎁" },
+  "last-minute": { label: "Last-Minute", emoji: "⏱️" },
+};
 
 export default function BookingPage() {
-  // ===== Tabs =====
-  const [activeTab, setActiveTab] = useState("stays");
-  const tabs = [
-    { key: "stays", label: "Stays", icon: "🏠" },
-    { key: "flights", label: "Flights", icon: "✈️" },
-    { key: "cars", label: "Cars", icon: "🚗" },
-    { key: "cruises", label: "Cruises", icon: "🛳️" },
-    { key: "excursions", label: "Excursions", icon: "🧭" },
-    { key: "packages", label: "Packages", icon: "🧳" },
-  ];
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const pillRefs = useRef({});
 
-  // ===== Budget state =====
-  const [budgetMode, setBudgetMode] = useState("solo"); // 'solo' | 'group'
-  const [budgetOpen, setBudgetOpen] = useState(false);
-  const [budget, setBudget] = useState({
-    solo: { total: 1500, spent: 150 },
-    group: { total: 3000, spent: 600 },
-  });
+  // Resolve active tab from ?tab=
+  const activeTab = useMemo(() => {
+    const raw = (params.get("tab") || "stays").toLowerCase();
+    return TAB_KEYS.includes(raw) ? raw : "stays";
+  }, [params]);
 
-  const activeBudget = budget[budgetMode];
-  const pct = useMemo(() => {
-    if (!activeBudget.total) return 0;
-    return Math.max(
-      0,
-      Math.min(100, Math.round((activeBudget.spent / activeBudget.total) * 100))
-    );
-  }, [activeBudget.total, activeBudget.spent]);
-
-  const statusClass = useMemo(() => {
-    if (!activeBudget.total) return "ok";
-    const ratio = activeBudget.spent / activeBudget.total;
-    if (ratio < 0.8) return "ok";
-    if (ratio < 1) return "warn";
-    return "over";
-  }, [activeBudget.total, activeBudget.spent]);
-
-  const statusText = useMemo(() => {
-    const { total, spent } = activeBudget;
-    if (!total) return "Set a budget to track spending";
-    const diff = total - spent;
-    if (diff > total * 0.2)
-      return `You're still $${diff.toLocaleString()} under your budget`;
-    if (diff >= 0) return `You're close — $${diff.toLocaleString()} left`;
-    return `Over by $${Math.abs(diff).toLocaleString()}`;
-  }, [activeBudget]);
-
-  const setActiveBudget = (next) =>
-    setBudget((prev) => ({
-      ...prev,
-      [budgetMode]: { ...prev[budgetMode], ...next },
-    }));
-
-  // ===== Dynamic search fields per tab =====
-  const GuestsSelect = (
-    <Select
-      defaultValue="2 guests"
-      style={{ width: "100%" }}
-      options={[
-        { value: "1 guest", label: "1 guest" },
-        { value: "2 guests", label: "2 guests" },
-        { value: "3 guests", label: "3 guests" },
-        { value: "4+ guests", label: "4+ guests" },
-      ]}
-    />
-  );
-
-  const RoomsSelect = (
-    <Select
-      defaultValue="1 room"
-      style={{ width: "100%" }}
-      options={[
-        { value: "1 room", label: "1 room" },
-        { value: "2 rooms", label: "2 rooms" },
-        { value: "3 rooms", label: "3 rooms" },
-      ]}
-    />
-  );
-
-  function renderSearchGrid() {
-    switch (activeTab) {
-      case "flights":
-        return (
-          <div className="search-grid">
-            <div className="cell">
-              <Input placeholder="From (city or airport)" />
-            </div>
-            <div className="cell">
-              <Input placeholder="To (city or airport)" />
-            </div>
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <RangePicker style={{ width: "100%" }} />
-            </div>
-            <div className="cell">
-              <Select
-                defaultValue="1 adult"
-                style={{ width: "100%" }}
-                options={[
-                  { value: "1 adult", label: "1 adult" },
-                  { value: "2 adults", label: "2 adults" },
-                  { value: "3 adults", label: "3 adults" },
-                  { value: "family", label: "Family" },
-                ]}
-              />
-            </div>
-            <div className="cell">
-              <Select
-                defaultValue="Economy"
-                style={{ width: "100%" }}
-                options={[
-                  { value: "economy", label: "Economy" },
-                  { value: "premium", label: "Premium Economy" },
-                  { value: "business", label: "Business" },
-                  { value: "first", label: "First" },
-                ]}
-              />
-            </div>
-          </div>
-        );
-
-      case "cars":
-        return (
-          <div className="search-grid">
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <Input placeholder="Pick-up location (city, airport, station)" />
-            </div>
-            <div className="cell">
-              <DatePicker
-                showTime
-                style={{ width: "100%" }}
-                placeholder="Pick-up date & time"
-              />
-            </div>
-            <div className="cell">
-              <DatePicker
-                showTime
-                style={{ width: "100%" }}
-                placeholder="Drop-off date & time"
-              />
-            </div>
-            <div className="cell">
-              <Select
-                defaultValue="Driver age 30+"
-                style={{ width: "100%" }}
-                options={[
-                  { value: "21-24", label: "Driver age 21–24" },
-                  { value: "25-29", label: "Driver age 25–29" },
-                  { value: "30+", label: "Driver age 30+" },
-                ]}
-              />
-            </div>
-          </div>
-        );
-
-      case "cruises":
-        return (
-          <div className="search-grid">
-            <div className="cell">
-              <Input placeholder="Destination / Region" />
-            </div>
-            <div className="cell">
-              <Input placeholder="Departure port (optional)" />
-            </div>
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <RangePicker style={{ width: "100%" }} />
-            </div>
-            <div className="cell">{GuestsSelect}</div>
-            <div className="cell">
-              <Select
-                defaultValue="Any cruise line"
-                style={{ width: "100%" }}
-                options={[
-                  { value: "any", label: "Any cruise line" },
-                  { value: "royal", label: "Royal Caribbean" },
-                  { value: "carnival", label: "Carnival" },
-                  { value: "msc", label: "MSC" },
-                ]}
-              />
-            </div>
-          </div>
-        );
-
-      case "excursions":
-        return (
-          <div className="search-grid">
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <Input placeholder="Where? (city, landmark, region)" />
-            </div>
-            <div className="cell">
-              <DatePicker style={{ width: "100%" }} placeholder="Date" />
-            </div>
-            <div className="cell">{GuestsSelect}</div>
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <Input placeholder="Activity / keyword (e.g., museum, hike, food tour)" />
-            </div>
-          </div>
-        );
-
-      case "packages":
-        return (
-          <div className="search-grid">
-            <div className="cell">
-              <Input placeholder="Origin (city or airport)" />
-            </div>
-            <div className="cell">
-              <Input placeholder="Destination (city or airport)" />
-            </div>
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <RangePicker style={{ width: "100%" }} />
-            </div>
-            <div className="cell">{GuestsSelect}</div>
-            <div className="cell">{RoomsSelect}</div>
-          </div>
-        );
-
-      case "stays":
-      default:
-        return (
-          <div className="search-grid">
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <span>🔍</span>
-              <Input
-                placeholder="Where to? (city, landmark, region)"
-                allowClear
-              />
-            </div>
-            <div className="cell" style={{ gridColumn: "span 2" }}>
-              <RangePicker style={{ width: "100%" }} />
-            </div>
-            <div className="cell">{GuestsSelect}</div>
-            <div className="cell">{RoomsSelect}</div>
-          </div>
-        );
+  // Normalize any bad ?tab= once
+  useEffect(() => {
+    const raw = (params.get("tab") || "stays").toLowerCase();
+    if (!TAB_KEYS.includes(raw)) {
+      const next = new URLSearchParams(params);
+      next.set("tab", "stays");
+      navigate(`/booking?${next.toString()}`, { replace: true });
     }
-  }
+  }, [params, navigate]);
+
+  // Update document title
+  useEffect(() => {
+    const label = TAB_META[activeTab]?.label || "Booking";
+    document.title = `One Sky Quest • ${label}`;
+  }, [activeTab]);
+
+  const setTab = useCallback(
+    (key, { replace = false } = {}) => {
+      const next = new URLSearchParams(params);
+      next.set("tab", key);
+      navigate(`/booking?${next.toString()}`, { replace });
+    },
+    [params, navigate]
+  );
+
+  // Keyboard navigation for the tablist
+  const onTabsKeyDown = useCallback(
+    (e) => {
+      const idx = TAB_KEYS.indexOf(activeTab);
+      const last = TAB_KEYS.length - 1;
+
+      let nextIdx = idx;
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        nextIdx = idx === last ? 0 : idx + 1;
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        nextIdx = idx === 0 ? last : idx - 1;
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        nextIdx = 0;
+      } else if (e.key === "End") {
+        e.preventDefault();
+        nextIdx = last;
+      } else {
+        return;
+      }
+
+      const nextKey = TAB_KEYS[nextIdx];
+      setTab(nextKey);
+      // Focus the newly active tab after navigation updates the URL
+      setTimeout(() => pillRefs.current[nextKey]?.focus(), 0);
+    },
+    [activeTab, setTab]
+  );
+
+  const stats = { xp: 60, saved: 0, new: 1 };
+
+  // Simple label / count for results header
+  const resultsLabel =
+    activeTab === "stays" ? "stays" : TAB_META[activeTab].label.toLowerCase();
 
   return (
-    <div className="booking-page">
-      {/* Floating Home button */}
-      <a className="home-fab" href="/">
-        🏠 Home
-      </a>
+    // Navbar is hidden here because PageLayout defaults to "landing-only"
+    // and /booking is not a landing route. Constrain width for readability.
+    <PageLayout fullBleed={false} maxWidth={1180} className="booking-page">
+      {/* ===== Hero ===== */}
+      <section className="booking-hero">
+        <div className="hero-head">
+          <Title className="hero-title">Book Your Next Adventure ✨</Title>
+          <Link to="/" className="home-chip" aria-label="Go to Home">
+            🏠 Home
+          </Link>
+        </div>
 
-      <div className="booking-wrap">
-        {/* ================= HERO ================= */}
-        <section className="hero">
-          <Title level={2}>Good evening, David 📚</Title>
-          <h1>Book Your Next Adventure ✨</h1>
-          <p className="sub"></p>
+        <div className="hero-stats" aria-label="Your booking stats">
+          <Tag className="pill" aria-label={`XP ${stats.xp}`}>
+            ★ XP {stats.xp}
+          </Tag>
+          <Tag className="pill" aria-label={`${stats.saved} saved trips`}>
+            {stats.saved} saved trips
+          </Tag>
+          <Tag className="pill" aria-label={`${stats.new} new items`}>
+            {stats.new} new
+          </Tag>
+        </div>
+      </section>
 
-          <Space className="pills" size={8} wrap>
-            <span className="pill">★ XP $60</span>
-            <span className="pill">Saved trips</span>
-            <span className="pill">1 New</span>
-          </Space>
-        </section>
+      {/* ===== Search Card + Tabs ===== */}
+      <section className="booking-card">
+        <div
+          className="tab-pills"
+          role="tablist"
+          aria-label="Booking categories"
+          onKeyDown={onTabsKeyDown}
+        >
+          {TAB_KEYS.map((k) => {
+            const { label, emoji } = TAB_META[k];
+            const active = k === activeTab;
+            return (
+              <button
+                key={k}
+                ref={(el) => (pillRefs.current[k] = el || undefined)}
+                role="tab"
+                id={`tab-${k}`}
+                aria-selected={active}
+                aria-controls={`panel-${k}`}
+                tabIndex={active ? 0 : -1}
+                className={`tab-pill ${active ? "active" : ""}`}
+                onClick={() => setTab(k)}
+              >
+                <span className="emoji" aria-hidden="true">
+                  {emoji}
+                </span>
+                {label}
+              </button>
+            );
+          })}
+          <div className="grow" />
 
-        {/* ================= SEARCH SHELL ================= */}
-        <div className="search-shell">
-          <div className="search-head">
-            <div className="cat-tabs">
-              {tabs.map((t) => (
-                <button
-                  key={t.key}
-                  className={`pill ${activeTab === t.key ? "active" : ""}`}
-                  aria-pressed={activeTab === t.key}
-                  onClick={() => setActiveTab(t.key)}
-                >
-                  <span style={{ fontSize: 16 }}>{t.icon}</span> {t.label}
-                </button>
-              ))}
+          {/* Fake toggle for now; hook to state later */}
+          <div
+            className="smart-toggle"
+            role="switch"
+            aria-checked="true"
+            tabIndex={0}
+          >
+            <span>Smart Plan AI</span>
+            <div className="fake-toggle">
+              <span className="dot on" />
             </div>
-
-            <div className="ai-toggle">
-              <span>Smart Plan AI</span>
-              <span className="dot" />
-              <Switch defaultChecked size="small" />
-            </div>
-          </div>
-
-          {/* Dynamic inputs */}
-          {renderSearchGrid()}
-
-          <div className="search-actions">
-            <Button className="btn-ghost">Filters</Button>
-            <button className="btn-search">🔎 Search</button>
-          </div>
-
-          <div className="quick-chips">
-            <button className="chip">Beach Weekend</button>
-            <button className="chip">Adventure Escape</button>
-            <button className="chip">City Vibes</button>
-            <button className="chip">Events Nearby</button>
-            <button className="chip">Romantic Getaway</button>
           </div>
         </div>
 
-        {/* ================= GRID ================= */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={16}>
-            <div className="results">
-              <div className="results-label center">
-                Showing 3 stays options
-              </div>
+        {/* Unified search — hide its own internal category tabs */}
+        <div
+          className="search-shell"
+          id={`panel-${activeTab}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${activeTab}`}
+        >
+          <UnifiedSearchBar activeTab={activeTab} showCategoryTabs={false} />
+        </div>
 
-              {/* Demo Card */}
-              <Card
-                className="card"
-                bordered={false}
-                bodyStyle={{ padding: 0 }}
-              >
-                <div className="thumb" />
-                <div className="body">
-                  <div className="title">Lisbon</div>
-                  <div className="meta">📍 From 1120</div>
-                  <Space size={[8, 8]} wrap style={{ marginTop: 8 }}>
-                    <span className="tag">City</span>
-                    <span className="tag">Europe</span>
-                    <span className="tag budget-ok">Within budget</span>
-                    <span className="tag">⭐</span>
-                  </Space>
-                  <div style={{ marginTop: 10 }}>
-                    <button className="btn-search" style={{ height: 40 }}>
-                      + Add to plan
-                    </button>
-                  </div>
-                </div>
-              </Card>
+        <div className="quick-themes" aria-label="Quick themes">
+          {[
+            "Beach Weekend",
+            "Adventure Escape",
+            "City Vibes",
+            "Events Nearby",
+            "Romantic Getaway",
+          ].map((t) => (
+            <button
+              className="chip"
+              key={t}
+              onClick={() => console.log("Theme:", t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== Results + Budget (demo) ===== */}
+      <section className="results-wrap">
+        <div className="results-card">
+          <div className="results-head" aria-live="polite">
+            Showing <b>3</b> {resultsLabel} options
+          </div>
+
+          <div className="results-placeholder" />
+
+          <div className="result-footer">
+            <div className="result-meta">
+              <span className="muted">Lisbon • From $1,120</span>
+              <span className="tag">City</span>
+              <span className="tag">Europe</span>
+              <span className="tag ok">Within budget</span>
+              <span className="tag star" aria-label="Top pick">
+                ★
+              </span>
             </div>
-          </Col>
+            <Button type="primary" className="cta-add">
+              + Add to plan
+            </Button>
+          </div>
+        </div>
 
-          {/* ===== Sidebar / Budget ===== */}
-          <Col xs={24} md={8}>
-            <div className="sidebar-card">
-              <div className="sidebar-head">
-                <div className="sidebar-title">Budget</div>
-                <Button
-                  type="text"
-                  className="adjust-btn"
-                  onClick={() => setBudgetOpen((v) => !v)}
-                >
-                  ⚙️ {budgetOpen ? "Done" : "Adjust"}
-                </Button>
-              </div>
+        <aside className="budget-card">
+          <div className="budget-head">
+            <div className="title">Budget</div>
+            <button className="adjust" aria-label="Adjust budget">
+              ⚙️ Adjust
+            </button>
+          </div>
 
-              {/* Mode switch */}
-              <div className="sidebar-mode">
-                <button
-                  className={budgetMode === "solo" ? "active" : ""}
-                  onClick={() => setBudgetMode("solo")}
-                >
-                  Solo
-                </button>
-                <button
-                  className={budgetMode === "group" ? "active" : ""}
-                  onClick={() => setBudgetMode("group")}
-                >
-                  Group
-                </button>
-              </div>
+          <div className="seg-toggle" role="tablist" aria-label="Budget mode">
+            <button className="seg active" role="tab" aria-selected>
+              Solo
+            </button>
+            <button className="seg" role="tab" aria-selected="false">
+              Group
+            </button>
+          </div>
 
-              {/* Status + progress */}
-              <div className={`budget-status ${statusClass}`}>
-                {statusText} ⓘ
-              </div>
-              <div className="progress">
-                <span style={{ width: `${pct}%` }} />
-              </div>
+          <div className="under-budget" aria-live="polite">
+            You’re still $1,350 under your budget ✓
+          </div>
+          <div className="bar">
+            <span style={{ width: "22%" }} />
+          </div>
 
-              {/* Controls */}
-              {budgetOpen && (
-                <div className="sidebar-controls">
-                  <div className="control-row">
-                    <label>Total budget</label>
-                    <InputNumber
-                      min={0}
-                      prefix="$"
-                      value={activeBudget.total}
-                      onChange={(v) =>
-                        setActiveBudget({ total: Number(v || 0) })
-                      }
-                    />
-                  </div>
+          <div className="planned">
+            <div className="planned-title">Planned items</div>
+            <div className="planned-empty">Nothing added yet</div>
+          </div>
 
-                  <div className="control-row">
-                    <label>Planned spend</label>
-                    <InputNumber
-                      min={0}
-                      prefix="$"
-                      value={activeBudget.spent}
-                      onChange={(v) =>
-                        setActiveBudget({
-                          spent: Math.min(Number(v || 0), activeBudget.total),
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div className="control-row">
-                    <label>Adjust spend</label>
-                    <Slider
-                      value={Math.min(activeBudget.spent, activeBudget.total)}
-                      max={Math.max(0, activeBudget.total)}
-                      onChange={(v) => setActiveBudget({ spent: v })}
-                    />
-                  </div>
-
-                  <div className="control-hint">
-                    Tip: switch to <b>Group</b> to track a separate budget.
-                  </div>
-                </div>
-              )}
-
-              <Divider style={{ borderColor: "rgba(255,255,255,.14)" }} />
-              <Text className="meta">Planned items</Text>
-              <Card
-                bordered={false}
-                style={{ marginTop: 8, background: "rgba(255,255,255,.04)" }}
-              >
-                <Text className="meta">Nothing added yet</Text>
-              </Card>
-
-              <Button block style={{ marginTop: 12 }} className="btn-ghost">
-                🔔 Subscribe to price drops
-              </Button>
-            </div>
-          </Col>
-        </Row>
-      </div>
-    </div>
+          <button className="subscribe">🔔 Subscribe to price drops</button>
+        </aside>
+      </section>
+    </PageLayout>
   );
 }

@@ -8,3 +8,4 @@ export { default as UniqueStaysCard } from "./UniqueStaysCard";
 export { default as LimitedDealsCard } from "./LimitedDealsCard";
 export { default as BuildMyDreamGetaway } from "./BuildMyDreamGetaway";
 export { default as TeamTravelCard } from "./TeamTravelCard";
+export { default as AIPlannerCard } from "./AIPlannerCard";

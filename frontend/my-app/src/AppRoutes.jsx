@@ -1,32 +1,31 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import AppLayout from "./layout/AppLayout";
 
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
-import QuestFeedPage from "./pages/QuestFeed";
-import SkyVaultPage from "./pages/SkyVault";
+import FeedPage from "./pages/FeedPage"; 
+import ProfilePage from "./pages/DigitalPassportPage"; 
 import MembershipPage from "./pages/Membership";
-import DigitalPassportPage from "./pages/DigitalPassportPage";
 import TeamTravelPage from "./pages/TeamTravelPage";
+import NotFound from "./pages/NotFound";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/booking" element={<BookingPage />} />
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/membership" element={<MembershipPage />} />
+        <Route path="/team-travel" element={<TeamTravelPage />} />
 
-      <Route path="/feed" element={<QuestFeedPage />} />
-      <Route path="/sky-vault" element={<SkyVaultPage />} />
-      <Route path="/membership" element={<MembershipPage />} />
-      <Route path="/profile" element={<DigitalPassportPage />} />
-      <Route path="/team-travel" element={<TeamTravelPage />} />
+        {/* legacy/aliases */}
+        <Route path="/book" element={<Navigate to="/booking" replace />} />
 
-      {/* Legacy aliases */}
-      <Route path="/book" element={<Navigate to="/booking" replace />} />
-      <Route path="/book/*" element={<Navigate to="/booking" replace />} />
-
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 }

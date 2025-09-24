@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Row,
   Col,
@@ -15,13 +15,20 @@ import {
   Modal,
   Input,
   message,
+  Empty,
 } from "antd";
 import {
   UserOutlined,
   GiftOutlined,
   CrownOutlined,
   CopyOutlined,
+  ShareAltOutlined,
+  QrcodeOutlined,
+  CameraOutlined,
+  PlayCircleOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
+import { useSearchParams } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import "../styles/profile-passport.css";
 
@@ -142,7 +149,8 @@ function SoftCard({ children, className = "", style }) {
         color: "var(--text)",
         ...style,
       }}
-      styles={{ body: { padding: 16 } }}
+      bodyStyle={{ padding: 16 }}
+      bordered={false}
     >
       {children}
     </Card>
@@ -159,17 +167,35 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
   const friends = top8.friends || [];
   const showFriends = top8Mode === "Top 8 Friends" && friends.length > 0;
 
+  const profileUrl = `https://onesky.quest/u/${
+    (user.username || "").replace(/^@/, "").trim() || "david"
+  }`;
+
+  const copyProfile = async () => {
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      message.success("Profile link copied!");
+    } catch {
+      message.error("Could not copy link");
+    }
+  };
+
   return (
-    <Card bordered={false} className="tp-card">
+    <Card bordered={false} className="tp-card" bodyStyle={{ padding: 16 }}>
       <div className="tp-top">
         <Text className="tp-title">TRAVEL PASS</Text>
         <span className="tp-camera" aria-hidden>
-          📷
+          <CameraOutlined />
         </span>
       </div>
 
       <div className="tp-id">
-        <Avatar size={84} icon={<UserOutlined />} className="tp-avatar" />
+        <Avatar
+          size={84}
+          icon={<UserOutlined />}
+          className="tp-avatar"
+          alt={`${user.name} avatar`}
+        />
         <div className="tp-identity">
           <Title
             level={2}
@@ -187,21 +213,27 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
             <Tag color="purple">{user.username}</Tag>
           </div>
         </div>
-        <Tooltip title="Share Digital Passport">
-          <Button type="default" onClick={onShowQR}>
-            QR
-          </Button>
-        </Tooltip>
+
+        <Space>
+          <Tooltip title="Copy profile link">
+            <Button icon={<ShareAltOutlined />} onClick={copyProfile} />
+          </Tooltip>
+          <Tooltip title="Show QR">
+            <Button icon={<QrcodeOutlined />} onClick={onShowQR} />
+          </Tooltip>
+        </Space>
       </div>
 
       <div className="tp-actions">
-        <Button type="primary">Share Memory</Button>
-        <Space size={8}>
+        <Button type="primary" icon={<SendOutlined />}>
+          Share Memory
+        </Button>
+        <Space size={8} aria-label="Quick actions">
           <Button shape="circle" aria-label="Music">
-            🎵
+            <PlayCircleOutlined />
           </Button>
           <Button shape="circle" aria-label="Photo">
-            📷
+            <CameraOutlined />
           </Button>
           <Button shape="circle" aria-label="Trip">
             ✈️
@@ -215,7 +247,12 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
               {miles.nextLevel.toLocaleString()}
             </Text>
           </div>
-          <Progress percent={pct} size="small" showInfo={false} />
+          <Progress
+            percent={pct}
+            size="small"
+            showInfo={false}
+            aria-label={`Miles progress ${pct}%`}
+          />
         </div>
       </div>
 
@@ -242,20 +279,29 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
 
       {!showFriends ? (
         <Row gutter={[12, 12]}>
-          {top8.places.slice(0, 8).map((city) => (
+          {(top8.places || []).slice(0, 8).map((city) => (
             <Col xs={12} sm={8} md={6} key={city}>
-              <div className="tp-tile">
+              <div
+                className="tp-tile"
+                role="img"
+                aria-label={`Top place ${city}`}
+              >
                 <div className="tp-tile-art" />
                 <div className="tp-tile-label">{city.toUpperCase()}</div>
               </div>
             </Col>
           ))}
+          {(!top8.places || top8.places.length === 0) && (
+            <Col span={24}>
+              <Empty description="Add your favorite places" />
+            </Col>
+          )}
         </Row>
       ) : (
         <Row gutter={[12, 12]}>
-          {friends.slice(0, 8).map((f) => (
+          {(friends || []).slice(0, 8).map((f) => (
             <Col xs={12} sm={8} md={6} key={f.id}>
-              <div className="top8-card friend">
+              <div className="top8-card friend" aria-label={`Friend ${f.name}`}>
                 <Avatar
                   size={64}
                   icon={<UserOutlined />}
@@ -263,11 +309,16 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
                 />
                 <div className="top8-title">{f.name}</div>
                 <div className="top8-sub">
-                  XP {f.xp} · {f.badges.join(" ")}
+                  XP {f.xp} · {(f.badges || []).join(" ")}
                 </div>
               </div>
             </Col>
           ))}
+          {(!friends || friends.length === 0) && (
+            <Col span={24}>
+              <Empty description="Add friends to your Top 8" />
+            </Col>
+          )}
         </Row>
       )}
 
@@ -282,7 +333,7 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
 /* ----------------- Stamps ----------------- */
 function Stamp({ title, code, date, icon }) {
   return (
-    <div className="stamp">
+    <div className="stamp" role="group" aria-label={`Stamp ${title}`}>
       <div className="stamp__ring" />
       <div className="stamp__content">
         <div className="stamp__title">
@@ -295,20 +346,23 @@ function Stamp({ title, code, date, icon }) {
     </div>
   );
 }
-
 function StampsGrid({ stamps }) {
   return (
     <SoftCard>
       <SectionTitle right={<Button size="small">Add Stamp</Button>}>
         Passport Stamps
       </SectionTitle>
-      <Row gutter={[12, 12]}>
-        {stamps.map((s) => (
-          <Col xs={12} sm={8} md={6} key={s.id}>
-            <Stamp {...s} />
-          </Col>
-        ))}
-      </Row>
+      {stamps?.length ? (
+        <Row gutter={[12, 12]}>
+          {stamps.map((s) => (
+            <Col xs={12} sm={8} md={6} key={s.id}>
+              <Stamp {...s} />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <Empty description="No stamps yet" />
+      )}
     </SoftCard>
   );
 }
@@ -316,7 +370,7 @@ function StampsGrid({ stamps }) {
 /* ----------------- Visas ----------------- */
 function VisaCard({ country, type, status, expiry }) {
   return (
-    <div className="visa">
+    <div className="visa" role="group" aria-label={`Visa ${country}`}>
       <div className="visa__row">
         <div className="visa__title">{country}</div>
         <Tag color={status === "Approved" ? "green" : "orange"}>{status}</Tag>
@@ -334,11 +388,15 @@ function VisasList({ visas }) {
       <SectionTitle right={<Button size="small">Add Visa</Button>}>
         Visas
       </SectionTitle>
-      <Space direction="vertical" size={12} className="w-full">
-        {visas.map((v) => (
-          <VisaCard key={v.id} {...v} />
-        ))}
-      </Space>
+      {visas?.length ? (
+        <Space direction="vertical" size={12} style={{ width: "100%" }}>
+          {visas.map((v) => (
+            <VisaCard key={v.id} {...v} />
+          ))}
+        </Space>
+      ) : (
+        <Empty description="No visas added" />
+      )}
     </SoftCard>
   );
 }
@@ -346,14 +404,14 @@ function VisasList({ visas }) {
 /* ----------------- Trips ----------------- */
 function TripCard({ title, range, status, notes }) {
   return (
-    <div className="trip">
+    <div className="trip" role="group" aria-label={`Trip ${title}`}>
       <div className="trip__row">
         <div className="trip__title">{title}</div>
         <Tag color={status === "Booked" ? "blue" : "default"}>{status}</Tag>
       </div>
       <div className="trip__range">{range}</div>
       <div className="trip__notes">
-        {notes?.map((n, i) => (
+        {(notes || []).map((n, i) => (
           <Tag key={i}>{n}</Tag>
         ))}
       </div>
@@ -366,16 +424,20 @@ function TripsPanel({ trips }) {
       <SectionTitle right={<Button size="small">Add Trip</Button>}>
         Trips
       </SectionTitle>
-      <Space direction="vertical" size={12} className="w-full">
-        {trips.map((t) => (
-          <TripCard key={t.id} {...t} />
-        ))}
-      </Space>
+      {trips?.length ? (
+        <Space direction="vertical" size={12} style={{ width: "100%" }}>
+          {trips.map((t) => (
+            <TripCard key={t.id} {...t} />
+          ))}
+        </Space>
+      ) : (
+        <Empty description="No trips yet" />
+      )}
     </SoftCard>
   );
 }
 
-/* ----------------- Invite & Earn (styled) ----------------- */
+/* ----------------- Invite & Earn ----------------- */
 function ReferralBox({ referral }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
@@ -398,10 +460,15 @@ function ReferralBox({ referral }) {
       >
         Invite & Earn
       </SectionTitle>
-      <Space direction="vertical" size={8} className="w-full">
+      <Space direction="vertical" size={8} style={{ width: "100%" }}>
         <Text>Share your code to earn miles.</Text>
         <Input.Group compact>
-          <Input style={{ width: "70%" }} value={referral.code} readOnly />
+          <Input
+            style={{ width: "70%" }}
+            value={referral.code}
+            readOnly
+            aria-label="Referral code"
+          />
           <Button type="primary" icon={<CopyOutlined />} onClick={copy}>
             {copied ? "Copied" : "Copy"}
           </Button>
@@ -415,17 +482,42 @@ function ReferralBox({ referral }) {
 /* ----------------- Root Page ----------------- */
 export default function DigitalPassportPage() {
   const data = usePassportData();
-  const [tab, setTab] = useState("Overview");
+
+  // Sync tab with ?tab= in the URL
+  const [params, setParams] = useSearchParams();
+  const tabFromUrl = (params.get("tab") || "Overview").toString();
+  const [tab, setTab] = useState(tabFromUrl);
   const [qrOpen, setQrOpen] = useState(false);
   const [top8Mode, setTop8Mode] = useState("Top 8 Places");
 
-  const tabOpts = useMemo(
-    () => ["Overview", "Stamps", "Visas", "Trips", "Badges"],
-    []
-  );
+  useEffect(() => {
+    const allowed = ["Overview", "Stamps", "Visas", "Trips", "Badges"];
+    if (!allowed.includes(tabFromUrl)) {
+      params.set("tab", "Overview");
+      setParams(params, { replace: true });
+      setTab("Overview");
+    } else {
+      setTab(tabFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromUrl]);
+
+  const onTabChange = (val) => {
+    setTab(val);
+    const next = new URLSearchParams(params);
+    next.set("tab", val);
+    setParams(next, { replace: true });
+  };
+
+  useEffect(() => {
+    const prev = document.title;
+    document.title = `One Sky Quest • Digital Passport`;
+    return () => (document.title = prev);
+  }, []);
 
   return (
-    <PageLayout pageKey="profile">
+    // Navbar stays hidden off-landing via PageLayout default rules
+    <PageLayout fullBleed={false} maxWidth={1180}>
       <div className="passport-wrap">
         {/* Travel Pass header */}
         <TravelPassHeader
@@ -437,7 +529,11 @@ export default function DigitalPassportPage() {
 
         {/* Tabs row */}
         <div className="flex items-center justify-between mb-3 mt-2">
-          <Segmented value={tab} onChange={setTab} options={tabOpts} />
+          <Segmented
+            value={tab}
+            onChange={onTabChange}
+            options={["Overview", "Stamps", "Visas", "Trips", "Badges"]}
+          />
         </div>
 
         {/* Overview — Trips directly under Stamps */}
@@ -445,12 +541,12 @@ export default function DigitalPassportPage() {
           <Row gutter={[16, 16]}>
             <Col xs={24} md={14}>
               <StampsGrid stamps={data.stamps} />
-              <div className="h-3" />
+              <div style={{ height: 12 }} />
               <TripsPanel trips={data.trips} />
             </Col>
             <Col xs={24} md={10}>
               <VisasList visas={data.visas} />
-              <div className="h-3" />
+              <div style={{ height: 12 }} />
               <ReferralBox referral={data.referral} />
             </Col>
           </Row>
@@ -484,8 +580,13 @@ export default function DigitalPassportPage() {
               <SoftCard>
                 <SectionTitle>Visa Stickers</SectionTitle>
                 <div className="visa-stickers-grid">
-                  {data.badges.map((b) => (
-                    <div key={b.id} className="visa-sticker small">
+                  {(data.badges || []).map((b) => (
+                    <div
+                      key={b.id}
+                      className="visa-sticker small"
+                      role="img"
+                      aria-label={b.label}
+                    >
                       <div className="visa-sticker__head">
                         <span className="visa-sticker__flag">{b.icon}</span>
                         <span className="visa-sticker__title">{b.label}</span>
@@ -493,6 +594,9 @@ export default function DigitalPassportPage() {
                       <div className="visa-sticker__meta">Achievement</div>
                     </div>
                   ))}
+                  {(!data.badges || data.badges.length === 0) && (
+                    <Empty description="No badges yet" />
+                  )}
                 </div>
               </SoftCard>
             </Col>
@@ -506,11 +610,15 @@ export default function DigitalPassportPage() {
           onCancel={() => setQrOpen(false)}
           footer={null}
         >
-          <div className="flex flex-col items-center gap-2">
+          <div
+            className="flex flex-col items-center gap-2"
+            style={{ display: "grid", placeItems: "center", gap: 8 }}
+          >
             <QRCode
-              value={`https://onesky.quest/u/${
-                data.user?.username?.replace(/^@/, "") || "david"
-              }`}
+              value={`https://onesky.quest/u/${(
+                data.user?.username || "david"
+              ).replace(/^@/, "")}`}
+              size={192}
             />
             <Text type="secondary">Scan to view profile</Text>
           </div>

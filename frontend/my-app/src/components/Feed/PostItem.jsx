@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Space, Avatar, Tag, Tooltip } from "antd";
+import { Typography, Space, Avatar, Tag } from "antd";
 import {
   HeartOutlined,
   MessageOutlined,
@@ -14,24 +14,36 @@ export default function PostItem({
   compact = false,
   edgeToEdgeMedia = false,
 }) {
-  const { user, time, location, text, media, trip, tags, xp, likes } = data;
+  if (!data) return null;
+
+  const {
+    user = {},
+    time = "",
+    location = "",
+    text = "",
+    media = {},
+    trip,
+    tags = [],
+    xp = 0,
+    likes = 0,
+  } = data;
 
   return (
     <article className={`qf-post qf-card ${compact ? "is-compact" : ""}`}>
       {/* header */}
       <div className="qf-post-head">
         <Avatar size={40} className="qf-avatar">
-          {user.name?.[0]}
+          {(user?.name?.[0] || user?.handle?.[0] || "U").toUpperCase?.()}
         </Avatar>
         <div className="qf-meta">
           <div className="qf-name-row">
-            <span className="qf-name">{user.name}</span>
+            <span className="qf-name">{user.name || "Traveler"}</span>
             {user.verified && <span className="qf-verified">✓</span>}
-            <span className="qf-handle">{user.handle}</span>
+            {user.handle && <span className="qf-handle">{user.handle}</span>}
             <span className="qf-dot">•</span>
             <span className="qf-time">{time}</span>
           </div>
-          <div className="qf-location">{location}</div>
+          {location && <div className="qf-location">{location}</div>}
         </div>
       </div>
 
@@ -65,12 +77,7 @@ export default function PostItem({
         {!!tags?.length && (
           <div className="qf-tags">
             {tags.map((t) => (
-              <Tag
-                key={t}
-                className="qf-tag"
-                onClick={() => {}}
-                style={{ cursor: "pointer" }}
-              >
+              <Tag key={t} className="qf-tag" style={{ cursor: "pointer" }}>
                 #{t}
               </Tag>
             ))}
@@ -83,7 +90,7 @@ export default function PostItem({
         <Space size={16}>
           <button className="qf-iconbtn">
             <HeartOutlined />
-            <span>{likes ?? 0}</span>
+            <span>{likes}</span>
           </button>
           <button className="qf-iconbtn">
             <MessageOutlined />
@@ -98,7 +105,7 @@ export default function PostItem({
             <span>Share</span>
           </button>
         </Space>
-        <span className="qf-xp">+{xp ?? 0} XP</span>
+        <span className="qf-xp">+{xp} XP</span>
       </div>
     </article>
   );
