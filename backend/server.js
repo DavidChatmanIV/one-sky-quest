@@ -15,7 +15,7 @@ import apiRouter from "./routes/api/index.js";
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
 
-// ✅ Correct filenames (Linux case-sensitive)
+// Correct filenames (Linux case-sensitive)
 import dmRoutes from "./routes/message.routes.js";
 import placeRoutes from "./routes/place.routes.js";
 

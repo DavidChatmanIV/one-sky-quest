@@ -1,74 +1,153 @@
-const express = require("express");
-const router = express.Router();
-const Message = require("../models/Message");
-const Conversation = require("../models/Conversation");
-const { auth } = require("../middleware/authMiddleware");
+import { Router } from "express";
+import { auth } from "../middleware/authMiddleware.js";
+
+// ⚠️ Make sure these filenames match exactly (case-sensitive on Render)
+import Message from "../models/Message.js"; // or "../models/message.js"
+import Conversation from "../models/Conversation.js"; // or "../models/conversation.js"
+
+const router = Router();
+const USE_MOCKS = process.env.USE_MOCKS !== "false"; // default true
 
 // 📬 Get all conversations for a user
+// GET /api/dm/conversations/:userId
 router.get("/conversations/:userId", auth, async (req, res) => {
   try {
+    if (USE_MOCKS) {
+      return res.json([
+        {
+          _id: "mock-convo-1",
+          participants: [
+            { _id: req.params.userId, username: "you" },
+            { _id: "u2", username: "Questy" },
+          ],
+          lastMessage: "Welcome to OSQ DMs 👋",
+          updatedAt: new Date(),
+        },
+      ]);
+    }
+
     const convos = await Conversation.find({
       participants: req.params.userId,
-    }).populate("participants", "username");
+    })
+      .populate("participants", "username")
+      .sort({ updatedAt: -1 });
+
     res.json(convos);
   } catch (err) {
+    console.error("GET /conversations error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ➕ Create new conversation between two users
+// POST /api/dm/conversations  { receiverId }
 router.post("/conversations", auth, async (req, res) => {
   try {
     const { receiverId } = req.body;
+    if (!receiverId)
+      return res.status(400).json({ error: "receiverId is required" });
+
+    if (USE_MOCKS) {
+      return res.status(201).json({
+        _id: "mock-convo-created",
+        participants: [req.user.id, receiverId],
+        lastMessage: null,
+        updatedAt: new Date(),
+      });
+    }
 
     let convo = await Conversation.findOne({
       participants: { $all: [req.user.id, receiverId] },
     });
 
     if (!convo) {
-      convo = new Conversation({
+      convo = await Conversation.create({
         participants: [req.user.id, receiverId],
       });
-      await convo.save();
     }
 
     res.status(201).json(convo);
   } catch (err) {
+    console.error("POST /conversations error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // 📨 Send a message (DM)
+// POST /api/dm/message  { conversationId, text, ... }
 router.post("/message", auth, async (req, res) => {
   try {
-    const newMessage = new Message({
-      ...req.body,
-      sender: req.user.id,
-    });
-    await newMessage.save();
+    const { conversationId, text, ...rest } = req.body || {};
+    if (!conversationId || !text) {
+      return res
+        .status(400)
+        .json({ error: "conversationId and text are required" });
+    }
 
-    await Conversation.findByIdAndUpdate(req.body.conversationId, {
-      lastMessage: req.body.text,
+    if (USE_MOCKS) {
+      return res.status(201).json({
+        _id: "mock-msg-1",
+        conversationId,
+        text,
+        sender: req.user.id,
+        createdAt: new Date(),
+        ...rest,
+      });
+    }
+
+    const newMessage = await Message.create({
+      conversationId,
+      text,
+      sender: req.user.id,
+      ...rest,
+    });
+
+    await Conversation.findByIdAndUpdate(conversationId, {
+      lastMessage: text,
       updatedAt: new Date(),
     });
 
     res.status(201).json(newMessage);
   } catch (err) {
+    console.error("POST /message error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // 📄 Get all messages in a conversation
+// GET /api/dm/messages/:conversationId
 router.get("/messages/:conversationId", auth, async (req, res) => {
   try {
+    if (USE_MOCKS) {
+      return res.json([
+        {
+          _id: "m1",
+          conversationId: req.params.conversationId,
+          text: "Hey!",
+          sender: "u2",
+          createdAt: new Date(Date.now() - 60000),
+        },
+        {
+          _id: "m2",
+          conversationId: req.params.conversationId,
+          text: "Welcome to One Sky Quest 🙌",
+          sender: "u2",
+          createdAt: new Date(),
+        },
+      ]);
+    }
+
     const messages = await Message.find({
       conversationId: req.params.conversationId,
-    }).sort({ createdAt: 1 });
+    })
+      .sort({ createdAt: 1 })
+      .lean();
 
     res.json(messages);
   } catch (err) {
+    console.error("GET /messages error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-module.exports = router;
+export default router;
