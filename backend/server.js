@@ -11,7 +11,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // Routes
-import apiRouter from "./routes/index.js";
+import apiRouter from "./routes/api/index.js"; 
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
 
@@ -77,7 +77,7 @@ app.use("/health", health);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", apiRouter);
 
-// Legacy contact form (kept from your code)
+// Legacy contact form
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
