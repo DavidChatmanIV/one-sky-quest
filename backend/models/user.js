@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -10,28 +10,13 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: 3,
       maxlength: 20,
-<<<<<<< HEAD
       match: /^[a-zA-Z0-9_]+$/, // letters, numbers, underscores only
     },
 
     // 👤 Display name (optional)
-    name: {
-      type: String,
-    },
+    name: { type: String, trim: true },
 
-    // 📧 Email (cleaned + unique)
-=======
-      match: /^[a-zA-Z0-9_]+$/, // Letters, numbers, underscores only
-    },
-
-    // 🧑 Display name (optional)
-    name: {
-      type: String,
-      trim: true,
-    },
-
-    // 📧 Email
->>>>>>> origin/fresh-start
+    // 📧 Email (unique, cleaned)
     email: {
       type: String,
       required: true,
@@ -40,64 +25,23 @@ const UserSchema = new mongoose.Schema(
       trim: true,
     },
 
-<<<<<<< HEAD
-    // 🔐 Hashed password
-=======
-    // 🔐 Password (hashed)
->>>>>>> origin/fresh-start
-    password: {
-      type: String,
-      required: true,
-    },
+    // 🔐 Password (store hashed)
+    password: { type: String, required: true },
 
-<<<<<<< HEAD
-    // ✈️ Saved trips
-=======
     // 🏅 XP & Gamification
-    xp: {
-      type: Number,
-      default: 0,
-    },
+    xp: { type: Number, default: 0 },
 
-    // 🎁 Referral System
-    referralCode: {
-      type: String,
-      unique: true,
-      sparse: true, // allows multiple nulls
-    },
-    referredBy: {
-      type: String, // stores the referralCode of another user
-    },
+    // 🎁 Referrals
+    referralCode: { type: String, unique: true, sparse: true }, // sparse allows multiple nulls
+    referredBy: { type: String }, // stores another user's referralCode
 
     // ✈️ Saved Trips
->>>>>>> origin/fresh-start
-    savedTrips: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Place",
-      },
-    ],
+    savedTrips: [{ type: mongoose.Schema.Types.ObjectId, ref: "Place" }],
 
-<<<<<<< HEAD
-    // 🧑‍🤝‍🧑 Social + Verification
-    followers: [String], // array of user IDs
-=======
     // 🧑‍🤝‍🧑 Social & Verification
-    followers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
->>>>>>> origin/fresh-start
-    faceVerified: {
-      type: Boolean,
-      default: false,
-    },
-    verified: {
-      type: Boolean,
-      default: false,
-    },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    faceVerified: { type: Boolean, default: false },
+    verified: { type: Boolean, default: false },
     verifiedBy: {
       type: String,
       enum: ["face", "followers", "manual", null],
@@ -105,41 +49,15 @@ const UserSchema = new mongoose.Schema(
     },
 
     // 🚫 Blocked users
-    blockedUsers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-<<<<<<< HEAD
-        default: [],
-      },
-    ],
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     // 🚩 Moderation
-=======
-      },
-    ],
+    flagged: { type: Boolean, default: false },
 
-    // 🚩 Flagged for moderation
->>>>>>> origin/fresh-start
-    flagged: {
-      type: Boolean,
-      default: false,
-    },
-
-<<<<<<< HEAD
-    // 🖼️ Profile image (optional)
-    profileImage: {
-      type: String,
-      default: "/images/default-user.png", // adjust to your frontend folder or CDN
-    },
-  },
-  {
-    timestamps: true, // ✅ adds createdAt and updatedAt
-=======
     // 🖼️ Profile image
     profileImage: {
       type: String,
-      default: "/images/default-user.png", // Adjust for production/CDN if needed
+      default: "/images/default-user.png",
     },
 
     // 🪪 Membership (optional)
@@ -150,15 +68,10 @@ const UserSchema = new mongoose.Schema(
     },
 
     // 🎨 Profile Theme (optional)
-    theme: {
-      type: String,
-      default: "default",
-    },
+    theme: { type: String, default: "default" },
   },
-  {
-    timestamps: true, // adds createdAt and updatedAt
->>>>>>> origin/fresh-start
-  }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", UserSchema);
+export default User;
