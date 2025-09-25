@@ -14,17 +14,14 @@ import { fileURLToPath } from "url";
 import apiRouter from "./routes/api/index.js";
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
-
-// Correct filenames (Linux case-sensitive)
 import dmRoutes from "./routes/message.routes.js";
 import placeRoutes from "./routes/place.routes.js";
 
-// __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.set("trust proxy", 1); // Render/Proxies
+app.set("trust proxy", 1);
 
 // ---------- Core middleware ----------
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
@@ -39,11 +36,10 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 // ---------- CORS ----------
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 const allowedOrigins = FRONTEND_ORIGIN.split(",").map((s) => s.trim());
-
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // e.g., curl/postman
+      if (!origin) return cb(null, true);
       const ok = allowedOrigins.some((o) => origin.startsWith(o));
       cb(ok ? null : new Error("CORS blocked"), ok);
     },
@@ -58,62 +54,47 @@ app.use(
 );
 
 // ---------- Mongo connection (conditional) ----------
-const USE_MOCKS = process.env.USE_MOCKS !== "false"; // default true -> skip DB for local/dev
+const USE_MOCKS = process.env.USE_MOCKS !== "false";
 const MONGO_URI = process.env.MONGO_URI;
 const MONGO_DB = process.env.MONGO_DB || "osq";
 
 if (!USE_MOCKS) {
   if (!MONGO_URI) {
-    console.error(
-      "❌ Missing MONGO_URI in environment (and USE_MOCKS is false)."
-    );
+    console.error("❌ Missing MONGO_URI (and USE_MOCKS is false).");
     process.exit(1);
   }
   mongoose
     .connect(MONGO_URI, { dbName: MONGO_DB })
     .then(() => console.log("✅ Mongo connected"))
     .catch((err) => {
-      console.error("❌ Mongo connection error:", err);
+      console.error("❌ Mongo error:", err);
       process.exit(1);
     });
 } else {
-  console.log("ℹ️ USE_MOCKS enabled — skipping Mongo connection.");
+  console.log("ℹ️ USE_MOCKS enabled — skipping Mongo.");
 }
 
 // ---------- Routes ----------
-app.get("/", (_req, res) => {
-  res.send("🚀 One Sky Quest backend is running!");
-});
-
+app.get("/", (_req, res) => res.send("🚀 One Sky Quest backend is running!"));
 app.use("/health", health);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Main API index (keeps existing wiring)
 app.use("/api", apiRouter);
-
-// Ensure DM & Places exist even if apiRouter doesn't mount them internally
 app.use("/api/dm", dmRoutes);
 app.use("/api/places", placeRoutes);
 
-// Legacy contact form (mock-safe)
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
     if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing name, email, or message" });
     }
-
     if (USE_MOCKS) {
-      return res.json({
-        ok: true,
-        message: "Received (mock). Thank you for contacting us!",
-      });
+      return res.json({ ok: true, message: "Received (mock). Thank you!" });
     }
-
     if (!mongoose.connection.readyState) {
       return res.status(503).json({ error: "DB not ready" });
     }
-
     const doc = new Contact({ name, email, message });
     await doc.save();
     res.json({ ok: true, message: "Thank you for contacting us!" });
@@ -135,8 +116,7 @@ app.use((req, _res, next) => {
 
 app.use((err, _req, res, _next) => {
   console.error(err);
-  const status = err.status || 500;
-  res.status(status).json({ error: err.message || "Server error" });
+  res.status(err.status || 500).json({ error: err.message || "Server error" });
 });
 
 // ---------- Start ----------

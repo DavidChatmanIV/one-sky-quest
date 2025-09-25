@@ -17,10 +17,10 @@ import feed from "../feed.js";
 import flight from "../flight.routes.js";
 import health from "../health.routes.js";
 import hotel from "../hotel.routes.js";
-import message from "../message.routes.js"; // ✅ keep this
+import message from "../message.routes.js"; 
 import notification from "../notification.routes.js";
 import pkg from "../package.routes.js";
-import place from "../place.routes.js"; // ✅ note the .routes.js extension
+import place from "../place.routes.js"; 
 
 const api = Router();
 

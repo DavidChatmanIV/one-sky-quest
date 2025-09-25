@@ -1,20 +1,20 @@
 import { Router } from "express";
-
 const router = Router();
-const USE_MOCKS = process.env.USE_MOCKS !== "false"; // default true
+
+const USE_MOCKS = process.env.USE_MOCKS !== "false";
+const PROVIDER = process.env.PLACES_PROVIDER || "google";
 
 // GET /api/places/search?query=hotel&lat=40.74&lng=-73.99&radius=1500
 router.get("/search", async (req, res) => {
   try {
-    const { query = "", lat, lng, radius = 2000 } = req.query;
+    const { query = "hotel", lat, lng, radius = 2000 } = req.query;
 
-    // ---- Mock path (safe for dev/Render until you add real keys) ----
     if (USE_MOCKS) {
       return res.json({
         provider: "mock",
         items: [
           {
-            id: "mock-1",
+            id: "h1",
             name: "Sample Hotel Downtown",
             address: "123 Main St",
             lat: 40.741,
@@ -23,7 +23,7 @@ router.get("/search", async (req, res) => {
             types: ["lodging"],
           },
           {
-            id: "mock-2",
+            id: "h2",
             name: "City View Suites",
             address: "456 Market Ave",
             lat: 40.739,
@@ -35,20 +35,18 @@ router.get("/search", async (req, res) => {
       });
     }
 
-    // ---- Live provider switch (choose one) ----
-    const PROVIDER = process.env.PLACES_PROVIDER || "google"; // 'google' | 'opentripmap' | 'amadeus'
-
     if (PROVIDER === "google") {
-      const key = process.env.GOOGLE_MAPS_KEY;
-      if (!key) throw new Error("Missing GOOGLE_MAPS_KEY");
       if (!lat || !lng)
         throw new Error("lat & lng are required for Google Places");
+      const key = process.env.GOOGLE_MAPS_KEY;
+      if (!key) throw new Error("Missing GOOGLE_MAPS_KEY");
+
       const url = new URL(
         "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
       );
       url.searchParams.set("location", `${lat},${lng}`);
       url.searchParams.set("radius", String(radius));
-      url.searchParams.set("keyword", query || "hotel");
+      url.searchParams.set("keyword", query);
       url.searchParams.set("type", "lodging");
       url.searchParams.set("key", key);
 
@@ -71,11 +69,12 @@ router.get("/search", async (req, res) => {
       if (!key) throw new Error("Missing OPENTRIPMAP_KEY");
       if (!lat || !lng)
         throw new Error("lat & lng are required for OpenTripMap");
+
       const url = new URL("https://api.opentripmap.com/0.1/en/places/radius");
       url.searchParams.set("radius", String(radius));
       url.searchParams.set("lon", String(lng));
       url.searchParams.set("lat", String(lat));
-      url.searchParams.set("kinds", "accomodations"); // note: typo in API is 'accomodations'
+      url.searchParams.set("kinds", "accomodations"); // API uses this spelling
       url.searchParams.set("apikey", key);
 
       const r = await fetch(url);
@@ -92,7 +91,6 @@ router.get("/search", async (req, res) => {
       return res.json({ provider: "opentripmap", items });
     }
 
-    // Placeholder for Amadeus/other providers
     return res
       .status(501)
       .json({ error: `Provider '${PROVIDER}' not implemented` });

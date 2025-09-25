@@ -1,14 +1,11 @@
 import { Router } from "express";
-import { auth } from "../middleware/authMiddleware.js";
-
-// ⚠️ Make sure these filenames match exactly (case-sensitive on Render)
-import Message from "../models/Message.js"; // or "../models/message.js"
-import Conversation from "../models/Conversation.js"; // or "../models/conversation.js"
+import { auth } from "../middleware/auth.js";
+import Message from "../models/Message.js";
+import Conversation from "../models/Conversation.js";
 
 const router = Router();
-const USE_MOCKS = process.env.USE_MOCKS !== "false"; // default true
+const USE_MOCKS = process.env.USE_MOCKS !== "false";
 
-// 📬 Get all conversations for a user
 // GET /api/dm/conversations/:userId
 router.get("/conversations/:userId", auth, async (req, res) => {
   try {
@@ -25,22 +22,16 @@ router.get("/conversations/:userId", auth, async (req, res) => {
         },
       ]);
     }
-
-    const convos = await Conversation.find({
-      participants: req.params.userId,
-    })
+    const convos = await Conversation.find({ participants: req.params.userId })
       .populate("participants", "username")
       .sort({ updatedAt: -1 });
-
     res.json(convos);
   } catch (err) {
-    console.error("GET /conversations error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ➕ Create new conversation between two users
-// POST /api/dm/conversations  { receiverId }
+// POST /api/dm/conversations
 router.post("/conversations", auth, async (req, res) => {
   try {
     const { receiverId } = req.body;
@@ -68,13 +59,11 @@ router.post("/conversations", auth, async (req, res) => {
 
     res.status(201).json(convo);
   } catch (err) {
-    console.error("POST /conversations error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 📨 Send a message (DM)
-// POST /api/dm/message  { conversationId, text, ... }
+// POST /api/dm/message
 router.post("/message", auth, async (req, res) => {
   try {
     const { conversationId, text, ...rest } = req.body || {};
@@ -109,12 +98,10 @@ router.post("/message", auth, async (req, res) => {
 
     res.status(201).json(newMessage);
   } catch (err) {
-    console.error("POST /message error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 📄 Get all messages in a conversation
 // GET /api/dm/messages/:conversationId
 router.get("/messages/:conversationId", auth, async (req, res) => {
   try {
@@ -142,10 +129,8 @@ router.get("/messages/:conversationId", auth, async (req, res) => {
     })
       .sort({ createdAt: 1 })
       .lean();
-
     res.json(messages);
   } catch (err) {
-    console.error("GET /messages error:", err);
     res.status(500).json({ error: err.message });
   }
 });

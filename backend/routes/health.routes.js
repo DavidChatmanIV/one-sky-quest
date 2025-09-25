@@ -1,22 +1,8 @@
-import { Router } from 'express';
-import mongoose from 'mongoose';
+import { Router } from "express";
+const router = Router();
 
-const r = Router();
-
-const mongoState = () => {
-  const state = mongoose.connection?.readyState ?? 0;
-  const map = { 0: "disconnected", 1: "connected", 2: "connecting", 3: "disconnecting" };
-  return { code: state, status: map[state] || "unknown" };
-};
-
-r.get('/', (_req, res) => {
-  res.json({
-    ok: true,
-    env: process.env.NODE_ENV || 'dev',
-    time: new Date().toISOString(),
-    uptimeSec: Math.round(process.uptime()),
-    mongo: mongoState(),
-  });
+router.get("/", (_req, res) => {
+  res.json({ ok: true, ts: new Date().toISOString() });
 });
 
-export default r;
+export default router;
