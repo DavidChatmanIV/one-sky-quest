@@ -1,12 +1,33 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const Admin = require("../models/Admin");
-const { verifyAdmin } = require("../middleware/auth"); // ✅ Correctly import from named export
+const jwt = require("jsonwebtoken");
+const Admin = require("../models/admin.js"); 
 
 const router = express.Router();
 
-// ✅ POST /api/admin/login
+// Register admin
+router.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    return res.status(400).json({ message: "Email and password required." });
+
+  try {
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin)
+      return res.status(400).json({ message: "Admin already exists." });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newAdmin = new Admin({ email, password: hashedPassword });
+    await newAdmin.save();
+
+    res.status(201).json({ message: "Admin registered successfully." });
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Login admin
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -18,20 +39,17 @@ router.post("/login", async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
-      expiresIn: "2h",
-    });
+    const token = jwt.sign(
+      { id: admin._id, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
 
     res.json({ token });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
-});
-
-// ✅ GET /api/admin/dashboard (protected)
-router.get("/dashboard", verifyAdmin, (req, res) => {
-  res.json({ message: "Welcome, verified admin!" });
 });
 
 module.exports = router;

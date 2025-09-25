@@ -2,21 +2,25 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
 
-// ✅ Register a new admin
+// 👇 IMPORTANT: lowercase filename + include .js (Linux is case-sensitive)
+const Admin = require("../models/admin.js");
+
+//  Register a new admin
 router.post("/register", async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password)
+  if (!email || !password) {
     return res
       .status(400)
       .json({ message: "Email and password are required." });
+  }
 
   try {
     const existingAdmin = await Admin.findOne({ email });
-    if (existingAdmin)
+    if (existingAdmin) {
       return res.status(400).json({ message: "Admin already exists." });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -34,8 +38,9 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password)
+  if (!email || !password) {
     return res.status(400).json({ message: "Email and password required." });
+  }
 
   try {
     const admin = await Admin.findOne({ email });
@@ -47,7 +52,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { role: "admin", id: admin._id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "dev_secret", // set JWT_SECRET in Render env
       { expiresIn: "1h" }
     );
 
