@@ -21,7 +21,7 @@ import message from "../message.routes.js";
 import messages from "../messages.js";
 import notification from "../notification.routes.js";
 import pkg from "../package.routes.js";
-import place from "../placeroutes.js";
+import place from "../placeRoutes.js";
 
 const api = Router();
 

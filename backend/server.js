@@ -15,6 +15,10 @@ import apiRouter from "./routes/api/index.js";
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
 
+// NEW: direct mounts for dm & places
+import dmRoutes from "./routes/message.js";
+import placeRoutes from "./routes/placeRoutes.js";
+
 // __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,7 +33,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
 
-// Morgan request logging
+// Logging
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 // ---------- CORS ----------
@@ -52,21 +56,28 @@ app.use(
   rateLimit({ windowMs: 60_000, max: 120, standardHeaders: true })
 );
 
-// ---------- Mongo connection ----------
+// ---------- Mongo connection (conditional) ----------
+const USE_MOCKS = process.env.USE_MOCKS !== "false"; // default true -> skip DB for local/dev
 const MONGO_URI = process.env.MONGO_URI;
 const MONGO_DB = process.env.MONGO_DB || "osq";
-if (!MONGO_URI) {
-  console.error("❌ Missing MONGO_URI in environment");
-  process.exit(1);
-}
 
-mongoose
-  .connect(MONGO_URI, { dbName: MONGO_DB })
-  .then(() => console.log("✅ Mongo connected"))
-  .catch((err) => {
-    console.error("❌ Mongo connection error:", err);
+if (!USE_MOCKS) {
+  if (!MONGO_URI) {
+    console.error(
+      "❌ Missing MONGO_URI in environment (and USE_MOCKS is false)."
+    );
     process.exit(1);
-  });
+  }
+  mongoose
+    .connect(MONGO_URI, { dbName: MONGO_DB })
+    .then(() => console.log("✅ Mongo connected"))
+    .catch((err) => {
+      console.error("❌ Mongo connection error:", err);
+      process.exit(1);
+    });
+} else {
+  console.log("ℹ️ USE_MOCKS enabled — skipping Mongo connection.");
+}
 
 // ---------- Routes ----------
 app.get("/", (_req, res) => {
@@ -75,15 +86,35 @@ app.get("/", (_req, res) => {
 
 app.use("/health", health);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Main API index (keeps existing wiring)
 app.use("/api", apiRouter);
 
-// Legacy contact form
+// Ensure DM & Places exist even if apiRouter doesn't mount them internally
+app.use("/api/dm", dmRoutes);
+app.use("/api/places", placeRoutes);
+
+// Legacy contact form (mock-safe)
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
     if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing name, email, or message" });
     }
+
+    // In mock mode, don't attempt DB writes
+    if (USE_MOCKS) {
+      return res.json({
+        ok: true,
+        message: "Received (mock). Thank you for contacting us!",
+      });
+    }
+
+    // If we require DB, make sure it's ready
+    if (!mongoose.connection.readyState) {
+      return res.status(503).json({ error: "DB not ready" });
+    }
+
     const doc = new Contact({ name, email, message });
     await doc.save();
     res.json({ ok: true, message: "Thank you for contacting us!" });
@@ -111,4 +142,6 @@ app.use((err, _req, res, _next) => {
 
 // ---------- Start ----------
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🚀 API running on :${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`)
+);

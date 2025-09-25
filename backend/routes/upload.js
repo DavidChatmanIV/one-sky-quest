@@ -1,18 +1,20 @@
-const express = require("express");
-const multer = require("multer");
-const path = require("path");
-const router = express.Router();
+import { Router } from "express";
+import multer from "multer";
+import { randomUUID as uuid } from "crypto";
 
-const storage = multer.diskStorage({
-  destination: "./uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage });
-
-router.post("/", upload.single("file"), (req, res) => {
-  res.status(200).json({ imageUrl: `/uploads/${req.file.filename}` });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-module.exports = router;
+export default Router().post("/upload", upload.single("file"), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file provided" });
+  // mock URL — later replace with S3 / Cloudinary
+  const id = uuid();
+  res.status(201).json({
+    id,
+    filename: req.file.originalname,
+    size: req.file.size,
+    url: `/static/uploads/${id}-${req.file.originalname}`,
+  });
+});

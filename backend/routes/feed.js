@@ -1,12 +1,23 @@
 import { Router } from "express";
-import feed from "../data/feed.mock.json" assert { type: "json" };
-import { uuid } from "../utils/id.js";
+import { loadMock } from "./_utils/mock.js";
+import { randomUUID as uuid } from "crypto";
 
 export default Router()
-  .get("/feed/trending", (req, res) => res.json(feed.trending))
-  .post("/feed/posts", (req, res) =>
-    res.status(201).json({ id: uuid(), ...req.body, ts: Date.now() })
-  )
-  .post("/feed/posts/:id/react", (req, res) =>
-    res.json({ id: req.params.id, ...req.body })
-  );
+  // list posts
+  .get("/feed", async (req, res) => {
+    const posts = await loadMock("feed", []); // expects feed.mock.json (array)
+    res.json(posts);
+  })
+  // get single post
+  .get("/feed/:id", async (req, res) => {
+    const posts = await loadMock("feed", []);
+    const found = posts.find((p) => String(p.id) === String(req.params.id));
+    if (!found) return res.status(404).json({ error: "Not found" });
+    res.json(found);
+  })
+  // create post (mock)
+  .post("/feed", async (req, res) => {
+    const body = req.body || {};
+    const post = { id: uuid(), ...body, ts: Date.now() };
+    res.status(201).json(post);
+  });
