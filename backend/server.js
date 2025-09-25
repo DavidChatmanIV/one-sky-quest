@@ -15,11 +15,9 @@ import apiRouter from "./routes/api/index.js";
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
 
-
+// ✅ Correct filenames (Linux case-sensitive)
 import dmRoutes from "./routes/message.routes.js";
-
-// (kept as-is; update only if you later rename to place.routes.js)
-import placeRoutes from "./routes/placeRoutes.js";
+import placeRoutes from "./routes/place.routes.js";
 
 // __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
