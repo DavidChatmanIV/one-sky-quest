@@ -17,11 +17,10 @@ import feed from "../feed.js";
 import flight from "../flight.routes.js";
 import health from "../health.routes.js";
 import hotel from "../hotel.routes.js";
-import message from "../message.routes.js";
-import messages from "../messages.js";
+import message from "../message.routes.js"; // ✅ keep this
 import notification from "../notification.routes.js";
 import pkg from "../package.routes.js";
-import place from "../placeRoutes.js";
+import place from "../place.routes.js"; // ✅ note the .routes.js extension
 
 const api = Router();
 
@@ -31,7 +30,7 @@ api.get("/", (_req, res) => {
 });
 
 // Mount routes
-api.use("/auth", authRouter); // new style import
+api.use("/auth", authRouter);
 api.use("/admin", admin);
 api.use("/admin-auth", adminAuth);
 api.use("/admin-protected", adminProtected);
@@ -45,8 +44,7 @@ api.use("/feed", feed);
 api.use("/flights", flight);
 api.use("/health", health);
 api.use("/hotels", hotel);
-api.use("/message", message);
-api.use("/messages", messages);
+api.use("/message", message); 
 api.use("/notifications", notification);
 api.use("/packages", pkg);
 api.use("/places", place);
