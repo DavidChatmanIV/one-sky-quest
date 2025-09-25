@@ -10,13 +10,15 @@ import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Routes
+// ---------- Routes ----------
 import apiRouter from "./routes/api/index.js";
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
 
-// NEW: direct mounts for dm & places
-import dmRoutes from "./routes/message.js";
+
+import dmRoutes from "./routes/message.routes.js";
+
+// (kept as-is; update only if you later rename to place.routes.js)
 import placeRoutes from "./routes/placeRoutes.js";
 
 // __dirname for ESM
@@ -33,12 +35,13 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
 
-// Logging
+// ---------- Logging ----------
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 // ---------- CORS ----------
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 const allowedOrigins = FRONTEND_ORIGIN.split(",").map((s) => s.trim());
+
 app.use(
   cors({
     origin: (origin, cb) => {
@@ -102,7 +105,6 @@ app.post("/contact", async (req, res) => {
       return res.status(400).json({ error: "Missing name, email, or message" });
     }
 
-    // In mock mode, don't attempt DB writes
     if (USE_MOCKS) {
       return res.json({
         ok: true,
@@ -110,7 +112,6 @@ app.post("/contact", async (req, res) => {
       });
     }
 
-    // If we require DB, make sure it's ready
     if (!mongoose.connection.readyState) {
       return res.status(503).json({ error: "DB not ready" });
     }
