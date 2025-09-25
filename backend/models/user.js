@@ -32,8 +32,8 @@ const UserSchema = new mongoose.Schema(
     xp: { type: Number, default: 0 },
 
     // 🎁 Referrals
-    referralCode: { type: String, unique: true, sparse: true }, // sparse allows multiple nulls
-    referredBy: { type: String }, // stores another user's referralCode
+    referralCode: { type: String, unique: true, sparse: true },
+    referredBy: { type: String },
 
     // ✈️ Saved Trips
     savedTrips: [{ type: mongoose.Schema.Types.ObjectId, ref: "Place" }],

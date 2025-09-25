@@ -2,8 +2,8 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-import User from "../models/User.js";
-import Admin from "../models/Admin.js";
+import User from "../models/user.js"; 
+import Admin from "../models/admin.js"; 
 
 const router = express.Router();
 
@@ -26,14 +26,12 @@ router.post("/register", async (req, res) => {
     const referredBy =
       (req.query?.ref || req.body?.referredBy || "").trim() || null;
 
-    // Basic validation
     if (!username || !email || !password) {
       return res.status(400).json({ message: "Missing required fields." });
     }
     username = String(username).trim();
     email = String(email).trim().toLowerCase();
 
-    // Uniqueness checks (email + username)
     const existing = await User.findOne({
       $or: [{ email }, { username }],
     });
@@ -44,10 +42,8 @@ router.post("/register", async (req, res) => {
       return res.status(409).json({ message: "Username already taken." });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user with referral code
     const referralCode = generateReferralCode(username);
     const newUser = new User({
       username,
@@ -58,11 +54,9 @@ router.post("/register", async (req, res) => {
     });
     await newUser.save();
 
-    // 🎁 Reward referrer with XP if a valid code is provided
     if (referredBy) {
       const referrer = await User.findOne({ referralCode: referredBy });
       if (referrer) {
-        // guard against self-referral or abuse
         if (String(referrer._id) !== String(newUser._id)) {
           referrer.xp = (referrer.xp || 0) + 50;
           await referrer.save();
@@ -153,7 +147,8 @@ router.post("/admin/login", async (req, res) => {
 });
 
 export default router;
-// (Optional CJS interop if a script accidentally requires this file)
+
+// (Optional CJS interop)
 if (typeof module !== "undefined") {
   // @ts-ignore
   module.exports = router;
