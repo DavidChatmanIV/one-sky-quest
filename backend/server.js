@@ -11,7 +11,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // Routes
-import apiRouter from "./routes/api/index.js"; 
+import apiRouter from "./routes/api/index.js";
 import health from "./routes/health.routes.js";
 import Contact from "./models/Contact.js";
 
