@@ -1,18 +1,15 @@
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const adminSchema = new mongoose.Schema(
-  {
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: {
-      type: String,
-      enum: ["superadmin", "support"],
-      default: "support",
-    },
+const adminSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: {
+    type: String,
+    enum: ["superadmin", "support"],
+    default: "support",
   },
-  { timestamps: true }
-);
+});
 
 // 🔐 Automatically hash password before saving
 adminSchema.pre("save", async function (next) {
@@ -26,5 +23,4 @@ adminSchema.methods.comparePassword = function (inputPassword) {
   return bcrypt.compare(inputPassword, this.password);
 };
 
-const Admin = mongoose.model("Admin", adminSchema);
-export default Admin;
+module.exports = mongoose.model("Admin", adminSchema);
