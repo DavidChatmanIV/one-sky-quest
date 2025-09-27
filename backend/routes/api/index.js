@@ -3,7 +3,7 @@ import { Router } from "express";
 // Auth (new style)
 import authRouter from "../auth.routes.js";
 
-// Other route modules (ensure each file uses ESM and default-exports a Router)
+// Other route modules
 import admin from "../admin.routes.js";
 import adminAuth from "../adminAuth.routes.js";
 import adminProtected from "../adminProtected.js";
@@ -12,15 +12,15 @@ import car from "../car.routes.js";
 import comments from "../comments.js";
 import conversations from "../conversations.js";
 import cruise from "../cruise.route.js"; 
-import dm from "../dm.js";
+import dm from "../dm.js"; 
 import feed from "../feed.js";
 import flight from "../flight.routes.js";
 import health from "../health.routes.js";
 import hotel from "../hotel.routes.js";
-import message from "../message.routes.js"; 
+import message from "../message.routes.js";
 import notification from "../notification.routes.js";
 import pkg from "../package.routes.js";
-import place from "../place.routes.js"; // not placeRoutes.js
+import place from "../place.routes.js";
 
 const api = Router();
 
@@ -34,17 +34,17 @@ api.use("/auth", authRouter);
 api.use("/admin", admin);
 api.use("/admin-auth", adminAuth);
 api.use("/admin-protected", adminProtected);
-api.use("/booking", booking); 
+api.use("/booking", booking);
 api.use("/cars", car);
 api.use("/comments", comments);
-api.use("/conversations", conversations); 
+api.use("/conversations", conversations);
 api.use("/cruise", cruise);
 api.use("/dm", dm);
 api.use("/feed", feed);
 api.use("/flights", flight);
 api.use("/health", health);
 api.use("/hotels", hotel);
-api.use("/messages", message); 
+api.use("/messages", message);
 api.use("/notifications", notification);
 api.use("/packages", pkg);
 api.use("/places", place);
