@@ -4,32 +4,26 @@ const { Schema } = mongoose;
 
 const conversationSchema = new Schema(
   {
-    // 1:1 or group DM participants
+    // 1:1 or group participants
     participants: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
+      { type: Schema.Types.ObjectId, ref: "User", required: true },
     ],
 
-    // Optional group fields (safe to ignore for 1:1)
+    // Optional group fields
     isGroup: { type: Boolean, default: false },
     title: { type: String, trim: true },
 
-    // Convenience for your list UI; you already update this in routes
+    // Convenience for list UI
     lastMessage: { type: String, trim: true },
 
-    // Optional: track last-read per user (handy later)
+    // Optional: per-user last-read timestamps
     lastReadAt: {
       type: Map,
-      of: Date, // key: userId (string), value: Date
+      of: Date, // key: userId, value: Date
       default: undefined,
     },
   },
-  {
-    timestamps: true, // adds createdAt / updatedAt
-  }
+  { timestamps: true }
 );
 
 // Helpful indexes
