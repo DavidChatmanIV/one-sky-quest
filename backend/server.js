@@ -17,6 +17,7 @@ import Contact from "./models/Contact.js";
 import dmRoutes from "./routes/message.routes.js";
 import placeRoutes from "./routes/place.routes.js";
 
+// __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -54,25 +55,53 @@ app.use(
 );
 
 // ---------- Mongo connection (conditional) ----------
-const USE_MOCKS = process.env.USE_MOCKS !== "false";
-const MONGO_URI = process.env.MONGO_URI;
-const MONGO_DB = process.env.MONGO_DB || "osq";
+const USE_MOCKS = process.env.USE_MOCKS === "true"; // default false → connect
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI; // accept either key
+const MONGO_DB = process.env.MONGODB_DB || process.env.MONGO_DB; // optional
 
-if (!USE_MOCKS) {
+async function connectMongo() {
+  if (USE_MOCKS) {
+    console.log("ℹ️ USE_MOCKS=true — skipping Mongo connection.");
+    return;
+  }
   if (!MONGO_URI) {
-    console.error("❌ Missing MONGO_URI (and USE_MOCKS is false).");
+    console.error(
+      "❌ Missing MONGODB_URI/MONGO_URI (and USE_MOCKS is not true)."
+    );
     process.exit(1);
   }
-  mongoose
-    .connect(MONGO_URI, { dbName: MONGO_DB })
-    .then(() => console.log("✅ Mongo connected"))
-    .catch((err) => {
-      console.error("❌ Mongo error:", err);
-      process.exit(1);
-    });
-} else {
-  console.log("ℹ️ USE_MOCKS enabled — skipping Mongo.");
+
+  const options = {
+    maxPoolSize: 20,
+    serverSelectionTimeoutMS: 7000,
+    socketTimeoutMS: 60000,
+  };
+  if (MONGO_DB) options.dbName = MONGO_DB; // only if provided; otherwise db is in URI
+
+  try {
+    await mongoose.connect(MONGO_URI, options);
+    const c = mongoose.connection;
+    console.log(`✅ Mongo connected (db: ${c.name})`);
+    c.on("error", (e) => console.error("❌ Mongo error:", e.message));
+    c.on("disconnected", () => console.warn("⚠️ Mongo disconnected"));
+  } catch (err) {
+    console.error("❌ Mongo connect failed:", err.message);
+    process.exit(1);
+  }
 }
+
+await connectMongo();
+
+// DB health endpoint (good for local + Render)
+app.get("/health/db", async (_req, res) => {
+  try {
+    if (USE_MOCKS) return res.json({ ok: true, mocked: true });
+    await mongoose.connection.db.admin().ping();
+    res.json({ ok: true, state: mongoose.connection.readyState });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
 
 // ---------- Routes ----------
 app.get("/", (_req, res) => res.send("🚀 One Sky Quest backend is running!"));
@@ -83,6 +112,7 @@ app.use("/api", apiRouter);
 app.use("/api/dm", dmRoutes);
 app.use("/api/places", placeRoutes);
 
+// Contact form example (writes to Mongo when not mocked)
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
@@ -92,7 +122,7 @@ app.post("/contact", async (req, res) => {
     if (USE_MOCKS) {
       return res.json({ ok: true, message: "Received (mock). Thank you!" });
     }
-    if (!mongoose.connection.readyState) {
+    if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({ error: "DB not ready" });
     }
     const doc = new Contact({ name, email, message });

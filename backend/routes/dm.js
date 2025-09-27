@@ -1,35 +1,56 @@
-import { Router } from "express";
+// GET /dm/mine?userId=:id
+// Returns the user's conversations sorted by updatedAt desc,
+// with a lastMessage preview and the "other" participant id.
+router.get("/mine", async (req, res, next) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.status(400).json({ error: "userId is required" });
 
-const router = Router();
+    // Find convos where user participates
+    const convos = await Conversation.find({ participants: userId })
+      .sort({ updatedAt: -1 })
+      .select("_id participants isGroup title lastMessage updatedAt")
+      .lean();
 
-/**
- * Direct Message routes
- * Starter version — expand later with Message + Conversation models
- */
+    // Get latest message for each convo in one shot
+    const convoIds = convos.map((c) => c._id);
+    const latestByConvo = await Message.aggregate([
+      { $match: { conversationId: { $in: convoIds } } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$conversationId",
+          messageId: { $first: "$_id" },
+          text: { $first: "$text" },
+          sender: { $first: "$sender" },
+          createdAt: { $first: "$createdAt" },
+        },
+      },
+    ]);
 
-// ✅ GET /dm/test → sanity check
-router.get("/test", (_req, res) => {
-  res.json({ ok: true, route: "dm works" });
-});
+    const latestMap = new Map(latestByConvo.map((m) => [String(m._id), m]));
 
-// ✅ POST /dm/send → placeholder for sending a direct message
-router.post("/send", (req, res) => {
-  const { from, to, message } = req.body;
+    // Shape response: include partnerId for 1:1 convos
+    const data = convos.map((c) => {
+      const latest = latestMap.get(String(c._id)) || null;
+      const partnerId = !c.isGroup
+        ? c.participants.find((p) => String(p) !== String(userId))
+        : null;
 
-  if (!from || !to || !message) {
-    return res
-      .status(400)
-      .json({ error: "from, to, and message are required" });
+      return {
+        ...c,
+        partnerId,
+        last: latest && {
+          _id: latest.messageId,
+          text: latest.text,
+          sender: latest.sender,
+          createdAt: latest.createdAt,
+        },
+      };
+    });
+
+    res.json(data);
+  } catch (err) {
+    next(err);
   }
-
-  // TODO: later connect to Message model & save to DB
-  res.status(201).json({
-    success: true,
-    from,
-    to,
-    message,
-    note: "Saving to DB will be added later.",
-  });
 });
-
-export default router;
