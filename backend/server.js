@@ -12,10 +12,14 @@ import { fileURLToPath } from "url";
 
 // ---------- Routes ----------
 import apiRouter from "./routes/api/index.js";
-import health from "./routes/health.routes.js";
-import Contact from "./models/Contact.js";
-import dmRoutes from "./routes/message.routes.js";
-import placeRoutes from "./routes/place.routes.js";
+import healthRouter from "./routes/health.routes.js";
+// Prefer using the barrel for models, but direct import is fine too:
+import Contact from "./models/contact.js"; // <- lowercase path (Render-safe)
+
+// If you truly have a separate DM router (NOT already mounted in apiRouter), use this:
+// import dmRouter from "./routes/dm.js";
+// If you truly need a separate places router (NOT already in apiRouter), use this:
+// import placesRouter from "./routes/place.routes.js";
 
 // __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -76,7 +80,7 @@ async function connectMongo() {
     serverSelectionTimeoutMS: 7000,
     socketTimeoutMS: 60000,
   };
-  if (MONGO_DB) options.dbName = MONGO_DB; // only if provided; otherwise db is in URI
+  if (MONGO_DB) options.dbName = MONGO_DB;
 
   try {
     await mongoose.connect(MONGO_URI, options);
@@ -105,12 +109,15 @@ app.get("/health/db", async (_req, res) => {
 
 // ---------- Routes ----------
 app.get("/", (_req, res) => res.send("🚀 One Sky Quest backend is running!"));
-app.use("/health", health);
+app.use("/health", healthRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Single API entrypoint—this already mounts /dm, /places, /messages, etc.
 app.use("/api", apiRouter);
-app.use("/api/dm", dmRoutes);
-app.use("/api/places", placeRoutes);
+
+// If (and only if) dm or places are NOT included in apiRouter, uncomment these:
+// app.use("/api/dm", dmRouter);
+// app.use("/api/places", placesRouter);
 
 // Contact form example (writes to Mongo when not mocked)
 app.post("/contact", async (req, res) => {

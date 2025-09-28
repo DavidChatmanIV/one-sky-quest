@@ -1,76 +1,74 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+import {
+  Booking,
+  User,
+  Hotel,
+  Flight,
+  Package,
+  Place,
+} from "../models/index.js";
+import { auth } from "../middleware/auth.js";
 
-const Booking = require("../models/Booking");
-const sendConfirmationEmail = require("../utils/sendConfirmationEmail");
-const verifyAdmin = require("../middleware/verifyAdminToken");
+const router = Router();
 
-// ✈️ PUBLIC: Create a new booking
-router.post("/book", async (req, res) => {
-  const { name, email, tripDetails, type } = req.body;
-
-  if (!name || !email || !tripDetails || !type) {
-    return res.status(400).json({ message: "All fields are required." });
-  }
-
+// 📖 GET: all bookings (admin or user-specific filtering can be added later)
+router.get("/", auth, async (req, res) => {
   try {
-    const newBooking = await Booking.create({ name, email, tripDetails, type });
-    await sendConfirmationEmail({ name, email, tripDetails, type });
-
-    res.status(201).json({
-      message: "Booking confirmed ✅",
-      booking: newBooking,
-    });
-  } catch (err) {
-    console.error("❌ Booking creation error:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-// 🔐 ADMIN: Get all bookings (formatted)
-router.get("/bookings", verifyAdmin, async (req, res) => {
-  try {
-    const bookings = await Booking.find()
+    const bookings = await Booking.find({ user: req.user.id })
       .populate("user", "email")
-      .sort({ date: -1 });
+      .populate("hotel")
+      .populate("flight")
+      .populate("package")
+      .populate("place");
 
-    const formatted = bookings.map((b) => ({
-      _id: b._id,
-      userEmail: b.user?.email || "Unknown",
-      destination: b.destination,
-      date: b.date,
-      status: b.status,
-    }));
-
-    res.json(formatted);
+    res.json(bookings);
   } catch (err) {
-    console.error("❌ Admin booking fetch error:", err);
-    res.status(500).json({ message: "Failed to load bookings" });
+    console.error("❌ Failed to fetch bookings:", err);
+    res.status(500).json({ message: "Error fetching bookings." });
   }
 });
 
-// 🔐 ADMIN: Delete a booking
-router.delete("/book/:id", verifyAdmin, async (req, res) => {
+// ➕ POST: create booking
+router.post("/", auth, async (req, res) => {
   try {
-    await Booking.findByIdAndDelete(req.params.id);
-    res.json({ message: "Booking deleted ✅" });
-  } catch (err) {
-    console.error("❌ Booking delete error:", err);
-    res.status(500).json({ message: "Delete failed." });
-  }
-});
+    const { hotel, flight, pkg, place, dates, travelers } = req.body;
 
-// 🔐 ADMIN: Update a booking
-router.put("/book/:id", verifyAdmin, async (req, res) => {
-  try {
-    const updated = await Booking.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+    const newBooking = new Booking({
+      user: req.user.id,
+      hotel,
+      flight,
+      package: pkg,
+      place,
+      dates,
+      travelers,
     });
-    res.json(updated);
+
+    await newBooking.save();
+    res.status(201).json(newBooking);
   } catch (err) {
-    console.error("❌ Booking update error:", err);
-    res.status(500).json({ message: "Update failed." });
+    console.error("❌ Failed to create booking:", err);
+    res.status(500).json({ message: "Error creating booking." });
   }
 });
 
-module.exports = router;
+// 🗑️ DELETE: cancel booking
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const booking = await Booking.findOneAndDelete({
+      _id: id,
+      user: req.user.id,
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found." });
+    }
+
+    res.json({ message: "Booking canceled successfully." });
+  } catch (err) {
+    console.error("❌ Failed to cancel booking:", err);
+    res.status(500).json({ message: "Error canceling booking." });
+  }
+});
+
+export default router;

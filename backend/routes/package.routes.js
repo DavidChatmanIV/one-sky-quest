@@ -1,22 +1,30 @@
-const express = require("express");
-const router = express.Router();
-const Package = require("../models/Package");
+import { Router } from "express";
+import { Package } from "../models/index.js";
+import { auth } from "../middleware/auth.js";
 
-router.get("/", async (req, res) => {
-const { destination, maxPrice, type } = req.query;
-const query = {};
+const router = Router();
 
-if (destination) query.destination = new RegExp(destination, "i");
-if (maxPrice) query.price = { $lte: parseFloat(maxPrice) };
-if (type) query.type = type;
-
-try {
-    const packages = await Package.find(query);
+// 📖 GET: all packages
+router.get("/", async (_req, res) => {
+  try {
+    const packages = await Package.find();
     res.json(packages);
-} catch (err) {
-    console.error("Error fetching packages:", err);
-    res.status(500).json({ message: "Error loading packages" });
-}
+  } catch (err) {
+    console.error("❌ Failed to fetch packages:", err);
+    res.status(500).json({ message: "Error fetching packages." });
+  }
 });
 
-module.exports = router;
+// ➕ POST: create package (admin only later if needed)
+router.post("/", auth, async (req, res) => {
+  try {
+    const pkg = new Package(req.body);
+    await pkg.save();
+    res.status(201).json(pkg);
+  } catch (err) {
+    console.error("❌ Failed to create package:", err);
+    res.status(500).json({ message: "Error creating package." });
+  }
+});
+
+export default router;
