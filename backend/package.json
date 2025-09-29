@@ -1,40 +1,24 @@
 {
-  "name": "one-sky-quest-backend",
-  "version": "1.0.0",
-  "description": "API for One Sky Quest",
+  "name": "osq-backend",
+  "private": true,
   "type": "module",
-  "main": "server.js",
   "engines": {
-    "node": "20.x",
-    "npm": "10.x"
+    "node": ">=20"
   },
   "scripts": {
-    "start": "node server.js",         
-    "dev": "nodemon server.js",        
-    "lint": "eslint .",              
-    "build": "echo 'No build step required'" 
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js",
+    "lint:imports": "grep -RIn '\\.\\./models/[A-Z]' . || true"
   },
-  "author": "David Chatman",
-  "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "body-parser": "^1.20.0",
     "compression": "^1.7.4",
-    "cookie-parser": "^1.4.7",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.3.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^7.0.3",
-    "morgan": "^1.10.1",
-    "nodemailer": "^7.0.3",
-    "papaparse": "^5.5.3",
-    "socket.io": "^4.8.1",
-    "uuid": "^11.1.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.5.0",
+    "morgan": "^1.10.0"
   }
 }

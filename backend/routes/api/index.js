@@ -1,9 +1,6 @@
 import { Router } from "express";
 
-// Auth (new style)
 import authRouter from "../auth.routes.js";
-
-// Other route modules
 import admin from "../admin.routes.js";
 import adminAuth from "../adminAuth.routes.js";
 import adminProtected from "../adminProtected.js";
@@ -11,7 +8,7 @@ import booking from "../booking.routes.js";
 import car from "../car.routes.js";
 import comments from "../comments.js";
 import conversations from "../conversations.js";
-import cruise from "../cruise.routes.js"; // fixed typo: .route.js → .routes.js
+import cruise from "../cruise.routes.js"; 
 import dm from "../dm.js";
 import feed from "../feed.js";
 import flight from "../flight.routes.js";
@@ -24,12 +21,10 @@ import place from "../place.routes.js";
 
 const api = Router();
 
-// Basic index route
 api.get("/", (_req, res) => {
   res.json({ ok: true, api: "One Sky Quest API root" });
 });
 
-// Mount routes
 api.use("/auth", authRouter);
 api.use("/admin", admin);
 api.use("/admin-auth", adminAuth);
