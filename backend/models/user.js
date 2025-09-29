@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const userSchema = new Schema(
+const UserSchema = new Schema(
   {
     username: {
       type: String,
       required: true,
       trim: true,
-      unique: true, // usernames should be unique
+      unique: true,
     },
     email: {
       type: String,
@@ -17,29 +17,44 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
     },
-    password: {
+    passwordHash: {
       type: String,
-      required: true,
+      required: true, // bcrypt hash stored here
     },
     avatar: {
-      type: String, // URL to profile image
+      type: String,
       default: "/default-avatar.png",
     },
-
-    // optional fields you can expand later
     bio: { type: String, trim: true },
-    xp: { type: Number, default: 0 }, // fits your OSQ gamification
+    xp: { type: Number, default: 0 },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+
+    // used by /saved-trips routes
+    savedTrips: [{ type: Schema.Types.ObjectId, ref: "Place" }],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 // Helpful indexes
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+UserSchema.index({ username: 1 }, { unique: true });
+UserSchema.index({ email: 1 }, { unique: true });
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+// Hide sensitive/internal fields when sending to client
+UserSchema.set("toJSON", {
+  transform: (_doc, ret) => {
+    delete ret.passwordHash;
+    delete ret.__v;
+    return ret;
+  },
+});
+UserSchema.set("toObject", {
+  transform: (_doc, ret) => {
+    delete ret.passwordHash;
+    delete ret.__v;
+    return ret;
+  },
+});
 
+// Keep hot-reload safe
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
 export default User;
