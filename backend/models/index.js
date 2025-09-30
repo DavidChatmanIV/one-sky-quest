@@ -1,6 +1,9 @@
 import { Router } from "express";
 
-// Tolerant imports (CJS or ESM)
+// Tolerant imports (handles ESM default export, named `router`, or CJS export)
+const pick = (mod) => mod?.default ?? mod?.router ?? mod;
+
+// Route modules (keep paths/casing EXACT)
 import * as adminMod from "../admin.routes.js";
 import * as adminAuthMod from "../adminAuth.routes.js";
 import * as adminProtectedMod from "../adminProtected.js";
@@ -18,8 +21,6 @@ import * as messageMod from "../message.routes.js";
 import * as notificationMod from "../notification.routes.js";
 import * as pkgMod from "../package.routes.js";
 import * as placeMod from "../place.routes.js";
-
-const pick = (mod) => mod?.default ?? mod?.router ?? mod;
 
 const admin = pick(adminMod);
 const adminAuth = pick(adminAuthMod);
@@ -41,10 +42,12 @@ const place = pick(placeMod);
 
 const api = Router();
 
+// Root check
 api.get("/", (_req, res) => {
   res.json({ ok: true, api: "One Sky Quest API root" });
 });
 
+// Only mount if the module resolved to a Router
 if (admin) api.use("/admin", admin);
 if (adminAuth) api.use("/admin-auth", adminAuth);
 if (adminProtected) api.use("/admin-protected", adminProtected);

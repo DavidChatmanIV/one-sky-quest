@@ -1,0 +1,111 @@
+/* ===== One Sky Quest — Smooth Search Bar ===== */
+:root{
+  /* uses your existing palette */
+  --bg-start:#0f1020; --bg-mid:#231a3a; --bg-end:#3a2430;
+  --surface:#1e2039; --surface-2:#2a2c4b;
+  --glass:rgba(255,255,255,.10);
+  --glass-2:rgba(255,255,255,.16);
+  --text-1:#f4f6fb; --text-2:#c9cbe3;
+  --cta:#ff8a2a; --cta-hover:#ff7a00;
+  --shadow:0 14px 36px rgba(0,0,0,.35);
+  --r-lg:14px; --r-xl:18px;
+}
+
+/* wrapper */
+.osq-search{
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border: 1px solid var(--glass);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  color: var(--text-1);
+  backdrop-filter: blur(10px) saturate(140%);
+}
+
+/* tabs */
+.osq-search__tabs{
+  display:flex; gap:10px; padding:6px;
+  background: rgba(255,255,255,.04);
+  border:1px solid var(--glass);
+  border-radius: 999px;
+  width: max-content;
+  margin: 2px auto 14px;
+}
+.tab{
+  padding:10px 14px; border-radius: 999px; border:1px solid transparent;
+  color: var(--text-2); background: transparent; font-weight: 600;
+}
+.tab.is-active{
+  color:#111; background: linear-gradient(180deg,#ffdbba,#ffa94d);
+  box-shadow: 0 8px 18px rgba(255,138,42,.35);
+  border-color: transparent;
+}
+
+/* grid (breathing room!) */
+.osq-search__grid{
+  display:grid;
+  grid-template-columns: 2fr repeat(3, 1fr) 1.1fr;
+  gap: 12px;
+}
+
+/* field shell */
+.field{ display:flex; flex-direction: column; gap:6px; }
+.field__label{ font-size:.85rem; color: var(--text-2); padding-left: 2px; }
+
+.field__control{
+  display:flex; align-items:center; gap:10px;
+  background: rgba(14, 12, 28, .55);
+  border: 1px solid var(--glass);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field__control:focus-within{
+  border-color: var(--glass-2);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset;
+}
+
+.field__icon{ opacity:.9 }
+.input{
+  flex:1; border:none; outline:none; background: transparent;
+  color: var(--text-1); font-size: .98rem;
+}
+
+/* CTA cell */
+.field--cta{
+  display:flex; flex-direction: column; justify-content: center; gap:8px;
+}
+.search-btn{
+  width:100%;
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--cta), var(--cta-hover));
+  color:#111; font-weight: 800; letter-spacing:.2px;
+  border:none; cursor:pointer;
+  box-shadow: 0 10px 24px rgba(255,138,42,.35);
+  transition: transform .15s ease, filter .15s ease;
+}
+.search-btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+.smart{
+  display:flex; align-items:center; gap:8px;
+  color: var(--text-2);
+  padding-left: 6px; font-size:.9rem;
+  opacity:.9;
+}
+.zap{ filter: drop-shadow(0 0 8px rgba(255,205,100,.45)); }
+
+/* responsive */
+@media (max-width: 1080px){
+  .osq-search__grid{ grid-template-columns: 1.6fr repeat(2, 1fr); }
+  .field--cta{ grid-column: span 3; }
+}
+@media (max-width: 720px){
+  .osq-search{ padding: 12px; }
+  .osq-search__tabs{ margin: 0 auto 10px; transform: scale(.95); }
+  .osq-search__grid{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .field--cta{ grid-column: auto; }
+}

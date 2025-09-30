@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Sky Quest – Direct Messages</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Header -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">✉️ Direct Messages</h1>
+    <a href="/index.html" class="text-blue-600 hover:underline">Back to Home</a>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="max-w-6xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+    <!-- Conversations List -->
+    <aside class="bg-white rounded-xl shadow p-4 h-[70vh] overflow-y-auto">
+      <h2 class="text-lg font-semibold mb-4">Conversations</h2>
+      <ul id="conversationList" class="space-y-3">
+        <!-- Live conversations will be injected here -->
+      </ul>
+    </aside>
+
+    <!-- Chat Area -->
+    <section class="md:col-span-2 bg-white rounded-xl shadow p-4 flex flex-col h-[70vh]">
+      <div id="chatBox" class="flex-1 overflow-y-auto mb-4 space-y-3 p-2">
+        <!-- Messages go here -->
+      </div>
+      <form id="chatForm" class="flex gap-2">
+        <input id="messageInput" type="text" placeholder="Type a message..." required class="flex-1 p-2 border rounded-lg" />
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- DM Script -->
+  <script>
+    const socket = io();
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    let activeConversationId = null;
+
+    function joinRoom(convoId) {
+      activeConversationId = convoId;
+      socket.emit("joinRoom", convoId);
+      fetch(`/api/dm/messages/${convoId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(messages => {
+          const chatBox = document.getElementById("chatBox");
+          chatBox.innerHTML = "";
+          messages.forEach(renderMessage);
+        });
+    }
+
+    function renderMessage(msg) {
+      const chatBox = document.getElementById("chatBox");
+      const bubble = document.createElement("div");
+      bubble.className = `max-w-xs rounded-lg p-2 ${
+        msg.sender === userId ? "bg-blue-100 self-end ml-auto" : "bg-gray-200 self-start mr-auto"
+      }`;
+      bubble.textContent = msg.text;
+      chatBox.appendChild(bubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    document.getElementById("chatForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const text = document.getElementById("messageInput").value;
+      if (!text || !activeConversationId) return;
+
+      const data = {
+        conversationId: activeConversationId,
+        text,
+        sender: userId,
+      };
+
+      socket.emit("sendMessage", data);
+
+      fetch("/api/dm/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      renderMessage(data);
+      document.getElementById("messageInput").value = "";
+    });
+
+    socket.on("receiveMessage", msg => {
+      if (msg.conversationId === activeConversationId) {
+        renderMessage(msg);
+      }
+    });
+
+    // 🔄 Fetch real conversations from backend
+    function loadConversations() {
+      fetch(`/api/dm/conversations/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(convos => {
+          const convoList = document.getElementById("conversationList");
+          convoList.innerHTML = "";
+
+          convos.forEach(convo => {
+            const otherUser = convo.participants.find(p => p._id !== userId);
+            const li = document.createElement("li");
+            li.className = "cursor-pointer hover:bg-gray-100 p-2 rounded";
+            li.textContent = otherUser?.username || "User";
+            li.onclick = () => joinRoom(convo._id);
+            convoList.appendChild(li);
+          });
+        });
+    }
+
+    // 📥 Load conversations on page load
+    document.addEventListener("DOMContentLoaded", loadConversations);
+  </script>
+</body>
+</html>

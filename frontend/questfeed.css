@@ -1,0 +1,190 @@
+/* 🌌 Background Overlay (darkens background for better text visibility) */
+.background-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 🧭 Navbar */
+.navbar {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  border-radius: 999px;
+  padding: 0.75rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  z-index: 1000;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #1d9bf0;
+}
+
+/* 🌄 Background & Base Layout */
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: url('./images/clouds-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding-top: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  color: #111827;
+}
+
+/* 🧊 Feed + Sidebar Layout */
+.feed-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ✨ Feed Container */
+.feed-container {
+  width: 100%;
+  max-width: 600px;
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.88);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔥 Trending Tags */
+.trending-tags {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(6px);
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-height: fit-content;
+  position: sticky;
+  top: 6rem;
+}
+
+.trending-tags h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.trending-tags a {
+  display: inline-block;
+  margin: 0.25rem 0;
+  color: #1d9bf0;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.trending-tags a:hover {
+  text-decoration: underline;
+}
+
+/* 🆕 Post Composer */
+.post-creator {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.post-creator textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  background: #f9fafb;
+}
+
+.post-creator button {
+  background-color: #1d9bf0;
+  color: #fff;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  float: right;
+  transition: background-color 0.3s ease;
+}
+
+.post-creator button:hover {
+  background-color: #1a8cd8;
+}
+
+/* 🆕 Post Cards */
+.post-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease;
+}
+
+.post-card:hover {
+  transform: scale(1.01);
+}
+
+.post-card p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.post-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-header strong {
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.post-header small {
+  font-size: 0.8rem;
+  color: #6b7280;
+}

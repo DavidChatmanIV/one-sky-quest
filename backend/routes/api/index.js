@@ -1,9 +1,12 @@
 import { Router } from "express";
 
+// Core auth/admin routes
 import authRouter from "../auth.routes.js";
 import admin from "../admin.routes.js";
 import adminAuth from "../adminAuth.routes.js";
 import adminProtected from "../adminProtected.js";
+
+// Domain routes
 import booking from "../booking.routes.js";
 import car from "../car.routes.js";
 import comments from "../comments.js";
@@ -21,14 +24,17 @@ import place from "../place.routes.js";
 
 const api = Router();
 
+// Root check
 api.get("/", (_req, res) => {
   res.json({ ok: true, api: "One Sky Quest API root" });
 });
 
+// Mount routes
 api.use("/auth", authRouter);
 api.use("/admin", admin);
 api.use("/admin-auth", adminAuth);
 api.use("/admin-protected", adminProtected);
+
 api.use("/booking", booking);
 api.use("/cars", car);
 api.use("/comments", comments);

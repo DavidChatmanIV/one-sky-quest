@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Sky Quest – Booking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+  <!-- ✅ Animation Styles -->
+  <style>
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fade-in 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+  <main class="max-w-3xl mx-auto py-10 px-6">
+    <h1 class="text-3xl font-bold mb-6 text-center">🗓️ Book Your Travel</h1>
+
+    <!-- 🌟 Booking Form -->
+    <form id="bookingForm" class="space-y-4 bg-white p-6 rounded-xl shadow mb-8">
+      <input id="bookingDestination" type="text" placeholder="Destination" required class="w-full p-3 border border-gray-300 rounded-lg" />
+      <input id="bookingStartDate" type="date" required class="w-full p-3 border border-gray-300 rounded-lg" />
+      <input id="bookingEndDate" type="date" required class="w-full p-3 border border-gray-300 rounded-lg" />
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Search</button>
+    </form>
+
+    <!-- 📌 Saved Trips Section -->
+    <section class="saved-trips-section rounded-xl shadow-lg bg-white p-6 mt-6 border-l-8" style="border-left-color: #ef4444">
+      <h2 class="text-2xl font-bold text-red-600 mb-2">📌 Saved Trips</h2>
+      <p id="no-trips-message" class="text-gray-600 mb-4">You haven't saved any trips yet. Start exploring and bookmark your favorites!</p>
+      <div id="saved-trips-container" class="space-y-4"></div>
+    </section>
+
+    <!-- ✈️ Booking Sections -->
+    <section class="space-y-6 mt-10">
+      <div class="booking-card border-l-8 rounded-xl shadow-xl p-6" style="border-left-color: #3b82f6">
+        <h2 class="text-2xl font-bold text-blue-700 mb-2">✈️ Flight Search</h2>
+        <p>Example flights: NYC → LA, <strong>$199</strong> · United Airlines</p>
+      </div>
+
+      <div class="booking-card border-l-8 rounded-xl shadow-xl p-6" style="border-left-color: #a855f7">
+        <h2 class="text-2xl font-bold text-purple-700 mb-2">🚢 Cruise Deals</h2>
+        <ul class="list-disc list-inside space-y-1">
+          <li>5-Night Bahamas Cruise – <strong>$499</strong></li>
+          <li>Mediterranean Adventure – <strong>$1,299</strong></li>
+        </ul>
+      </div>
+
+      <div class="booking-card border-l-8 rounded-xl shadow-xl p-6" style="border-left-color: #ec4899">
+        <h2 class="text-2xl font-bold text-pink-700 mb-2">📦 Travel Packages</h2>
+        <ul class="space-y-2">
+          <li>🗼 Paris Getaway · 5 days · <strong>$899</strong> · Includes hotel + flight</li>
+          <li>🌴 Costa Rica Adventure · 7 days · <strong>$1,200</strong></li>
+        </ul>
+        <!-- ⭐ Optional Save Button -->
+        <button onclick="saveTrip('🗼 Paris Getaway', '5 days · $899 · Includes hotel + flight')" class="bg-yellow-400 px-3 py-1 mt-3 rounded hover:bg-yellow-500 transition">
+          ⭐ Save Trip
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ✅ Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-green-500 text-white py-2 px-4 rounded shadow hidden z-50"></div>
+
+  <!-- ✅ Scripts -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    // ✅ Save trip globally
+    function saveTrip(title, details) {
+      const trips = JSON.parse(localStorage.getItem("savedTrips")) || [];
+      trips.push({ title, details });
+      localStorage.setItem("savedTrips", JSON.stringify(trips));
+      renderSavedTrips();
+    }
+
+    // ✅ Booking form handler
+    document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const destination = document.getElementById("bookingDestination").value;
+      const startDate = document.getElementById("bookingStartDate").value;
+      const endDate = document.getElementById("bookingEndDate").value;
+      const toast = document.getElementById("toast");
+
+      const tripDetails = `Trip to ${destination} from ${startDate} to ${endDate}`;
+      const bookingData = {
+        name: "Team Trip",
+        email: "team@oneskyquest.com",
+        tripDetails,
+        type: "team",
+      };
+
+      try {
+        const res = await fetch("/api/bookings/book", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bookingData),
+        });
+
+        const data = await res.json();
+        toast.textContent = data.message || "✅ Booking saved!";
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 3000);
+
+        saveTrip("✈️ " + bookingData.name, bookingData.tripDetails);
+      } catch (err) {
+        console.error("Booking failed:", err);
+        toast.textContent = "❌ Booking failed!";
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 3000);
+      }
+    });
+
+    // ✅ Load/render saved trips
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTripsContainer = document.getElementById("saved-trips-container");
+      const noTripsMessage = document.getElementById("no-trips-message");
+
+      function removeTrip(index) {
+        const cards = document.querySelectorAll(".saved-trip-card");
+        const card = cards[index];
+        card.classList.add("opacity-0");
+
+        setTimeout(() => {
+          const trips = JSON.parse(localStorage.getItem("savedTrips")) || [];
+          trips.splice(index, 1);
+          localStorage.setItem("savedTrips", JSON.stringify(trips));
+          renderSavedTrips();
+        }, 300);
+      }
+
+      window.renderSavedTrips = function () {
+        const trips = JSON.parse(localStorage.getItem("savedTrips")) || [];
+        savedTripsContainer.innerHTML = "";
+
+        if (trips.length === 0) {
+          noTripsMessage.style.display = "block";
+        } else {
+          noTripsMessage.style.display = "none";
+        }
+
+        trips.forEach((trip, index) => {
+          const card = document.createElement("div");
+          card.className = "saved-trip-card bg-gray-50 border-l-8 border-blue-500 rounded-xl shadow-md p-4 opacity-0 animate-fade-in";
+          card.innerHTML = `
+            <h3 class="text-lg font-semibold text-blue-700">${trip.title}</h3>
+            <p class="text-sm text-gray-600">${trip.details}</p>
+            <div class="mt-2 flex gap-3">
+              <button class="px-4 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">View</button>
+              <button onclick="removeTrip(${index})" class="px-4 py-1 text-sm bg-red-100 text-red-600 rounded hover:bg-red-200">Remove</button>
+            </div>
+          `;
+          savedTripsContainer.appendChild(card);
+        });
+      };
+
+      renderSavedTrips();
+    });
+  </script>
+</body>
+</html>

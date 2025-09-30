@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🌎 Global Reset (lightweight) */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* 🌅 App base (tokens come from theme-warm.css) */
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  background-color: var(--bg-page);
+  color: var(--text-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 🔗 Links */
+a { text-decoration: none; color: inherit; }
+
+/* 🧭 Section layout (prevents navbar overlap) */
+section { max-width: 1200px; margin: 0 auto; padding: 6rem 1rem 4rem; }
