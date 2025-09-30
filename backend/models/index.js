@@ -1,40 +1,66 @@
-import * as AdminMod from "./admin.js";
-import * as BookingMod from "./booking.js";
-import * as CarMod from "./car.js";
-import * as ChatMod from "./chat.js";
-import * as CommentMod from "./comment.js";
-import * as ContactMod from "./contact.js";
-import * as ConversationMod from "./conversation.js";
-import * as CruiseMod from "./cruise.js";
-import * as FlightMod from "./flight.js";
-import * as HotelMod from "./hotel.js";
-import * as MessageMod from "./message.js";
-import * as NotificationMod from "./notification.js";
-import * as PackageMod from "./package.js";
-import * as PlaceMod from "./place.js";
-import * as PostMod from "./post.js";
-import * as ProfileMod from "./profile.js";
-import * as ReportMod from "./report.js";
-import * as UserMod from "./user.js";
+import { Router } from "express";
 
-// Prefer default export; fall back to named (conventional) export.
-const pick = (mod, name) => mod?.default ?? mod?.[name];
+// Tolerant imports (CJS or ESM)
+import * as adminMod from "../admin.routes.js";
+import * as adminAuthMod from "../adminAuth.routes.js";
+import * as adminProtectedMod from "../adminProtected.js";
+import * as bookingMod from "../booking.routes.js";
+import * as carMod from "../car.routes.js";
+import * as commentsMod from "../comments.js";
+import * as conversationsMod from "../conversations.js";
+import * as cruiseMod from "../cruise.route.js";
+import * as dmMod from "../dm.js";
+import * as feedMod from "../feed.js";
+import * as flightMod from "../flight.routes.js";
+import * as healthMod from "../health.routes.js";
+import * as hotelMod from "../hotel.routes.js";
+import * as messageMod from "../message.routes.js";
+import * as notificationMod from "../notification.routes.js";
+import * as pkgMod from "../package.routes.js";
+import * as placeMod from "../place.routes.js";
 
-export const Admin = pick(AdminMod, "Admin");
-export const Booking = pick(BookingMod, "Booking");
-export const Car = pick(CarMod, "Car");
-export const Chat = pick(ChatMod, "Chat");
-export const Comment = pick(CommentMod, "Comment");
-export const Contact = pick(ContactMod, "Contact");
-export const Conversation = pick(ConversationMod, "Conversation");
-export const Cruise = pick(CruiseMod, "Cruise");
-export const Flight = pick(FlightMod, "Flight");
-export const Hotel = pick(HotelMod, "Hotel");
-export const Message = pick(MessageMod, "Message");
-export const Notification = pick(NotificationMod, "Notification");
-export const Package = pick(PackageMod, "Package");
-export const Place = pick(PlaceMod, "Place");
-export const Post = pick(PostMod, "Post");
-export const Profile = pick(ProfileMod, "Profile");
-export const Report = pick(ReportMod, "Report");
-export const User = pick(UserMod, "User");
+const pick = (mod) => mod?.default ?? mod?.router ?? mod;
+
+const admin = pick(adminMod);
+const adminAuth = pick(adminAuthMod);
+const adminProtected = pick(adminProtectedMod);
+const booking = pick(bookingMod);
+const car = pick(carMod);
+const comments = pick(commentsMod);
+const conversations = pick(conversationsMod);
+const cruise = pick(cruiseMod);
+const dm = pick(dmMod);
+const feed = pick(feedMod);
+const flight = pick(flightMod);
+const health = pick(healthMod);
+const hotel = pick(hotelMod);
+const message = pick(messageMod);
+const notification = pick(notificationMod);
+const pkg = pick(pkgMod);
+const place = pick(placeMod);
+
+const api = Router();
+
+api.get("/", (_req, res) => {
+  res.json({ ok: true, api: "One Sky Quest API root" });
+});
+
+if (admin) api.use("/admin", admin);
+if (adminAuth) api.use("/admin-auth", adminAuth);
+if (adminProtected) api.use("/admin-protected", adminProtected);
+if (booking) api.use("/booking", booking);
+if (car) api.use("/car", car);
+if (comments) api.use("/comments", comments);
+if (conversations) api.use("/conversations", conversations);
+if (cruise) api.use("/cruise", cruise);
+if (dm) api.use("/dm", dm);
+if (feed) api.use("/feed", feed);
+if (flight) api.use("/flight", flight);
+if (health) api.use("/health", health);
+if (hotel) api.use("/hotel", hotel);
+if (message) api.use("/message", message);
+if (notification) api.use("/notification", notification);
+if (pkg) api.use("/package", pkg);
+if (place) api.use("/place", place);
+
+export default api;
