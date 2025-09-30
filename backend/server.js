@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 import apiRouter from "./routes/api/index.js";
 import healthRouter from "./routes/health.routes.js";
 // IMPORTANT: match the actual filename casing on disk (Render/Linux is case-sensitive)
-import Contact from "./models/Contact.js";
+import Contact from "./models/contact.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
