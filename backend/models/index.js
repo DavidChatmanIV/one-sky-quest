@@ -1,39 +1,40 @@
-import Admin from "./admin.js";
-import Booking from "./booking.js";
-import Car from "./car.js";
-import Chat from "./chat.js";
-import Comment from "./comment.js";
-import Contact from "./contact.js";
-import Conversation from "./conversation.js";
-import Cruise from "./cruise.js";
-import Flight from "./flight.js";
-import Hotel from "./hotel.js";
-import Message from "./message.js";
-import Notification from "./notification.js";
-import Package from "./package.js";
-import Place from "./place.js";
-import Post from "./post.js";
-import Profile from "./profile.js";
-import Report from "./report.js";
-import User from "./user.js";
+import * as AdminMod from "./admin.js";
+import * as BookingMod from "./booking.js";
+import * as CarMod from "./car.js";
+import * as ChatMod from "./chat.js";
+import * as CommentMod from "./comment.js";
+import * as ContactMod from "./contact.js";
+import * as ConversationMod from "./conversation.js";
+import * as CruiseMod from "./cruise.js";
+import * as FlightMod from "./flight.js";
+import * as HotelMod from "./hotel.js";
+import * as MessageMod from "./message.js";
+import * as NotificationMod from "./notification.js";
+import * as PackageMod from "./package.js";
+import * as PlaceMod from "./place.js";
+import * as PostMod from "./post.js";
+import * as ProfileMod from "./profile.js";
+import * as ReportMod from "./report.js";
+import * as UserMod from "./user.js";
 
-export {
-  Admin,
-  Booking,
-  Car,
-  Chat,
-  Comment,
-  Contact,
-  Conversation,
-  Cruise,
-  Flight,
-  Hotel,
-  Message,
-  Notification,
-  Package,
-  Place,
-  Post,
-  Profile,
-  Report,
-  User,
-};
+// Prefer default export; fall back to named (conventional) export.
+const pick = (mod, name) => mod?.default ?? mod?.[name];
+
+export const Admin = pick(AdminMod, "Admin");
+export const Booking = pick(BookingMod, "Booking");
+export const Car = pick(CarMod, "Car");
+export const Chat = pick(ChatMod, "Chat");
+export const Comment = pick(CommentMod, "Comment");
+export const Contact = pick(ContactMod, "Contact");
+export const Conversation = pick(ConversationMod, "Conversation");
+export const Cruise = pick(CruiseMod, "Cruise");
+export const Flight = pick(FlightMod, "Flight");
+export const Hotel = pick(HotelMod, "Hotel");
+export const Message = pick(MessageMod, "Message");
+export const Notification = pick(NotificationMod, "Notification");
+export const Package = pick(PackageMod, "Package");
+export const Place = pick(PlaceMod, "Place");
+export const Post = pick(PostMod, "Post");
+export const Profile = pick(ProfileMod, "Profile");
+export const Report = pick(ReportMod, "Report");
+export const User = pick(UserMod, "User");
