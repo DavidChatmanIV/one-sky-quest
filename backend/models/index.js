@@ -1,18 +1,39 @@
-export { default as Admin } from "./admin.js";
-export { default as Booking } from "./booking.js"; 
-export { default as Car } from "./car.js";
-export { default as Chat } from "./chat.js";
-export { default as Comment } from "./comment.js";
-export { default as Contact } from "./contact.js";
-export { default as Conversation } from "./conversation.js";
-export { default as Cruise } from "./cruise.js";
-export { default as Flight } from "./flight.js";
-export { default as Hotel } from "./hotel.js";
-export { default as Message } from "./message.js";
-export { default as Notification } from "./notification.js";
-export { default as Package } from "./package.js";
-export { default as Place } from "./place.js";
-export { default as Post } from "./post.js";
-export { default as Profile } from "./profile.js";
-export { default as Report } from "./report.js"; 
-export { default as User } from "./user.js";
+import Admin from "./admin.js";
+import Booking from "./booking.js";
+import Car from "./car.js";
+import Chat from "./chat.js";
+import Comment from "./comment.js";
+import Contact from "./contact.js";
+import Conversation from "./conversation.js";
+import Cruise from "./cruise.js";
+import Flight from "./flight.js";
+import Hotel from "./hotel.js";
+import Message from "./message.js";
+import Notification from "./notification.js";
+import Package from "./package.js";
+import Place from "./place.js";
+import Post from "./post.js";
+import Profile from "./profile.js";
+import Report from "./report.js";
+import User from "./user.js";
+
+export {
+  Admin,
+  Booking,
+  Car,
+  Chat,
+  Comment,
+  Contact,
+  Conversation,
+  Cruise,
+  Flight,
+  Hotel,
+  Message,
+  Notification,
+  Package,
+  Place,
+  Post,
+  Profile,
+  Report,
+  User,
+};
