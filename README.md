@@ -1,2 +1,0 @@
-# one sky quest
- 
