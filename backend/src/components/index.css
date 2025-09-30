@@ -1,0 +1,13 @@
+/* Hexagon clip */
+.clip-hex {
+clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+}
+
+/* Custom animation */
+@keyframes wiggle {
+0%, 100% { transform: rotate(-2deg); }
+50% { transform: rotate(2deg); }
+}
+.animate-wiggle {
+animation: wiggle 1s ease-in-out infinite;
+}

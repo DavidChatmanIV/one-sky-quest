@@ -1,5 +1,5 @@
 export { default as Admin } from "./admin.js";
-export { default as Booking } from "./booking.js";
+export { default as Booking } from "./booking.js"; 
 export { default as Car } from "./car.js";
 export { default as Chat } from "./chat.js";
 export { default as Comment } from "./comment.js";
@@ -14,5 +14,5 @@ export { default as Package } from "./package.js";
 export { default as Place } from "./place.js";
 export { default as Post } from "./post.js";
 export { default as Profile } from "./profile.js";
-export { default as Report } from "./report.js";
+export { default as Report } from "./report.js"; 
 export { default as User } from "./user.js";
