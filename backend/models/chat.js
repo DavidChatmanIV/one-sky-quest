@@ -1,121 +1,28 @@
-const socket = io("http://localhost:3000"); // use your live URL when deploying
-let currentUser = "USER_ID"; // Replace with your logged-in user ID
-let currentConversationId = null;
+import mongoose from "mongoose";
 
-// Load inbox
-fetch(`/api/dm/conversations/${currentUser}`)
-<<<<<<< HEAD
-.then((res) => res.json())
-.then((conversations) => {
-    const inbox = document.getElementById("inbox");
-    conversations.forEach((conv) => {
-    const el = document.createElement("div");
-    el.textContent = `Chat with ${conv.participants.join(", ")}`;
-    el.classList.add("chat-preview");
-    el.onclick = () => openChat(conv._id);
-    inbox.appendChild(el);
-    });
-});
+const { Schema } = mongoose;
 
-function openChat(conversationId) {
-currentConversationId = conversationId;
-=======
-  .then((res) => res.json())
-  .then((conversations) => {
-    const inbox = document.getElementById("inbox");
-    conversations.forEach((conv) => {
-      const el = document.createElement("div");
-      el.textContent = `Chat with ${conv.participants.join(", ")}`;
-      el.classList.add("chat-preview");
-      el.onclick = () => openChat(conv._id);
-      inbox.appendChild(el);
-    });
-  });
+const ChatSchema = new Schema(
+  {
+    // Users in this chat (DM = 2 users; group = 3+)
+    participants: [
+      { type: Schema.Types.ObjectId, ref: "User", required: true },
+    ],
 
-function openChat(conversationId) {
-  currentConversationId = conversationId;
->>>>>>> origin/fresh-start
-  document.getElementById("chatWindow").classList.remove("hidden");
-  document.getElementById("messages").innerHTML = "";
+    // Optional title for group chats
+    title: { type: String, default: "" },
 
-  socket.emit("joinRoom", conversationId);
+    // Group vs DM flag
+    isGroup: { type: Boolean, default: false },
 
-  fetch(`/api/dm/message/${conversationId}`)
-    .then((res) => res.json())
-    .then((messages) => {
-      messages.forEach((msg) => {
-        addMessageToUI(msg);
-      });
-    });
-}
+    // When the last message was sent (helps sort the sidebar)
+    lastMessageAt: { type: Date, default: Date.now },
 
-function addMessageToUI(msg) {
-<<<<<<< HEAD
-const msgDiv = document.createElement("div");
-msgDiv.textContent = `${msg.sender}: ${msg.text}`;
-document.getElementById("messages").appendChild(msgDiv);
-=======
-  const msgDiv = document.createElement("div");
-  msgDiv.textContent = `${msg.sender}: ${msg.text}`;
-  document.getElementById("messages").appendChild(msgDiv);
->>>>>>> origin/fresh-start
-}
+    // Optional: store last message id for quick preview
+    lastMessage: { type: Schema.Types.ObjectId, ref: "Message" },
+  },
+  { timestamps: true }
+);
 
-// Send message
-document.getElementById("messageForm").addEventListener("submit", async (e) => {
-<<<<<<< HEAD
-e.preventDefault();
-const text = document.getElementById("messageInput").value;
-
-const message = {
-    conversationId: currentConversationId,
-    sender: currentUser,
-    text,
-};
-
-await fetch("/api/dm/message", {
-    method: "POST",
-    headers: {
-    "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
-});
-
-socket.emit("sendMessage", message);
-addMessageToUI(message);
-document.getElementById("messageInput").value = "";
-});
-
-socket.on("receiveMessage", (data) => {
-if (data.conversationId === currentConversationId) {
-    addMessageToUI(data);
-}
-=======
-  e.preventDefault();
-  const text = document.getElementById("messageInput").value;
-
-  const message = {
-    conversationId: currentConversationId,
-    sender: currentUser,
-    text,
-  };
-
-  await fetch("/api/dm/message", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
-  });
-
-  socket.emit("sendMessage", message);
-  addMessageToUI(message);
-  document.getElementById("messageInput").value = "";
-});
-
-socket.on("receiveMessage", (data) => {
-  if (data.conversationId === currentConversationId) {
-    addMessageToUI(data);
-  }
->>>>>>> origin/fresh-start
-});
+// Prevent model overwrite errors in dev/hot reload
+export default mongoose.models.Chat || mongoose.model("Chat", ChatSchema);
