@@ -1,15 +1,19 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const carSchema = new mongoose.Schema({
-company: String,
-model: String,
-location: String,
-pickupDate: String,
-returnDate: String,
-price: Number,
-image: String,
-rating: Number,
-seats: Number,
-});
+const CarSchema = new mongoose.Schema(
+  {
+    company: { type: String, required: true },
+    model: { type: String, required: true },
+    location: { type: String, required: true },
+    pickupDate: { type: String, required: true },
+    returnDate: { type: String, required: true },
+    price: { type: Number, required: true },
+    image: { type: String },
+    rating: { type: Number },
+    seats: { type: Number },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("Car", carSchema);
+// ESM-friendly default export with hot-reload safety
+export default mongoose.models.Car || mongoose.model("Car", CarSchema);
