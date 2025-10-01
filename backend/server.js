@@ -60,6 +60,15 @@ app.use(
   })
 );
 
+// ---------- TEMP env probe (remove after confirming on Render) ----------
+app.get("/__envcheck", (_req, res) => {
+  const uri = process.env.MONGODB_URI || "";
+  res.json({
+    present: !!uri,
+    sample: uri ? uri.slice(0, 16) + "..." + uri.slice(-6) : "not set",
+  });
+});
+
 // ---------- Mongo ----------
 const USE_MOCKS = process.env.USE_MOCKS === "true";
 const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
@@ -163,3 +172,4 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () =>
   console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`)
 );
+ 
