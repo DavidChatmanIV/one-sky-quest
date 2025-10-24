@@ -15,7 +15,7 @@ import {
   UniqueStaysCard,
   LimitedDealsCard,
   TeamTravelCard,
-  AIPlannerCard, // unified AI card
+  AIPlannerCard,
 } from "../components/landing";
 
 import "../styles/LandingPage.css";
@@ -94,7 +94,7 @@ export default function LandingPage() {
     []
   );
   const limitedDeals = useMemo(() => {
-    const ends = Date.now() + 12 * 3600e3;
+    const ends = Date.now() + 12 * 3600e3; // 12 hours from now
     return [
       {
         id: "lis",
@@ -138,109 +138,103 @@ export default function LandingPage() {
       />
 
       <div className="landing-wrap">
-        {/* Hero */}
+        {/* ===== Hero ===== */}
         <section
           className="landing-hero osq-hero-minimal"
           aria-label="Welcome & Search"
         >
-          <Title className="hero-greeting title-white">
-            {greeting}{" "}
-            <span className="wave" aria-hidden="true">
-              {emoji}
-            </span>
-          </Title>
+          <div className="lp-container">
+            <Title className="hero-greeting title-white">
+              {greeting}{" "}
+              <span className="wave" aria-hidden="true">
+                {emoji}
+              </span>
+            </Title>
 
-          {/* quick stats */}
-          <div className="hero-stats" aria-label="Your quick stats">
-            <Tag className="pill">
-              <Avatar size="small" style={{ background: "transparent" }}>
-                🌀
-              </Avatar>
-              XP {stats.xp}
-            </Tag>
-            <Tag className="pill">{stats.saved} saved trips</Tag>
-            <Tag className="pill">{stats.newItems} new</Tag>
-          </div>
+            {/* quick stats */}
+            <div className="hero-stats" aria-label="Your quick stats">
+              <Tag className="pill">
+                <Avatar size="small" style={{ background: "transparent" }}>
+                  🌀
+                </Avatar>
+                XP {stats.xp}
+              </Tag>
+              <Tag className="pill">{stats.saved} saved trips</Tag>
+              <Tag className="pill">{stats.newItems} new</Tag>
+            </div>
 
-          {/* XP LEVEL — hero placement */}
-          <div className="hero-xp">
-            <XPLevelCard level="Globetrotter" percent={80} variant="hero" />
-          </div>
+            {/* XP Level */}
+            <div className="hero-xp slim">
+              <XPLevelCard level="Globetrotter" percent={80} variant="hero" />
+            </div>
 
-          <UnifiedSearchBar />
+            {/* Search */}
+            <div className="lp-surface lp-gap">
+              <UnifiedSearchBar />
+            </div>
 
-          {/* Smart Tools (top row) */}
-          <Row
-            gutter={[20, 20]}
-            style={{ marginTop: 16 }}
-            className="smart-row"
-          >
-            <Col xs={24} md={12} xl={8}>
-              <UniqueStaysCard items={uniqueItems} />
-            </Col>
-
-            <Col xs={24} md={12} xl={8}>
-              <LimitedDealsCard deals={limitedDeals} />
-            </Col>
-
-            {/* Unified AI card */}
-            <Col xs={24} xl={8}>
-              <AIPlannerCard
-                userName={userName}
-                pick={aiPick}
-                onStart={() => console.log("Launch AI Trip Builder")}
-                onViewDeals={() => console.log("View all deals")}
-                onEditProfile={() => console.log("Edit Profile")}
-                onSeePlan={() => console.log("See AI plan")}
-                defaultMode="suggest"
-              />
-            </Col>
-          </Row>
-
-          {/* Main grid */}
-          <Row
-            gutter={[20, 20]}
-            className="hero-grid"
-            style={{ marginTop: 16 }}
-          >
-            {/* Left stack */}
-            <Col xs={24} lg={12} xl={14}>
-              <Space
-                direction="vertical"
-                size={20}
-                style={{ width: "100%" }}
-                className="stack-fill"
-              >
-                <SavedTripsCard trips={trips} />
-                <TeamTravelCard
-                  onStart={() => console.log("Start Team Trip")}
-                  onOpenMap={() => console.log("Open Team Travel mini-map")}
+            {/* Smart tools row */}
+            <Row gutter={[16, 16]} className="lp-gap">
+              <Col xs={24} md={12} xl={8}>
+                <UniqueStaysCard items={uniqueItems} />
+              </Col>
+              <Col xs={24} md={12} xl={8}>
+                <LimitedDealsCard deals={limitedDeals} />
+              </Col>
+              <Col xs={24} xl={8}>
+                <AIPlannerCard
+                  userName={userName}
+                  pick={aiPick}
+                  onStart={() => console.log("Launch AI Trip Builder")}
+                  onViewDeals={() => console.log("View all deals")}
+                  onEditProfile={() => console.log("Edit Profile")}
+                  onSeePlan={() => console.log("See AI plan")}
+                  defaultMode="suggest"
                 />
-              </Space>
-            </Col>
+              </Col>
+            </Row>
 
-            {/* Right stack */}
-            <Col xs={24} lg={12} xl={10}>
-              <Space
-                direction="vertical"
-                size={20}
-                style={{ width: "100%" }}
-                className="stack-fill"
-              >
-                <QuestFeedPreview item={feedItem} />
-                {/* New: Testimonials + Feedback (kept uniform height) */}
-                <TestimonialsFeedbackCard cardHeight={360} />
-              </Space>
-            </Col>
-          </Row>
+            {/* Main grid */}
+            <Row gutter={[16, 16]} className="lp-gap">
+              {/* Left stack */}
+              <Col xs={24} lg={12} xl={14}>
+                <Space
+                  direction="vertical"
+                  size={16}
+                  className="stack-fill w-100"
+                >
+                  <SavedTripsCard trips={trips} />
+                  <TeamTravelCard
+                    onStart={() => console.log("Start Team Trip")}
+                    onOpenMap={() => console.log("Open Team Travel mini-map")}
+                  />
+                </Space>
+              </Col>
+
+              {/* Right stack */}
+              <Col xs={24} lg={12} xl={10}>
+                <Space
+                  direction="vertical"
+                  size={16}
+                  className="stack-fill w-100"
+                >
+                  <QuestFeedPreview item={feedItem} />
+                  <TestimonialsFeedbackCard cardHeight={360} />
+                </Space>
+              </Col>
+            </Row>
+          </div>
         </section>
 
+        {/* Perks */}
         <section
           id="perks"
-          style={{ marginTop: 24 }}
           aria-label="Membership Perks"
+          className="lp-section"
         >
-          <OneSkyPerksCard />
+          <div className="lp-container">
+            <OneSkyPerksCard />
+          </div>
         </section>
       </div>
 

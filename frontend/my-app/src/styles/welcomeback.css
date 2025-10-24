@@ -1,0 +1,44 @@
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* centers horizontally */
+  justify-content: center; /* centers vertically if parent allows */
+  text-align: center;      /* center text inside */
+  margin-top: 2.5rem;      /* reduced from 4rem */
+  margin-bottom: 1.25rem;  /* balanced spacing */
+}
+
+/* Limit card width and center it nicely */
+.welcomeCard {
+  width: 100%;
+  max-width: 820px;        /* fits modern layouts */
+  margin: 0 auto;
+}
+
+/* Headline (Welcome back, David) styling */
+.welcome-h1 {
+  font-size: 2rem;         /* consistent with Ant Design Titles */
+  font-weight: 600;
+  color: #fff;             /* ensures readability on dark or gradient bg */
+  margin-bottom: 0.5rem;   /* tighter spacing */
+}
+
+/* Keep tags tight to the title */
+.welcome-tags {
+  margin-top: 0.25rem;
+}
+
+/* Center badge under tags */
+.welcome-badge {
+  margin-top: 0.5rem;
+}
+
+/* Progress block spacing */
+.welcome-progress {
+  margin-top: 1rem;
+}
+
+/* Main content spacing (adjust for sticky headers) */
+main {
+  padding-top: 2rem !important;
+}

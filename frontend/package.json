@@ -1,14 +1,24 @@
 {
   "name": "frontend",
   "version": "1.0.0",
+  "description": "Frontend for One Sky Quest built with React, Vite, Ant Design, and Tailwind CSS.",
   "main": "tailwind.config.js",
   "scripts": {
+    "dev": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "react",
+    "vite",
+    "tailwind",
+    "antd",
+    "frontend",
+    "oneskyquest"
+  ],
+  "author": "David Chatman",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "antd": "^5.27.4",

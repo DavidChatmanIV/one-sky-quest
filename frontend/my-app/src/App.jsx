@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import "aos/dist/aos.css";
+import AOS from "aos";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -31,6 +33,14 @@ function WithPlainLayout() {
 }
 
 export default function App() {
+  useEffect(() => {
+    AOS.init({
+      once: true,
+      duration: 600,
+      easing: "ease-out",
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>

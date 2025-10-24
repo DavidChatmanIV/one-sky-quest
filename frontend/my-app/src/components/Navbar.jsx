@@ -73,10 +73,10 @@ export default function Navbar() {
           <button
             className="brand"
             onClick={() => navigate("/")}
-            aria-label="One Sky Quest Home"
+            aria-label="Skyrio Home"
           >
             <span className="dot" />
-            One Sky
+            Skyrio
           </button>
 
           {/* Desktop pillars */}

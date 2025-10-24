@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { UserOutlined, TrophyOutlined, StarOutlined } from "@ant-design/icons";
 import { getProfile } from "../services/profileService";
+import "./WelcomeBack.css";
 
 const { Title, Text } = Typography;
 
@@ -102,61 +103,61 @@ export default function WelcomeBack({ userId }) {
   } = state.data || {};
 
   return (
-    <Card className="welcomeCard fadeIn" styles={{ body: { padding: 20 } }}>
-      <Space
-        align="start"
-        style={{ width: "100%", justifyContent: "space-between" }}
-      >
-        <Space align="center">
-          <Avatar size={64} src={avatarUrl} icon={<UserOutlined />} />
-          <div>
-            <Title level={4} style={{ margin: 0 }}>
-              {greeting}, {firstName || username || "Traveler"} 👋
-            </Title>
-            <Space wrap size="small">
-              <Tag icon={<StarOutlined />} color="blue">
-                Level {level ?? 1}
-              </Tag>
-              <Tag color="default">XP {xp ?? 0}</Tag>
-              {typeof savedTrips === "number" && (
-                <Tag color="green">{savedTrips} saved trips</Tag>
+    <section className="welcome-section">
+      <Card className="welcomeCard fadeIn" styles={{ body: { padding: 20 } }}>
+        <Space direction="vertical" align="center" style={{ width: "100%" }}>
+          <Space align="center">
+            <Avatar size={64} src={avatarUrl} icon={<UserOutlined />} />
+            <div>
+              {/* use h1 scale for stronger, centered headline */}
+              <Title level={2} className="welcome-h1" style={{ margin: 0 }}>
+                {greeting}, {firstName || username || "Traveler"} 👋
+              </Title>
+
+              <Space wrap size="small" className="welcome-tags">
+                <Tag icon={<StarOutlined />} color="blue">
+                  Level {level ?? 1}
+                </Tag>
+                <Tag color="default">XP {xp ?? 0}</Tag>
+                {typeof savedTrips === "number" && (
+                  <Tag color="green">{savedTrips} saved trips</Tag>
+                )}
+                {typeof unread === "number" && unread > 0 && (
+                  <Tag color="red">{unread} new</Tag>
+                )}
+              </Space>
+
+              {nextBadge && (
+                <div className="welcome-badge">
+                  <Tooltip title={`Next badge: ${nextBadge.name}`}>
+                    <Space>
+                      <TrophyOutlined />
+                      <Text strong>{nextBadge.name}</Text>
+                    </Space>
+                  </Tooltip>
+                </div>
               )}
-              {typeof unread === "number" && unread > 0 && (
-                <Tag color="red">{unread} new</Tag>
-              )}
-            </Space>
-          </div>
+            </div>
+          </Space>
         </Space>
 
-        {nextBadge && (
-          <Tooltip title={`Next badge: ${nextBadge.name}`}>
-            <Space>
-              <TrophyOutlined />
-              <Text strong>{nextBadge.name}</Text>
-            </Space>
-          </Tooltip>
-        )}
-      </Space>
+        <div className="welcome-progress">
+          <Text type="secondary">Progress to next level</Text>
+          <Progress percent={progress} status="active" showInfo />
+        </div>
 
-      <div style={{ marginTop: 16 }}>
-        <Text type="secondary">Progress to next level</Text>
-        <Progress percent={progress} status="active" showInfo />
-      </div>
-
-      {/* styled-jsx removed; standard style tag works in plain React */}
-      <style>{`
-        .fadeIn {
-          opacity: 0;
-          transform: translateY(6px);
-          animation: fadeInUp 320ms ease-out forwards;
-        }
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
+        {/* keep the entrance animation */}
+        <style>{`
+          .fadeIn {
+            opacity: 0;
+            transform: translateY(6px);
+            animation: fadeInUp 320ms ease-out forwards;
           }
-        }
-      `}</style>
-    </Card>
+          @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </Card>
+    </section>
   );
 }

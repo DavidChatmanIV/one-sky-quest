@@ -1,5 +1,6 @@
+// src/main.jsx (or src/index.jsx)
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 // Providers
@@ -12,8 +13,8 @@ import AppRoutes from "./AppRoutes";
 /** 1) Ant reset FIRST (normalize component defaults) */
 import "antd/dist/reset.css";
 
-/** 2) Tailwind + global utilities (lives in src/App.css) */
-import "./App.css";
+/** 2) Tailwind + global utilities (Tailwind entry via PostCSS) */
+import "./style.css"; // <- Your Tailwind entry (replaces App.css as Tailwind entry)
 
 /** 3) App/page styles */
 import "./styles/global.css";
@@ -30,7 +31,7 @@ import "./styles/OverlayTone.css";
 import "./styles/theme.css";
 
 /* ---------- Render Root ---------- */
-ReactDOM.createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AssistantProvider>
       <BrowserRouter>
