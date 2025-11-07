@@ -1,18 +1,30 @@
-/* ===== One Sky Quest — Smooth Search Bar ===== */
+/* ==============================
+   Skyrio — Unified Search Bar
+   ============================== */
+
+/* ---- Core theme tokens (uses your existing palette) ---- */
 :root{
-  /* uses your existing palette */
   --bg-start:#0f1020; --bg-mid:#231a3a; --bg-end:#3a2430;
-  --surface:#1e2039; --surface-2:#2a2c4b;
+
+  --surface:#1e2039;         /* cards */
+  --surface-2:#2a2c4b;       /* dock background */
   --glass:rgba(255,255,255,.10);
   --glass-2:rgba(255,255,255,.16);
-  --text-1:#f4f6fb; --text-2:#c9cbe3;
-  --cta:#ff8a2a; --cta-hover:#ff7a00;
+
+  --text-1:#f4f6fb;
+  --text-2:#c9cbe3;
+
+  --cta:#ff8a2a;
+  --cta-2:#ffa94d;           /* used by gradient buttons */
+  --cta-hover:#ff7a00;
+
   --shadow:0 14px 36px rgba(0,0,0,.35);
-  --r-lg:14px; --r-xl:18px;
+  --r-lg:14px;
+  --r-xl:18px;
 }
 
-/* wrapper */
-.osq-search{
+/* ---- Wrapper (glass card) ---- */
+.skyrio-search{
   background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
   border: 1px solid var(--glass);
   border-radius: var(--r-xl);
@@ -20,10 +32,25 @@
   box-shadow: var(--shadow);
   color: var(--text-1);
   backdrop-filter: blur(10px) saturate(140%);
+  position: relative;
+  z-index: 10;
 }
 
-/* tabs */
-.osq-search__tabs{
+/* ---- Optional top “dock” look (merged from search-dock) ---- */
+.skyrio-search--dock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--surface-2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+
+/* ---- Tabs (Flights / Hotels / Packages / Cars / etc.) ---- */
+.skyrio-search__tabs{
   display:flex; gap:10px; padding:6px;
   background: rgba(255,255,255,.04);
   border:1px solid var(--glass);
@@ -31,25 +58,25 @@
   width: max-content;
   margin: 2px auto 14px;
 }
-.tab{
+.skyrio-tab{
   padding:10px 14px; border-radius: 999px; border:1px solid transparent;
   color: var(--text-2); background: transparent; font-weight: 600;
 }
-.tab.is-active{
-  color:#111; background: linear-gradient(180deg,#ffdbba,#ffa94d);
+.skyrio-tab.is-active{
+  color:#111; 
+  background: linear-gradient(180deg,#ffdbba,var(--cta-2));
   box-shadow: 0 8px 18px rgba(255,138,42,.35);
-  border-color: transparent;
 }
 
-/* grid (breathing room!) */
-.osq-search__grid{
+/* ---- Grid layout ---- */
+.skyrio-search__grid{
   display:grid;
-  grid-template-columns: 2fr repeat(3, 1fr) 1.1fr;
+  grid-template-columns: 2fr repeat(3, 1fr) 1.1fr; /* [Where | Dates | Guests | Class | CTA] */
   gap: 12px;
 }
 
-/* field shell */
-.field{ display:flex; flex-direction: column; gap:6px; }
+/* ---- Field shell ---- */
+.field{ display:flex; flex-direction: column; gap:6px; min-width: 0; }
 .field__label{ font-size:.85rem; color: var(--text-2); padding-left: 2px; }
 
 .field__control{
@@ -58,20 +85,19 @@
   border: 1px solid var(--glass);
   border-radius: var(--r-lg);
   padding: 12px 14px;
-  transition: border-color .15s ease, box-shadow .15s ease;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 .field__control:focus-within{
   border-color: var(--glass-2);
   box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset;
 }
-
 .field__icon{ opacity:.9 }
 .input{
   flex:1; border:none; outline:none; background: transparent;
-  color: var(--text-1); font-size: .98rem;
+  color: var(--text-1); font-size: .98rem; min-width: 0;
 }
 
-/* CTA cell */
+/* ---- CTA cell ---- */
 .field--cta{
   display:flex; flex-direction: column; justify-content: center; gap:8px;
 }
@@ -79,7 +105,7 @@
   width:100%;
   padding: 14px 18px;
   border-radius: var(--r-lg);
-  background: linear-gradient(180deg, var(--cta), var(--cta-hover));
+  background: linear-gradient(90deg, var(--cta) 0%, var(--cta-2) 100%);
   color:#111; font-weight: 800; letter-spacing:.2px;
   border:none; cursor:pointer;
   box-shadow: 0 10px 24px rgba(255,138,42,.35);
@@ -87,6 +113,7 @@
 }
 .search-btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
 
+/* ---- Smart helper text ---- */
 .smart{
   display:flex; align-items:center; gap:8px;
   color: var(--text-2);
@@ -95,17 +122,54 @@
 }
 .zap{ filter: drop-shadow(0 0 8px rgba(255,205,100,.45)); }
 
-/* responsive */
+/* ---- Ant Design alignment (inputs, picker, select) ---- */
+.skyrio-search .ant-input,
+.skyrio-search .ant-input-affix-wrapper,
+.skyrio-search .ant-select-selector,
+.skyrio-search .ant-picker{
+  border-radius: 12px !important;
+  border: none !important;
+  background: var(--glass) !important;
+  color: var(--text-1) !important;
+  box-shadow: none !important;
+}
+.skyrio-search .ant-input::placeholder,
+.skyrio-search .ant-select-selection-placeholder,
+.skyrio-search .ant-picker-input > input::placeholder{
+  color: rgba(244,246,251,.55) !important;
+}
+.skyrio-search .ant-input-affix-wrapper:focus,
+.skyrio-search .ant-input-affix-wrapper-focused,
+.skyrio-search .ant-select-focused .ant-select-selector,
+.skyrio-search .ant-picker-focused{
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset !important;
+  background: rgba(255,255,255,.12) !important;
+}
+
+/* ---- Compact (fits one fold, no “Show more”) ---- */
+.skyrio-search--compact .skyrio-search__grid{
+  grid-template-columns: 1.8fr 1.2fr 1.2fr 1fr 1fr; /* a bit tighter */
+}
+.skyrio-search--compact .field__label{ display:none; } /* save vertical space */
+.skyrio-search--compact .field__control{ padding: 10px 12px; }
+
+/* ---- Responsive ---- */
 @media (max-width: 1080px){
-  .osq-search__grid{ grid-template-columns: 1.6fr repeat(2, 1fr); }
+  .skyrio-search__grid{ grid-template-columns: 1.6fr repeat(2, 1fr); }
   .field--cta{ grid-column: span 3; }
 }
 @media (max-width: 720px){
-  .osq-search{ padding: 12px; }
-  .osq-search__tabs{ margin: 0 auto 10px; transform: scale(.95); }
-  .osq-search__grid{
+  .skyrio-search{ padding: 12px; }
+  .skyrio-search__tabs{ margin: 0 auto 10px; transform: scale(.95); }
+  .skyrio-search__grid{
     grid-template-columns: 1fr;
     gap: 10px;
   }
   .field--cta{ grid-column: auto; }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

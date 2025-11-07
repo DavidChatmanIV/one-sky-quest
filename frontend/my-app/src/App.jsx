@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom"; // BrowserRouter removed
 import "aos/dist/aos.css";
 import AOS from "aos";
 
@@ -42,7 +42,7 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         {/* Landing (with Navbar) */}
         <Route element={<WithLandingLayout />}>
@@ -64,6 +64,6 @@ export default function App() {
 
       {/* Persist across all routes */}
       <CookieBanner />
-    </BrowserRouter>
+    </>
   );
 }

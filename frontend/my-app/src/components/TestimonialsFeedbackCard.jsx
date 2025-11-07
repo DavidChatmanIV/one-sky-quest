@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Card,
   Tabs,
@@ -18,12 +18,13 @@ import {
   BulbOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
-
 import "../styles/TestimonialsFeedbackCard.css";
 
 const { Text, Title } = Typography;
 
-// --- Demo data ---
+/* ---------------------------
+ * Demo data (safe defaults)
+ * --------------------------- */
 const SAMPLE_TESTIMONIALS = [
   {
     id: "t1",
@@ -69,6 +70,9 @@ const SAMPLE_FEEDBACK = [
   },
 ];
 
+/* =====================================================================
+ * Testimonials & Feedback Card (AntD v5 clean)
+ * ===================================================================== */
 export default function TestimonialsFeedbackCard({
   title = "Testimonials & Feedback",
   cardHeight = 360,
@@ -131,11 +135,11 @@ export default function TestimonialsFeedbackCard({
   return (
     <Card
       className="osq-card testimonials-card"
-      bordered={false}
-      bodyStyle={{ padding: 14 }}
+      variant="filled" // ✅ AntD v5 replacement for bordered={false}
+      styles={{ body: { padding: 14 } }} // ✅ AntD v5 replacement for bodyStyle
       style={{
         height: cardHeight,
-        overflow: "hidden", // <— ensure nothing bleeds below the card
+        overflow: "hidden",
       }}
     >
       <Space direction="vertical" size={8} style={{ width: "100%" }}>
@@ -178,6 +182,9 @@ export default function TestimonialsFeedbackCard({
                 type="text"
                 className="osq-ghost-btn"
                 onClick={() => setExpanded((v) => !v)}
+                aria-label={
+                  expanded ? "Collapse feedback list" : "Expand feedback list"
+                }
               >
                 {expanded ? "Show less" : "Show more"}
               </Button>
@@ -204,18 +211,20 @@ export default function TestimonialsFeedbackCard({
  * Rotating Testimonials
  * --------------------------- */
 function RotatingTestimonials({ items, height, autoplayMs }) {
-  // Reserve a bit more room for header/tabs/footer so nothing overflows.
-  const RESERVED = 176; // was 136 — increased to prevent overlap
+  // Reserve a bit more room so nothing overflows with tabs/footer
+  const RESERVED = 176;
   const contentH = Math.max(150, height - RESERVED);
 
-  const [index, setIndex] = React.useState(0);
-  React.useEffect(() => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (!items?.length) return;
     const id = setInterval(
       () => setIndex((i) => (i + 1) % items.length),
       autoplayMs
     );
     return () => clearInterval(id);
-  }, [items.length, autoplayMs]);
+  }, [items?.length, autoplayMs]);
 
   const prev = () => setIndex((i) => (i - 1 + items.length) % items.length);
   const next = () => setIndex((i) => (i + 1) % items.length);
@@ -244,13 +253,23 @@ function RotatingTestimonials({ items, height, autoplayMs }) {
       </FadeSwap>
 
       <div className="osq-controls">
-        <Button size="small" className="osq-ghost-btn" onClick={prev}>
+        <Button
+          size="small"
+          className="osq-ghost-btn"
+          onClick={prev}
+          aria-label="Previous testimonial"
+        >
           Prev
         </Button>
         <span className="osq-progress">
           {index + 1} / {items.length}
         </span>
-        <Button size="small" className="osq-ghost-btn" onClick={next}>
+        <Button
+          size="small"
+          className="osq-ghost-btn"
+          onClick={next}
+          aria-label="Next testimonial"
+        >
           Next
         </Button>
       </div>
@@ -278,7 +297,7 @@ function QuickFeedbackList({ items, height, expanded, onAdd }) {
       className={`osq-panel ${expanded ? "" : "osq-mask-fade"}`}
       style={{
         height: contentH,
-        overflowY: expanded ? "auto" : "hidden", // scroll within card when expanded
+        overflowY: expanded ? "auto" : "hidden",
       }}
     >
       <div className="osq-panel-inner osq-feedback-list">
@@ -292,6 +311,7 @@ function QuickFeedbackList({ items, height, expanded, onAdd }) {
             onChange={(e) => setText(e.target.value)}
             autoSize={{ minRows: 1, maxRows: 3 }}
             onPressEnter={(e) => {
+              // Submit on Enter (not Shift+Enter)
               if (!e.shiftKey) {
                 e.preventDefault();
                 submit();
@@ -335,8 +355,8 @@ function QuickFeedbackList({ items, height, expanded, onAdd }) {
  * Minimal fade transition wrapper
  * --------------------------- */
 function FadeSwap({ children }) {
-  const [show, setShow] = React.useState(true);
-  React.useEffect(() => {
+  const [show, setShow] = useState(true);
+  useEffect(() => {
     setShow(false);
     const id = setTimeout(() => setShow(true), 40);
     return () => clearTimeout(id);

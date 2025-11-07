@@ -1,7 +1,7 @@
-// src/main.jsx (or src/index.jsx)
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { ConfigProvider } from "antd";
 
 // Providers
 import { AssistantProvider } from "./context";
@@ -34,9 +34,19 @@ import "./styles/theme.css";
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AssistantProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <ConfigProvider
+        theme={{
+          components: {
+            Card: {
+              variant: "outlined", // change to "borderless" if you prefer no borders globally
+            },
+          },
+        }}
+      >
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </ConfigProvider>
     </AssistantProvider>
   </React.StrictMode>
 );

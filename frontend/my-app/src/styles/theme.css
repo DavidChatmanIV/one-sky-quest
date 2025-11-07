@@ -1,49 +1,94 @@
 /* =========================
-   One Sky Quest Theme (Warm Gradient) — Hard Lock
-   ========================= */
+  Skyrio Warm Gradient Theme
+  + Unified Hero Layout
+  ========================= */
 
+/* ---------- Core tokens ---------- */
 :root {
+  /* Background gradient stops */
   --bg-start: #3a2a72;
   --bg-mid:   #4a2a7a;
-  --bg-deep:  #563064;
+  --bg-deep:  #563064; /* extra stop for warmth */
   --bg-end:   #7a3c3a;
 
+  /* Text */
   --text-default: #f4f6fb;
-  --text-muted: #c9cbe3;
+  --text-muted:   #c9cbe3;
 
-  --surface: rgba(255,255,255,.06);
-  --surface-2: rgba(255,255,255,.04);
-  --border-soft: rgba(255,255,255,.12);
+  /* Surfaces & borders */
+  --surface:       rgba(255,255,255,.06);
+  --surface-2:     rgba(255,255,255,.04);
+  --border-soft:   rgba(255,255,255,.12);
 
-  --accent-primary: #ff8a2a;
+  /* Accents */
+  --accent-primary:       #ff8a2a;
   --accent-primary-hover: #ff9e4d;
-  --accent-glow: 0 0 12px rgba(255,138,42,.55);
+  --accent-shadow:        rgba(255,138,42,.40);
 
+  /* Buttons */
   --btn-text: #fff;
-  --btn-glass: rgba(255,255,255,.08);
-  --btn-glass-hover: rgba(255,255,255,.12);
-  --btn-border: rgba(255,255,255,.16);
+  --btn-glass:        rgba(255,255,255,.08);
+  --btn-glass-hover:  rgba(255,255,255,.12);
+  --btn-border:       rgba(255,255,255,.16);
+
+  /* Layout helpers */
+  --nav-h: 72px;
+  --page-w: 1180px;
+  --lp-gap: 20px;
+  --lp-radius: 16px;
+
+  /* === Aliases consumed by global.css === */
+  --text-1: var(--text-default);
+  --text-2: var(--text-muted);
+  --glass: var(--surface);
+  --glass-2: var(--surface-2);
+  --cta: var(--accent-primary);
+  --cta-2: var(--accent-primary-hover);
+  --cta-glow: var(--accent-shadow);
 }
 
-/* Ensure the canvas is addressable */
-html, body, #root { min-height: 100%; }
+/* ---------- Base / resets ---------- */
+html, body, #root { min-height: 100%; height: 100%; }
+* { box-sizing: border-box; }
+:where(img, svg, video, canvas) { display: block; max-width: 100%; }
+:where(button, input, textarea, select) { font: inherit; }
+:where(a) { color: inherit; text-decoration: none; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--cta); outline-offset: 2px; }
+html { scroll-behavior: smooth; }
 
-/* 🔒 Hard-lock warm gradient */
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Hard-locked warm gradient ---------- */
 html, body, #root {
-  background: linear-gradient(
-    180deg,
-    var(--bg-start) 0%,
-    var(--bg-mid)   40%,
-    var(--bg-deep)  70%,
-    var(--bg-end)   100%
-  ) !important;
+  background:
+    linear-gradient(
+      180deg,
+      var(--bg-start) 0%,
+      var(--bg-mid)   40%,
+      var(--bg-deep)  70%,
+      var(--bg-end)   100%
+    ) !important;
+  background-color: var(--bg-mid) !important;
   background-attachment: fixed !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
   color: var(--text-default);
 }
+/* iOS Safari fix for background-attachment */
+@supports (-webkit-touch-callout: none) {
+  html, body, #root { background-attachment: scroll !important; }
+}
 
-/* Any wrappers that sometimes set white — force transparent */
+/* Force wrappers transparent so gradient shows through */
 .ant-app,
 .ant-layout,
 .ant-layout-content,
@@ -57,46 +102,190 @@ html, body, #root {
   background: transparent !important;
 }
 
-/* Cards / surfaces */
-.ant-card, .osq-surface, .card {
+/* ---------- Cards / surfaces ---------- */
+.ant-card,
+.osq-surface,
+.card {
   background: var(--surface) !important;
   border: 1px solid var(--border-soft) !important;
   color: var(--text-default) !important;
   box-shadow: 0 8px 28px rgba(0,0,0,.35);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--lp-radius);
 }
 
-/* Inputs */
-.ant-input, .ant-select-selector, .ant-picker {
+/* ---------- Inputs ---------- */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker {
   background: var(--surface-2) !important;
   color: var(--text-default) !important;
   border: 1px solid var(--border-soft) !important;
+  border-radius: 12px !important;
 }
-.ant-input::placeholder { color: rgba(244,246,251,.7) !important; }
+.ant-input::placeholder,
+.ant-select-selection-placeholder {
+  color: rgba(244,246,251,.70) !important;
+}
+.ant-input-affix-wrapper > input.ant-input {
+  background: transparent !important;
+  color: var(--text-default) !important;
+}
 
-/* Tabs / segmented */
-.ant-segmented, .ant-tabs-nav {
+/* ---------- Tabs / segmented ---------- */
+.ant-segmented,
+.ant-tabs-nav {
   background: var(--surface-2) !important;
-  border-radius: 10px;
+  border-radius: 10px !important;
+  border: 1px solid var(--border-soft) !important;
 }
 
-/* Buttons */
-.ant-btn-primary, .start-btn, .osq-btn-primary {
+/* ---------- Buttons ---------- */
+.ant-btn-primary,
+.start-btn,
+.osq-btn-primary,
+.skyrio-btn-primary {
   background: linear-gradient(180deg, var(--accent-primary-hover), var(--accent-primary)) !important;
   color: var(--btn-text) !important;
   border: none !important;
-  box-shadow: 0 8px 24px rgba(255,138,42,.4) !important;
+  box-shadow: 0 8px 24px var(--accent-shadow) !important;
 }
-.ant-btn-primary:hover, .start-btn:hover, .osq-btn-primary:hover {
+.ant-btn-primary:hover,
+.start-btn:hover,
+.osq-btn-primary:hover,
+.skyrio-btn-primary:hover {
   filter: brightness(1.05);
 }
 
-.ant-btn-default, .nav-button, .osq-btn-glass {
+.ant-btn-default,
+.nav-button,
+.osq-btn-glass,
+.skyrio-btn-glass {
   color: var(--btn-text) !important;
   background: var(--btn-glass) !important;
   border: 1px solid var(--btn-border) !important;
 }
-.ant-btn-default:hover, .nav-button:hover, .osq-btn-glass:hover {
+.ant-btn-default:hover,
+.nav-button:hover,
+.osq-btn-glass:hover,
+.skyrio-btn-glass:hover {
   background: var(--btn-glass-hover) !important;
+}
+
+/* ===========================================
+   Unified Hero Layout (Expedia-style fit)
+   =========================================== */
+
+/* Viewport scaffold */
+.main-viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 0 24px 48px;
+  /* let the global gradient show through */
+  background: transparent !important;
+}
+
+/* Page container width + rhythm */
+.section,
+.page-section {
+  max-width: var(--page-w);
+  width: 100%;
+  margin: 0 auto 32px;
+  border-radius: var(--lp-radius);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.section:hover,
+.page-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+.section-inner,
+.page-section-inner {
+  padding: 16px 20px;
+}
+
+/* Hero header sizing */
+.hero-header {
+  text-align: center;
+  margin-top: 48px;
+  margin-bottom: 24px;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--text-1);
+}
+
+/* ---------- Sticky Search Dock (under navbar) ---------- */
+/* Apply this wrapper to your search module so the page "fits" cleanly like Expedia */
+.search-dock {
+  position: sticky;
+  top: calc(var(--nav-h) + 10px);
+  z-index: 100;
+  width: 100%;
+  max-width: var(--page-w);
+  margin: 12px auto 24px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 10px 30px rgba(0,0,0,.30), 0 0 0 1px rgba(255,255,255,.03) inset;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Make controls compact to help "one-screen" fit */
+.search-dock .ant-form-item { margin-bottom: 8px; }
+.search-dock .ant-input,
+.search-dock .ant-input-affix-wrapper,
+.search-dock .ant-select-selector,
+.search-dock .ant-picker {
+  height: 42px;
+}
+
+/* Row spacing for the hero band under the dock */
+.hero-band {
+  max-width: var(--page-w);
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--lp-gap);
+  margin: 8px auto 0;
+}
+
+/* Content panels following the hero */
+.panel-grid {
+  max-width: var(--page-w);
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--lp-gap);
+}
+.panel-grid > .panel {
+  grid-column: span 6; /* two-up default */
+  border-radius: var(--lp-radius);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+}
+
+/* ---------- Responsive polish ---------- */
+@media (max-width: 1280px) {
+  .hero-header { font-size: 1.85rem; margin-top: 40px; }
+}
+@media (max-width: 992px) {
+  .panel-grid > .panel { grid-column: span 12; } /* stack */
+  .search-dock { top: calc(var(--nav-h) + 6px); margin: 8px auto 20px; }
+}
+@media (max-width: 576px) {
+  .section-inner, .page-section-inner { padding: 14px 14px; }
+  .search-dock { padding: 10px; border-radius: 12px; }
+  .hero-header { font-size: 1.6rem; margin-top: 32px; }
 }

@@ -1,159 +1,193 @@
 /* ============================================
-  One Sky Quest – Global Styles (MERGED)
+  Skyrio – global.css v1.2 (Clean & Smooth, merged)
    ============================================ */
 
-/* ===== Root Tokens (fallbacks if theme.css hasn’t loaded yet) ===== */
-:root {
-  --nav-h: 72px;
+/* ===== Base reset (gentle, merge-safe) ===== */
+html, body, #root { height: 100%; }
+* { box-sizing: border-box; }
+:where(img, svg, video, canvas) { display:block; max-width:100%; }
+:where(button, input, textarea, select) { font: inherit; }
+:where(a) { color: inherit; text-decoration: none; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--cta); outline-offset: 2px; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
 
-  /* text & surfaces */
+/* === Remove default Skip to Content link (project decision) === */
+a[href="#main-content"],
+a.skip-to-content,
+a[href="#content"],
+a[href="#app"]{
+  display:none !important;
+  visibility:hidden !important;
+  position:absolute !important;
+}
+
+/* ===========================
+   Root Tokens
+   =========================== */
+:root{
+  /* layout */
+  --nav-h: 72px;
+  --page-w: 1180px;
+  --grid-gap: 20px;
+  --radius: 16px;
+  --elev-1: 0 6px 18px rgba(0,0,0,.22);
+  --elev-2: 0 10px 30px rgba(0,0,0,.30);
+
+  --header-h: var(--nav-h, 72px);
+  --vh: 100dvh;
+
+  /* text */
   --text-1: #f4f6fb;
   --text-2: #c9cbe3;
-  --glass: rgba(255, 255, 255, 0.06);
-  --glass-2: rgba(255, 255, 255, 0.10);
-  --border-soft: rgba(255, 255, 255, 0.12);
+  --text-dim: rgba(255,255,255,.70);
 
-  /* brand accent */
+  /* glass + borders */
+  --glass: rgba(255,255,255,.06);
+  --glass-2: rgba(255,255,255,.10);
+  --border-soft: rgba(255,255,255,.12);
+
+  /* brand */
   --cta: #ff8a2a;
   --cta-2: #ffa94d;
+  --cta-glow: rgba(255,138,42,.40);
 
-  /* NEW: global background stops used by the body gradient */
-  --bg-start: #0f1020;
-  --bg-mid:   #231a3a;
-  --bg-end:   #3a2430;
+  /* background gradient */
+  --bg-start:#0f1020;
+  --bg-mid:#231a3a;
+  --bg-end:#3a2430;
 
   /* buttons */
-  --cta-glow: rgba(255,138,42,.40);
   --btn-glass: rgba(255,255,255,.08);
   --btn-glass-hover: rgba(255,255,255,.12);
   --btn-border: rgba(255,255,255,.16);
   --btn-text: #ffffff;
+
+  /* hero + type scale */
+  --search-h: 78px;
+  --lp-gap: 16px;
+  --lp-radius: 14px;
+
+  --h1: clamp(28px, 3.4vw, 40px);
+  --h2: clamp(22px, 2.1vw, 28px);
+  --h3: clamp(18px, 1.7vw, 22px);
+  --body: clamp(13px, 1.2vw, 16px);
+
+  --pad-hero: clamp(8px, 2.5vh, 20px);
+  --pad-card: 12px;
+}
+@media (max-height: 800px){
+  :root{
+    --lp-gap: 12px;
+    --search-h: 70px;
+    --h1: clamp(20px, 3vw, 30px);
+    --h2: clamp(15px, 2vw, 20px);
+    --body: clamp(12px, 1.1vw, 15px);
+  }
+}
+
+/* ===== Day theme (optional toggle via [data-theme="day"]) ===== */
+[data-theme="day"]{
+  --bg-start:#f3f6ff; --bg-mid:#f9efe1; --bg-end:#ffe6c8;
+  --text-1:#1a2433; --text-2:#4a5a73;
 }
 
 /* ===========================
-   Base page background lives on <body>, not inner wrappers
+   Background + typography
    =========================== */
-html, body, #root { height: 100%; }
-
-body {
-  margin: 0;
-  color: var(--text-1);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  /* stacked radials + FINAL linear base (no transparent holes) */
+body{
+  margin:0;
+  color:var(--text-1);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height:1.45;
   background:
     radial-gradient(1000px 700px at 10% -120px, #2b1e4b 0%, rgba(43,30,75,0) 60%),
     radial-gradient(1000px 700px at 90% -120px, #3a2430 0%, rgba(58,36,48,0) 60%),
     linear-gradient(180deg, var(--bg-start) 0%, var(--bg-mid) 40%, var(--bg-end) 100%);
-  background-color: var(--bg-mid);         /* solid fallback */
+  background-color: var(--bg-mid);
+  background-attachment: fixed, fixed, fixed;
   background-repeat: no-repeat;
-  background-attachment: fixed, fixed, fixed; /* keeps paint steady on scroll */
 }
 
-/* Make inner sections transparent so the body gradient shows through */
+/* ===== Page wrappers ===== */
 .landing-wrap,
 .qf-wrap,
 .booking-wrap,
-.passport-wrap {
-  background: transparent;
-}
+.passport-wrap{ background:transparent; }
 
-/* ===========================
-   Optional Light Mode (if you toggle themes)
-   =========================== */
-[data-theme="day"] {
-  --bg-start: #f3f6ff;
-  --bg-mid:   #f9efe1;
-  --bg-end:   #ffe6c8;
-
-  --text-1: #1a2433;
-  --text-2: #4a5a73;
-}
-
-/* ===== Fixed Navbar Padding Offset ===== */
+/* ===== Navbar offset + anchor snap fix ===== */
 .osq-main,
 main,
-.ant-layout-content {
-  padding-top: calc(var(--nav-h) + 12px);
-}
+.ant-layout-content{ padding-top: calc(var(--nav-h) + 12px); }
 section[id],
-[data-anchor] {
-  scroll-margin-top: calc(var(--nav-h) + 12px);
-}
+[data-anchor],
+:target{ scroll-margin-top: calc(var(--nav-h) + 12px); }
 
-/* ===== Typography ===== */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-1);
-  margin: 0;
-}
-p, span, li {
-  color: var(--text-1);
-}
+/* ===== Headings ===== */
+h1,h2,h3,h4,h5,h6{ color:var(--text-1); margin:0; }
+h1{ font-size:var(--h1); line-height:1.15; }
+h2{ font-size:var(--h2); line-height:1.2; }
+h3{ font-size:var(--h3); line-height:1.25; }
+small{ color:var(--text-2); }
+p, span, li{ color:var(--text-1); }
 
-/* ===== Generic Card Surfaces ===== */
+/* ===== Layout helpers ===== */
+.container{ max-width:var(--page-w); margin-inline:auto; padding-inline:16px; }
+.section{ padding:28px 0; }
+.section-tight{ padding:16px 0; }
+
+/* ===========================
+   Cards & panels
+   =========================== */
 .card,
 .panel,
 .section,
-.ant-card {
-  background: var(--glass);
-  border: 1px solid var(--glass-2);
-  border-radius: 14px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.ant-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
   color: var(--text-1);
+  box-shadow: var(--elev-1);
 }
-[data-theme="day"] .card,
-[data-theme="day"] .panel,
-[data-theme="day"] .section,
-[data-theme="day"] .ant-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0,0,0,0.08);
-  color: #1a2433;
-}
+.card.is-strong{ box-shadow: var(--elev-2); }
+.card-padding{ padding:18px; }
 
-/* ===== Inputs & Form Elements ===== */
-.ant-input,
-.ant-input-affix-wrapper,
-.ant-select-selector,
-.ant-picker {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: var(--text-1);
-}
-.ant-input::placeholder,
-.ant-select-selection-placeholder {
-  color: var(--text-2);
-}
-[data-theme="day"] .ant-input,
-[data-theme="day"] .ant-input-affix-wrapper,
-[data-theme="day"] .ant-select-selector,
-[data-theme="day"] .ant-picker {
-  background: rgba(0,0,0,0.04);
-  border-color: rgba(0,0,0,0.12);
-  color: #1a2433;
-}
-
-/* ===== Global Button Palette ===== */
+/* ===========================
+   Buttons (Skyrio + legacy OSQ aliases)
+   =========================== */
 .ant-btn-primary,
 .start-btn,
-.osq-btn-primary {
+.osq-btn-primary,
+.skyrio-btn-primary{
   color: var(--btn-text) !important;
   background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
   border: none !important;
+  font-weight:600;
   box-shadow: 0 8px 24px var(--cta-glow) !important;
-  font-weight: 600;
 }
 .ant-btn-primary:hover,
 .start-btn:hover,
-.osq-btn-primary:hover {
+.osq-btn-primary:hover,
+.skyrio-btn-primary:hover{
   filter: brightness(1.05);
   box-shadow: 0 10px 28px rgba(255,138,42,.52) !important;
 }
-
 .ant-btn-default,
 .nav-button,
-.osq-btn-glass {
+.osq-btn-glass,
+.skyrio-btn-glass{
   color: var(--btn-text) !important;
   background: var(--btn-glass) !important;
   border: 1px solid var(--btn-border) !important;
@@ -161,35 +195,274 @@ p, span, li {
 }
 .ant-btn-default:hover,
 .nav-button:hover,
-.osq-btn-glass:hover {
+.osq-btn-glass:hover,
+.skyrio-btn-glass:hover{
   background: var(--btn-glass-hover) !important;
 }
 
-/* Status pills (Approved / Booked / Completed) */
-.osq-status {
-  display:inline-flex; align-items:center; padding: 2px 10px; height: 22px;
-  font-size: 12px; font-weight: 800; border-radius: 999px; letter-spacing:.2px;
-  color: #0e1116; border: none;
+/* ===========================
+   Inputs
+   =========================== */
+:where(.ant-input,.ant-input-affix-wrapper,.ant-select-selector,.ant-picker,.input,.select,.searchbar){
+  height:44px;
+  padding:0 14px;
+  border-radius:12px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border-soft);
+  color: var(--text-1);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
-.osq-status.approved {
+.ant-input::placeholder,
+.ant-select-selection-placeholder{ color:var(--text-2); }
+:where(.input,.select,.searchbar,.ant-input,.ant-input-affix-wrapper,.ant-select-selector,.ant-picker):hover{
+  background: rgba(255,255,255,.07);
+}
+.input:focus-visible,
+.select:focus-visible,
+.searchbar:focus-visible,
+.ant-input:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused{
+  border-color: var(--cta) !important;
+  box-shadow: 0 0 0 3px rgba(255,138,42,.25) !important;
+}
+select{ background-color:transparent; color:inherit; }
+select:focus{ outline:none; }
+
+/* ===========================
+   Status pills
+   =========================== */
+.osq-status,
+.skyrio-status{
+  display:inline-flex;
+  align-items:center;
+  padding:2px 10px;
+  height:22px;
+  font-size:12px;
+  font-weight:800;
+  border-radius:999px;
+  color:#0e1116;
+  border:none;
+}
+.osq-status.approved,
+.skyrio-status.approved{
   background: linear-gradient(180deg,#59e39c,#2ecc71);
   box-shadow: 0 6px 16px rgba(46,204,113,.35);
 }
-.osq-status.booked {
+.osq-status.booked,
+.skyrio-status.booked{
   background: linear-gradient(180deg,#7fc0ff,#4597ff);
   box-shadow: 0 6px 16px rgba(69,151,255,.35);
 }
-.osq-status.completed {
+.osq-status.completed,
+.skyrio-status.completed{
   background: linear-gradient(180deg,#cfd6e6,#9aa3b2);
   color:#0d0f1a;
 }
 
-/* ===== Animations ===== */
-@keyframes osqFadeInUp {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ===========================
+   Animations (subtle)
+   =========================== */
+@keyframes osqFadeInUp{
+  from{opacity:0; transform:translateY(6px);}
+  to{opacity:1; transform:translateY(0);}
 }
-@keyframes osqFadeInDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes osqFadeInDown{
+  from{opacity:0; transform:translateY(-10px);}
+  to{opacity:1; transform:translateY(0);}
 }
+.fade-in{ animation: fade-in .24s ease both; }
+@keyframes fade-in{
+  from{opacity:0; transform:translateY(6px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* ===========================
+   Hero + Dock
+   =========================== */
+.hero-fold{
+  min-height: calc(var(--vh) - var(--header-h));
+  display:grid;
+  grid-template-rows:1fr auto;
+  gap:var(--lp-gap);
+  padding: var(--pad-hero) 0;
+}
+section:not(.hero-fold){
+  max-width:1200px;
+  margin:0 auto;
+  padding:4rem 1rem 3rem;
+}
+.landing-wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding:8px 14px 12px;
+  background:transparent;
+}
+.hero-center{ align-self:center; text-align:center; }
+.hero-title{
+  font-size:var(--h1);
+  line-height:1.1;
+  letter-spacing:.2px;
+  margin:0 0 10px;
+  color:var(--text-1);
+}
+.hero-chips{
+  display:inline-flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+  font-size:var(--body);
+}
+.xp-card{
+  margin:14px auto 0;
+  padding:var(--pad-card);
+  background:var(--glass);
+  border:1px solid var(--glass-2);
+  border-radius:var(--lp-radius);
+  box-shadow:var(--elev-2);
+  width:min(420px,92%);
+}
+.search-dock{
+  align-self:end;
+  height:var(--search-h);
+  display:grid;
+  grid-template-columns:1fr;
+}
+.dock-inner{
+  height:100%;
+  display:grid;
+  grid-auto-flow:column;
+  gap:8px;
+  padding:10px;
+  background:var(--glass);
+  border:1px solid var(--glass-2);
+  border-radius: calc(var(--lp-radius) + 2px);
+  box-shadow: var(--elev-2);
+}
+.dock-tabs{ display:flex; gap:8px; align-items:center; }
+.dock-tab{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:12px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  font-size:var(--body);
+}
+.dock-field{ min-width:0; display:grid; align-items:center; }
+.dock-input{
+  width:100%;
+  height:38px;
+  padding:0 10px;
+  border-radius:10px;
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  color:var(--text-1);
+  font-size:var(--body);
+}
+
+/* ===========================
+   Nav (frosted)
+   =========================== */
+.site-nav{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  height:var(--nav-h);
+  background: linear-gradient(180deg, rgba(18,17,34,.85), rgba(18,17,34,.70));
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:0 6px 24px rgba(0,0,0,.35);
+}
+.logo{ font-weight:800; letter-spacing:.2px; }
+.tutorial-pill{ opacity:.9; }
+@media (max-width:720px){
+  .tutorial-pill{ display:none; }
+}
+
+/* ===========================
+   Utility grids
+   =========================== */
+.grid{ display:grid; gap:var(--grid-gap); }
+.grid-2{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+.grid-3{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+.grid-4{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media (max-width:1100px){
+  .grid-4{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:720px){
+  .grid-3,.grid-4{ grid-template-columns:1fr; }
+}
+
+/* ===========================
+   Reusable component helpers
+   =========================== */
+.card--perk{ min-height:116px; display:flex; align-items:center; }
+.deal-card{ min-height:140px; }
+
+/* ===========================
+   Booking strip
+   =========================== */
+.booking-strip{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:var(--grid-gap);
+  align-items:center;
+  background: rgba(255,255,255,.05);
+  border:1px solid var(--border-soft);
+  border-radius:18px;
+  padding:12px;
+  box-shadow: var(--elev-1);
+}
+.booking-strip .tabbar{
+  grid-column:1 / -1;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+@media (max-width:980px){
+  .booking-strip{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:640px){
+  .booking-strip{ grid-template-columns:1fr; }
+}
+
+/* ===========================
+   Perks grid
+   =========================== */
+.perks{
+  display:grid;
+  gap:var(--grid-gap);
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+@media (max-width:980px){
+  .perks{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:640px){
+  .perks{ grid-template-columns:1fr; }
+}
+
+/* ===========================
+   Performance helpers
+   =========================== */
+.lazy-section{ contain: layout style paint; }
+@supports (content-visibility: auto){
+  .lazy-section{ content-visibility:auto; contain-intrinsic-size:800px; }
+}
+.lazy-section.is-lg{ min-block-size:800px; }
+
+/* ===========================
+   Utility spacing (used by PageShell)
+   =========================== */
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-24{margin-bottom:24px}
+
+/* ===========================
+   OPTIONAL: hide “Show More” UI if present
+   =========================== */
+.show-more,
+.btn-show-more,
+[data-ui="show-more"]{ display:none !important; }

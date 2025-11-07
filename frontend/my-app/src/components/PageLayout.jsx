@@ -18,7 +18,6 @@ export default function PageLayout({
 }) {
   const { pathname } = useLocation();
 
-  // Normalize trailing slash
   const cleanPath = useMemo(() => {
     const p = (pathname || "/").replace(/\/+$/, "");
     return p === "" ? "/" : p;
@@ -28,12 +27,7 @@ export default function PageLayout({
 
   return (
     <>
-      {/* Accessibility: Skip to content link */}
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-
-      {/* Main content — no Navbar here */}
+      {/* Removed skip-to-content for Skyrio layout */}
       <main
         id="main"
         role="main"

@@ -47,6 +47,7 @@ const usePassportData = () =>
         home: "New Jersey, USA",
         memberSince: "2024",
         passportNo: "OSQ-4J2M-6K9",
+        tier: "Free",
       },
       stats: {
         countriesVisited: 12,
@@ -149,15 +150,15 @@ function SoftCard({ children, className = "", style }) {
         color: "var(--text)",
         ...style,
       }}
-      bodyStyle={{ padding: 16 }}
-      bordered={false}
+      variant="borderless"
+      styles={{ body: { padding: 16 } }}
     >
       {children}
     </Card>
   );
 }
 
-/* ----------------- Travel Pass Header ----------------- */
+/* ----------------- Travel Pass Header (merged, AntD v5-safe) ----------------- */
 function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
   const { user, stats, top8, miles } = data;
   const pct = Math.min(
@@ -181,12 +182,14 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
   };
 
   return (
-    <Card bordered={false} className="tp-card" bodyStyle={{ padding: 16 }}>
+    <Card
+      variant="borderless"
+      className="tp-card"
+      styles={{ body: { padding: 16 } }}
+    >
       <div className="tp-top">
-        <Text className="tp-title">TRAVEL PASS</Text>
-        <span className="tp-camera" aria-hidden>
-          <CameraOutlined />
-        </span>
+        <Text className="tp-title">DIGITAL PASSPORT</Text>
+        <Tag color="gold">{user.tier || "Free"} Tier</Tag>
       </div>
 
       <div className="tp-id">
@@ -277,6 +280,7 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
         </Space>
       </div>
 
+      {/* Top 8 */}
       {!showFriends ? (
         <Row gutter={[12, 12]}>
           {(top8.places || []).slice(0, 8).map((city) => (
@@ -437,9 +441,10 @@ function TripsPanel({ trips }) {
   );
 }
 
-/* ----------------- Invite & Earn ----------------- */
+/* ----------------- Invite & Earn (merged version) ----------------- */
 function ReferralBox({ referral }) {
   const [copied, setCopied] = useState(false);
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(referral.code);
@@ -449,6 +454,9 @@ function ReferralBox({ referral }) {
       message.error("Could not copy code");
     }
   };
+
+  const onApply = () => message.success("Referral code applied!");
+
   return (
     <SoftCard className="invite-card">
       <SectionTitle
@@ -460,8 +468,11 @@ function ReferralBox({ referral }) {
       >
         Invite & Earn
       </SectionTitle>
+
       <Space direction="vertical" size={8} style={{ width: "100%" }}>
         <Text>Share your code to earn miles.</Text>
+
+        {/* Copy existing code */}
         <Input.Group compact>
           <Input
             style={{ width: "70%" }}
@@ -473,6 +484,17 @@ function ReferralBox({ referral }) {
             {copied ? "Copied" : "Copy"}
           </Button>
         </Input.Group>
+
+        {/* Or apply a code you received */}
+        <div style={{ marginTop: 12 }}>
+          <Space.Compact block>
+            <Input placeholder="Enter referral code" allowClear />
+            <Button type="primary" onClick={onApply}>
+              Apply
+            </Button>
+          </Space.Compact>
+        </div>
+
         <Text className="reward">Reward: {referral.reward}</Text>
       </Space>
     </SoftCard>
@@ -516,7 +538,6 @@ export default function DigitalPassportPage() {
   }, []);
 
   return (
-    // Navbar stays hidden off-landing via PageLayout default rules
     <PageLayout fullBleed={false} maxWidth={1180}>
       <div className="passport-wrap">
         {/* Travel Pass header */}
