@@ -1,5 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
+import { Segmented, Badge } from "antd";
+import {
+  CarOutlined,
+  GiftOutlined,
+  SendOutlined,
+  HomeOutlined,
+} from "@ant-design/icons";
+import { Ship, Mountain } from "lucide-react";
 import "../styles/SearchBar.css";
+
+const TABS = [
+  { key: "stays", label: "Stays", icon: <HomeOutlined /> },
+  { key: "flights", label: "Flights", icon: <SendOutlined /> },
+  { key: "cars", label: "Cars", icon: <CarOutlined /> },
+  { key: "adventures", label: "Adventures", icon: <Mountain size={16} /> },
+  { key: "cruises", label: "Cruises", icon: <Ship size={16} />, badge: "New" },
+  { key: "packages", label: "Packages", icon: <GiftOutlined /> },
+];
+
+const Pill = ({ icon, text, badge }) => (
+  <span className="tab-pill">
+    {icon}
+    <span className="tab-pill-text">{text}</span>
+    {badge ? (
+      <Badge color="#ff8a2a" className="tab-pill-badge" text={badge} />
+    ) : null}
+  </span>
+);
 
 export default function SearchBar({
   onSearch = () => {},
@@ -8,35 +35,41 @@ export default function SearchBar({
     start: "",
     end: "",
     guests: "2 adults · 1 room",
+    mode: "stays",
   },
   setValues = () => {},
 }) {
+  const [tab, setTab] = useState(values.mode ?? "stays");
   const update = (key) => (e) =>
     setValues((v) => ({ ...v, [key]: e?.target ? e.target.value : e }));
 
+  const options = TABS.map((t) => ({
+    value: t.key,
+    label: <Pill icon={t.icon} text={t.label} badge={t.badge} />,
+  }));
+  const handleTab = (next) => {
+    setTab(next);
+    setValues((v) => ({ ...v, mode: next }));
+  };
+
+  console.log("[SearchBar] render mode:", tab); // sanity check
+
   return (
-    <div className="osq-search">
-      {/* row 1: tabs */}
-      <div className="osq-search__tabs" role="tablist">
-        <button className="tab is-active" role="tab" aria-selected="true">
-          🏠 Stays
-        </button>
-        <button className="tab" role="tab">
-          ✈️ Flights
-        </button>
-        <button className="tab" role="tab">
-          🚗 Cars
-        </button>
-        <button className="tab" role="tab">
-          🎁 Packages
-        </button>
-        <button className="tab" role="tab">
-          🧭 Excursions
-        </button>
+    <div className="osq-search skyrio-search skyrio-search--compact">
+      {/* NEW Segmented switcher */}
+      <div className="tab-switcher glass-white" role="tablist">
+        <Segmented
+          block
+          size="large"
+          value={tab}
+          onChange={handleTab}
+          options={options}
+        />
+        <span aria-hidden className="orange-glass-bubble" />
       </div>
 
-      {/* row 2: inputs */}
-      <div className="osq-search__grid">
+      {/* Inputs (unchanged) */}
+      <div className="skyrio-search__grid">
         <label className="field">
           <span className="field__label">Where to?</span>
           <div className="field__control">
@@ -93,8 +126,7 @@ export default function SearchBar({
             Search • Earn +50 XP
           </button>
           <div className="smart">
-            <span className="zap">⚡</span>
-            Smart Plan AI
+            <span className="zap">⚡</span>Smart Plan AI
           </div>
         </div>
       </div>

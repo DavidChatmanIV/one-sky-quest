@@ -10,14 +10,15 @@ import {
   Space,
 } from "antd";
 import { useNavigate } from "react-router-dom";
+import "../styles/SearchBar.css"; // Make sure this file includes the white glass + bubble styles
 
 const TAB_OPTIONS = [
   { value: "Stays", label: "Stays", icon: <span>🏠</span> },
   { value: "Flights", label: "Flights", icon: <span>✈️</span> },
   { value: "Cars", label: "Cars", icon: <span>🚗</span> },
-  { value: "Cruises", label: "Cruises", icon: <span>🛳️</span> }, // ✅ fixed: add value
+  { value: "Cruises", label: "Cruises", icon: <span>🛳️</span>, badge: "New" },
   { value: "Packages", label: "Packages", icon: <span>🎁</span> },
-  { value: "Excursions", label: "Excursions", icon: <span>🧭</span> },
+  { value: "Adventures", label: "Adventures", icon: <span>✨</span> },
 ];
 
 export default function UnifiedSearchBar() {
@@ -30,62 +31,64 @@ export default function UnifiedSearchBar() {
         return "From / To";
       case "Cars":
         return "Pick-up location";
+      case "Cruises":
+        return "Departure port or region";
       case "Packages":
         return "City or resort";
-      case "Excursions":
+      case "Adventures":
         return "City or landmark";
-      case "Cruises":
-        return "Departure port or region"; // ✅ new
       default:
         return "City, landmark, or address";
     }
   }, [tab]);
 
   return (
-    <div className="osq-search-card">
-      <div className="osq-search-tabs osq-tabs-rounded">
+    <div className="skyrio-search skyrio-search--compact">
+      {/* --- White glass segmented bar with orange bubble --- */}
+      <div className="tab-switcher glass-white" role="tablist">
         <Segmented
+          block
+          size="large"
+          value={tab}
+          onChange={(v) => setTab(v)}
           options={TAB_OPTIONS.map((o) => ({
             value: o.value,
             label: (
-              <span className="seg-item">
-                <span className="seg-emoji" aria-hidden>
+              <span className="tab-pill">
+                <span aria-hidden className="seg-emoji">
                   {o.icon}
                 </span>
-                <span className="seg-text">{o.label}</span>
+                <span className="tab-pill-text">{o.label}</span>
+                {o.badge ? (
+                  <span className="tab-pill-badge ant-badge-status-text">
+                    {o.badge}
+                  </span>
+                ) : null}
               </span>
             ),
           }))}
-          value={tab}
-          onChange={(val) => setTab(val)}
-          size="large"
-          block
         />
+        <span aria-hidden className="orange-glass-bubble" />
       </div>
 
-      {/* Shared row: tailor fields per tab */}
-      <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
-        {/* Where / Port / From-To */}
+      {/* --- Input Grid --- */}
+      <Row gutter={[12, 12]} className="skyrio-search__grid">
+        {/* Shared Input */}
         <Col xs={24} md={8}>
-          <Input
-            className="osq-where"
-            size="large"
-            placeholder={placeLabel}
-            allowClear
-          />
+          <Input size="large" placeholder={placeLabel} allowClear />
         </Col>
 
         {/* ===== STAYS ===== */}
         {tab === "Stays" && (
           <>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Start date"
               />
             </Col>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
@@ -94,11 +97,9 @@ export default function UnifiedSearchBar() {
             </Col>
             <Col xs={24} md={4}>
               <Select
-                className="osq-travelers-btn"
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="2 adults · 1 room"
-                classNames={{ popup: "osq-select-popup" }}
                 options={[
                   { label: "1 adult · 1 room", value: "1-1" },
                   { label: "2 adults · 1 room", value: "2-1" },
@@ -111,14 +112,14 @@ export default function UnifiedSearchBar() {
         {/* ===== FLIGHTS ===== */}
         {tab === "Flights" && (
           <>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Depart"
               />
             </Col>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
@@ -127,11 +128,9 @@ export default function UnifiedSearchBar() {
             </Col>
             <Col xs={24} md={4}>
               <Select
-                className="osq-travelers-btn"
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Economy · 1"
-                classNames={{ popup: "osq-select-popup" }}
                 options={[
                   { label: "Economy · 1", value: "eco-1" },
                   { label: "Business · 1", value: "biz-1" },
@@ -144,14 +143,14 @@ export default function UnifiedSearchBar() {
         {/* ===== CARS ===== */}
         {tab === "Cars" && (
           <>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Pick-up date"
               />
             </Col>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
@@ -160,11 +159,9 @@ export default function UnifiedSearchBar() {
             </Col>
             <Col xs={24} md={4}>
               <Select
-                className="osq-travelers-btn"
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Driver age"
-                classNames={{ popup: "osq-select-popup" }}
                 options={[
                   { label: "25+", value: "25" },
                   { label: "21–24", value: "21-24" },
@@ -174,17 +171,17 @@ export default function UnifiedSearchBar() {
           </>
         )}
 
-        {/* ===== CRUISES (NEW) ===== */}
+        {/* ===== CRUISES ===== */}
         {tab === "Cruises" && (
           <>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Sail date"
               />
             </Col>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
@@ -193,11 +190,9 @@ export default function UnifiedSearchBar() {
             </Col>
             <Col xs={24} md={4}>
               <Select
-                className="osq-travelers-btn"
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="2 travelers · Balcony"
-                classNames={{ popup: "osq-select-popup" }}
                 options={[
                   { label: "2 travelers · Interior", value: "2-int" },
                   { label: "2 travelers · Oceanview", value: "2-ocv" },
@@ -212,14 +207,14 @@ export default function UnifiedSearchBar() {
         {/* ===== PACKAGES ===== */}
         {tab === "Packages" && (
           <>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Start date"
               />
             </Col>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
@@ -228,11 +223,9 @@ export default function UnifiedSearchBar() {
             </Col>
             <Col xs={24} md={4}>
               <Select
-                className="osq-travelers-btn"
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="2 travelers"
-                classNames={{ popup: "osq-select-popup" }}
                 options={[
                   { label: "1 traveler", value: "1" },
                   { label: "2 travelers", value: "2" },
@@ -243,10 +236,10 @@ export default function UnifiedSearchBar() {
           </>
         )}
 
-        {/* ===== EXCURSIONS ===== */}
-        {tab === "Excursions" && (
+        {/* ===== ADVENTURES ===== */}
+        {tab === "Adventures" && (
           <>
-            <Col xs={12} md={6} className="osq-date">
+            <Col xs={12} md={6}>
               <DatePicker
                 size="large"
                 style={{ width: "100%" }}
@@ -255,11 +248,9 @@ export default function UnifiedSearchBar() {
             </Col>
             <Col xs={12} md={4}>
               <Select
-                className="osq-travelers-btn"
                 size="large"
                 style={{ width: "100%" }}
                 placeholder="Time"
-                classNames={{ popup: "osq-select-popup" }}
                 options={[
                   { label: "Morning", value: "am" },
                   { label: "Afternoon", value: "pm" },
@@ -270,11 +261,10 @@ export default function UnifiedSearchBar() {
           </>
         )}
 
-        {/* Search CTA */}
+        {/* ===== SEARCH BUTTON ===== */}
         <Col xs={24}>
           <Space style={{ width: "100%", justifyContent: "flex-end" }}>
             <Button
-              className="osq-search-btn"
               type="primary"
               size="large"
               onClick={() => navigate(`/search/${tab.toLowerCase()}`)}
