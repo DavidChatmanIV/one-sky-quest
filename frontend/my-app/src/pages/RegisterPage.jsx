@@ -1,45 +1,73 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Input, Button, message, Card, Typography, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import BoardingPassToast from "../components/BoardingPassToast";
-import "../styles/login.css";
+import "../styles/login.css"; // reuse same layout styles for now
 
 const { Title, Text } = Typography;
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    emailOrUsername: "",
+    username: "",
+    name: "",
+    email: "",
     password: "",
+    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
-
-  // Prevent duplicate toast/nav if remounts or double-clicks happen
   const successHandledRef = useRef(false);
 
-  const handleLogin = async () => {
-    if (loading) return; // double-click guard
+  const handleChange = (field) => (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  const handleRegister = async () => {
+    if (loading) return;
+
+    const { username, name, email, password, confirmPassword } = formData;
+
+    // basic client-side validation
+    if (!username || !email || !password) {
+      message.error("Username, email, and password are required");
+      return;
+    }
+    if (password.length < 6) {
+      message.error("Password should be at least 6 characters");
+      return;
+    }
+    if (password !== confirmPassword) {
+      message.error("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          emailOrUsername: formData.emailOrUsername,
-          password: formData.password,
+          username,
+          email,
+          password,
+          name,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
 
-      // Save token (and user) for later API calls
+      // Save token + user
       localStorage.setItem("token", data.token);
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
       }
 
-      // Pick the best display name from returned user
       const displayName =
         data.user?.name ||
         data.user?.username ||
@@ -53,7 +81,7 @@ export default function LoginPage() {
           description: (
             <BoardingPassToast
               name={displayName}
-              routeFrom="Login"
+              routeFrom="Sign Up"
               routeTo="Dashboard"
             />
           ),
@@ -66,7 +94,8 @@ export default function LoginPage() {
         nav("/dashboard");
       }
     } catch (err) {
-      message.error(err.message || "Login failed");
+      console.error("[Register] error:", err);
+      message.error(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -81,56 +110,73 @@ export default function LoginPage() {
           <Text className="brand">Skyrio</Text>
         </div>
         <Title level={2} className="welcome">
-          Welcome back, Explorer
+          Create your Skyrio account
         </Title>
         <Text className="tagline">
-          Smarter planning. Real rewards. Built for explorers.
+          Start earning XP, saving trips, and planning smarter.
         </Text>
       </div>
 
-      {/* --- Glass card + Passport Stamp --- */}
+      {/* --- Glass card --- */}
       <div className="login-card-wrap">
         <div className="passport-stamp" aria-hidden />
         <Card
-          title="Log In"
+          title="Sign Up"
           className="login-card"
           style={{ width: 400, borderRadius: 16, textAlign: "center" }}
         >
           <Input
-            placeholder="Email or username"
-            name="emailOrUsername"
-            value={formData.emailOrUsername}
-            onChange={(e) =>
-              setFormData({ ...formData, emailOrUsername: e.target.value })
-            }
-            style={{ marginBottom: 12 }}
+            placeholder="Username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange("username")}
+            style={{ marginBottom: 10 }}
+          />
+          <Input
+            placeholder="Full name (optional)"
+            name="name"
+            value={formData.name}
+            onChange={handleChange("name")}
+            style={{ marginBottom: 10 }}
+          />
+          <Input
+            placeholder="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange("email")}
+            style={{ marginBottom: 10 }}
           />
           <Input.Password
             placeholder="Password"
             name="password"
             value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
+            onChange={handleChange("password")}
+            style={{ marginBottom: 10 }}
+          />
+          <Input.Password
+            placeholder="Confirm password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange("confirmPassword")}
             style={{ marginBottom: 16 }}
           />
+
           <Button
             type="primary"
             block
             loading={loading}
-            onClick={handleLogin}
+            onClick={handleRegister}
             className="cta"
           >
-            🛫 Board Now
+            ✈️ Create Account
           </Button>
 
-          {/* ⬇️ New "Create account" link */}
           <div style={{ marginTop: 12 }}>
             <Text type="secondary">
-              New here?{" "}
+              Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => nav("/register")}
+                onClick={() => nav("/login")}
                 style={{
                   border: "none",
                   background: "transparent",
@@ -139,14 +185,14 @@ export default function LoginPage() {
                   padding: 0,
                 }}
               >
-                Create an account
+                Log in
               </button>
             </Text>
           </div>
 
           {/* a11y live region */}
           <div aria-live="polite" style={{ height: 0, overflow: "hidden" }}>
-            {loading ? "Signing in…" : ""}
+            {loading ? "Creating your account…" : ""}
           </div>
         </Card>
       </div>

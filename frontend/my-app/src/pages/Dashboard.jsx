@@ -21,6 +21,8 @@ import {
   HomeOutlined,
 } from "@ant-design/icons";
 
+import { useAuth } from "../hooks/useAuth";
+
 // Components
 import SavedExcursions from "../components/excursions/SavedExcursions";
 import UpcomingBookings from "../components/dashboard/UpcomingBookings";
@@ -29,19 +31,53 @@ import XPBadgeCard from "../components/dashboard/XPBadgeCard";
 import FeedbackForm from "../components/FeedbackForm";
 
 const { Content } = Layout;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 export default function Dashboard() {
-  // ---- hero state / data (mock) ----
-  const name = "David";
-  const xp = 560;
-  const levelLabel = "Globetrotter";
-  const levelPct = 80;
-  const stats = { trips: 3, notifications: 1 };
-
-  // ---- tabs state ----
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+
+  // ---------- Auth states ----------
+  if (loading) {
+    return (
+      <Layout className="min-h-screen bg-white">
+        <Content>
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            Loading your dashboard…
+          </div>
+        </Content>
+      </Layout>
+    );
+  }
+
+  if (!user) {
+    // ProtectedRoute should normally handle this, but good as a fallback.
+    return (
+      <Layout className="min-h-screen bg-white">
+        <Content>
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            You’re not logged in.
+          </div>
+        </Content>
+      </Layout>
+    );
+  }
+
+  // ---------- Derived user display info ----------
+  const displayName =
+    user.name ||
+    user.username ||
+    (user.email ? user.email.split("@")[0] : "Explorer");
+
+  const xp = user.xp ?? 0;
+  const levelLabel = user.levelLabel || "Globetrotter";
+  const levelPct = user.levelProgressPct ?? 80;
+
+  const stats = {
+    trips: user.savedTripsCount ?? 0,
+    notifications: user.unreadNotifications ?? 0,
+  };
 
   const tabItems = [
     {
@@ -83,7 +119,7 @@ export default function Dashboard() {
       key: "alerts",
       label: (
         <span>
-          <Badge dot>
+          <Badge dot={stats.notifications > 0}>
             <BellOutlined /> Alerts
           </Badge>
         </span>
@@ -130,7 +166,7 @@ export default function Dashboard() {
               {/* Greeting */}
               <header className="text-center">
                 <h1 className="font-semibold tracking-[-0.02em] text-[28px] sm:text-[32px] leading-tight">
-                  Good evening, {name} <span aria-hidden>🌆</span>
+                  Good evening, {displayName} <span aria-hidden>🌆</span>
                 </h1>
                 <div className="mt-1 flex items-center justify-center gap-2 text-sm text-white/80">
                   <span className="rounded-full bg-white/10 px-2.5 py-1 backdrop-blur">
@@ -253,12 +289,52 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* ================= TABS + CONTENT ================= */}
+        {/* ================= MAIN DASHBOARD CONTENT ================= */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Title level={2} className="!mb-3">
+          <Title level={2} className="!mb-1">
             📊 Dashboard
           </Title>
+          <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+            Your Skyrio control center — XP, trips, and travel tools in one
+            place.
+          </Text>
 
+          {/* Profile / XP Snapshot cards (from second snippet, but styled to fit) */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 16,
+              marginBottom: 24,
+            }}
+          >
+            <Card title="XP & Status" style={{ borderRadius: 16 }}>
+              <Text strong>XP: </Text> <Text>{xp}</Text>
+              <br />
+              <Text strong>Level: </Text> <Text>{levelLabel}</Text>
+              <br />
+              <Text strong>Role: </Text> <Text>{user.role || "explorer"}</Text>
+            </Card>
+
+            <Card title="Profile Snapshot" style={{ borderRadius: 16 }}>
+              <Text strong>Email: </Text> <Text>{user.email}</Text>
+              <br />
+              {user.username && (
+                <>
+                  <Text strong>Username: </Text> <Text>{user.username}</Text>
+                  <br />
+                </>
+              )}
+              <Text strong>Member since: </Text>
+              <Text>
+                {user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString()
+                  : "—"}
+              </Text>
+            </Card>
+          </div>
+
+          {/* Tabs Section */}
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}

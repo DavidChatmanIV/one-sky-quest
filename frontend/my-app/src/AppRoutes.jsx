@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import AppLayout from "./layout/AppLayout"; 
+import AppLayout from "./layout/AppLayout";
 
 // Public pages
 import LandingPage from "./pages/LandingPage";
@@ -11,11 +11,12 @@ import ProfilePage from "./pages/DigitalPassportPage";
 import MembershipPage from "./pages/Membership";
 import TeamTravelPage from "./pages/TeamTravelPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/NotFound";
 
 // Protected example page(s)
-import Dashboard from "./pages/Dashboard"; 
-import ProtectedRoute from "./routes/ProtectedRoute"; 
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function AppRoutes() {
   return (
@@ -25,21 +26,19 @@ export default function AppRoutes() {
         {/* ---------- Public ---------- */}
         <Route index element={<LandingPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} /> {/* ✅ added */}
         <Route path="booking" element={<BookingPage />} />
         <Route path="feed" element={<FeedPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="membership" element={<MembershipPage />} />
         <Route path="team-travel" element={<TeamTravelPage />} />
-
         {/* legacy/aliases */}
         <Route path="book" element={<Navigate to="/booking" replace />} />
-
         {/* ---------- Protected ---------- */}
         <Route element={<ProtectedRoute />}>
           <Route path="dashboard" element={<Dashboard />} />
           {/* add other protected pages here */}
         </Route>
-
         {/* ---------- 404 ---------- */}
         <Route path="*" element={<NotFound />} />
       </Route>
