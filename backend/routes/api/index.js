@@ -6,6 +6,7 @@ async function mount(routeBase, modulePath) {
   try {
     const mod = await import(modulePath);
     const router = mod.default || mod;
+
     if (typeof router === "function") {
       api.use(routeBase, router);
       console.log(`[api] Mounted ${routeBase} ← ${modulePath}`);
@@ -20,20 +21,30 @@ async function mount(routeBase, modulePath) {
         `[api] Error mounting ${routeBase} from ${modulePath}:`,
         err
       );
+    } else {
+      console.warn(
+        `[api] Optional route not found for ${routeBase} (${modulePath}); skipping.`
+      );
     }
   }
 }
 
+// ---------- Mount all sub-routers (paths are relative to this file) ----------
 await mount("/auth", "../auth.routes.js");
 await mount("/conversations", "../conversations.js");
 await mount("/feed", "../feed.js");
 await mount("/health", "../health.routes.js");
 await mount("/message", "../message.routes.js");
 await mount("/profile", "../profile.routes.js");
+await mount("/notifications", "../notification.routes.js");
+await mount("/admin/users", "../admin.users.routes.js");
+
+//  bookings router (routes/bookings.routes.js)
+await mount("/bookings", "../bookings.routes.js");
 
 // Root of the API namespace
 api.get("/", (_req, res) => {
-  res.json({ ok: true, api: "One Sky Quest API root" });
+  res.json({ ok: true, api: "Skyrio API root" });
 });
 
 export default api;

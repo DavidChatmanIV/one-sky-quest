@@ -1,35 +1,63 @@
 import { Router } from "express";
-import {
-  Booking,
-  User,
-  Hotel,
-  Flight,
-  Package,
-  Place,
-} from "../models/index.js";
-import { auth } from "../middleware/auth.js";
+import Booking from "../models/booking.js";
+import authRequired from "../middleware/authRequired.js";
 
 const router = Router();
 
-// 📖 GET: all bookings (admin or user-specific filtering can be added later)
-router.get("/", auth, async (req, res) => {
+/**
+ * GET /api/bookings
+ * Supports:
+ *  - ?page=1&limit=20
+ *  - ?sortBy=createdAt&sortDir=desc|asc
+ *  - Admin: all bookings
+ *  - Normal user: only their bookings
+ */
+router.get("/", authRequired, async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user.id })
-      .populate("user", "email")
-      .populate("hotel")
-      .populate("flight")
-      .populate("package")
-      .populate("place");
+    const page = Math.max(parseInt(req.query.page ?? "1", 10), 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit ?? "20", 10), 1),
+      100
+    );
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortDir = req.query.sortDir === "asc" ? 1 : -1;
 
-    res.json(bookings);
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortDir };
+
+    const isAdmin = req.user?.role === "admin" || req.user?.isAdmin === true;
+    const baseFilter = isAdmin ? {} : { user: req.user.id };
+
+    const [items, total] = await Promise.all([
+      Booking.find(baseFilter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .populate("user", "email")
+        .populate("hotel")
+        .populate("flight")
+        .populate("package")
+        .populate("place"),
+      Booking.countDocuments(baseFilter),
+    ]);
+
+    res.json({
+      items,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
-    console.error("❌ Failed to fetch bookings:", err);
-    res.status(500).json({ message: "Error fetching bookings." });
+    console.error("GET /api/bookings error:", err);
+    res.status(500).json({ message: "Failed to fetch bookings" });
   }
 });
 
-// ➕ POST: create booking
-router.post("/", auth, async (req, res) => {
+/**
+ * POST /api/bookings
+ */
+router.post("/", authRequired, async (req, res) => {
   try {
     const { hotel, flight, pkg, place, dates, travelers } = req.body;
 
@@ -37,13 +65,20 @@ router.post("/", auth, async (req, res) => {
       user: req.user.id,
       hotel,
       flight,
-      package: pkg,
+      package: pkg, // frontend sends `pkg`
       place,
       dates,
       travelers,
     });
 
     await newBooking.save();
+
+    await newBooking.populate("user", "email");
+    await newBooking.populate("hotel");
+    await newBooking.populate("flight");
+    await newBooking.populate("package");
+    await newBooking.populate("place");
+
     res.status(201).json(newBooking);
   } catch (err) {
     console.error("❌ Failed to create booking:", err);
@@ -51,14 +86,17 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// 🗑️ DELETE: cancel booking
-router.delete("/:id", auth, async (req, res) => {
+/**
+ * DELETE /api/bookings/:id
+ */
+router.delete("/:id", authRequired, async (req, res) => {
   try {
     const { id } = req.params;
-    const booking = await Booking.findOneAndDelete({
-      _id: id,
-      user: req.user.id,
-    });
+    const isAdmin = req.user?.role === "admin" || req.user?.isAdmin === true;
+
+    const filter = isAdmin ? { _id: id } : { _id: id, user: req.user.id };
+
+    const booking = await Booking.findOneAndDelete(filter);
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found." });

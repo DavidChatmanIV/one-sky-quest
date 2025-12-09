@@ -37,6 +37,14 @@ async function authRequired(req, res, next) {
     next();
   } catch (err) {
     console.error("[authRequired] error:", err.message);
+
+    // Tiny UX upgrade: clearer expired-token message
+    if (err.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ message: "Session expired, please log in again" });
+    }
+
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }

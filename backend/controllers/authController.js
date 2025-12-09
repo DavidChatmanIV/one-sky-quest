@@ -1,20 +1,15 @@
-const generateReferralCode = (username) => {
-  return `ONE_${username.toUpperCase().slice(0, 5)}${Math.floor(
-    Math.random() * 1000
-  )}`;
-};
+import { Router } from "express";
+import {
+  register,
+  login,
+  checkAuth,
+} from "../../controllers/authcontroller.js";
+import authRequired from "../../middleware/authRequired.js";
 
-// inside your register logic
-const referralCode = generateReferralCode(username);
+const router = Router();
 
-// Optional: check if URL has a ?ref= parameter
-const referredBy = req.query.ref || null;
+router.post("/register", register);
+router.post("/login", login);
+router.get("/check", authRequired, checkAuth);
 
-const newUser = new User({
-  username,
-  email,
-  password: hashedPassword,
-  referralCode,
-  referredBy,
-});
-await newUser.save();
+export default router;

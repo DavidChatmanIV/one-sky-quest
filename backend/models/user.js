@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const { Schema } = mongoose;
 
 const UserSchema = new Schema(
@@ -7,6 +8,12 @@ const UserSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
+    },
+
+    name: {
+      type: String,
+      trim: true,
     },
 
     email: {
@@ -14,6 +21,7 @@ const UserSchema = new Schema(
       required: true,
       trim: true,
       lowercase: true,
+      unique: true,
     },
 
     passwordHash: {
@@ -38,8 +46,13 @@ const UserSchema = new Schema(
 
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "support", "manager", "admin"],
       default: "user",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
 
     savedTrips: [
@@ -48,23 +61,16 @@ const UserSchema = new Schema(
         ref: "Place",
       },
     ],
-
-    name: {
-      type: String,
-      trim: true,
-    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-// ---------- Centralized Indexes ----------
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ username: 1 }, { unique: true });
-
-// ---------- Safe JSON Output ----------
+// ---------- Instance helpers ----------
 UserSchema.methods.toSafeJSON = function () {
   return {
-    id: this._id,
+    id: this._id.toString(),
     username: this.username,
     email: this.email,
     name: this.name,
@@ -72,10 +78,23 @@ UserSchema.methods.toSafeJSON = function () {
     bio: this.bio,
     xp: this.xp,
     role: this.role,
+    isActive: this.isActive,
     savedTrips: this.savedTrips,
     createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
   };
 };
+
+// ---------- Clean JSON output (no passwordHash, no __v) ----------
+UserSchema.set("toJSON", {
+  transform(_doc, ret) {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    delete ret.__v;
+    delete ret.passwordHash;
+    return ret;
+  },
+});
 
 // ---------- Safe Export for Render/Linux ----------
 const User = mongoose.models.User || mongoose.model("User", UserSchema);

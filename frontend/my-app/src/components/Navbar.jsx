@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, NavLink, Link, useLocation } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { Button, Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import "../styles/Navbar.css";
 
 //  Use the Link-based menu for reliable routing
 import BookMenu from "./BookMenu";
+import NotificationsBell from "./NotificationsBell.jsx";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -137,26 +138,8 @@ export default function Navbar() {
               </Button>
             </Dropdown>
 
-            <Link
-              to="/notifications"
-              className="btn icon"
-              aria-label="Notifications"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 3a6 6 0 0 0-6 6v2.2c0 .6-.2 1.2-.6 1.7L4 14.5c-.5.7 0 1.7.9 1.7H19c.9 0 1.4-1 .9-1.7l-1.4-1.6c-.4-.5-.6-1.1-.6-1.7V9a6 6 0 0 0-6-6Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-                <path
-                  d="M9.8 18.5a2.2 2.2 0 0 0 4.4 0"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span className="notif-dot" />
-            </Link>
+            {/* 🔔 Live notifications bell (replaces old /notifications link) */}
+            <NotificationsBell />
 
             <Button
               className="btn cta start-btn"

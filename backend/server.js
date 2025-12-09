@@ -33,28 +33,40 @@ app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
+// ✅ AUTH RATE LIMITING (right after core middleware)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // 20 login/register attempts per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api/auth", authLimiter);
+
 // ---------- CORS ----------
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 const allowedOrigins = FRONTEND_ORIGIN.split(",").map((s) => s.trim());
+
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // server-to-server or same-origin
+      if (!origin) return cb(null, true); // server-to-server, curl/Postman, same-origin
+
       const ok = allowedOrigins.some(
         (o) => origin === o || origin.startsWith(o)
       );
+
       return ok ? cb(null, true) : cb(new Error("CORS blocked"));
     },
     credentials: true,
   })
 );
 
-// ---------- Rate limit (API only) ----------
+// ---------- Global Rate Limit (API) ----------
 app.use(
   "/api",
   rateLimit({
-    windowMs: 60_000,
-    max: 120,
+    windowMs: 60_000, // 1 minute
+    max: 120, // 120 requests per minute per IP
     standardHeaders: true,
     legacyHeaders: false,
   })
@@ -79,20 +91,24 @@ async function connectMongo() {
     console.log("ℹ️ USE_MOCKS=true — skipping Mongo.");
     return;
   }
+
   if (!MONGO_URI) {
     console.error("❌ Missing MONGODB_URI.");
     process.exit(1);
   }
+
   const opts = {
     dbName: MONGO_DB || undefined,
     maxPoolSize: 20,
     serverSelectionTimeoutMS: 7_000,
     socketTimeoutMS: 60_000,
   };
+
   try {
     await mongoose.connect(MONGO_URI, opts);
     const c = mongoose.connection;
     console.log(`✅ Mongo connected (db: ${c.name})`);
+
     c.on("error", (e) => console.error("❌ Mongo error:", e.message));
     c.on("disconnected", () => console.warn("⚠️ Mongo disconnected"));
   } catch (err) {
@@ -100,12 +116,14 @@ async function connectMongo() {
     process.exit(1);
   }
 }
+
 await connectMongo();
 
 // ---------- Health ----------
 app.get("/health/db", async (_req, res) => {
   try {
     if (USE_MOCKS) return res.json({ ok: true, mocked: true });
+
     await mongoose.connection.db.admin().ping();
     res.json({ ok: true, state: mongoose.connection.readyState });
   } catch (e) {
@@ -115,6 +133,7 @@ app.get("/health/db", async (_req, res) => {
 
 // ---------- Routes ----------
 app.get("/", (_req, res) => res.send("🚀 One Sky Quest backend is running!"));
+
 app.use("/health", healthRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", apiRouter);
@@ -123,17 +142,22 @@ app.use("/api", apiRouter);
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
+
     if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing name, email, or message" });
     }
+
     if (USE_MOCKS) {
       return res.json({ ok: true, message: "Received (mock). Thank you!" });
     }
+
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({ error: "DB not ready" });
     }
+
     const doc = new Contact({ name, email, message });
     await doc.save();
+
     res.json({ ok: true, message: "Thank you for contacting us!" });
   } catch (err) {
     console.error("Contact error:", err);
@@ -153,7 +177,9 @@ app.use((req, _res, next) => {
 
 app.use((err, _req, res, _next) => {
   console.error(err);
-  res.status(err.status || 500).json({ error: err.message || "Server error" });
+  res.status(err.status || 500).json({
+    error: err.message || "Server error",
+  });
 });
 
 // ---------- Graceful shutdown ----------
@@ -162,14 +188,15 @@ process.on("SIGINT", async () => {
   await mongoose.connection.close().catch(() => {});
   process.exit(0);
 });
+
 process.on("SIGTERM", async () => {
   console.log("🛑 SIGTERM received, closing server...");
   await mongoose.connection.close().catch(() => {});
   process.exit(0);
 });
 
+// ---------- Start Server ----------
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () =>
   console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`)
 );
- 

@@ -1,4 +1,3 @@
-// src/layout/AppLayout.jsx
 import React from "react";
 import { Layout, Typography, Space, Button, message } from "antd";
 import { Outlet, Link, useNavigate } from "react-router-dom";
@@ -30,6 +29,10 @@ export default function AppLayout() {
     message.success("See you next trip, Explorer ✈️");
     nav("/login");
   };
+
+  // 👉 Basic frontend RBAC
+  const role = user?.role || "user";
+  const isAdmin = role === "admin" || role === "manager";
 
   return (
     <Layout style={{ minHeight: "100vh" }} className="osq-shell">
@@ -68,6 +71,7 @@ export default function AppLayout() {
           }}
         >
           <Space size="middle">
+            {/* Public / core links */}
             <Link to="/booking" style={{ color: "#fff" }}>
               Booking
             </Link>
@@ -77,9 +81,27 @@ export default function AppLayout() {
             <Link to="/profile" style={{ color: "#fff" }}>
               Passport
             </Link>
-            <Link to="/dashboard" style={{ color: "#fff" }}>
-              Dashboard
-            </Link>
+
+            {/* Logged-in core area */}
+            {isAuthenticated && (
+              <>
+                <Link to="/dashboard" style={{ color: "#fff" }}>
+                  Dashboard
+                </Link>
+
+                {/* ✅ Only show if admin/manager */}
+                {isAdmin && (
+                  <>
+                    <Link to="/admin/bookings" style={{ color: "#fff" }}>
+                      Admin Bookings
+                    </Link>
+                    <Link to="/admin/users" style={{ color: "#fff" }}>
+                      Users
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
           </Space>
 
           {loading ? (

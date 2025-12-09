@@ -1,9 +1,16 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Outlet } from "react-router-dom"; // BrowserRouter removed
+import { Routes, Route, Outlet } from "react-router-dom";
 import "aos/dist/aos.css";
 import AOS from "aos";
 
-// Pages
+// Layouts
+import AppLayout from "./layouts/AppLayout";
+import { LandingLayout, PageLayout } from "./components/PageLayout";
+
+// Guards
+import RequireRole from "./components/RequireRole";
+
+// Public / marketing pages
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
 import FeedPage from "./pages/FeedPage";
@@ -12,9 +19,18 @@ import MembershipPage from "./pages/Membership";
 import TeamTravelPage from "./pages/TeamTravelPage";
 import NotFound from "./pages/NotFound";
 
-// Components
+// Auth pages
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+
+// Dashboard / app pages
+import DashboardPage from "./pages/DashboardPage";
+import UserBookingsPage from "./pages/UserBookingsPage";
+import AdminBookingsPage from "./pages/AdminBookingsPage";
+import AdminUsersTable from "./pages/AdminUsersTable";
+
+// Global components
 import CookieBanner from "./components/CookieBanner";
-import { LandingLayout, PageLayout } from "./components/PageLayout";
 
 function WithLandingLayout() {
   return (
@@ -44,12 +60,12 @@ export default function App() {
   return (
     <>
       <Routes>
-        {/* Landing (with Navbar) */}
+        {/* Landing (with Navbar / hero shell) */}
         <Route element={<WithLandingLayout />}>
           <Route path="/" element={<LandingPage />} />
         </Route>
 
-        {/* All other pages (no Navbar) */}
+        {/* Public “plain” pages (still use marketing layout, no dashboard shell) */}
         <Route element={<WithPlainLayout />}>
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/feed" element={<FeedPage />} />
@@ -58,7 +74,37 @@ export default function App() {
           <Route path="/team-travel" element={<TeamTravelPage />} />
         </Route>
 
-        {/* 404 */}
+        {/* Authenticated app shell (Dashboard, user area, admin area) */}
+        <Route element={<AppLayout />}>
+          {/* Normal user routes */}
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/bookings" element={<UserBookingsPage />} />
+          {/* Add more normal user routes here as needed */}
+
+          {/* Admin section (RBAC protected) */}
+          <Route
+            path="/admin/bookings"
+            element={
+              <RequireRole allowedRoles={["admin", "manager"]}>
+                <AdminBookingsPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <RequireRole allowedRoles={["admin", "manager"]}>
+                <AdminUsersTable />
+              </RequireRole>
+            }
+          />
+        </Route>
+
+        {/* Auth routes (outside AppLayout + marketing layouts) */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* 404 fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
 
