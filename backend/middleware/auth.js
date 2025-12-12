@@ -55,5 +55,10 @@ export function requireRole(...allowedRoles) {
   };
 }
 
-// Convenience admin-only guard, if you want the same semantics as your old verifyAdmin
+// Convenience admin-only guard (same semantics as old verifyAdmin)
 export const requireAdmin = requireRole("admin");
+
+// ---------- Backward-compatible aliases ----------
+// If some routes still import { auth, verifyAdmin }:
+export const auth = authRequired;
+export const verifyAdmin = requireAdmin;

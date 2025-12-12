@@ -29,6 +29,8 @@ async function handleResponse(res) {
  *  - unread: boolean (only unread if true)
  *  - limit: number
  *  - sort: "asc" | "desc"
+ *
+ * Returns whatever the backend sends (array by default).
  */
 export async function getNotifications(options = {}) {
   const params = new URLSearchParams();
@@ -45,6 +47,23 @@ export async function getNotifications(options = {}) {
   });
 
   return handleResponse(res);
+}
+
+/**
+ * Convenience wrapper for loading notifications in the dropdown.
+ *
+ * Uses getNotifications() under the hood and normalizes the output
+ * to an array, whether the backend returns:
+ *   - an array: [ ... ]
+ *   - or an object like { notifications: [...] }
+ */
+export async function fetchNotifications(options = {}) {
+  const data = await getNotifications(options);
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.notifications)) return data.notifications;
+
+  return [];
 }
 
 /**

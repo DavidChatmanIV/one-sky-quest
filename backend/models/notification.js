@@ -1,69 +1,97 @@
 import mongoose from "mongoose";
 
-const notificationSchema = new mongoose.Schema(
+const { Schema } = mongoose;
+
+const notificationSchema = new Schema(
   {
-    // ✅ Link notification to a real user
+    // ------------------------------------------
+    // 🔗 WHO the notification belongs to
+    // ------------------------------------------
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true, // faster lookups
+      index: true,
     },
 
-    // ✅ High-level category (UI filtering)
+    // ------------------------------------------
+    // 🎯 HIGH-LEVEL DISPLAY CATEGORY (UI filters)
+    // ------------------------------------------
     type: {
       type: String,
-      enum: ["general", "booking", "alert", "promo", "dm"],
+      enum: [
+        "general",
+        "booking",
+        "alert",
+        "promo",
+        "dm",
+        "trip",
+        "system",
+        "xp",
+      ],
       default: "general",
+      index: true,
     },
 
-    // ✅ Machine-readable event type (logic-based)
+    // ------------------------------------------
+    // ⚙️ MACHINE-READABLE EVENT TYPE
+    // examples:
+    // "booking_created", "dm_new", "xp_earned"
+    // ------------------------------------------
     event: {
       type: String,
       required: true,
-      // examples:
-      // 'booking_created'
-      // 'dm_new'
-      // 'xp_earned'
-      // 'trip_updated'
+      trim: true,
     },
 
-    // ✅ Short headline for UI
+    // ------------------------------------------
+    // 📝 TITLE + MESSAGE
+    // ------------------------------------------
     title: {
       type: String,
       trim: true,
       default: "",
     },
 
-    // ✅ Full notification message
     message: {
       type: String,
       required: true,
       trim: true,
     },
 
-    // ✅ Read state
-    isRead: {
-      type: Boolean,
-      default: false,
-    },
-
-    // ✅ Click-to-open system
+    // ------------------------------------------
+    // 📍 CLICK-TO-OPEN NAVIGATION SYSTEM
+    //
+    // "trip" → /trip/:id
+    // "booking" → /booking/:id
+    // "dm" → /dm/:conversationId
+    // "profile" → /profile/:id
+    // "external" → full URL
+    // ------------------------------------------
     targetType: {
       type: String,
-      enum: ["trip", "booking", "dm", "profile", "external"],
-      default: null,
+      enum: ["trip", "booking", "dm", "profile", "external", "none"],
+      default: "none",
     },
 
     targetId: {
       type: String,
-      default: null, // bookingId, conversationId, tripId, etc.
+      default: null,
     },
 
-    // ✅ Optional direct link support
+    // Optional direct link for external URLs
     link: {
       type: String,
       default: "",
+    },
+
+    // ------------------------------------------
+    // 👁 READ STATUS
+    // ------------------------------------------
+    isRead: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
   },
   {

@@ -1,10 +1,14 @@
 import { Router } from "express";
-import User from "../models/user.js";
-import { authRequired, requireRole } from "../middleware/auth.js";
+import User from "../../models/user.js";
+import { authRequired, requireRole } from "../../middleware/auth.js";
 
 const router = Router();
 
-// GET /api/admin/users?search=&page=&limit=
+/**
+ * GET /api/admin/users
+ * Supports: ?search= &page= &limit=
+ * Access: admin, manager
+ */
 router.get(
   "/",
   authRequired,
@@ -21,6 +25,7 @@ router.get(
         filter.$or = [
           { email: { $regex: search, $options: "i" } },
           { name: { $regex: search, $options: "i" } },
+          { username: { $regex: search, $options: "i" } },
         ];
       }
 
@@ -29,17 +34,12 @@ router.get(
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
-          .select("name email role isActive createdAt")
+          .select("username name email role isActive createdAt updatedAt")
           .lean(),
         User.countDocuments(filter),
       ]);
 
-      res.json({
-        items,
-        total,
-        page,
-        limit,
-      });
+      res.json({ items, total, page, limit });
     } catch (err) {
       console.error("GET /api/admin/users error:", err);
       res.status(500).json({ message: "Failed to load users" });
@@ -47,7 +47,11 @@ router.get(
   }
 );
 
-// PATCH /api/admin/users/:id/role
+/**
+ * PATCH /api/admin/users/:id/role
+ * Updates user role
+ * Access: admin, manager
+ */
 router.patch(
   "/:id/role",
   authRequired,
@@ -55,7 +59,9 @@ router.patch(
   async (req, res) => {
     try {
       const { role } = req.body;
-      if (!["user", "support", "manager", "admin"].includes(role)) {
+
+      const allowedRoles = ["user", "support", "manager", "admin"];
+      if (!allowedRoles.includes(role)) {
         return res.status(400).json({ message: "Invalid role" });
       }
 
@@ -63,7 +69,7 @@ router.patch(
         req.params.id,
         { role },
         { new: true }
-      ).select("name email role isActive");
+      ).select("username name email role isActive updatedAt");
 
       if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -75,7 +81,11 @@ router.patch(
   }
 );
 
-// PATCH /api/admin/users/:id/status
+/**
+ * PATCH /api/admin/users/:id/status
+ * Toggles user active/inactive
+ * Access: admin, manager
+ */
 router.patch(
   "/:id/status",
   authRequired,
@@ -83,11 +93,12 @@ router.patch(
   async (req, res) => {
     try {
       const { isActive } = req.body;
+
       const user = await User.findByIdAndUpdate(
         req.params.id,
         { isActive: !!isActive },
         { new: true }
-      ).select("name email role isActive");
+      ).select("username name email role isActive updatedAt");
 
       if (!user) return res.status(404).json({ message: "User not found" });
 

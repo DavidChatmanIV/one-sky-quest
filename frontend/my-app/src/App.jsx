@@ -27,7 +27,9 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import UserBookingsPage from "./pages/UserBookingsPage";
 import AdminBookingsPage from "./pages/AdminBookingsPage";
-import AdminUsersTable from "./pages/AdminUsersTable";
+
+// 🔐 Admin user management page (new path)
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 
 // Global components
 import CookieBanner from "./components/CookieBanner";
@@ -90,11 +92,13 @@ export default function App() {
               </RequireRole>
             }
           />
+
+          {/* 🔐 Admin-only user management page */}
           <Route
             path="/admin/users"
             element={
-              <RequireRole allowedRoles={["admin", "manager"]}>
-                <AdminUsersTable />
+              <RequireRole allowedRoles={["admin"]}>
+                <AdminUsersPage />
               </RequireRole>
             }
           />

@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema(
   {
+    // ---------- Core Identity ----------
     username: {
       type: String,
       required: true,
@@ -29,6 +30,7 @@ const UserSchema = new Schema(
       required: true,
     },
 
+    // ---------- Profile ----------
     avatar: {
       type: String,
       default: "/default-avatar.png",
@@ -44,6 +46,7 @@ const UserSchema = new Schema(
       default: 0,
     },
 
+    // ---------- RBAC ROLE SYSTEM ----------
     role: {
       type: String,
       enum: ["user", "support", "manager", "admin"],
@@ -55,6 +58,7 @@ const UserSchema = new Schema(
       default: true,
     },
 
+    // ---------- Saved Trips (Skyrio Feature) ----------
     savedTrips: [
       {
         type: Schema.Types.ObjectId,
@@ -85,18 +89,18 @@ UserSchema.methods.toSafeJSON = function () {
   };
 };
 
-// ---------- Clean JSON output (no passwordHash, no __v) ----------
+// ---------- Transform JSON output ----------
 UserSchema.set("toJSON", {
   transform(_doc, ret) {
     ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
-    delete ret.passwordHash;
+    delete ret.passwordHash; // never expose hash
     return ret;
   },
 });
 
-// ---------- Safe Export for Render/Linux ----------
+// ---------- Render/Linux Safe Export ----------
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 export default User;

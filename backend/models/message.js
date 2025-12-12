@@ -9,20 +9,42 @@ const messageSchema = new Schema(
       ref: "Conversation",
       required: true,
     },
-    sender: {
+
+    // normalized to match your API + frontend payload
+    senderId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+
+    // optional now (because images can be sent alone)
     text: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
+    },
+
+    // ✅ NEW: image support
+    imageUrl: {
+      type: String,
+      trim: true,
+      default: "",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true, // createdAt, updatedAt
+  }
 );
 
+//  Prevent completely empty messages (no text + no image)
+messageSchema.pre("save", function (next) {
+  if (!this.text && !this.imageUrl) {
+    return next(new Error("Message must have text or an image."));
+  }
+  next();
+});
+
+//  Hot-reload safe model export (prevents overwrite errors in dev)
 const Message =
   mongoose.models.Message || mongoose.model("Message", messageSchema);
 

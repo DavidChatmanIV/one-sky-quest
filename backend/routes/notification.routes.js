@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { Notification } from "../models/index.js";
-import { auth } from "../middleware/auth.js";
+import Notification from "../models/notification.js";
+import { auth as authRequired } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -11,18 +11,20 @@ const router = Router();
  *  - limit=20    -> max number to return (default 50)
  *  - sort=desc|asc (default: desc by createdAt)
  */
-router.get("/", auth, async (req, res) => {
+router.get("/", authRequired, async (req, res) => {
   try {
     const { unread, limit = 50, sort = "desc" } = req.query;
+    const userId = req.user.id; // comes from JWT payload
 
-    const query = { user: req.user.id };
+    const query = { user: userId };
     if (unread === "true") {
       query.isRead = false;
     }
 
     const notifications = await Notification.find(query)
       .sort({ createdAt: sort === "asc" ? 1 : -1 })
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     res.json(notifications);
   } catch (err) {
@@ -35,12 +37,15 @@ router.get("/", auth, async (req, res) => {
  * GET /api/notifications/unread-count
  * For showing the bell badge number
  */
-router.get("/unread-count", auth, async (req, res) => {
+router.get("/unread-count", authRequired, async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const count = await Notification.countDocuments({
-      user: req.user.id,
+      user: userId,
       isRead: false,
     });
+
     res.json({ count });
   } catch (err) {
     console.error("❌ Failed to fetch unread count:", err);
@@ -62,8 +67,9 @@ router.get("/unread-count", auth, async (req, res) => {
  *   "link": "/dashboard/trips/123"
  * }
  */
-router.post("/", auth, async (req, res) => {
+router.post("/", authRequired, async (req, res) => {
   try {
+    const userId = req.user.id;
     const { type, event, title, message, targetType, targetId, link } =
       req.body;
 
@@ -74,7 +80,7 @@ router.post("/", auth, async (req, res) => {
     }
 
     const notification = new Notification({
-      user: req.user.id,
+      user: userId,
       type,
       event,
       title,
@@ -86,10 +92,10 @@ router.post("/", auth, async (req, res) => {
 
     await notification.save();
 
-    // 🔔 Socket.io hook (optional)
+    // 🔔 Socket.io hook (optional, keep commented until wired):
     // const io = req.app.get("io");
     // if (io) {
-    //   io.to(req.user.id.toString()).emit("notification:new", notification);
+    //   io.to(userId.toString()).emit("notification:new", notification);
     // }
 
     res.status(201).json(notification);
@@ -103,12 +109,13 @@ router.post("/", auth, async (req, res) => {
  * PATCH /api/notifications/:id/read
  * Mark a single notification as read
  */
-router.patch("/:id/read", auth, async (req, res) => {
+router.patch("/:id/read", authRequired, async (req, res) => {
   try {
+    const userId = req.user.id;
     const { id } = req.params;
 
     const notification = await Notification.findOneAndUpdate(
-      { _id: id, user: req.user.id },
+      { _id: id, user: userId },
       { isRead: true },
       { new: true }
     );
@@ -128,10 +135,12 @@ router.patch("/:id/read", auth, async (req, res) => {
  * PATCH /api/notifications/read-all
  * Mark ALL notifications as read for the logged-in user
  */
-router.patch("/read-all", auth, async (req, res) => {
+router.patch("/read-all", authRequired, async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const result = await Notification.updateMany(
-      { user: req.user.id, isRead: false },
+      { user: userId, isRead: false },
       { $set: { isRead: true } }
     );
 
@@ -149,13 +158,14 @@ router.patch("/read-all", auth, async (req, res) => {
  * DELETE /api/notifications/:id
  * Delete a single notification
  */
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", authRequired, async (req, res) => {
   try {
+    const userId = req.user.id;
     const { id } = req.params;
 
     const deleted = await Notification.findOneAndDelete({
       _id: id,
-      user: req.user.id,
+      user: userId,
     });
 
     if (!deleted) {
@@ -166,6 +176,42 @@ router.delete("/:id", auth, async (req, res) => {
   } catch (err) {
     console.error("❌ Failed to delete notification:", err);
     res.status(500).json({ message: "Error deleting notification." });
+  }
+});
+
+/**
+ * POST /api/notifications/test
+ * TEMP helper to create a sample notification for the current user
+ */
+router.post("/test", authRequired, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const {
+      type = "general",
+      event = "test_notification",
+      title = "New trip booked 🎉",
+      message = "Your trip to Tokyo has been confirmed.",
+      targetType = "trip",
+      targetId = "demo-trip-id",
+      link = "/dashboard/trips/demo-trip-id",
+    } = req.body || {};
+
+    const notification = await Notification.create({
+      user: userId,
+      type,
+      event,
+      title,
+      message,
+      targetType,
+      targetId,
+      link,
+    });
+
+    res.status(201).json(notification);
+  } catch (err) {
+    console.error("[notifications] POST /test error:", err);
+    res.status(500).json({ message: "Failed to create test notification" });
   }
 });
 

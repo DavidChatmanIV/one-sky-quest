@@ -35,12 +35,22 @@ await mount("/conversations", "../conversations.js");
 await mount("/feed", "../feed.js");
 await mount("/health", "../health.routes.js");
 await mount("/message", "../message.routes.js");
+
+// Profile & notifications
 await mount("/profile", "../profile.routes.js");
 await mount("/notifications", "../notification.routes.js");
-await mount("/admin/users", "../admin.users.routes.js");
 
-//  bookings router (routes/bookings.routes.js)
+// Uploads (images, etc.)
+await mount("/uploads", "../uploads.routes.js");
+
+// Bookings router (routes/bookings.routes.js)
 await mount("/bookings", "../bookings.routes.js");
+
+// DM alias (if you’re reusing message.routes.js for now)
+await mount("/dm", "../message.routes.js");
+
+// Admin routes (role management, user listing, etc.)
+await mount("/admin", "../admin.routes.js");
 
 // Root of the API namespace
 api.get("/", (_req, res) => {

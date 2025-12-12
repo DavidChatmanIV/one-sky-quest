@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import {
   Badge,
   Button,
@@ -23,6 +29,12 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const { Text } = Typography;
+
+/* helper is outside the component so hooks don't depend on it */
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 /* icon per notification type */
 const iconMap = {
@@ -57,10 +69,15 @@ export default function Notifications() {
   const panelRef = useRef(null);
   const navigate = useNavigate();
 
-  /* initial fetch when panel opens */
-  const fetchNotifications = async () => {
+  /* memoized so it can safely go in deps */
+  const fetchNotifications = useCallback(async () => {
     try {
-      const res = await fetch("/api/notifications");
+      setLoading(true);
+      const res = await fetch("/api/notifications?limit=20", {
+        headers: {
+          ...getAuthHeaders(),
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch notifications");
       const data = await res.json();
       setNotifications(Array.isArray(data) ? data : []);
@@ -70,12 +87,17 @@ export default function Notifications() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // reads from localStorage only → safe empty deps
 
   const markAllAsRead = async () => {
     try {
       setBusy(true);
-      await fetch("/api/notifications/read-all", { method: "PUT" });
+      await fetch("/api/notifications/read-all", {
+        method: "PUT",
+        headers: {
+          ...getAuthHeaders(),
+        },
+      });
       await fetchNotifications();
       toast.success("Marked all as read");
     } catch (err) {
@@ -89,7 +111,12 @@ export default function Notifications() {
   const clearAll = async () => {
     try {
       setBusy(true);
-      await fetch("/api/notifications/clear", { method: "DELETE" });
+      await fetch("/api/notifications/clear", {
+        method: "DELETE",
+        headers: {
+          ...getAuthHeaders(),
+        },
+      });
       await fetchNotifications();
       toast("Notifications cleared", { icon: "🧹" });
     } catch (err) {
@@ -100,15 +127,16 @@ export default function Notifications() {
     }
   };
 
+  // Load when panel becomes visible
   useEffect(() => {
     if (visible) {
       fetchNotifications();
       const t = setTimeout(() => panelRef.current?.focus(), 0);
       return () => clearTimeout(t);
     }
-  }, [visible]);
+  }, [visible, fetchNotifications]); // no more missing-deps warning
 
-  /* ✅ Realtime via WebSocket with safe close (no try/catch, no linter warnings) */
+  /* Realtime via WebSocket with safe close */
   useEffect(() => {
     if (!visible) return;
 
@@ -143,7 +171,6 @@ export default function Notifications() {
           const payload = JSON.parse(evt.data);
           if (payload.type === "new" && payload.data) {
             setNotifications((prev) => [payload.data, ...prev]);
-            // optional toast preview
             toast(payload.data?.title || "New notification", { icon: "🔔" });
           } else if (payload.type === "bulk" && Array.isArray(payload.data)) {
             setNotifications(payload.data);
@@ -165,7 +192,6 @@ export default function Notifications() {
         reconnectTimer = window.setTimeout(connect, delay);
       };
 
-      // Guard-close; no try/catch needed
       ws.onerror = () => {
         safeClose();
       };
@@ -189,18 +215,43 @@ export default function Notifications() {
     [notifications, activeKey]
   );
 
-  /* per-item click: optimistic mark-as-read + navigate if route present */
-  const handleItemClick = (item) => {
+  //* per-item click: mark-as-read + navigate based on targetType */
+  const handleItemClick = async (item) => {
     try {
-      if (item?.id && !item.read) {
+      const notifId = item._id || item.id;
+      const hasId = Boolean(notifId);
+
+      // 1) Optimistic mark as read in UI
+      if (hasId && !item.read) {
         setNotifications((prev) =>
-          prev.map((n) => (n.id === item.id ? { ...n, read: true } : n))
+          prev.map((n) =>
+            n._id === notifId || n.id === notifId ? { ...n, read: true } : n
+          )
         );
-        fetch(`/api/notifications/${encodeURIComponent(item.id)}/read`, {
-          method: "PUT",
+      }
+
+      // 2) Mark as read in backend
+      if (hasId && !item.read) {
+        fetch(`/api/notifications/${encodeURIComponent(notifId)}/read`, {
+          method: "PATCH",
+          headers: {
+            ...getAuthHeaders(),
+          },
         }).catch(() => {});
       }
-      if (item?.route && typeof item.route === "string") {
+
+      // 3) Navigate to correct destination
+      if (item.targetType === "booking" && item.targetId) {
+        setVisible(false);
+        navigate(`/dashboard/bookings/${item.targetId}`);
+      } else if (item.targetType === "dm" && item.targetId) {
+        setVisible(false);
+        navigate(`/dm/${item.targetId}`);
+      } else if (item.targetType === "trip" && item.targetId) {
+        setVisible(false);
+        navigate(`/saved-trips/${item.targetId}`);
+      } else if (item.route && typeof item.route === "string") {
+        // fallback for old-style notifications
         setVisible(false);
         navigate(item.route);
       }
