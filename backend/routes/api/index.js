@@ -30,27 +30,22 @@ async function mount(routeBase, modulePath) {
 }
 
 // ---------- Mount all sub-routers (paths are relative to this file) ----------
-await mount("/auth", "../auth.routes.js");
+
+// These are in backend/routes/api/
+await mount("/auth", "./auth.routes.js");
+await mount("/profile", "./profile.routes.js");
+await mount("/uploads", "./uploads.routes.js");
+
+// These are in backend/routes/
 await mount("/conversations", "../conversations.js");
 await mount("/feed", "../feed.js");
-await mount("/health", "../health.routes.js");
+await mount("/health", "../health.js"); // match your actual filename
 await mount("/message", "../message.routes.js");
-
-// Profile & notifications
-await mount("/profile", "../profile.routes.js");
 await mount("/notifications", "../notification.routes.js");
-
-// Uploads (images, etc.)
-await mount("/uploads", "../uploads.routes.js");
-
-// Bookings router (routes/bookings.routes.js)
 await mount("/bookings", "../bookings.routes.js");
-
-// DM alias (if you’re reusing message.routes.js for now)
-await mount("/dm", "../message.routes.js");
-
-// Admin routes (role management, user listing, etc.)
+await mount("/dm", "../dm.js");
 await mount("/admin", "../admin.routes.js");
+
 
 // Root of the API namespace
 api.get("/", (_req, res) => {
