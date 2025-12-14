@@ -1,6 +1,15 @@
-// GET /dm/mine?userId=:id
-// Returns the user's conversations sorted by updatedAt desc,
-// with a lastMessage preview and the "other" participant id.
+import { Router } from "express";
+import Conversation from "../models/Conversation.js";
+import Message from "../models/Message.js";
+
+const router = Router();
+
+// sanity check
+router.get("/ping", (_req, res) => {
+  res.json({ ok: true, route: "dm" });
+});
+
+// GET /api/dm/mine?userId=...
 router.get("/mine", async (req, res, next) => {
   try {
     const { userId } = req.query;
@@ -12,8 +21,12 @@ router.get("/mine", async (req, res, next) => {
       .select("_id participants isGroup title lastMessage updatedAt")
       .lean();
 
+    // If no convos, return early (avoids $in: [])
+    if (!convos.length) return res.json([]);
+
     // Get latest message for each convo in one shot
     const convoIds = convos.map((c) => c._id);
+
     const latestByConvo = await Message.aggregate([
       { $match: { conversationId: { $in: convoIds } } },
       { $sort: { createdAt: -1 } },
@@ -40,12 +53,14 @@ router.get("/mine", async (req, res, next) => {
       return {
         ...c,
         partnerId,
-        last: latest && {
-          _id: latest.messageId,
-          text: latest.text,
-          sender: latest.sender,
-          createdAt: latest.createdAt,
-        },
+        last: latest
+          ? {
+              _id: latest.messageId,
+              text: latest.text,
+              sender: latest.sender,
+              createdAt: latest.createdAt,
+            }
+          : null,
       };
     });
 
@@ -54,3 +69,5 @@ router.get("/mine", async (req, res, next) => {
     next(err);
   }
 });
+
+export default router;
