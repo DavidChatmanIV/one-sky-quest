@@ -51,7 +51,6 @@ const FRONTEND_ORIGIN =
   process.env.CLIENT_ORIGIN ||
   "http://localhost:5173";
 
-// Allow comma-separated origins
 const allowedOrigins = FRONTEND_ORIGIN.split(",")
   .map((o) => o.trim())
   .filter(Boolean);
@@ -59,7 +58,7 @@ const allowedOrigins = FRONTEND_ORIGIN.split(",")
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // Postman / Render health check
+      if (!origin) return cb(null, true); // Render health checks / Postman
       return allowedOrigins.includes(origin)
         ? cb(null, true)
         : cb(new Error("CORS blocked"));
@@ -79,7 +78,7 @@ app.use(
   })
 );
 
-// ---------- ENV sanity check (TEMP) ----------
+// ---------- ENV sanity check ----------
 app.get("/__envcheck", (_req, res) => {
   const uri = process.env.MONGODB_URI || process.env.MONGO_URI || "";
   res.json({
@@ -212,8 +211,6 @@ const io = new SocketIOServer(httpServer, {
 app.set("io", io);
 
 // ---------- Socket logic ----------
-const onlineUsers = new Map();
-
 io.on("connection", (socket) => {
   console.log("🔥 Socket connected", socket.id);
 
@@ -222,19 +219,20 @@ io.on("connection", (socket) => {
   });
 
   socket.on("dm:typing", ({ conversationId, fromUserId }) => {
-    if (conversationId)
+    if (conversationId) {
       socket.to(String(conversationId)).emit("dm:typing", { fromUserId });
+    }
   });
 
   socket.on("send_message", (payload) => {
-    if (payload?.conversationId)
+    if (payload?.conversationId) {
       socket
         .to(String(payload.conversationId))
         .emit("message_received", payload);
+    }
   });
 
   socket.on("disconnect", () => {
-    onlineUsers.delete(socket.id);
     console.log("❌ Socket disconnected", socket.id);
   });
 });
@@ -256,8 +254,10 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 // ---------- Start ----------
 await connectMongo();
 
-const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
+// Render provides PORT. Locally default to 5050.
+const PORT = Number(process.env.PORT) || 5050;
+
+httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`);
 });
 
