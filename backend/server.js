@@ -51,15 +51,18 @@ const FRONTEND_ORIGIN =
   process.env.CLIENT_ORIGIN ||
   "http://localhost:5173";
 
-// allow comma-separated origins in prod
-const allowedOrigins = FRONTEND_ORIGIN.split(",").map((o) => o.trim());
+// Allow comma-separated origins
+const allowedOrigins = FRONTEND_ORIGIN.split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // Postman / server-to-server
-      const ok = allowedOrigins.includes(origin);
-      return ok ? cb(null, true) : cb(new Error("CORS blocked"));
+      if (!origin) return cb(null, true); // Postman / Render health check
+      return allowedOrigins.includes(origin)
+        ? cb(null, true)
+        : cb(new Error("CORS blocked"));
     },
     credentials: true,
   })
@@ -97,22 +100,20 @@ async function connectMongo() {
   }
 
   if (!MONGODB_URI) {
-    console.error(
-      "❌ Missing MONGODB_URI (or MONGO_URI). Check .env / Render variables."
-    );
+    console.error("❌ Missing MONGODB_URI (or MONGO_URI).");
     process.exit(1);
   }
 
   try {
     await mongoose.connect(MONGODB_URI, {
-      dbName: MONGO_DB || undefined, // remove if db is already in URI
+      dbName: MONGO_DB || undefined,
       maxPoolSize: 20,
       serverSelectionTimeoutMS: 7000,
       socketTimeoutMS: 60000,
     });
 
     const c = mongoose.connection;
-    console.log(`✅ MongoDB connected to Skyrio (db: ${c.name})`);
+    console.log(`✅ MongoDB connected (db: ${c.name})`);
 
     c.on("error", (e) =>
       console.error("❌ MongoDB connection error:", e.message)
@@ -160,7 +161,7 @@ app.post("/contact", async (req, res) => {
     }
 
     if (USE_MOCKS) {
-      return res.json({ ok: true, message: "Received (mock). Thank you!" });
+      return res.json({ ok: true, message: "Received (mock)." });
     }
 
     if (mongoose.connection.readyState !== 1) {
@@ -182,7 +183,7 @@ app.use((req, _res, next) => {
     err.status = 404;
     return next(err);
   }
-  return next();
+  next();
 });
 
 app.use((err, _req, res, _next) => {
@@ -197,7 +198,12 @@ const httpServer = createServer(app);
 
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      return allowedOrigins.includes(origin)
+        ? cb(null, true)
+        : cb(new Error("CORS blocked"));
+    },
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -212,34 +218,19 @@ io.on("connection", (socket) => {
   console.log("🔥 Socket connected", socket.id);
 
   socket.on("dm:join", ({ conversationId }) => {
-    if (!conversationId) return;
-    socket.join(String(conversationId));
+    if (conversationId) socket.join(String(conversationId));
   });
 
   socket.on("dm:typing", ({ conversationId, fromUserId }) => {
-    if (!conversationId) return;
-    socket.to(String(conversationId)).emit("dm:typing", { fromUserId });
-  });
-
-  socket.on("join_conversation", ({ conversationId, userId }) => {
-    if (!conversationId) return;
-    socket.join(String(conversationId));
-    if (userId) onlineUsers.set(socket.id, { userId, conversationId });
+    if (conversationId)
+      socket.to(String(conversationId)).emit("dm:typing", { fromUserId });
   });
 
   socket.on("send_message", (payload) => {
-    if (!payload?.conversationId) return;
-    socket.to(String(payload.conversationId)).emit("message_received", payload);
-  });
-
-  socket.on("typing", ({ conversationId, user }) => {
-    if (!conversationId) return;
-    socket.to(String(conversationId)).emit("typing", { user });
-  });
-
-  socket.on("stop_typing", ({ conversationId, user }) => {
-    if (!conversationId) return;
-    socket.to(String(conversationId)).emit("stop_typing", { user });
+    if (payload?.conversationId)
+      socket
+        .to(String(payload.conversationId))
+        .emit("message_received", payload);
   });
 
   socket.on("disconnect", () => {
@@ -253,10 +244,7 @@ async function shutdown(signal) {
   console.log(`🛑 ${signal} received, shutting down...`);
   try {
     await mongoose.connection.close().catch(() => {});
-    httpServer.close(() => {
-      console.log("✅ HTTP server closed");
-      process.exit(0);
-    });
+    httpServer.close(() => process.exit(0));
   } catch {
     process.exit(0);
   }
@@ -268,7 +256,7 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 // ---------- Start ----------
 await connectMongo();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`);
 });
