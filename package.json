@@ -1,0 +1,19 @@
+{
+  "name": "skyrio-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend/my-app",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c yellow,cyan \"npm --workspace backend run dev\" \"npm --workspace frontend/my-app run dev\"",
+    "build": "npm --workspace frontend/my-app run build",
+    "start": "npm --workspace backend start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "mongodb": "^7.0.0"
+  }
+}

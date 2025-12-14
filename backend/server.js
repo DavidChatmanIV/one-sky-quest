@@ -14,12 +14,13 @@ import { Server as SocketIOServer } from "socket.io";
 
 import apiRouter from "./routes/api/index.js";
 import healthRouter from "./routes/health.routes.js";
-// IMPORTANT: match the actual filename casing on disk (Render/Linux is case-sensitive)
 import Contact from "./models/contact.js";
 
+// ---------- Path helpers ----------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ---------- App ----------
 const app = express();
 app.set("trust proxy", 1);
 
@@ -35,9 +36,9 @@ app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-// ---------- AUTH RATE LIMITING ----------
+// ---------- AUTH RATE LIMIT ----------
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
@@ -50,34 +51,32 @@ const FRONTEND_ORIGIN =
   process.env.CLIENT_ORIGIN ||
   "http://localhost:5173";
 
-// support comma-separated list for prod
-const allowedOrigins = FRONTEND_ORIGIN.split(",").map((s) => s.trim());
+// allow comma-separated origins in prod
+const allowedOrigins = FRONTEND_ORIGIN.split(",").map((o) => o.trim());
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // server-to-server, Postman, same-origin
-      const ok = allowedOrigins.some(
-        (o) => origin === o || origin.startsWith(o)
-      );
+      if (!origin) return cb(null, true); // Postman / server-to-server
+      const ok = allowedOrigins.includes(origin);
       return ok ? cb(null, true) : cb(new Error("CORS blocked"));
     },
     credentials: true,
   })
 );
 
-// ---------- Global Rate Limit (API) ----------
+// ---------- Global API rate limit ----------
 app.use(
   "/api",
   rateLimit({
-    windowMs: 60_000, // 1 min
+    windowMs: 60_000,
     max: 120,
     standardHeaders: true,
     legacyHeaders: false,
   })
 );
 
-// ---------- TEMP env probe (remove after confirming on Render) ----------
+// ---------- ENV sanity check (TEMP) ----------
 app.get("/__envcheck", (_req, res) => {
   const uri = process.env.MONGODB_URI || process.env.MONGO_URI || "";
   res.json({
@@ -88,64 +87,74 @@ app.get("/__envcheck", (_req, res) => {
 
 // ---------- Mongo ----------
 const USE_MOCKS = process.env.USE_MOCKS === "true";
-const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
 const MONGO_DB = process.env.MONGODB_DB || process.env.MONGO_DB;
 
 async function connectMongo() {
   if (USE_MOCKS) {
-    console.log("ℹ️ USE_MOCKS=true — skipping Mongo.");
+    console.log("ℹ️ USE_MOCKS=true — skipping MongoDB.");
     return;
   }
 
-  if (!MONGO_URI) {
-    console.error("❌ Missing MONGODB_URI / MONGO_URI.");
+  if (!MONGODB_URI) {
+    console.error(
+      "❌ Missing MONGODB_URI (or MONGO_URI). Check .env / Render variables."
+    );
     process.exit(1);
   }
 
-  const opts = {
-    dbName: MONGO_DB || undefined,
-    maxPoolSize: 20,
-    serverSelectionTimeoutMS: 7_000,
-    socketTimeoutMS: 60_000,
-  };
-
   try {
-    await mongoose.connect(MONGO_URI, opts);
-    const c = mongoose.connection;
-    console.log(`✅ Mongo connected (db: ${c.name})`);
+    await mongoose.connect(MONGODB_URI, {
+      dbName: MONGO_DB || undefined, // remove if db is already in URI
+      maxPoolSize: 20,
+      serverSelectionTimeoutMS: 7000,
+      socketTimeoutMS: 60000,
+    });
 
-    c.on("error", (e) => console.error("❌ Mongo error:", e.message));
-    c.on("disconnected", () => console.warn("⚠️ Mongo disconnected"));
+    const c = mongoose.connection;
+    console.log(`✅ MongoDB connected to Skyrio (db: ${c.name})`);
+
+    c.on("error", (e) =>
+      console.error("❌ MongoDB connection error:", e.message)
+    );
+    c.on("disconnected", () => console.warn("⚠️ MongoDB disconnected"));
   } catch (err) {
-    console.error("❌ Mongo connect failed:", err.message);
+    console.error("❌ MongoDB connection failed:", err.message);
     process.exit(1);
   }
 }
 
-// ---------- Health (DB ping) ----------
+// ---------- Health ----------
 app.get("/health/db", async (_req, res) => {
   try {
     if (USE_MOCKS) return res.json({ ok: true, mocked: true });
 
+    if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) {
+      return res.status(503).json({
+        ok: false,
+        state: mongoose.connection.readyState,
+        error: "DB not ready",
+      });
+    }
+
     await mongoose.connection.db.admin().ping();
-    res.json({ ok: true, state: mongoose.connection.readyState });
+    return res.json({ ok: true, state: mongoose.connection.readyState });
   } catch (e) {
-    res.status(500).json({ ok: false, error: e.message });
+    return res.status(500).json({ ok: false, error: e.message });
   }
 });
 
-// ---------- Root + Routes ----------
-app.get("/", (_req, res) => res.send("🚀 One Sky Quest backend is running!"));
+// ---------- Routes ----------
+app.get("/", (_req, res) => res.send("🚀 Skyrio backend is running!"));
 
 app.use("/health", healthRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", apiRouter);
 
-// ---------- Contact example ----------
+// ---------- Contact ----------
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
-
     if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing name, email, or message" });
     }
@@ -158,17 +167,15 @@ app.post("/contact", async (req, res) => {
       return res.status(503).json({ error: "DB not ready" });
     }
 
-    const doc = new Contact({ name, email, message });
-    await doc.save();
-
-    res.json({ ok: true, message: "Thank you for contacting us!" });
+    await new Contact({ name, email, message }).save();
+    return res.json({ ok: true, message: "Thank you for contacting us!" });
   } catch (err) {
-    console.error("Contact error:", err);
-    res.status(500).json({ error: "Contact form failed. Try again." });
+    console.error("❌ Contact error:", err);
+    return res.status(500).json({ error: "Contact form failed." });
   }
 });
 
-// ---------- 404 + error ----------
+// ---------- 404 + Error ----------
 app.use((req, _res, next) => {
   if (req.path.startsWith("/api")) {
     const err = new Error("Not found");
@@ -196,20 +203,17 @@ const io = new SocketIOServer(httpServer, {
   },
 });
 
-// expose io to routes so you can do: const io = req.app.get("io");
 app.set("io", io);
 
-// Optional: in-memory online users map
+// ---------- Socket logic ----------
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
   console.log("🔥 Socket connected", socket.id);
 
-  // DM namespace used by DmPage.jsx
   socket.on("dm:join", ({ conversationId }) => {
     if (!conversationId) return;
     socket.join(String(conversationId));
-    console.log(`Socket ${socket.id} joined DM room ${conversationId}`);
   });
 
   socket.on("dm:typing", ({ conversationId, fromUserId }) => {
@@ -217,48 +221,25 @@ io.on("connection", (socket) => {
     socket.to(String(conversationId)).emit("dm:typing", { fromUserId });
   });
 
-  // Alias from older code (joinConversation)
-  socket.on("joinConversation", (conversationId) => {
-    if (!conversationId) return;
-    socket.join(String(conversationId));
-    console.log(
-      `Socket ${socket.id} joined conversation (alias) ${conversationId}`
-    );
-  });
-
-  // ✅ Generic conversation join (from newer server.js)
   socket.on("join_conversation", ({ conversationId, userId }) => {
     if (!conversationId) return;
     socket.join(String(conversationId));
-    if (userId) {
-      onlineUsers.set(socket.id, {
-        userId,
-        conversationId: String(conversationId),
-      });
-    }
-    console.log(
-      `[socket] user ${userId || "anon"} joined room ${conversationId}`
-    );
+    if (userId) onlineUsers.set(socket.id, { userId, conversationId });
   });
 
-  //  Broadcast a new message to everyone else in the room
   socket.on("send_message", (payload) => {
-    const { conversationId } = payload || {};
-    if (!conversationId) return;
-    socket.to(String(conversationId)).emit("message_received", payload);
+    if (!payload?.conversationId) return;
+    socket.to(String(payload.conversationId)).emit("message_received", payload);
   });
 
-  // Typing indicators (generic)
   socket.on("typing", ({ conversationId, user }) => {
     if (!conversationId) return;
-    socket.to(String(conversationId)).emit("typing", { conversationId, user });
+    socket.to(String(conversationId)).emit("typing", { user });
   });
 
   socket.on("stop_typing", ({ conversationId, user }) => {
     if (!conversationId) return;
-    socket
-      .to(String(conversationId))
-      .emit("stop_typing", { conversationId, user });
+    socket.to(String(conversationId)).emit("stop_typing", { user });
   });
 
   socket.on("disconnect", () => {
@@ -269,7 +250,7 @@ io.on("connection", (socket) => {
 
 // ---------- Graceful shutdown ----------
 async function shutdown(signal) {
-  console.log(`🛑 ${signal} received, closing server...`);
+  console.log(`🛑 ${signal} received, shutting down...`);
   try {
     await mongoose.connection.close().catch(() => {});
     httpServer.close(() => {
@@ -284,7 +265,7 @@ async function shutdown(signal) {
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 
-// ---------- Start Server ----------
+// ---------- Start ----------
 await connectMongo();
 
 const PORT = process.env.PORT || 8080;

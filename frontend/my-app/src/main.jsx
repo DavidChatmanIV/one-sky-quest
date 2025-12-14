@@ -13,8 +13,8 @@ import AppRoutes from "./AppRoutes";
 /** 1) Ant reset FIRST (normalize component defaults) */
 import "antd/dist/reset.css";
 
-/** 2) Tailwind + global utilities (Tailwind entry via PostCSS) */
-import "./style.css"; // <- Your Tailwind entry (replaces App.css as Tailwind entry)
+/** 2) Tailwind + global utilities */
+import "./style.css"; // your Tailwind entry (via PostCSS)
 
 /** 3) App/page styles */
 import "./styles/global.css";
@@ -30,7 +30,6 @@ import "./styles/OverlayTone.css";
 /** 4) THEME LAST so gradient/glow tokens override when needed */
 import "./styles/theme.css";
 
-/* ---------- Render Root ---------- */
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AssistantProvider>
@@ -38,7 +37,7 @@ createRoot(document.getElementById("root")).render(
         theme={{
           components: {
             Card: {
-              variant: "outlined", // change to "borderless" if you prefer no borders globally
+              variant: "outlined", // set "borderless" if you prefer no borders globally
             },
           },
         }}
