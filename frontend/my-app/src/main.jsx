@@ -14,20 +14,23 @@ import AppRoutes from "./AppRoutes";
 import "antd/dist/reset.css";
 
 /** 2) Tailwind + global utilities */
-import "./style.css"; // your Tailwind entry (via PostCSS)
+import "./style.css"; // Tailwind entry
 
-/** 3) App/page styles */
+/** 3) App / page styles */
 import "./styles/global.css";
 import "./styles/Navbar.css";
 import "./styles/LandingPage.css";
 import "./styles/BookingPage.css";
-import "./styles/QuestFeed.css";
+
+/** 🔥 SkyStream styles (replaces QuestFeed) */
+import "./styles/skystream.css";
+
 import "./styles/profile-passport.css";
 import "./styles/SmartPlan.css";
 import "./styles/surfaces.css";
 import "./styles/OverlayTone.css";
 
-/** 4) THEME LAST so gradient/glow tokens override when needed */
+/** 4) THEME LAST (overrides everything above) */
 import "./styles/theme.css";
 
 createRoot(document.getElementById("root")).render(
@@ -37,7 +40,7 @@ createRoot(document.getElementById("root")).render(
         theme={{
           components: {
             Card: {
-              variant: "outlined", // set "borderless" if you prefer no borders globally
+              variant: "outlined",
             },
           },
         }}

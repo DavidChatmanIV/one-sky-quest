@@ -13,7 +13,7 @@ import RequireRole from "./components/RequireRole";
 // Public / marketing pages
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
-import FeedPage from "./pages/FeedPage";
+import SkyStreamPage from "./pages/SkyStreamPage"; 
 import DigitalPassportPage from "./pages/DigitalPassportPage";
 import MembershipPage from "./pages/Membership";
 import TeamTravelPage from "./pages/TeamTravelPage";
@@ -28,11 +28,13 @@ import DashboardPage from "./pages/DashboardPage";
 import UserBookingsPage from "./pages/UserBookingsPage";
 import AdminBookingsPage from "./pages/AdminBookingsPage";
 
-// 🔐 Admin user management page (new path)
+// 🔐 Admin user management page
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 
 // Global components
 import CookieBanner from "./components/CookieBanner";
+
+/* ---------------- Layout wrappers ---------------- */
 
 function WithLandingLayout() {
   return (
@@ -50,6 +52,8 @@ function WithPlainLayout() {
   );
 }
 
+/* ---------------- App ---------------- */
+
 export default function App() {
   useEffect(() => {
     AOS.init({
@@ -62,28 +66,31 @@ export default function App() {
   return (
     <>
       <Routes>
-        {/* Landing (with Navbar / hero shell) */}
+        {/* Landing (marketing shell) */}
         <Route element={<WithLandingLayout />}>
           <Route path="/" element={<LandingPage />} />
         </Route>
 
-        {/* Public “plain” pages (still use marketing layout, no dashboard shell) */}
+        {/* Public “plain” pages (marketing layout, no dashboard shell) */}
         <Route element={<WithPlainLayout />}>
           <Route path="/booking" element={<BookingPage />} />
-          <Route path="/feed" element={<FeedPage />} />
+
+          {/* 🔥 SkyStream (new feed) */}
+          <Route path="/feed" element={<SkyStreamPage />} />
+          <Route path="/skystream" element={<SkyStreamPage />} />
+
           <Route path="/digital-passport" element={<DigitalPassportPage />} />
           <Route path="/membership" element={<MembershipPage />} />
           <Route path="/team-travel" element={<TeamTravelPage />} />
         </Route>
 
-        {/* Authenticated app shell (Dashboard, user area, admin area) */}
+        {/* Authenticated app shell (dashboard + admin) */}
         <Route element={<AppLayout />}>
-          {/* Normal user routes */}
+          {/* User routes */}
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/bookings" element={<UserBookingsPage />} />
-          {/* Add more normal user routes here as needed */}
 
-          {/* Admin section (RBAC protected) */}
+          {/* Admin routes */}
           <Route
             path="/admin/bookings"
             element={
@@ -93,7 +100,6 @@ export default function App() {
             }
           />
 
-          {/* 🔐 Admin-only user management page */}
           <Route
             path="/admin/users"
             element={
@@ -104,15 +110,15 @@ export default function App() {
           />
         </Route>
 
-        {/* Auth routes (outside AppLayout + marketing layouts) */}
+        {/* Auth routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* 404 fallback */}
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {/* Persist across all routes */}
+      {/* Global persistent UI */}
       <CookieBanner />
     </>
   );
