@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Input, Badge, Tooltip, Tag } from "antd";
 import {
   ThunderboltOutlined,
@@ -17,17 +17,34 @@ const TAB_OPTIONS = [
 export default function SkyStreamHeader({
   activeTab = "forYou",
   onTabChange,
-  search = "",
+
+  // if parent passes these, we’ll sync to them
+  search,
   onSearchChange,
+
   xpToday = 0,
   onCompose,
   onPost,
 }) {
-  useAuth(); // keep hook for future personalization
+  useAuth(); // reserved for future personalization
+
+  // ✅ Local state so typing ALWAYS works
+  const [localSearch, setLocalSearch] = useState(search ?? "");
+
+  // ✅ If parent changes `search`, reflect it
+  useEffect(() => {
+    if (typeof search === "string") setLocalSearch(search);
+  }, [search]);
 
   const handlePost = () => {
     if (onCompose) return onCompose();
     if (onPost) return onPost();
+  };
+
+  const handleSearchChange = (e) => {
+    const next = e.target.value;
+    setLocalSearch(next); // ✅ keeps typing responsive
+    onSearchChange?.(next); // ✅ still informs parent if wired
   };
 
   return (
@@ -43,9 +60,9 @@ export default function SkyStreamHeader({
             </div>
 
             {/* XP + PRO */}
-            <div className="skystream-actions-left">
-              <Tooltip title="XP Today">
-                <Badge count={xpToday} color="gold">
+            <div className="skystream-subbadges">
+              <Tooltip title="XP earned today">
+                <Badge count={xpToday} overflowCount={999}>
                   <Tag
                     className="skystream-pill"
                     icon={<ThunderboltOutlined />}
@@ -55,7 +72,7 @@ export default function SkyStreamHeader({
                 </Badge>
               </Tooltip>
 
-              <Tooltip title="Premium Perks">
+              <Tooltip title="Premium perks">
                 <Tag className="skystream-pill" icon={<StarOutlined />}>
                   Pro
                 </Tag>
@@ -78,8 +95,8 @@ export default function SkyStreamHeader({
             className="skystream-search"
             prefix={<SearchOutlined />}
             placeholder="Search SkyStream"
-            value={search}
-            onChange={(e) => onSearchChange?.(e.target.value)}
+            value={localSearch}
+            onChange={handleSearchChange}
             allowClear
           />
         </div>
