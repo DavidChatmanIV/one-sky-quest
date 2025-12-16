@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Button, Input, Badge, Tooltip, Tag } from "antd";
 import {
   ThunderboltOutlined,
@@ -11,92 +11,61 @@ import { useAuth } from "../../hooks/useAuth";
 const TAB_OPTIONS = [
   { key: "forYou", label: "For You" },
   { key: "following", label: "Following" },
-  { key: "trending", label: "Trending" },
-  { key: "news", label: "News" },
+  { key: "deals", label: "Deals" },
 ];
 
 export default function SkyStreamHeader({
   activeTab = "forYou",
   onTabChange,
-
   search = "",
   onSearchChange,
-
   xpToday = 0,
   onCompose,
-  onPost, // fallback
+  onPost,
 }) {
-  const auth = useAuth();
-
-  const displayName = useMemo(() => {
-    const fromAuth =
-      auth?.user?.name ||
-      auth?.user?.username ||
-      (auth?.user?.email ? auth.user.email.split("@")[0] : "");
-
-    if (fromAuth) return fromAuth;
-
-    try {
-      const raw = localStorage.getItem("user");
-      if (!raw) return "Traveler";
-      const u = JSON.parse(raw);
-      return (
-        u?.name ||
-        u?.username ||
-        (u?.email ? u.email.split("@")[0] : "Traveler")
-      );
-    } catch {
-      return "Traveler";
-    }
-  }, [auth?.user]);
+  useAuth(); // keep hook for future personalization
 
   const handlePost = () => {
-    if (typeof onCompose === "function") return onCompose();
-    if (typeof onPost === "function") return onPost();
+    if (onCompose) return onCompose();
+    if (onPost) return onPost();
   };
 
   return (
-    <header className="skystream-hero" role="banner">
+    <header className="skystream-hero">
       <div className="skystream-hero-inner">
         {/* TOP ROW */}
         <div className="skystream-top">
           <div className="skystream-titleblock">
-            {/* Title row + pills inline (mock feel) */}
-            <div className="skystream-titleline">
-              <h1 className="skystream-title">
-                SkyStream{" "}
-                <span className="skystream-for">• For {displayName}</span>
-              </h1>
-
-              <div className="skystream-actions-left" aria-label="XP and Pro">
-                <Tooltip title="XP Today">
-                  <Badge count={xpToday} color="gold" overflowCount={999}>
-                    <Tag
-                      className="skystream-pill"
-                      icon={<ThunderboltOutlined />}
-                    >
-                      XP
-                    </Tag>
-                  </Badge>
-                </Tooltip>
-
-                <Tooltip title="Premium Perks">
-                  <Tag className="skystream-pill" icon={<StarOutlined />}>
-                    Pro
-                  </Tag>
-                </Tooltip>
-              </div>
-            </div>
+            <h1 className="skystream-title">SkyStream</h1>
 
             <div className="skystream-subtitle">
               Live travel moments across Skyrio
+            </div>
+
+            {/* XP + PRO */}
+            <div className="skystream-actions-left">
+              <Tooltip title="XP Today">
+                <Badge count={xpToday} color="gold">
+                  <Tag
+                    className="skystream-pill"
+                    icon={<ThunderboltOutlined />}
+                  >
+                    XP
+                  </Tag>
+                </Badge>
+              </Tooltip>
+
+              <Tooltip title="Premium Perks">
+                <Tag className="skystream-pill" icon={<StarOutlined />}>
+                  Pro
+                </Tag>
+              </Tooltip>
             </div>
           </div>
 
           <Button
             className="skystream-post"
             icon={<PlusOutlined />}
-            size="large"
             onClick={handlePost}
           >
             Post
@@ -108,7 +77,7 @@ export default function SkyStreamHeader({
           <Input
             className="skystream-search"
             prefix={<SearchOutlined />}
-            placeholder="Search SkyStream..."
+            placeholder="Search SkyStream"
             value={search}
             onChange={(e) => onSearchChange?.(e.target.value)}
             allowClear
@@ -116,7 +85,7 @@ export default function SkyStreamHeader({
         </div>
 
         {/* TABS */}
-        <nav className="skystream-tabs" aria-label="SkyStream tabs">
+        <nav className="skystream-tabs">
           {TAB_OPTIONS.map((t) => (
             <button
               key={t.key}
