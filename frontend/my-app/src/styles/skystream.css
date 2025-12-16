@@ -183,21 +183,41 @@ html { scrollbar-gutter: stable; }
 .skystream-search.ant-input-affix-wrapper{
   height:56px;
   border-radius:var(--sk-r-pill) !important;
+
   background:rgba(255,255,255,.10) !important;
   border:1px solid rgba(255,255,255,.16) !important;
+
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter: blur(12px);
+
+  /* FIX: remove the “double input” look */
+  padding: 0 18px !important;
 }
 
-.skystream-search input{
+/* AntD inner input (the actual text field) */
+.skystream-search.ant-input-affix-wrapper .ant-input{
   background:transparent !important;
   color:#fff !important;
+
+  /* FIX: kill inner border/outline so you only see ONE pill */
+  border:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+
+  height:100% !important;
 }
 
-.skystream-search:focus-within{
+/* Icon colors (prefix/suffix) */
+.skystream-search.ant-input-affix-wrapper .anticon{
+  color: rgba(255,255,255,.78) !important;
+}
+
+/* Focus glow */
+.skystream-search.ant-input-affix-wrapper:focus-within{
   border-color: rgba(255,122,24,.45) !important;
   box-shadow:0 0 0 4px rgba(255,122,24,.12);
 }
+
 
 /* =====================================================
    TABS
