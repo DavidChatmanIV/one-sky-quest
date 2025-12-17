@@ -1,41 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Button } from "antd";
+import React, { useMemo } from "react";
+import { Modal, Button, Space, Typography } from "antd";
 
-const TutorialModal = () => {
-  const [visible, setVisible] = useState(false);
+const { Text } = Typography;
 
-  useEffect(() => {
-    const seen = localStorage.getItem("osq_tutorial_seen");
-    if (!seen) {
-      setVisible(true);
-    }
-  }, []);
-
-  const handleClose = () => {
-    localStorage.setItem("osq_tutorial_seen", "true");
-    setVisible(false);
+export default function TutorialModal({ open, onClose }) {
+  const close = () => {
+    localStorage.setItem("skyrio_tutorial_seen", "true");
+    onClose?.();
   };
+
+  const footer = useMemo(
+    () => (
+      <Button type="primary" onClick={close} className="btn-orange">
+        Let’s Go ✈️
+      </Button>
+    ),
+    []
+  );
 
   return (
     <Modal
-      title="👋 Welcome to One Sky Quest!"
-      open={visible}
-      onCancel={handleClose}
-      footer={[
-        <Button key="get-started" type="primary" onClick={handleClose}>
-          Let’s Go!
-        </Button>,
-      ]}
+      title="👋 Welcome to Skyrio"
+      open={!!open}
+      onCancel={close}
+      footer={footer}
     >
-      <p>🌍 Welcome to your travel adventure hub!</p>
-      <ul className="list-disc pl-5 mt-3 space-y-1">
-        <li>Use the homepage to search flights, hotels, and excursions.</li>
-        <li>Track your XP and badges as you explore new places.</li>
-        <li>Save trips, chat with others, and share your journey.</li>
-        <li>Replay this tutorial anytime from the 🔁 button in the top bar.</li>
-      </ul>
+      <Space direction="vertical" size={10} style={{ width: "100%" }}>
+        <Text style={{ color: "rgba(255,255,255,.85)" }}>
+          Quick 30-second tour — Skyrio helps you plan faster, save money, and
+          get rewarded.
+        </Text>
+
+        <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
+          <li>Get started in seconds — no stress.</li>
+          <li>Earn XP as you plan and book trips.</li>
+          <li>Use AI for quick trip ideas.</li>
+          <li>Turn on price tracking alerts when you’re ready.</li>
+        </ul>
+
+        <Text style={{ color: "rgba(255,255,255,.7)" }}>
+          You can reopen this anytime from “Take a 30-sec tour”.
+        </Text>
+      </Space>
     </Modal>
   );
-};
-
-export default TutorialModal;
+}
