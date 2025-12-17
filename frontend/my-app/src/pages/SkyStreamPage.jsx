@@ -9,9 +9,15 @@ import "../styles/skystream.css";
 const { Content } = Layout;
 
 export default function SkyStreamPage() {
+  // ---------------------------
+  // STATE (owned by the page)
+  // ---------------------------
   const [activeTab, setActiveTab] = useState("forYou");
   const [search, setSearch] = useState("");
 
+  // ---------------------------
+  // MOCK POSTS (replace with API later)
+  // ---------------------------
   const posts = useMemo(
     () => [
       {
@@ -45,41 +51,55 @@ export default function SkyStreamPage() {
     []
   );
 
-  const filtered = useMemo(() => {
+  // ---------------------------
+  // SEARCH FILTER (simple & fast)
+  // ---------------------------
+  const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return posts;
+
     return posts.filter((p) => {
-      const hay = `${p.title} ${p.body} ${p.tags.join(" ")}`.toLowerCase();
-      return hay.includes(q);
+      const haystack = `${p.title} ${p.body} ${p.tags.join(" ")}`.toLowerCase();
+      return haystack.includes(q);
     });
   }, [posts, search]);
 
+  // ---------------------------
+  // POST ACTION (modal later)
+  // ---------------------------
   const handlePost = () => {
-    // later: open modal
     console.log("Post clicked");
   };
 
+  // ---------------------------
+  // RENDER
+  // ---------------------------
   return (
     <Layout className="skystream-page">
       <Content className="skystream-content">
         <div className="skystream-shell">
+          {/* HEADER */}
           <SkyStreamHeader
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            onTabChange={setActiveTab}
             search={search}
-            setSearch={setSearch}
+            onSearchChange={setSearch}
+            xpToday={12}
             onPost={handlePost}
           />
 
+          {/* GRID */}
           <div className="skystream-grid">
+            {/* FEED */}
             <div className="skystream-feed">
               <div className="skystream-feed-stack">
-                {filtered.map((p) => (
-                  <SkyStreamCard key={p.id} post={p} />
+                {filteredPosts.map((post) => (
+                  <SkyStreamCard key={post.id} post={post} />
                 ))}
               </div>
             </div>
 
+            {/* ASIDE */}
             <aside className="skystream-aside">
               <TrendingPanel />
               <HotspotsPanel />

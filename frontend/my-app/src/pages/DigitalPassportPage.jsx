@@ -16,6 +16,7 @@ import {
   Input,
   message,
   Empty,
+  Tabs,
 } from "antd";
 import {
   UserOutlined,
@@ -27,33 +28,67 @@ import {
   CameraOutlined,
   PlayCircleOutlined,
   SendOutlined,
+  SoundOutlined,
 } from "@ant-design/icons";
 import { useSearchParams } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
+import { useAuth } from "../hooks/useAuth";
 import "../styles/profile-passport.css";
 
 const { Title, Text } = Typography;
 
-/* ----------------- Mock Data ----------------- */
-const usePassportData = () =>
-  useMemo(
-    () => ({
+/* =========================================================
+   Soft Launch Settings
+   ========================================================= */
+const SOFT_LAUNCH = true; // <- keep true for friends/family testing
+
+/* ----------------- Soft Launch Data (dynamic user + demo content) ----------------- */
+function usePassportData() {
+  const auth = useAuth();
+
+  return useMemo(() => {
+    const u = auth?.user || null;
+
+    const baseHandle =
+      (u?.username || "").replace(/^@/, "").trim() ||
+      (u?.email ? u.email.split("@")[0] : "") ||
+      "explorer";
+
+    const username = `@${baseHandle}`;
+    const name = (u?.name || "").trim() || "Explorer";
+    const year = new Date().getFullYear();
+
+    const referralCode = `SKYRIO-${baseHandle.toUpperCase()}-${year}`;
+
+    // Soft launch miles: force 0
+    const milesCurrent = SOFT_LAUNCH
+      ? 0
+      : Number.isFinite(Number(u?.miles))
+      ? Number(u.miles)
+      : 0;
+
+    const milesNext = Number.isFinite(Number(u?.milesGoal))
+      ? Number(u.milesGoal)
+      : 5000;
+
+    return {
       user: {
-        name: "David",
-        username: "@onesky.david",
-        tagline: "An avid traveler exploring new horizons",
-        status: "New Explorer",
-        level: 1,
-        home: "New Jersey, USA",
-        memberSince: "2024",
-        passportNo: "OSQ-4J2M-6K9",
-        tier: "Free",
+        name,
+        username,
+        tagline: u?.tagline || "An avid traveler exploring new horizons",
+        status: u?.status || "New Explorer",
+        level: Number.isFinite(Number(u?.level)) ? Number(u.level) : 1,
+        tier: u?.tier || "Free",
       },
       stats: {
-        countriesVisited: 12,
-        favoriteStyle: "Beach + City",
-        nextBadgeTarget: "Globetrotter",
+        countriesVisited: Number.isFinite(Number(u?.countriesVisited))
+          ? Number(u.countriesVisited)
+          : 12,
+        favoriteStyle: u?.favoriteStyle || "Beach + City",
+        nextBadgeTarget: u?.nextBadgeTarget || "Globetrotter",
       },
+
+      // Demo content (replace with API later)
       badges: [
         { id: "early", label: "Early Explorer", icon: <GiftOutlined /> },
         { id: "planner", label: "Itinerary Pro", icon: "🧭" },
@@ -121,16 +156,23 @@ const usePassportData = () =>
           { id: "av", name: "Ava", xp: 300, badges: ["🗺️"] },
         ],
       },
-      referral: { code: "OSQ-DAVID-2025", reward: "+250 miles" },
-      miles: { current: 1200, nextLevel: 5000 },
-    }),
-    []
-  );
+
+      referral: { code: referralCode, reward: "+250 miles" },
+      miles: { current: milesCurrent, nextLevel: milesNext },
+      music: {
+        // soft launch defaults
+        provider: "spotify",
+        url: "",
+        muted: true,
+      },
+    };
+  }, [auth?.user]);
+}
 
 /* ----------------- Reusable ----------------- */
 function SectionTitle({ children, right }) {
   return (
-    <div className="flex items-center justify-between mb-2">
+    <div className="sk-row sk-row-between sk-mb-2">
       <Title level={4} className="!m-0">
         {children}
       </Title>
@@ -158,19 +200,151 @@ function SoftCard({ children, className = "", style }) {
   );
 }
 
-/* ----------------- Travel Pass Header (merged, AntD v5-safe) ----------------- */
+/* =========================================================
+   Music (Apple Music / Spotify) — Soft Launch version
+   Notes:
+   - True autoplay is blocked by browsers unless user interacts.
+   - We support “auto play after user enables once” + “mute default”.
+   ========================================================= */
+function toSpotifyEmbed(url) {
+  if (!url) return "";
+  // Accept either open.spotify.com/... or spotify:...
+  if (url.includes("open.spotify.com")) {
+    const u = new URL(url);
+    // Spotify embed expects /embed/...
+    return `${u.origin}/embed${u.pathname}?utm_source=generator`;
+  }
+  return "";
+}
+
+function toAppleMusicEmbed(url) {
+  if (!url) return "";
+  // Apple Music share links often contain /album/ or /playlist/
+  // Apple embed typically works by adding ?app=music and using the same URL in an iframe.
+  // Not perfect for every link, but good for soft launch.
+  return url;
+}
+
+function ProfileMusicModal({ open, onClose, initial }) {
+  const [provider, setProvider] = useState(initial?.provider || "spotify");
+  const [url, setUrl] = useState(initial?.url || "");
+  const [muted, setMuted] = useState(initial?.muted ?? true);
+
+  useEffect(() => {
+    if (!open) return;
+    setProvider(initial?.provider || "spotify");
+    setUrl(initial?.url || "");
+    setMuted(initial?.muted ?? true);
+  }, [open, initial]);
+
+  const save = () => {
+    const payload = { provider, url, muted };
+    localStorage.setItem("skyrio_profile_music", JSON.stringify(payload));
+    message.success("Music saved to this browser (soft launch).");
+    onClose();
+  };
+
+  const embedSrc =
+    provider === "spotify" ? toSpotifyEmbed(url) : toAppleMusicEmbed(url);
+
+  return (
+    <Modal
+      title="Profile Music"
+      open={open}
+      onCancel={onClose}
+      onOk={save}
+      okText="Save"
+    >
+      <Text type="secondary">
+        Soft launch note: browsers block true autoplay. We keep{" "}
+        <b>Muted ON by default</b>, and you can enable play after a tap.
+      </Text>
+
+      <div style={{ marginTop: 12 }}>
+        <Tabs
+          activeKey={provider}
+          onChange={(k) => setProvider(k)}
+          items={[
+            { key: "spotify", label: "Spotify" },
+            { key: "apple", label: "Apple Music" },
+          ]}
+        />
+      </div>
+
+      <Space direction="vertical" style={{ width: "100%" }} size={10}>
+        <Input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder={
+            provider === "spotify"
+              ? "Paste a Spotify track/playlist URL"
+              : "Paste an Apple Music song/album/playlist URL"
+          }
+        />
+
+        <div className="sk-row sk-row-between">
+          <Text>Muted by default (MySpace vibe)</Text>
+          <Button
+            size="small"
+            onClick={() => setMuted((m) => !m)}
+            className={muted ? "" : "is-on"}
+          >
+            {muted ? "Muted" : "Sound On"}
+          </Button>
+        </div>
+
+        {embedSrc ? (
+          <div className="music-embed">
+            {provider === "spotify" ? (
+              <iframe
+                title="Spotify embed"
+                src={embedSrc}
+                width="100%"
+                height="152"
+                frameBorder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+              />
+            ) : (
+              <iframe
+                title="Apple Music embed"
+                src={embedSrc}
+                width="100%"
+                height="175"
+                frameBorder="0"
+                allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+                loading="lazy"
+              />
+            )}
+          </div>
+        ) : (
+          <div className="music-empty">
+            <Text type="secondary">
+              Paste a link to preview the embed here.
+            </Text>
+          </div>
+        )}
+      </Space>
+    </Modal>
+  );
+}
+
+/* ----------------- Travel Pass Header ----------------- */
 function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
   const { user, stats, top8, miles } = data;
-  const pct = Math.min(
-    100,
-    Math.round((miles.current / miles.nextLevel) * 100)
-  );
+  const pct =
+    miles.nextLevel > 0
+      ? Math.min(100, Math.round((miles.current / miles.nextLevel) * 100))
+      : 0;
+
   const friends = top8.friends || [];
   const showFriends = top8Mode === "Top 8 Friends" && friends.length > 0;
 
-  const profileUrl = `https://onesky.quest/u/${
-    (user.username || "").replace(/^@/, "").trim() || "david"
-  }`;
+  const [musicOpen, setMusicOpen] = useState(false);
+
+  const handle = (user.username || "").replace(/^@/, "").trim() || "explorer";
+  const profileUrl = `https://skyrio.app/u/${handle}`;
 
   const copyProfile = async () => {
     try {
@@ -182,155 +356,182 @@ function TravelPassHeader({ data, top8Mode, onTop8Mode, onShowQR }) {
   };
 
   return (
-    <Card
-      variant="borderless"
-      className="tp-card"
-      styles={{ body: { padding: 16 } }}
-    >
-      <div className="tp-top">
-        <Text className="tp-title">DIGITAL PASSPORT</Text>
-        <Tag color="gold">{user.tier || "Free"} Tier</Tag>
-      </div>
-
-      <div className="tp-id">
-        <Avatar
-          size={84}
-          icon={<UserOutlined />}
-          className="tp-avatar"
-          alt={`${user.name} avatar`}
-        />
-        <div className="tp-identity">
-          <Title
-            level={2}
-            className="!m-0 tp-name"
-            style={{ color: "var(--text)" }}
-          >
-            {user.name}
-          </Title>
-          <div className="tp-tagline" style={{ color: "var(--text)" }}>
-            {user.tagline}
-          </div>
-          <div className="tp-chips">
-            <Tag color="blue">Level {user.level}</Tag>
-            <Tag color="geekblue">{user.status}</Tag>
-            <Tag color="purple">{user.username}</Tag>
-          </div>
+    <>
+      <Card
+        variant="borderless"
+        className="tp-card"
+        styles={{ body: { padding: 16 } }}
+      >
+        <div className="tp-top">
+          <Text className="tp-title">DIGITAL PASSPORT</Text>
+          <Tag className="tp-tier">{user.tier || "Free"} Tier</Tag>
         </div>
 
-        <Space>
-          <Tooltip title="Copy profile link">
-            <Button icon={<ShareAltOutlined />} onClick={copyProfile} />
-          </Tooltip>
-          <Tooltip title="Show QR">
-            <Button icon={<QrcodeOutlined />} onClick={onShowQR} />
-          </Tooltip>
-        </Space>
-      </div>
-
-      <div className="tp-actions">
-        <Button type="primary" icon={<SendOutlined />}>
-          Share Memory
-        </Button>
-        <Space size={8} aria-label="Quick actions">
-          <Button shape="circle" aria-label="Music">
-            <PlayCircleOutlined />
-          </Button>
-          <Button shape="circle" aria-label="Photo">
-            <CameraOutlined />
-          </Button>
-          <Button shape="circle" aria-label="Trip">
-            ✈️
-          </Button>
-        </Space>
-        <div className="tp-miles">
-          <Text className="muted">Miles</Text>
-          <div className="tp-mile-row">
-            <Text strong style={{ color: "var(--text)" }}>
-              {miles.current.toLocaleString()} /{" "}
-              {miles.nextLevel.toLocaleString()}
-            </Text>
+        <div className="tp-id">
+          <Avatar size={84} icon={<UserOutlined />} className="tp-avatar" />
+          <div className="tp-identity">
+            <Title level={2} className="!m-0 tp-name">
+              {user.name}
+            </Title>
+            <div className="tp-tagline">{user.tagline}</div>
+            <div className="tp-chips">
+              <Tag className="chip">Level {user.level}</Tag>
+              <Tag className="chip">{user.status}</Tag>
+              <Tag className="chip">{user.username}</Tag>
+            </div>
           </div>
-          <Progress
-            percent={pct}
-            size="small"
-            showInfo={false}
-            aria-label={`Miles progress ${pct}%`}
-          />
+
+          <Space>
+            <Tooltip title="Copy profile link">
+              <Button
+                className="icon-btn"
+                icon={<ShareAltOutlined />}
+                onClick={copyProfile}
+              />
+            </Tooltip>
+            <Tooltip title="Show QR">
+              <Button
+                className="icon-btn"
+                icon={<QrcodeOutlined />}
+                onClick={onShowQR}
+              />
+            </Tooltip>
+          </Space>
         </div>
-      </div>
 
-      <div className="tp-divider">MEMORIES</div>
-      <div className="tp-memo" style={{ color: "var(--text)" }}>
-        <Text style={{ color: "var(--text)" }}>
-          ✈️ Visited {stats.countriesVisited} countries • Loves{" "}
-          {stats.favoriteStyle}. Next badge: {stats.nextBadgeTarget}.
-        </Text>
-        <Tag> Music</Tag>
-      </div>
+        <div className="tp-actions">
+          <Button type="primary" className="cta" icon={<SendOutlined />}>
+            Share Memory
+          </Button>
 
-      <div className="tp-divider">
-        <Space align="center">
-          TOP 8
-          <Segmented
-            size="small"
-            value={top8Mode}
-            onChange={onTop8Mode}
-            options={["Top 8 Places", "Top 8 Friends"]}
-          />
-        </Space>
-      </div>
-
-      {/* Top 8 */}
-      {!showFriends ? (
-        <Row gutter={[12, 12]}>
-          {(top8.places || []).slice(0, 8).map((city) => (
-            <Col xs={12} sm={8} md={6} key={city}>
-              <div
-                className="tp-tile"
-                role="img"
-                aria-label={`Top place ${city}`}
+          <Space size={8} aria-label="Quick actions">
+            <Tooltip title="Profile music">
+              <Button
+                className="icon-btn"
+                shape="circle"
+                onClick={() => setMusicOpen(true)}
+                aria-label="Music"
               >
-                <div className="tp-tile-art" />
-                <div className="tp-tile-label">{city.toUpperCase()}</div>
-              </div>
-            </Col>
-          ))}
-          {(!top8.places || top8.places.length === 0) && (
-            <Col span={24}>
-              <Empty description="Add your favorite places" />
-            </Col>
-          )}
-        </Row>
-      ) : (
-        <Row gutter={[12, 12]}>
-          {(friends || []).slice(0, 8).map((f) => (
-            <Col xs={12} sm={8} md={6} key={f.id}>
-              <div className="top8-card friend" aria-label={`Friend ${f.name}`}>
-                <Avatar
-                  size={64}
-                  icon={<UserOutlined />}
-                  className="stamp-frame"
-                />
-                <div className="top8-title">{f.name}</div>
-                <div className="top8-sub">
-                  XP {f.xp} · {(f.badges || []).join(" ")}
-                </div>
-              </div>
-            </Col>
-          ))}
-          {(!friends || friends.length === 0) && (
-            <Col span={24}>
-              <Empty description="Add friends to your Top 8" />
-            </Col>
-          )}
-        </Row>
-      )}
+                <SoundOutlined />
+              </Button>
+            </Tooltip>
 
-      <div className="tp-promo">
-        Share your promo: <span className="line" />{" "}
-        <span className="xp-bonus">XP BONUS</span>
-      </div>
-    </Card>
+            <Tooltip title="Photo">
+              <Button className="icon-btn" shape="circle" aria-label="Photo">
+                <CameraOutlined />
+              </Button>
+            </Tooltip>
+
+            <Tooltip title="Trip">
+              <Button className="icon-btn" shape="circle" aria-label="Trip">
+                ✈️
+              </Button>
+            </Tooltip>
+          </Space>
+
+          <div className="tp-miles">
+            <Text className="muted">Miles</Text>
+            <div className="tp-mile-row">
+              <Text strong>
+                {miles.current.toLocaleString()} /{" "}
+                {miles.nextLevel.toLocaleString()}
+              </Text>
+            </div>
+            <Progress percent={pct} size="small" showInfo={false} />
+          </div>
+        </div>
+
+        <div className="tp-divider">MEMORIES</div>
+        <div className="tp-memo">
+          <Text>
+            ✈️ Visited {stats.countriesVisited} countries • Loves{" "}
+            {stats.favoriteStyle}. Next badge: <b>{stats.nextBadgeTarget}</b>.
+          </Text>
+          <Tag className="chip"> Music</Tag>
+        </div>
+
+        <div className="tp-divider">
+          <Space align="center">
+            TOP 8
+            <Segmented
+              size="small"
+              value={top8Mode}
+              onChange={onTop8Mode}
+              options={["Top 8 Places", "Top 8 Friends"]}
+            />
+          </Space>
+        </div>
+
+        {!showFriends ? (
+          <Row gutter={[12, 12]}>
+            {(top8.places || []).slice(0, 8).map((city) => (
+              <Col xs={12} sm={8} md={6} key={city}>
+                <div
+                  className="tp-tile"
+                  role="img"
+                  aria-label={`Top place ${city}`}
+                >
+                  <div className="tp-tile-art" />
+                  <div className="tp-tile-label">{city.toUpperCase()}</div>
+                </div>
+              </Col>
+            ))}
+            {(!top8.places || top8.places.length === 0) && (
+              <Col span={24}>
+                <Empty description="Add your favorite places" />
+              </Col>
+            )}
+          </Row>
+        ) : (
+          <Row gutter={[12, 12]}>
+            {(friends || []).slice(0, 8).map((f) => (
+              <Col xs={12} sm={8} md={6} key={f.id}>
+                <div
+                  className="top8-card friend"
+                  aria-label={`Friend ${f.name}`}
+                >
+                  <Avatar
+                    size={64}
+                    icon={<UserOutlined />}
+                    className="stamp-frame"
+                  />
+                  <div className="top8-title">{f.name}</div>
+                  <div className="top8-sub">
+                    XP {f.xp} · {(f.badges || []).join(" ")}
+                  </div>
+                </div>
+              </Col>
+            ))}
+            {(!friends || friends.length === 0) && (
+              <Col span={24}>
+                <Empty description="Add friends to your Top 8" />
+              </Col>
+            )}
+          </Row>
+        )}
+
+        <div className="tp-promo">
+          Share your promo: <span className="line" />{" "}
+          <span className="xp-bonus">XP BONUS</span>
+        </div>
+      </Card>
+
+      <ProfileMusicModal
+        open={musicOpen}
+        onClose={() => setMusicOpen(false)}
+        initial={(() => {
+          try {
+            return (
+              JSON.parse(
+                localStorage.getItem("skyrio_profile_music") || "null"
+              ) || data.music
+            );
+          } catch {
+            return data.music;
+          }
+        })()}
+      />
+    </>
   );
 }
 
@@ -350,10 +551,17 @@ function Stamp({ title, code, date, icon }) {
     </div>
   );
 }
+
 function StampsGrid({ stamps }) {
   return (
     <SoftCard>
-      <SectionTitle right={<Button size="small">Add Stamp</Button>}>
+      <SectionTitle
+        right={
+          <Button size="small" className="subtle-btn">
+            Add Stamp
+          </Button>
+        }
+      >
         Passport Stamps
       </SectionTitle>
       {stamps?.length ? (
@@ -373,11 +581,14 @@ function StampsGrid({ stamps }) {
 
 /* ----------------- Visas ----------------- */
 function VisaCard({ country, type, status, expiry }) {
+  const statusKey = (status || "").toLowerCase().includes("approved")
+    ? "approved"
+    : "pending";
   return (
     <div className="visa" role="group" aria-label={`Visa ${country}`}>
       <div className="visa__row">
         <div className="visa__title">{country}</div>
-        <Tag color={status === "Approved" ? "green" : "orange"}>{status}</Tag>
+        <Tag className={`status-tag ${statusKey}`}>{status}</Tag>
       </div>
       <div className="visa__type">{type}</div>
       <div className="visa__exp">
@@ -386,10 +597,17 @@ function VisaCard({ country, type, status, expiry }) {
     </div>
   );
 }
+
 function VisasList({ visas }) {
   return (
     <SoftCard>
-      <SectionTitle right={<Button size="small">Add Visa</Button>}>
+      <SectionTitle
+        right={
+          <Button size="small" className="subtle-btn">
+            Add Visa
+          </Button>
+        }
+      >
         Visas
       </SectionTitle>
       {visas?.length ? (
@@ -407,25 +625,35 @@ function VisasList({ visas }) {
 
 /* ----------------- Trips ----------------- */
 function TripCard({ title, range, status, notes }) {
+  const statusKey = (status || "").toLowerCase(); // booked / completed / etc
   return (
     <div className="trip" role="group" aria-label={`Trip ${title}`}>
       <div className="trip__row">
         <div className="trip__title">{title}</div>
-        <Tag color={status === "Booked" ? "blue" : "default"}>{status}</Tag>
+        <Tag className={`status-tag ${statusKey}`}>{status}</Tag>
       </div>
       <div className="trip__range">{range}</div>
       <div className="trip__notes">
         {(notes || []).map((n, i) => (
-          <Tag key={i}>{n}</Tag>
+          <Tag key={i} className="note-tag">
+            {n}
+          </Tag>
         ))}
       </div>
     </div>
   );
 }
+
 function TripsPanel({ trips }) {
   return (
     <SoftCard>
-      <SectionTitle right={<Button size="small">Add Trip</Button>}>
+      <SectionTitle
+        right={
+          <Button size="small" className="subtle-btn">
+            Add Trip
+          </Button>
+        }
+      >
         Trips
       </SectionTitle>
       {trips?.length ? (
@@ -441,27 +669,33 @@ function TripsPanel({ trips }) {
   );
 }
 
-/* ----------------- Invite & Earn (merged version) ----------------- */
+/* ----------------- Invite & Earn ----------------- */
 function ReferralBox({ referral }) {
   const [copied, setCopied] = useState(false);
+  const [applyCode, setApplyCode] = useState("");
 
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(referral.code);
       setCopied(true);
       message.success(`Copied! Share to earn ${referral.reward}`);
+      setTimeout(() => setCopied(false), 1200);
     } catch {
       message.error("Could not copy code");
     }
   };
 
-  const onApply = () => message.success("Referral code applied!");
+  const onApply = () => {
+    if (!applyCode.trim()) return message.info("Enter a code first.");
+    message.success("Referral code applied!");
+    setApplyCode("");
+  };
 
   return (
     <SoftCard className="invite-card">
       <SectionTitle
         right={
-          <Tag color="gold">
+          <Tag className="rewards-chip">
             <CrownOutlined /> Rewards
           </Tag>
         }
@@ -469,30 +703,34 @@ function ReferralBox({ referral }) {
         Invite & Earn
       </SectionTitle>
 
-      <Space direction="vertical" size={8} style={{ width: "100%" }}>
-        <Text>Share your code to earn miles.</Text>
+      <Space direction="vertical" size={10} style={{ width: "100%" }}>
+        <Text className="muted">Share your code to earn miles.</Text>
 
-        {/* Copy existing code */}
-        <Input.Group compact>
-          <Input
-            style={{ width: "70%" }}
-            value={referral.code}
-            readOnly
-            aria-label="Referral code"
-          />
-          <Button type="primary" icon={<CopyOutlined />} onClick={copy}>
+        {/* 1) Your code row (no “double bar”) */}
+        <div className="invite-row">
+          <Input value={referral.code} readOnly aria-label="Referral code" />
+          <Button
+            type="primary"
+            className={`reward-copy-btn ${copied ? "is-copied" : ""}`}
+            icon={<CopyOutlined />}
+            onClick={copy}
+          >
             {copied ? "Copied" : "Copy"}
           </Button>
-        </Input.Group>
+        </div>
 
-        {/* Or apply a code you received */}
-        <div style={{ marginTop: 12 }}>
-          <Space.Compact block>
-            <Input placeholder="Enter referral code" allowClear />
-            <Button type="primary" onClick={onApply}>
-              Apply
-            </Button>
-          </Space.Compact>
+        {/* 2) Apply received code row */}
+        <div className="invite-row">
+          <Input
+            value={applyCode}
+            onChange={(e) => setApplyCode(e.target.value)}
+            placeholder="Enter referral code"
+            allowClear
+            aria-label="Enter referral code"
+          />
+          <Button type="primary" className="apply-btn" onClick={onApply}>
+            Apply
+          </Button>
         </div>
 
         <Text className="reward">Reward: {referral.reward}</Text>
@@ -505,7 +743,6 @@ function ReferralBox({ referral }) {
 export default function DigitalPassportPage() {
   const data = usePassportData();
 
-  // Sync tab with ?tab= in the URL
   const [params, setParams] = useSearchParams();
   const tabFromUrl = (params.get("tab") || "Overview").toString();
   const [tab, setTab] = useState(tabFromUrl);
@@ -515,8 +752,9 @@ export default function DigitalPassportPage() {
   useEffect(() => {
     const allowed = ["Overview", "Stamps", "Visas", "Trips", "Badges"];
     if (!allowed.includes(tabFromUrl)) {
-      params.set("tab", "Overview");
-      setParams(params, { replace: true });
+      const next = new URLSearchParams(params);
+      next.set("tab", "Overview");
+      setParams(next, { replace: true });
       setTab("Overview");
     } else {
       setTab(tabFromUrl);
@@ -533,14 +771,13 @@ export default function DigitalPassportPage() {
 
   useEffect(() => {
     const prev = document.title;
-    document.title = `One Sky Quest • Digital Passport`;
+    document.title = `Skyrio • Digital Passport`;
     return () => (document.title = prev);
   }, []);
 
   return (
     <PageLayout fullBleed={false} maxWidth={1180}>
       <div className="passport-wrap">
-        {/* Travel Pass header */}
         <TravelPassHeader
           data={data}
           top8Mode={top8Mode}
@@ -548,8 +785,7 @@ export default function DigitalPassportPage() {
           onShowQR={() => setQrOpen(true)}
         />
 
-        {/* Tabs row */}
-        <div className="flex items-center justify-between mb-3 mt-2">
+        <div className="tabs-row">
           <Segmented
             value={tab}
             onChange={onTabChange}
@@ -557,7 +793,6 @@ export default function DigitalPassportPage() {
           />
         </div>
 
-        {/* Overview — Trips directly under Stamps */}
         {tab === "Overview" && (
           <Row gutter={[16, 16]}>
             <Col xs={24} md={14}>
@@ -573,7 +808,6 @@ export default function DigitalPassportPage() {
           </Row>
         )}
 
-        {/* Dedicated tabs */}
         {tab === "Stamps" && (
           <Row gutter={[16, 16]}>
             <Col xs={24}>
@@ -581,6 +815,7 @@ export default function DigitalPassportPage() {
             </Col>
           </Row>
         )}
+
         {tab === "Visas" && (
           <Row gutter={[16, 16]}>
             <Col xs={24}>
@@ -588,6 +823,7 @@ export default function DigitalPassportPage() {
             </Col>
           </Row>
         )}
+
         {tab === "Trips" && (
           <Row gutter={[16, 16]}>
             <Col xs={24}>
@@ -595,6 +831,7 @@ export default function DigitalPassportPage() {
             </Col>
           </Row>
         )}
+
         {tab === "Badges" && (
           <Row gutter={[16, 16]}>
             <Col xs={24}>
@@ -624,21 +861,19 @@ export default function DigitalPassportPage() {
           </Row>
         )}
 
-        {/* QR Modal */}
         <Modal
           title="Share your Digital Passport"
           open={qrOpen}
           onCancel={() => setQrOpen(false)}
           footer={null}
         >
-          <div
-            className="flex flex-col items-center gap-2"
-            style={{ display: "grid", placeItems: "center", gap: 8 }}
-          >
+          <div style={{ display: "grid", placeItems: "center", gap: 8 }}>
             <QRCode
-              value={`https://onesky.quest/u/${(
-                data.user?.username || "david"
-              ).replace(/^@/, "")}`}
+              value={`https://skyrio.app/u/${(
+                data.user?.username || "@explorer"
+              )
+                .replace(/^@/, "")
+                .trim()}`}
               size={192}
             />
             <Text type="secondary">Scan to view profile</Text>

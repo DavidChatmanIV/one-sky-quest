@@ -1,263 +1,305 @@
-import React, { useMemo, useEffect, useRef, useCallback } from "react";
-import { Button, Tag, Typography } from "antd";
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import PageLayout from "../components/PageLayout";
-import UnifiedSearchBar from "../components/UnifiedSearchBar";
-import "../styles/BookingPage.css";
+import React, { useMemo, useState } from "react";
+import {
+  Layout,
+  Typography,
+  Segmented,
+  Button,
+  Tag,
+  Space,
+  Input,
+  DatePicker,
+  Dropdown,
+  Menu,
+  Modal,
+  InputNumber,
+} from "antd";
+import {
+  EnvironmentOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  SearchOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 
-const { Title } = Typography;
+import "../styles/bookingPage.css";
 
-const TAB_KEYS = [
-  "stays",
-  "flights",
-  "cars",
-  "cruises",
-  "excursions",
-  "packages",
-  "last-minute",
+const { Content } = Layout;
+const { Title, Text } = Typography;
+
+const TAB_OPTIONS = [
+  { key: "stays", label: "Stays" },
+  { key: "flights", label: "Flights" },
+  { key: "cars", label: "Cars" },
+  { key: "cruises", label: "Cruises" },
+  { key: "excursions", label: "Excursions" },
+  { key: "packages", label: "Packages" },
+  { key: "lastMinute", label: "Last-Minute" },
 ];
 
-const TAB_META = {
-  stays: { label: "Stays", emoji: "🏠" },
-  flights: { label: "Flights", emoji: "✈️" },
-  cars: { label: "Cars", emoji: "🚗" },
-  cruises: { label: "Cruises", emoji: "🛳️" },
-  excursions: { label: "Excursions", emoji: "🗺️" },
-  packages: { label: "Packages", emoji: "🎁" },
-  "last-minute": { label: "Last-Minute", emoji: "⏱️" },
-};
+const QUICK_TAGS = [
+  "Beach Weekend",
+  "Adventure Escape",
+  "City Vibes",
+  "Events Nearby",
+  "Romantic Getaway",
+];
 
-export default function BookingPage() {
-  const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const pillRefs = useRef({});
-
-  // Resolve active tab from ?tab=
-  const activeTab = useMemo(() => {
-    const raw = (params.get("tab") || "stays").toLowerCase();
-    return TAB_KEYS.includes(raw) ? raw : "stays";
-  }, [params]);
-
-  // Normalize any bad ?tab= once
-  useEffect(() => {
-    const raw = (params.get("tab") || "stays").toLowerCase();
-    if (!TAB_KEYS.includes(raw)) {
-      const next = new URLSearchParams(params);
-      next.set("tab", "stays");
-      navigate(`/booking?${next.toString()}`, { replace: true });
-    }
-  }, [params, navigate]);
-
-  // Update document title
-  useEffect(() => {
-    const label = TAB_META[activeTab]?.label || "Booking";
-    document.title = `One Sky Quest • ${label}`;
-  }, [activeTab]);
-
-  const setTab = useCallback(
-    (key, { replace = false } = {}) => {
-      const next = new URLSearchParams(params);
-      next.set("tab", key);
-      navigate(`/booking?${next.toString()}`, { replace });
-    },
-    [params, navigate]
+function GuestsDropdown({ value, onChange }) {
+  const menu = (
+    <Menu
+      items={[
+        { key: "1a1r", label: "1 adult • 1 room" },
+        { key: "2a1r", label: "2 adults • 1 room" },
+        { key: "2a2r", label: "2 adults • 2 rooms" },
+        { key: "4a2r", label: "4 adults • 2 rooms" },
+      ]}
+      onClick={(info) => onChange?.(info.key)}
+    />
   );
 
-  // Keyboard navigation for the tablist
-  const onTabsKeyDown = useCallback(
-    (e) => {
-      const idx = TAB_KEYS.indexOf(activeTab);
-      const last = TAB_KEYS.length - 1;
-
-      let nextIdx = idx;
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        nextIdx = idx === last ? 0 : idx + 1;
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        nextIdx = idx === 0 ? last : idx - 1;
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        nextIdx = 0;
-      } else if (e.key === "End") {
-        e.preventDefault();
-        nextIdx = last;
-      } else {
-        return;
-      }
-
-      const nextKey = TAB_KEYS[nextIdx];
-      setTab(nextKey);
-      // Focus the newly active tab after navigation updates the URL
-      setTimeout(() => pillRefs.current[nextKey]?.focus(), 0);
-    },
-    [activeTab, setTab]
-  );
-
-  const stats = { xp: 60, saved: 0, new: 1 };
-
-  // Simple label / count for results header
-  const resultsLabel =
-    activeTab === "stays" ? "stays" : TAB_META[activeTab].label.toLowerCase();
+  const labelMap = {
+    "1a1r": "1 adult • 1 room",
+    "2a1r": "2 adults • 1 room",
+    "2a2r": "2 adults • 2 rooms",
+    "4a2r": "4 adults • 2 rooms",
+  };
 
   return (
-    // Navbar is hidden here because PageLayout defaults to "landing-only"
-    // and /booking is not a landing route. Constrain width for readability.
-    <PageLayout fullBleed={false} maxWidth={1180} className="booking-page">
-      {/* ===== Hero ===== */}
-      <section className="booking-hero">
-        <div className="hero-head">
-          <Title className="hero-title">Book Your Next Adventure ✨</Title>
-          <Link to="/" className="home-chip" aria-label="Go to Home">
-            🏠 Home
-          </Link>
+    <Dropdown overlay={menu} trigger={["click"]}>
+      <Button className="sk-inputBtn" icon={<UserOutlined />}>
+        {labelMap[value] || "2 adults • 1 room"}
+      </Button>
+    </Dropdown>
+  );
+}
+
+function StayCard() {
+  return (
+    <div className="sk-stayCard">
+      <div className="sk-stayMedia" />
+      <div className="sk-stayMeta">
+        <div className="sk-stayTitleRow">
+          <div>
+            <div className="sk-stayTitle">Lisbon, Portugal</div>
+            <div className="sk-stayPrice">From $1,120</div>
+          </div>
+          <Button className="sk-cta" size="middle">
+            + Add to Plan
+          </Button>
         </div>
 
-        <div className="hero-stats" aria-label="Your booking stats">
-          <Tag className="pill" aria-label={`XP ${stats.xp}`}>
-            ★ XP {stats.xp}
-          </Tag>
-          <Tag className="pill" aria-label={`${stats.saved} saved trips`}>
-            {stats.saved} saved trips
-          </Tag>
-          <Tag className="pill" aria-label={`${stats.new} new items`}>
-            {stats.new} new
-          </Tag>
-        </div>
-      </section>
+        <Space size={8} wrap className="sk-stayTags">
+          <Tag className="sk-tag">City</Tag>
+          <Tag className="sk-tag">Europe</Tag>
+          <Tag className="sk-tag">Within Budget</Tag>
+          <Tag className="sk-tag">★ Popular</Tag>
+        </Space>
+      </div>
+    </div>
+  );
+}
 
-      {/* ===== Search Card + Tabs ===== */}
-      <section className="booking-card">
-        <div
-          className="tab-pills"
-          role="tablist"
-          aria-label="Booking categories"
-          onKeyDown={onTabsKeyDown}
-        >
-          {TAB_KEYS.map((k) => {
-            const { label, emoji } = TAB_META[k];
-            const active = k === activeTab;
-            return (
-              <button
-                key={k}
-                ref={(el) => (pillRefs.current[k] = el || undefined)}
-                role="tab"
-                id={`tab-${k}`}
-                aria-selected={active}
-                aria-controls={`panel-${k}`}
-                tabIndex={active ? 0 : -1}
-                className={`tab-pill ${active ? "active" : ""}`}
-                onClick={() => setTab(k)}
-              >
-                <span className="emoji" aria-hidden="true">
-                  {emoji}
-                </span>
-                {label}
-              </button>
-            );
-          })}
-          <div className="grow" />
+function BudgetPanel() {
+  const [mode, setMode] = useState("Solo");
 
-          {/* Fake toggle for now; hook to state later */}
-          <div
-            className="smart-toggle"
-            role="switch"
-            aria-checked="true"
-            tabIndex={0}
+  // budget state (default 2500, but loads from localStorage)
+  const [budget, setBudget] = useState(() => {
+    const saved = localStorage.getItem("sk_budget");
+    return saved ? Number(saved) : 2500;
+  });
+
+  // example “current plan total” (swap with real planned items later)
+  const planTotal = 1150;
+  const underBy = Math.max(0, budget - planTotal);
+
+  const [open, setOpen] = useState(false);
+  const [draftBudget, setDraftBudget] = useState(budget);
+
+  const saveBudget = () => {
+    setBudget(draftBudget);
+    localStorage.setItem("sk_budget", String(draftBudget));
+    setOpen(false);
+  };
+
+  return (
+    <div className="sk-budgetCard">
+      <div className="sk-budgetHeader">
+        <div className="sk-budgetTitle">Budget</div>
+
+        <Space size={8}>
+          <Button
+            className="sk-ghostBtn"
+            icon={<SettingOutlined />}
+            onClick={() => {
+              setDraftBudget(budget);
+              setOpen(true);
+            }}
           >
-            <span>Smart Plan AI</span>
-            <div className="fake-toggle">
-              <span className="dot on" />
+            Set Budget
+          </Button>
+
+          <Segmented
+            size="small"
+            options={["Solo", "Group"]}
+            value={mode}
+            onChange={setMode}
+          />
+        </Space>
+      </div>
+
+      <div className="sk-budgetStat">
+        <div className="sk-budgetValue">
+          ${underBy.toLocaleString()} under your budget.
+        </div>
+        <div className="sk-budgetSub">
+          Budget: ${budget.toLocaleString()} • Planned: $
+          {planTotal.toLocaleString()}
+        </div>
+      </div>
+
+      <div className="sk-budgetBlock">
+        <div className="sk-budgetBlockTitle">Planned items</div>
+        <div className="sk-budgetEmpty">No items added yet</div>
+      </div>
+
+      <Modal
+        title="Set your trip budget"
+        open={open}
+        onCancel={() => setOpen(false)}
+        onOk={saveBudget}
+        okText="Save"
+      >
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ color: "rgba(255,255,255,0.75)" }}>
+            Choose a budget that Skyrio will help you stay under.
+          </div>
+
+          <InputNumber
+            style={{ width: "100%" }}
+            min={100}
+            step={50}
+            value={draftBudget}
+            onChange={(v) => setDraftBudget(Number(v || 0))}
+            formatter={(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            parser={(v) => String(v).replace(/\$\s?|(,*)/g, "")}
+          />
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+export default function BookingPage() {
+  const [activeTab, setActiveTab] = useState("stays");
+  const [destination, setDestination] = useState("");
+  const [dates, setDates] = useState(null);
+  const [guests, setGuests] = useState("2a1r");
+
+  const headerPills = useMemo(
+    () => [{ label: "XP 60" }, { label: "0 saved trips" }, { label: "1 new" }],
+    []
+  );
+
+  const onSearch = () => {
+    console.log({ activeTab, destination, dates, guests });
+  };
+
+  return (
+    <Layout className="sk-bookingPage">
+      <Content className="sk-wrap">
+        {/* HERO */}
+        <div className="sk-hero">
+          <Title level={1} className="sk-heroTitle">
+            Book Your Next Adventure ✨
+          </Title>
+
+          <div className="sk-pillRow">
+            {headerPills.map((p) => (
+              <div key={p.label} className="sk-pill">
+                {p.label}
+              </div>
+            ))}
+          </div>
+
+          <Text className="sk-heroHint">
+            Smart Plan AI will optimize this trip for budget &amp; XP.
+          </Text>
+        </div>
+
+        {/* SEARCH + BUDGET ROW */}
+        <div className="sk-grid">
+          {/* LEFT */}
+          <div className="sk-left">
+            <div className="sk-glass">
+              {/* Tabs */}
+              <div className="sk-tabs">
+                {TAB_OPTIONS.map((t) => (
+                  <button
+                    key={t.key}
+                    className={`sk-tab ${
+                      activeTab === t.key ? "isActive" : ""
+                    }`}
+                    onClick={() => setActiveTab(t.key)}
+                    type="button"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Unified Search Row */}
+              <div className="sk-searchRow">
+                <Input
+                  className="sk-input"
+                  prefix={<EnvironmentOutlined />}
+                  placeholder="Destination"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  allowClear
+                />
+
+                <DatePicker.RangePicker
+                  className="sk-input"
+                  suffixIcon={<CalendarOutlined />}
+                  value={dates}
+                  onChange={(val) => setDates(val)}
+                />
+
+                <GuestsDropdown value={guests} onChange={setGuests} />
+
+                <Button
+                  className="sk-searchBtn"
+                  icon={<SearchOutlined />}
+                  onClick={onSearch}
+                >
+                  Search +50 XP
+                </Button>
+              </div>
+
+              {/* Quick tags */}
+              <div className="sk-quickTags">
+                {QUICK_TAGS.map((tag) => (
+                  <button className="sk-chip" key={tag} type="button">
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Results */}
+            <div className="sk-results">
+              <StayCard />
+            </div>
+          </div>
+
+          {/* RIGHT */}
+          <div className="sk-right">
+            <div className="sk-sticky">
+              <BudgetPanel />
             </div>
           </div>
         </div>
-
-        {/* Unified search — hide its own internal category tabs */}
-        <div
-          className="search-shell"
-          id={`panel-${activeTab}`}
-          role="tabpanel"
-          aria-labelledby={`tab-${activeTab}`}
-        >
-          <UnifiedSearchBar activeTab={activeTab} showCategoryTabs={false} />
-        </div>
-
-        <div className="quick-themes" aria-label="Quick themes">
-          {[
-            "Beach Weekend",
-            "Adventure Escape",
-            "City Vibes",
-            "Events Nearby",
-            "Romantic Getaway",
-          ].map((t) => (
-            <button
-              className="chip"
-              key={t}
-              onClick={() => console.log("Theme:", t)}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== Results + Budget (demo) ===== */}
-      <section className="results-wrap">
-        <div className="results-card">
-          <div className="results-head" aria-live="polite">
-            Showing <b>3</b> {resultsLabel} options
-          </div>
-
-          <div className="results-placeholder" />
-
-          <div className="result-footer">
-            <div className="result-meta">
-              <span className="muted">Lisbon • From $1,120</span>
-              <span className="tag">City</span>
-              <span className="tag">Europe</span>
-              <span className="tag ok">Within budget</span>
-              <span className="tag star" aria-label="Top pick">
-                ★
-              </span>
-            </div>
-            <Button type="primary" className="cta-add">
-              + Add to plan
-            </Button>
-          </div>
-        </div>
-
-        <aside className="budget-card">
-          <div className="budget-head">
-            <div className="title">Budget</div>
-            <button className="adjust" aria-label="Adjust budget">
-              ⚙️ Adjust
-            </button>
-          </div>
-
-          <div className="seg-toggle" role="tablist" aria-label="Budget mode">
-            <button className="seg active" role="tab" aria-selected>
-              Solo
-            </button>
-            <button className="seg" role="tab" aria-selected="false">
-              Group
-            </button>
-          </div>
-
-          <div className="under-budget" aria-live="polite">
-            You’re still $1,350 under your budget ✓
-          </div>
-          <div className="bar">
-            <span style={{ width: "22%" }} />
-          </div>
-
-          <div className="planned">
-            <div className="planned-title">Planned items</div>
-            <div className="planned-empty">Nothing added yet</div>
-          </div>
-
-          <button className="subscribe">🔔 Subscribe to price drops</button>
-        </aside>
-      </section>
-    </PageLayout>
+      </Content>
+    </Layout>
   );
 }
