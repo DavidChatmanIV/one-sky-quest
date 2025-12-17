@@ -1,138 +1,50 @@
-import React from "react";
-import { Layout, Typography, Space, Button, message } from "antd";
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Layout } from "antd";
+import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import "../styles/appLayout.css"; // layout-specific styles
+
+import Navbar from "../components/Navbar"; // ✅ this is your Navbar.jsx
+import "../styles/Navbar.css"; // ✅ navbar styles
+import "../styles/appLayout.css"; // keep your layout styles
 
 const { Header, Content, Footer } = Layout;
-const { Text } = Typography;
 
 export default function AppLayout() {
-  const { user, loading, logout } = useAuth();
-  const nav = useNavigate();
+  const { user } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
 
-  const isAuthenticated = !!user;
+  // ✅ scroll animation trigger
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const displayName =
-    user?.name ||
-    user?.username ||
-    (user?.email ? user.email.split("@")[0] : "Explorer");
-
-  const handleLogout = () => {
-    // Use hook's logout if available, otherwise fallback
-    if (logout) {
-      logout();
-    } else {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-    }
-    message.success("See you next trip, Explorer ✈️");
-    nav("/login");
-  };
-
-  // 👉 Basic frontend RBAC
+  // ✅ keep RBAC available (use in Navbar dropdown later if you want)
   const role = user?.role || "user";
   const isAdmin = role === "admin" || role === "manager";
 
+  // optional: expose these to Navbar later via props if you want
+  const authMeta = useMemo(
+    () => ({
+      isAuthenticated: !!user,
+      displayName:
+        user?.name ||
+        user?.username ||
+        (user?.email ? user.email.split("@")[0] : "Explorer"),
+      isAdmin,
+      role,
+    }),
+    [user, isAdmin, role]
+  );
+
   return (
     <Layout style={{ minHeight: "100vh" }} className="osq-shell">
-      <Header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "0 24px",
-          background: "rgba(10, 8, 29, 0.9)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        {/* Brand / Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: "999px",
-              background:
-                "radial-gradient(circle at 30% 30%, #ffb347, #ff5f6d)",
-            }}
-          />
-          <Link to="/" style={{ color: "#fff", fontWeight: 600 }}>
-            Skyrio
-          </Link>
-        </div>
-
-        {/* Right side: nav links + auth controls */}
-        <div
-          style={{
-            marginLeft: "auto",
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <Space size="middle">
-            {/* Public / core links */}
-            <Link to="/booking" style={{ color: "#fff" }}>
-              Booking
-            </Link>
-            <Link to="/feed" style={{ color: "#fff" }}>
-              Feed
-            </Link>
-            <Link to="/profile" style={{ color: "#fff" }}>
-              Passport
-            </Link>
-
-            {/* Logged-in core area */}
-            {isAuthenticated && (
-              <>
-                <Link to="/dashboard" style={{ color: "#fff" }}>
-                  Dashboard
-                </Link>
-
-                {/* ✅ Only show if admin/manager */}
-                {isAdmin && (
-                  <>
-                    <Link to="/admin/bookings" style={{ color: "#fff" }}>
-                      Admin Bookings
-                    </Link>
-                    <Link to="/admin/users" style={{ color: "#fff" }}>
-                      Users
-                    </Link>
-                  </>
-                )}
-              </>
-            )}
-          </Space>
-
-          {loading ? (
-            <Text style={{ color: "#fff", marginLeft: 16 }}>Loading…</Text>
-          ) : isAuthenticated ? (
-            <Space size="small" style={{ marginLeft: 16 }}>
-              <Text style={{ color: "#fff" }}>Hi, {displayName}</Text>
-              <Button size="small" onClick={handleLogout}>
-                Log out
-              </Button>
-            </Space>
-          ) : (
-            <Space size="small" style={{ marginLeft: 16 }}>
-              <Button
-                size="small"
-                type="link"
-                onClick={() => nav("/login")}
-                style={{ color: "#fff" }}
-              >
-                Log in
-              </Button>
-              <Button
-                size="small"
-                type="primary"
-                onClick={() => nav("/register")}
-              >
-                Join Skyrio
-              </Button>
-            </Space>
-          )}
-        </div>
+      {/* ✅ AntD header gets your navbar classes so CSS applies */}
+      <Header className={`osq-navbar ${scrolled ? "is-scrolled" : ""}`}>
+        {/* ✅ Navbar controls all nav items (remove inline nav from AppLayout) */}
+        <Navbar {...authMeta} />
       </Header>
 
       <Content className="osq-main">

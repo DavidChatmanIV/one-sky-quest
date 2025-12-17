@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import Navbar from "./Navbar";
 
 /**
  * Base PageLayout (no Navbar).
@@ -26,41 +25,25 @@ export default function PageLayout({
   const isBooking = cleanPath.startsWith("/booking");
 
   return (
-    <>
-      {/* Removed skip-to-content for Skyrio layout */}
-      <main
-        id="main"
-        role="main"
-        className={[
-          "page-root",
-          "no-nav", // base layout has no navbar
-          isBooking ? "page--booking" : "",
-          fullBleed ? "full-bleed" : "constrained",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={
-          fullBleed
-            ? undefined
-            : { maxWidth, margin: "0 auto", paddingLeft: 16, paddingRight: 16 }
-        }
-      >
-        {children}
-      </main>
-    </>
-  );
-}
-
-/**
- * LandingLayout — ONLY for the landing route.
- * Wraps PageLayout and adds Navbar once.
- */
-export function LandingLayout(props) {
-  return (
-    <>
-      <Navbar />
-      <PageLayout {...props} />
-    </>
+    <main
+      id="main"
+      role="main"
+      className={[
+        "page-root",
+        "no-nav", // base layout has no navbar (navbar handled by AppLayout)
+        isBooking ? "page--booking" : "",
+        fullBleed ? "full-bleed" : "constrained",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={
+        fullBleed
+          ? undefined
+          : { maxWidth, margin: "0 auto", paddingLeft: 16, paddingRight: 16 }
+      }
+    >
+      {children}
+    </main>
   );
 }

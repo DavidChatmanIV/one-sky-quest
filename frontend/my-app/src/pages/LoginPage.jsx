@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Input, Button, message, Card, Typography, notification } from "antd";
+import { Input, Button, message, Typography, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import BoardingPassToast from "../components/BoardingPassToast";
 import "../styles/login.css";
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     if (loading) return; // double-click guard
     setLoading(true);
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -72,89 +73,144 @@ export default function LoginPage() {
     }
   };
 
+  // Optional: press Enter to login
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") handleLogin();
+  };
+
   return (
-    <div className="login-wrap">
-      {/* --- Header / Hero --- */}
-      <div className="login-hero">
-        <div className="logo-row">
-          <div className="brand-dot" aria-hidden />
-          <Text className="brand">Skyrio</Text>
+    <div className="auth-page">
+      {/* Soft background glows */}
+      <div className="glow g1" aria-hidden />
+      <div className="glow g2" aria-hidden />
+      <div className="glow g3" aria-hidden />
+
+      <div className="auth-shell">
+        {/* Brand header */}
+        <div className="auth-top">
+          <div className="brand-row">
+            <div className="brand-dot" aria-hidden />
+            <span className="brand-text">Skyrio</span>
+          </div>
+
+          <Title level={2} className="auth-title">
+            Welcome back, Explorer
+          </Title>
+          <Text className="auth-subtitle">
+            Check in fast. Earn XP. Keep it moving.
+          </Text>
         </div>
-        <Title level={2} className="welcome">
-          Welcome back, Explorer
-        </Title>
-        <Text className="tagline">
-          Smarter planning. Real rewards. Built for explorers.
-        </Text>
-      </div>
 
-      {/* --- Glass card + Passport Stamp --- */}
-      <div className="login-card-wrap">
-        <div className="passport-stamp" aria-hidden />
-        <Card
-          title="Log In"
-          className="login-card"
-          style={{ width: 400, borderRadius: 16, textAlign: "center" }}
-        >
-          <Input
-            placeholder="Email or username"
-            name="emailOrUsername"
-            value={formData.emailOrUsername}
-            onChange={(e) =>
-              setFormData({ ...formData, emailOrUsername: e.target.value })
-            }
-            style={{ marginBottom: 12 }}
-          />
-          <Input.Password
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            style={{ marginBottom: 16 }}
-          />
-          <Button
-            type="primary"
-            block
-            loading={loading}
-            onClick={handleLogin}
-            className="cta"
-          >
-            🛫 Board Now
-          </Button>
+        {/* Boarding Pass Card */}
+        <div className="pass" onKeyDown={onKeyDown}>
+          {/* Ticket notch */}
+          <div className="pass-notch" aria-hidden />
 
-          {/* ⬇️ New "Create account" link */}
-          <div style={{ marginTop: 12 }}>
-            <Text type="secondary">
-              New here?{" "}
-              <button
-                type="button"
-                onClick={() => nav("/register")}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  color: "#40a9ff",
-                  cursor: "pointer",
-                  padding: 0,
-                }}
-              >
-                Create an account
-              </button>
-            </Text>
+          <div className="pass-header">
+            <div className="pass-airline">
+              <span className="pass-chip" aria-hidden />
+              <span className="pass-airline-name">Skyrio Boarding Pass</span>
+            </div>
+
+            <div className="pass-mini">
+              <Text className="pass-mini-label">Gate</Text>
+              <div className="pass-mini-pill">SKY</div>
+            </div>
+          </div>
+
+          <div className="pass-route">
+            <div className="route-col">
+              <Text className="route-label">From</Text>
+              <div className="route-value">Login</div>
+            </div>
+
+            <div className="route-mid" aria-hidden>
+              ✈️
+            </div>
+
+            <div className="route-col right">
+              <Text className="route-label">To</Text>
+              <div className="route-value">Dashboard</div>
+            </div>
+          </div>
+
+          <div className="pass-divider" aria-hidden />
+
+          <div className="pass-form">
+            <Input
+              className="auth-input"
+              placeholder="Email or username"
+              name="emailOrUsername"
+              value={formData.emailOrUsername}
+              onChange={(e) =>
+                setFormData({ ...formData, emailOrUsername: e.target.value })
+              }
+              autoComplete="username"
+            />
+
+            <Input.Password
+              className="auth-input"
+              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              autoComplete="current-password"
+            />
+
+            <Button
+              type="primary"
+              block
+              loading={loading}
+              onClick={handleLogin}
+              className="pass-cta"
+            >
+              🛫 Confirm Boarding
+            </Button>
+
+            <div className="pass-secondary">
+              <Text className="pass-secondary-text">
+                New here?{" "}
+                <button
+                  type="button"
+                  onClick={() => nav("/register")}
+                  className="link-btn"
+                >
+                  Create an account
+                </button>
+              </Text>
+            </div>
+          </div>
+
+          <div className="pass-divider dotted" aria-hidden />
+
+          {/* Barcode */}
+          <div className="pass-barcode" aria-hidden>
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
           </div>
 
           {/* a11y live region */}
-          <div aria-live="polite" style={{ height: 0, overflow: "hidden" }}>
+          <div aria-live="polite" className="sr-only">
             {loading ? "Signing in…" : ""}
           </div>
-        </Card>
-      </div>
+        </div>
 
-      {/* --- Footer --- */}
-      <footer className="login-footer">
-        <Text type="secondary">© {new Date().getFullYear()} Skyrio</Text>
-      </footer>
+        <footer className="auth-footer">
+          <Text className="footer-text">
+            © {new Date().getFullYear()} Skyrio
+          </Text>
+        </footer>
+      </div>
     </div>
   );
 }

@@ -1,161 +1,367 @@
-/* -------- Tokens (fallbacks) -------- */
-:root{
-  --bg-start:#3a2a72; --bg-mid:#4a2a7a; --bg-end:#7a3c3a;
-  --text-1:#f4f6fb;  --text-2:#c9cbe3;
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
 
-  --surface:rgba(255,255,255,.08);
-  --border-soft:rgba(255,255,255,.18);
-
-  --cta:#ff8a2a; --cta-2:#ff9e4d;
-
-  --shadow-lg:0 20px 60px rgba(0,0,0,.35);
-  --shadow-sm:0 6px 18px rgba(0,0,0,.18);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(195,92,255,0.6), transparent 45%),
+    radial-gradient(circle at 80% 85%, rgba(43,188,255,0.6), transparent 50%),
+    radial-gradient(circle at 50% 40%, rgba(255,95,183,0.35), transparent 55%),
+    linear-gradient(180deg, #070a1a, #090b22);
 }
 
-/* -------- Page wrapper (optional) -------- */
-.login-page{
-  min-height:100dvh;
-  display:grid; place-items:center;
-  padding:24px;
-  background:linear-gradient(180deg,var(--bg-start),var(--bg-mid) 45%,var(--bg-end));
+/* ===============================
+   GLOW ORBS (BACKGROUND DEPTH)
+================================ */
+
+.glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.6;
+  z-index: 1;
 }
 
-/* -------- Card -------- */
-.login-card{
-  width:100%; max-width:440px;
-  color:var(--text-1);
-  background:var(--surface);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border:1px solid var(--border-soft);
-  border-radius:20px;
-  box-shadow:var(--shadow-lg);
-  overflow:hidden;
-  transform:translateZ(0);
-  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-}
-.login-card:hover{
-  transform:translateY(-1px);
-  box-shadow:0 28px 70px rgba(0,0,0,.42);
-  border-color:rgba(255,255,255,.26);
+.g1 {
+  width: 260px;
+  height: 260px;
+  left: -80px;
+  top: -80px;
+  background: #c35cff;
 }
 
-/* Ant Card header/body (if used) */
-.login-card .ant-card-head{
-  background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border-bottom:1px solid var(--border-soft);
-}
-.login-card .ant-card-head-title{ letter-spacing:.2px; opacity:.95; }
-.login-card .ant-card-body{ padding:18px 18px 22px; }
-
-/* Titles (if not using Ant header) */
-.login-title{ font-size:22px; font-weight:700; margin:8px 0 6px; }
-.login-subtitle{ color:var(--text-2); font-size:13px; margin-bottom:14px; }
-
-/* -------- Inputs (pill, warm focus) -------- */
-.ant-input,
-.ant-input-affix-wrapper,
-.ant-input-password,
-.ant-select-selector{
-  height:42px;
-  border-radius:999px !important;
-  background:rgba(255,255,255,.92) !important;
-  border:1px solid rgba(0,0,0,.06) !important;
-  box-shadow:inset 0 1px 0 rgba(0,0,0,.06);
-  color:#1b1b1f;
-}
-.ant-input::placeholder,
-.ant-input-affix-wrapper input::placeholder{ color:rgba(0,0,0,.35); }
-
-.ant-input:hover,
-.ant-input-affix-wrapper:hover,
-.ant-input-password:hover,
-.ant-select-selector:hover{
-  border-color:rgba(0,0,0,.18) !important;
+.g2 {
+  width: 280px;
+  height: 280px;
+  right: -120px;
+  bottom: -120px;
+  background: #2bbcff;
 }
 
-.ant-input:focus,
-.ant-input-affix-wrapper:focus,
-.ant-input-affix-wrapper-focused,
-.ant-input-password:focus,
-.ant-select-focused .ant-select-selector{
-  border-color:var(--cta) !important;
-  box-shadow:
-    0 0 0 3px rgba(255,138,42,.25),
-    inset 0 1px 0 rgba(255,255,255,.6) !important;
-  outline:none;
+.g3 {
+  width: 220px;
+  height: 220px;
+  left: 60px;
+  bottom: 140px;
+  background: #ff5fb7;
+  opacity: 0.35;
 }
 
-/* Error text */
-.ant-form-item-explain-error{
-  color:#ff7676; font-size:12px; margin-top:4px;
+/* ===============================
+   MAIN SHELL
+================================ */
+
+.auth-shell {
+  width: min(92vw, 460px);
+  padding: 24px 0;
+  position: relative;
+  z-index: 2;
 }
 
-/* -------- Buttons -------- */
-.ant-btn.login-primary{
-  height:44px; border-radius:999px;
-  font-weight:600; letter-spacing:.2px;
-  color:#fff;
-  background:linear-gradient(135deg,var(--cta),var(--cta-2));
-  border:none; box-shadow:var(--shadow-sm);
-  transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
-}
-.ant-btn.login-primary:hover{
-  filter:brightness(1.05);
-  transform:translateY(-1px);
-  box-shadow:0 10px 22px rgba(255,138,42,.35);
-}
-.ant-btn.login-primary:active{ transform:translateY(0); }
+/* ===============================
+   HEADER
+================================ */
 
-/* Secondary actions */
-.login-actions{ display:flex; justify-content:space-between; gap:8px; margin-top:10px; }
-.login-link{ color:var(--text-2); font-size:13px; }
-.login-link:hover{ color:#fff; }
-
-/* Checkbox spacing */
-.ant-form-item .ant-checkbox-wrapper{ gap:8px; }
-
-/* Divider */
-.login-divider{
-  position:relative; text-align:center;
-  margin:14px 0 10px; color:var(--text-2); font-size:12px;
-}
-.login-divider::before,
-.login-divider::after{
-  content:""; position:absolute; top:50%; width:42%; height:1px;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
-}
-.login-divider::before{ left:0; }
-.login-divider::after{ right:0; }
-
-/* Social buttons */
-.social-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.ant-btn.social{
-  height:42px; border-radius:999px;
-  background:rgba(255,255,255,.88);
-  border:1px solid rgba(0,0,0,.06); color:#111;
-}
-.ant-btn.social:hover{ background:#fff; border-color:rgba(0,0,0,.18); }
-
-/* Footer */
-.login-footer{ text-align:center; margin-top:14px; color:var(--text-2); font-size:12px; }
-
-/* -------- Soft Ring (no masks) --------
-   Add className="login-card ring" to enable
-----------------------------------------*/
-.login-card.ring{ position:relative; }
-.login-card.ring::before{
-  content:""; position:absolute; inset:-10px; border-radius:28px; pointer-events:none;
-  /* outer glow */
-  box-shadow:0 0 0 10px rgba(255,138,42,.28), 0 0 40px rgba(255,138,42,.45);
-  /* subtle gradient so corners feel warm */
-  background:radial-gradient(closest-side, rgba(255,138,42,.22), transparent 70%);
-  filter:blur(2px);
-  z-index:-1; /* sits behind the card */
+.auth-top {
+  text-align: center;
+  margin-bottom: 18px;
 }
 
-/* -------- Responsive -------- */
-@media (max-width:520px){
-  .login-card{ margin:0 8px; }
-  .social-row{ grid-template-columns:1fr; }
+.brand-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #6f68ff, #c661ff, #ff8fcf);
+  box-shadow: 0 0 14px rgba(198,97,255,0.6);
+}
+
+.brand-text {
+  color: rgba(255,255,255,0.92);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.auth-title {
+  margin: 14px 0 6px !important;
+  color: rgba(255,255,255,0.95) !important;
+}
+
+.auth-subtitle {
+  color: rgba(255,255,255,0.72) !important;
+}
+
+/* ===============================
+   BOARDING PASS CARD
+================================ */
+
+.pass {
+  position: relative;
+  padding: 18px;
+  border-radius: 26px;
+
+  background: rgba(255,255,255,0.11);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+  backdrop-filter: blur(18px);
+
+  animation: fadeUp 0.6s ease-out;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===============================
+   TOP NOTCH (TICKET CUT)
+================================ */
+
+.pass-notch {
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 28px;
+  border-radius: 0 0 18px 18px;
+  background: rgba(10,12,28,0.9);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-top: none;
+}
+
+/* ===============================
+   PASS HEADER
+================================ */
+
+.pass-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pass-airline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pass-chip {
+  width: 28px;
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #6f68ff, #c661ff);
+  box-shadow: 0 0 18px rgba(111,104,255,0.35);
+}
+
+.pass-airline-name {
+  color: rgba(255,255,255,0.9);
+  font-weight: 700;
+}
+
+.pass-mini-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6) !important;
+}
+
+.pass-mini-pill {
+  margin-top: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+/* ===============================
+   ROUTE ROW
+================================ */
+
+.pass-route {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+}
+
+.route-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6) !important;
+}
+
+.route-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.95);
+}
+
+.route-col.right {
+  text-align: right;
+}
+
+.route-mid {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* ===============================
+   DIVIDERS
+================================ */
+
+.pass-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.15);
+  margin: 12px 0 16px;
+}
+
+.pass-divider.dotted {
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  background: none;
+}
+
+/* ===============================
+   FORM INPUTS
+================================ */
+
+.pass-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-input .ant-input,
+.auth-input .ant-input-affix-wrapper {
+  background: rgba(0,0,0,0.25) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  color: rgba(255,255,255,0.95) !important;
+  border-radius: 14px !important;
+}
+
+.auth-input .ant-input::placeholder {
+  color: rgba(255,255,255,0.55) !important;
+}
+
+.auth-input .ant-input-password-icon {
+  color: rgba(255,255,255,0.75);
+}
+
+/* ===============================
+   CTA BUTTON
+================================ */
+
+.pass-cta {
+  height: 46px;
+  border-radius: 999px !important;
+  border: none !important;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+
+  background: linear-gradient(90deg, #6f68ff, #c661ff, #ff8fcf) !important;
+  box-shadow: 0 10px 30px rgba(198,97,255,0.3);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.pass-cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* ===============================
+   SECONDARY LINK
+================================ */
+
+.pass-secondary {
+  text-align: center;
+  margin-top: 4px;
+}
+
+.pass-secondary-text {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+.link-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 800;
+  color: rgba(111,104,255,0.95);
+}
+
+.link-btn:hover {
+  color: rgba(198,97,255,0.95);
+  text-decoration: underline;
+}
+
+/* ===============================
+   BARCODE
+================================ */
+
+.pass-barcode {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  padding: 10px 4px 4px;
+  opacity: 0.85;
+}
+
+.pass-barcode span {
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.2);
+}
+
+.pass-barcode span:nth-child(2) { height: 18px; }
+.pass-barcode span:nth-child(3) { height: 30px; }
+.pass-barcode span:nth-child(4) { height: 16px; }
+.pass-barcode span:nth-child(5) { height: 28px; }
+.pass-barcode span:nth-child(6) { height: 20px; }
+.pass-barcode span:nth-child(7) { height: 32px; }
+.pass-barcode span:nth-child(8) { height: 14px; }
+.pass-barcode span:nth-child(9) { height: 30px; }
+.pass-barcode span:nth-child(10){ height: 22px; }
+
+/* ===============================
+   FOOTER
+================================ */
+
+.auth-footer {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.footer-text {
+  color: rgba(255,255,255,0.55) !important;
+}
+
+/* ===============================
+   ACCESSIBILITY
+================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
 }
