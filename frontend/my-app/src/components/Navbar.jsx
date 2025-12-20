@@ -108,49 +108,51 @@ export default function Navbar() {
 
         {/* RIGHT */}
         <div className="sk-actions">
-          {!isLoggedIn ? (
-            <>
-              {/* Keep ONE log in + ONE get started */}
-              <Button
-                type="primary"
-                className="sk-btnPrimary"
-                onClick={() => navigate("/register")}
-              >
-                Get Started
-              </Button>
-
-              <Button
-                className="sk-btnGhost"
-                type="default"
-                onClick={() => navigate("/login")}
-              >
-                Log in
-              </Button>
-            </>
-          ) : (
-            <div className="sk-user">
-              <span className="sk-hello">Hey, {displayName}</span>
-
-              <Dropdown
-                menu={avatarMenu}
-                placement="bottomRight"
-                trigger={["click"]}
-                overlayClassName="sk-dropdown"
-              >
-                <button
-                  className="sk-avatarBtn"
-                  type="button"
-                  aria-label="Account menu"
+          {/* ✅ Desktop-only actions wrapper (fixes duplicate buttons) */}
+          <div className="sk-actions-desktop">
+            {!isLoggedIn ? (
+              <>
+                <Button
+                  type="primary"
+                  className="sk-btnPrimary"
+                  onClick={() => navigate("/register")}
                 >
-                  <Avatar
-                    size={34}
-                    src={user?.avatarUrl}
-                    icon={!user?.avatarUrl ? <UserOutlined /> : null}
-                  />
-                </button>
-              </Dropdown>
-            </div>
-          )}
+                  Get Started
+                </Button>
+
+                <Button
+                  className="sk-btnGhost"
+                  type="default"
+                  onClick={() => navigate("/login")}
+                >
+                  Log in
+                </Button>
+              </>
+            ) : (
+              <div className="sk-user">
+                <span className="sk-hello">Hey, {displayName}</span>
+
+                <Dropdown
+                  menu={avatarMenu}
+                  placement="bottomRight"
+                  trigger={["click"]}
+                  overlayClassName="sk-dropdown"
+                >
+                  <button
+                    className="sk-avatarBtn"
+                    type="button"
+                    aria-label="Account menu"
+                  >
+                    <Avatar
+                      size={34}
+                      src={user?.avatarUrl}
+                      icon={!user?.avatarUrl ? <UserOutlined /> : null}
+                    />
+                  </button>
+                </Dropdown>
+              </div>
+            )}
+          </div>
 
           {/* Mobile hamburger */}
           <button
@@ -192,7 +194,7 @@ export default function Navbar() {
             {!isLoggedIn ? (
               <Button
                 type="primary"
-                className="mobile-login"
+                className="mobile-primary"
                 onClick={() => navigate("/login")}
               >
                 Log in

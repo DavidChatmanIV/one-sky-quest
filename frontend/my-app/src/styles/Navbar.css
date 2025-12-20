@@ -2,12 +2,21 @@
   --nav-h: 76px;
   --nav-h-compact: 64px;
 
-  --nav-hero-bg: rgba(12, 10, 24, 0.46);
-  --nav-scrolled-bg: rgba(10, 8, 22, 0.86);
+  /* ✅ Premium glass gradient (Option 1) */
+  --nav-hero-bg: linear-gradient(
+    180deg,
+    rgba(16, 12, 32, 0.55),
+    rgba(16, 12, 32, 0.25)
+  );
+
+  --nav-scrolled-bg: linear-gradient(
+    180deg,
+    rgba(10, 8, 22, 0.78),
+    rgba(10, 8, 22, 0.58)
+  );
 
   --text: #f4f6fb;
   --muted: rgba(244, 246, 251, 0.72);
-
   --border: rgba(255, 255, 255, 0.12);
 
   --cta: #ff8a2a;
@@ -32,24 +41,56 @@
   align-items: center;
   justify-content: center;
 
+  /* IMPORTANT: allow pseudo-element to cover full viewport */
+  overflow: visible;
+}
+
+/* ✅ Full-viewport background layer (covers the dark backend strip) */
+.sk-nav::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100vw;
+  height: 100%;
+
   background: var(--nav-hero-bg);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
-  transition:
-    height 220ms ease,
-    padding 220ms ease,
-    background 200ms ease,
-    box-shadow 200ms ease,
-    border-color 200ms ease;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.sk-nav.is-scrolled {
+/* subtle premium sun-glow */
+.sk-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100vw;
+  height: 100%;
+
+  pointer-events: none;
+  background: radial-gradient(
+    900px 80px at 50% 0%,
+    rgba(255, 138, 42, 0.10),
+    transparent 70%
+  );
+  opacity: 0.6;
+  z-index: 0;
+}
+
+.sk-nav.is-scrolled::before {
   background: var(--nav-scrolled-bg);
-  border-bottom-color: rgba(255, 255, 255, 0.10);
-  box-shadow: var(--shadow-soft);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
 .sk-nav.is-compact {
@@ -64,8 +105,10 @@
 
 .sk-glowline {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+
   bottom: -1px;
   height: 2px;
 
@@ -80,6 +123,7 @@
 
   opacity: 0.35;
   pointer-events: none;
+  z-index: 0;
 }
 
 .sk-nav.is-scrolled .sk-glowline {
@@ -91,6 +135,9 @@
    ========================= */
 
 .sk-nav-inner {
+  position: relative;
+  z-index: 1;
+
   width: 100%;
   max-width: 1180px;
 
@@ -224,13 +271,9 @@
   color: var(--text);
 }
 
-/* ✅ Hard kill any previous "dot" styles, we use a clean underline */
-.sk-link.is-active::before,
+/* Active underline */
 .sk-link.is-active::after {
   content: "";
-}
-
-.sk-link.is-active::after {
   position: absolute;
   left: 14px;
   right: 14px;
@@ -281,7 +324,6 @@
   border-radius: 999px !important;
   font-weight: 900 !important;
   border: none !important;
-
   background: linear-gradient(90deg, var(--cta), var(--cta2)) !important;
 }
 
@@ -344,7 +386,7 @@
 .hamburger span:nth-child(2) { top: 19px; }
 .hamburger span:nth-child(3) { top: 26px; }
 
-/* ✅ Mobile panel styles (this is what stops duplicate buttons) */
+/* Mobile panel */
 .mobile-panel {
   position: fixed;
   top: var(--nav-h);
@@ -422,14 +464,6 @@
   background: linear-gradient(90deg, var(--cta), var(--cta2)) !important;
 }
 
-.mobile-ghost {
-  border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text) !important;
-  font-weight: 800 !important;
-}
-
 .mobile-backdrop {
   position: fixed;
   inset: 0;
@@ -442,6 +476,9 @@
 @media (max-width: 880px) {
   .sk-links { display: none; }
   .sk-hello { display: none; }
+
   .hamburger { display: inline-flex; }
-  .sk-actions-desktop { display: none; } /* ✅ hides desktop auth buttons on mobile */
+
+  /* ✅ This is what prevents duplicate auth buttons */
+  .sk-actions-desktop { display: none; }
 }
