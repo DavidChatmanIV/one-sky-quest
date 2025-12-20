@@ -71,24 +71,15 @@ export default function Navbar() {
   return (
     <header className={`sk-nav ${scrolled ? "is-scrolled is-compact" : ""}`}>
       <div className="sk-nav-inner">
-        {/* LEFT: Brand */}
-        <button
-          className="sk-brand"
-          onClick={() => navigate("/")}
-          type="button"
-        >
-          <img
-            src={logo}
-            alt="Skyrio"
-            className="sk-logoImg"
-            draggable="false"
-          />
+        {/* LEFT */}
+        <button className="sk-brand" onClick={() => navigate("/")}>
+          <img src={logo} alt="Skyrio" className="sk-logoImg" />
           <span className="sk-logoText">Skyrio</span>
         </button>
 
         {/* CENTER */}
         <div className="sk-mid">
-          <nav className="sk-links" aria-label="Primary">
+          <nav className="sk-links">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -97,7 +88,7 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `sk-link ${item.className || ""} ${
                     isActive ? "is-active" : ""
-                  }`.trim()
+                  }`
                 }
               >
                 {item.label}
@@ -108,7 +99,6 @@ export default function Navbar() {
 
         {/* RIGHT */}
         <div className="sk-actions">
-          {/* ✅ Desktop-only actions wrapper (fixes duplicate buttons) */}
           <div className="sk-actions-desktop">
             {!isLoggedIn ? (
               <>
@@ -119,10 +109,8 @@ export default function Navbar() {
                 >
                   Get Started
                 </Button>
-
                 <Button
                   className="sk-btnGhost"
-                  type="default"
                   onClick={() => navigate("/login")}
                 >
                   Log in
@@ -131,18 +119,13 @@ export default function Navbar() {
             ) : (
               <div className="sk-user">
                 <span className="sk-hello">Hey, {displayName}</span>
-
                 <Dropdown
                   menu={avatarMenu}
                   placement="bottomRight"
                   trigger={["click"]}
                   overlayClassName="sk-dropdown"
                 >
-                  <button
-                    className="sk-avatarBtn"
-                    type="button"
-                    aria-label="Account menu"
-                  >
+                  <button className="sk-avatarBtn">
                     <Avatar
                       size={34}
                       src={user?.avatarUrl}
@@ -154,13 +137,10 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile */}
           <button
             className={`hamburger ${mobileOpen ? "is-open" : ""}`}
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
-            type="button"
           >
             <span />
             <span />
@@ -169,50 +149,36 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Glow line */}
       <div className="sk-glowline" />
 
       {/* MOBILE PANEL */}
       <div className={`mobile-panel ${mobileOpen ? "open" : ""}`}>
         <div className="mobile-panel-inner">
-          <nav className="mobile-list">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === "/"}
-                className={({ isActive }) =>
-                  `mobile-item ${isActive ? "active" : ""}`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className="mobile-item"
+              onClick={() => setMobileOpen(false)}
+            >
+              {item.label}
+            </NavLink>
+          ))}
 
-          <div className="mobile-actions">
-            {!isLoggedIn ? (
-              <Button
-                type="primary"
-                className="mobile-primary"
-                onClick={() => navigate("/login")}
-              >
-                Log in
-              </Button>
-            ) : (
-              <Button danger onClick={handleLogout}>
-                Log out
-              </Button>
-            )}
-          </div>
+          {!isLoggedIn ? (
+            <Button
+              type="primary"
+              className="mobile-primary"
+              onClick={() => navigate("/login")}
+            >
+              Log in
+            </Button>
+          ) : (
+            <Button danger onClick={handleLogout}>
+              Log out
+            </Button>
+          )}
         </div>
-
-        <button
-          className="mobile-backdrop"
-          aria-label="Close menu"
-          onClick={() => setMobileOpen(false)}
-          type="button"
-        />
       </div>
     </header>
   );
