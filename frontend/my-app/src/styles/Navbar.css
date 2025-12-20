@@ -1,430 +1,447 @@
 :root {
-  --nav-h: 72px;
-  --subnav-h: 44px;
+  --nav-h: 76px;
+  --nav-h-compact: 64px;
 
-  --bg-nav: rgba(16, 12, 32, 0.72);
-  --bg-subnav: rgba(16, 12, 32, 0.55);
-  --text-1: #f4f6fb;
-  --muted: #c9cbe3;
+  --nav-hero-bg: rgba(12, 10, 24, 0.46);
+  --nav-scrolled-bg: rgba(10, 8, 22, 0.86);
+
+  --text: #f4f6fb;
+  --muted: rgba(244, 246, 251, 0.72);
+
+  --border: rgba(255, 255, 255, 0.12);
+
   --cta: #ff8a2a;
-  --cta-2: #ffa94d;
+  --cta2: #ffa94d;
 
-  --glass: rgba(255, 255, 255, 0.06);
-  --glass-2: rgba(255, 255, 255, 0.1);
-  --border: rgba(255, 255, 255, 0.08);
-
-  --shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  --shadow-soft: 0 10px 26px rgba(0, 0, 0, 0.25);
 }
 
-/* Layout spacing */
-.app-main {
-  padding-top: calc(var(--nav-h) + var(--subnav-h));
-}
+/* =========================
+   Base navbar
+   ========================= */
 
-/* ===================== TOP NAV ===================== */
-.osq-navbar {
+.sk-nav {
   position: sticky;
   top: 0;
   z-index: 1000;
 
+  height: var(--nav-h);
+  padding: 10px 14px;
+
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
-  height: var(--nav-h);
-  padding: 0 20px;
+  background: var(--nav-hero-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
-  background: var(--bg-nav);
-  backdrop-filter: saturate(140%) blur(12px);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
   transition:
-    height 0.22s ease,
-    padding 0.22s ease,
-    background 0.22s ease,
-    box-shadow 0.22s ease,
-    border-color 0.22s ease;
+    height 220ms ease,
+    padding 220ms ease,
+    background 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
 }
 
-/* ✅ Scroll animation state */
-.osq-navbar.is-scrolled {
-  height: 60px;
-  padding: 0 16px;
-  background: rgba(16, 12, 32, 0.86);
-  backdrop-filter: saturate(160%) blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+.sk-nav.is-scrolled {
+  background: var(--nav-scrolled-bg);
+  border-bottom-color: rgba(255, 255, 255, 0.10);
+  box-shadow: var(--shadow-soft);
 }
 
-.nav-left,
-.nav-right {
-  display: flex;
+.sk-nav.is-compact {
+  height: var(--nav-h-compact);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* =========================
+   Glow gradient line
+   ========================= */
+
+.sk-glowline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 138, 42, 0),
+    rgba(255, 138, 42, 0.6),
+    rgba(191, 88, 255, 0.45),
+    rgba(70, 170, 255, 0.35),
+    rgba(255, 138, 42, 0)
+  );
+
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.sk-nav.is-scrolled .sk-glowline {
+  opacity: 0.70;
+}
+
+/* =========================
+   Inner layout
+   ========================= */
+
+.sk-nav-inner {
+  width: 100%;
+  max-width: 1180px;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 14px;
 }
 
-.nav-pillars-desktop {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+/* =========================
+   Brand
+   ========================= */
 
-/* ===================== BRAND ===================== */
-.brand {
-  display: flex;
+.sk-brand {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-weight: 700;
-  color: var(--text-1);
+
   background: transparent;
-  border: 0;
+  border: none;
   cursor: pointer;
-  font-size: 20px;
-}
 
-.brand .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, var(--cta), var(--cta-2));
-  box-shadow: 0 0 10px rgba(255, 138, 42, 0.6);
-}
-
-/* ===================== NAV LINKS ===================== */
-.nav-link {
-  color: var(--text-1) !important;
-  opacity: 0.92;
-  font-weight: 600;
-  background: transparent;
-  border: 0;
   padding: 8px 10px;
+  border-radius: 14px;
+
+  transition: background 160ms ease;
+}
+
+.sk-brand:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sk-logoImg {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+
   border-radius: 10px;
+  padding: 2px;
 
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    background 0.2s ease;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  transition: width 220ms ease, height 220ms ease;
 }
 
-.nav-link:hover {
-  opacity: 1;
-  transform: translateY(-1px);
-  background: var(--glass);
+.sk-nav.is-compact .sk-logoImg {
+  width: 30px;
+  height: 30px;
 }
 
-.nav-link.active,
-.nav-link[aria-current="page"] {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.sk-logoText {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text);
+  opacity: 0.92;
 }
 
-.chev {
-  font-size: 12px;
-  margin-left: 6px;
+/* =========================
+   Center navigation pills
+   ========================= */
+
+.sk-mid {
+  display: flex;
+  justify-content: center;
 }
 
-/* ===================== CTA ===================== */
-.btn.cta.start-btn {
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-weight: 800;
-  background: linear-gradient(90deg, var(--cta), var(--cta-2));
-  color: #0f1020;
-  border: 0;
-  box-shadow: 0 8px 24px rgba(255, 138, 42, 0.25);
+.sk-links {
+  position: relative;
+  isolation: isolate;
 
-  transition:
-    filter 0.2s ease,
-    transform 0.2s ease;
-}
-
-.btn.cta.start-btn:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-}
-
-/* ===================== ICON BUTTONS ===================== */
-.btn.icon {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  padding: 6px;
 
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
 
-  background: var(--glass);
-  color: var(--text-1);
-  border: 1px solid var(--border);
-
-  position: relative;
-  transition: background 0.2s ease;
+  overflow: hidden;
 }
 
-.btn.icon:hover {
-  background: var(--glass-2);
-}
-
-/* Notification dot */
-.notif-dot {
+/* subtle animated sheen */
+.sk-links::before {
+  content: "";
   position: absolute;
-  right: -2px;
-  top: -2px;
+  inset: -40% -60%;
+  z-index: 0;
 
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 35%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0) 55%
+  );
 
-  background: var(--cta);
-  box-shadow: 0 0 8px rgba(255, 138, 42, 0.7);
+  transform: translateX(-35%);
+  animation: sk-sheen 6.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
-/* ===================== USER / AUTH ===================== */
-.nav-user {
-  display: flex;
+@keyframes sk-sheen {
+  0% { transform: translateX(-35%); }
+  50% { transform: translateX(35%); }
+  100% { transform: translateX(-35%); }
+}
+
+.sk-link {
+  position: relative;
+  z-index: 1;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.sk-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+.sk-link.is-active {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+/* ✅ Hard kill any previous "dot" styles, we use a clean underline */
+.sk-link.is-active::before,
+.sk-link.is-active::after {
+  content: "";
+}
+
+.sk-link.is-active::after {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 6px;
+  height: 2px;
+  border-radius: 999px;
+
+  background: linear-gradient(90deg, var(--cta), var(--cta2));
+  box-shadow: 0 0 18px rgba(255, 138, 42, 0.30);
+}
+
+/* Passport accent */
+.passport-pill.is-active {
+  border: 1px solid rgba(255, 138, 42, 0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 138, 42, 0.20),
+    rgba(255, 138, 42, 0.10)
+  );
+}
+
+/* =========================
+   Right actions
+   ========================= */
+
+.sk-actions {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
 }
 
-.nav-hello {
-  color: var(--text-1);
-  opacity: 0.9;
-  font-weight: 700;
-  font-size: 14px;
-  white-space: nowrap;
+.sk-actions-desktop {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.nav-avatar-btn {
+/* Desktop buttons */
+.sk-btnGhost {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--text) !important;
+  font-weight: 800 !important;
+}
+
+.sk-btnPrimary {
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  border: none !important;
+
+  background: linear-gradient(90deg, var(--cta), var(--cta2)) !important;
+}
+
+/* =========================
+   User + dropdown
+   ========================= */
+
+.sk-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sk-hello {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  opacity: 0.92;
+}
+
+.sk-avatarBtn {
+  border: none;
   background: transparent;
-  border: 0;
-  padding: 0;
   cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
+  padding: 4px;
   border-radius: 999px;
 }
 
-/* Replay tour button */
-.nav-tour-btn {
-  color: var(--text-1) !important;
-  opacity: 0.9;
-  border-radius: 12px;
+.sk-dropdown .ant-dropdown-menu {
+  background: rgba(12, 10, 24, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
 }
 
-.nav-tour-btn:hover {
-  background: var(--glass) !important;
-  opacity: 1;
-}
+/* =========================
+   Mobile
+   ========================= */
 
-/* ===================== SUBNAV ===================== */
-.osq-subnav {
-  position: sticky;
-  top: var(--nav-h);
-  z-index: 999;
-
-  height: var(--subnav-h);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 0 16px;
-  border-bottom: 1px solid var(--border);
-
-  background: var(--bg-subnav);
-  backdrop-filter: saturate(140%) blur(12px);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  height: 30px;
-  padding: 0 14px;
-  border-radius: 999px;
-
-  color: var(--text-1);
-  background: var(--glass);
-  border: 1px solid var(--border);
-
-  font-size: 14px;
-  white-space: nowrap;
-  transition: background 0.2s ease;
-}
-
-.pill:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* ===================== MOBILE HAMBURGER ===================== */
 .hamburger {
   display: none;
-
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 40px;
   border-radius: 12px;
-
-  background: var(--glass);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
   position: relative;
 }
 
 .hamburger span {
   position: absolute;
-  left: 9px;
-  right: 9px;
-
+  left: 12px;
+  right: 12px;
   height: 2px;
-  background: var(--text-1);
-  border-radius: 2px;
-
-  transition:
-    transform 0.26s ease,
-    top 0.26s ease,
-    opacity 0.26s ease;
+  background: rgba(255, 255, 255, 0.88);
+  transition: 180ms ease;
 }
 
 .hamburger span:nth-child(1) { top: 12px; }
-.hamburger span:nth-child(2) { top: 18px; }
-.hamburger span:nth-child(3) { top: 24px; }
+.hamburger span:nth-child(2) { top: 19px; }
+.hamburger span:nth-child(3) { top: 26px; }
 
-.hamburger.is-open span:nth-child(1) {
-  top: 18px;
-  transform: rotate(45deg);
-}
-
-.hamburger.is-open span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.is-open span:nth-child(3) {
-  top: 18px;
-  transform: rotate(-45deg);
-}
-
-/* ===================== MOBILE PANEL ===================== */
+/* ✅ Mobile panel styles (this is what stops duplicate buttons) */
 .mobile-panel {
   position: fixed;
-  inset: 0;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+
   pointer-events: none;
-  z-index: 998;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: 180ms ease;
+
+  z-index: 999;
+}
+
+.sk-nav.is-compact + .mobile-panel,
+.sk-nav.is-scrolled + .mobile-panel {
+  top: var(--nav-h-compact);
 }
 
 .mobile-panel.open {
+  opacity: 1;
+  transform: translateY(0);
   pointer-events: auto;
 }
 
-.mobile-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  border: 0;
-  transition: opacity 0.26s ease;
-}
-
-.mobile-panel.open .mobile-backdrop {
-  opacity: 1;
-}
-
 .mobile-panel-inner {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  margin: 10px auto 0;
+  width: min(520px, calc(100% - 24px));
+  border-radius: 18px;
 
-  width: 82%;
-  max-width: 380px;
+  background: rgba(12, 10, 24, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 
-  background: rgba(22, 18, 40, 0.98);
-  border-left: 1px solid var(--border);
-
-  transform: translateX(100%);
-  transition: transform 0.28s ease;
-
-  padding: 14px;
-  box-shadow: 0 16px 44px rgba(0,0,0,.35);
-}
-
-.mobile-panel.open .mobile-panel-inner {
-  transform: translateX(0);
-}
-
-/* ===================== MOBILE CONTENT ===================== */
-.mobile-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.mobile-item,
-.mobile-sub {
-  width: 100%;
-  text-align: left;
   padding: 12px;
-  border-radius: 12px;
-
-  color: var(--text-1);
-  background: transparent;
-  border: 1px solid var(--border);
-
-  font-size: 15px;
-  transition: background 0.2s ease;
 }
 
-.mobile-sub {
-  opacity: 0.9;
-  padding-left: 22px;
+.mobile-list {
+  display: grid;
+  gap: 8px;
 }
 
-.mobile-item:hover,
-.mobile-sub:hover {
-  background: rgba(255, 255, 255, 0.08);
+.mobile-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  color: rgba(244, 246, 251, 0.88);
+  text-decoration: none;
+  font-weight: 800;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-.mobile-item.active,
-.mobile-sub.active {
-  background: rgba(255, 255, 255, 0.15);
+.mobile-item.active {
+  border-color: rgba(255, 138, 42, 0.28);
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .mobile-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
 }
 
-.mobile-ai {
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--glass);
-  color: var(--text-1);
+.mobile-primary {
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  border: none !important;
+  background: linear-gradient(90deg, var(--cta), var(--cta2)) !important;
 }
 
-.mobile-login {
-  color: var(--muted) !important;
-  align-self: flex-start;
+.mobile-ghost {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--text) !important;
+  font-weight: 800 !important;
 }
 
-/* ===================== RESPONSIVE ===================== */
-@media (max-width: 900px) {
-  .nav-pillars-desktop,
-  .nav-actions-desktop {
-    display: none;
-  }
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: default;
+}
 
-  .hamburger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .osq-subnav {
-    flex-wrap: wrap;
-    row-gap: 8px;
-  }
+/* Responsive rules */
+@media (max-width: 880px) {
+  .sk-links { display: none; }
+  .sk-hello { display: none; }
+  .hamburger { display: inline-flex; }
+  .sk-actions-desktop { display: none; } /* ✅ hides desktop auth buttons on mobile */
 }

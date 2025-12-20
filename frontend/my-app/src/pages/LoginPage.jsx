@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { Input, Button, message, Typography, notification } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import BoardingPassToast from "../components/BoardingPassToast";
 import "../styles/login.css";
 
@@ -12,13 +12,32 @@ export default function LoginPage() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+
   const nav = useNavigate();
+  const location = useLocation();
 
   // Prevent duplicate toast/nav if remounts or double-clicks happen
   const successHandledRef = useRef(false);
 
+  // Where to go after login (ProtectedRoute sets state.from)
+  const redirectTo = useMemo(() => {
+    const from = location.state?.from;
+    if (typeof from === "string" && from.trim().startsWith("/")) return from;
+    return "/dashboard";
+  }, [location.state]);
+
   const handleLogin = async () => {
     if (loading) return; // double-click guard
+    if (successHandledRef.current) return;
+
+    const emailOrUsername = (formData.emailOrUsername || "").trim();
+    const password = formData.password || "";
+
+    if (!emailOrUsername || !password) {
+      message.warning("Enter your email/username and password.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -26,8 +45,8 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          emailOrUsername: formData.emailOrUsername,
-          password: formData.password,
+          emailOrUsername,
+          password,
         }),
       });
 
@@ -46,27 +65,29 @@ export default function LoginPage() {
         data.user?.username ||
         (data.user?.email ? data.user.email.split("@")[0] : "Explorer");
 
-      if (!successHandledRef.current) {
-        successHandledRef.current = true;
+      // Prevent duplicate notifications/navigation
+      successHandledRef.current = true;
 
-        notification.open({
-          message: null,
-          description: (
-            <BoardingPassToast
-              name={displayName}
-              routeFrom="Login"
-              routeTo="Dashboard"
-            />
-          ),
-          placement: "topRight",
-          duration: 3,
-          style: { background: "transparent", boxShadow: "none", padding: 0 },
-        });
+      notification.open({
+        message: null,
+        description: (
+          <BoardingPassToast
+            name={displayName}
+            routeFrom="Login"
+            routeTo={redirectTo === "/dashboard" ? "Dashboard" : redirectTo}
+          />
+        ),
+        placement: "topRight",
+        duration: 3,
+        style: { background: "transparent", boxShadow: "none", padding: 0 },
+      });
 
-        message.success(`Welcome aboard, ${displayName} ✈️`);
-        nav("/dashboard");
-      }
+      message.success(`Welcome aboard, ${displayName} ✈️`);
+
+      // 🔥 Redirect back to the protected page they originally requested
+      nav(redirectTo, { replace: true });
     } catch (err) {
+      successHandledRef.current = false;
       message.error(err.message || "Login failed");
     } finally {
       setLoading(false);
@@ -96,13 +117,14 @@ export default function LoginPage() {
           <Title level={2} className="auth-title">
             Welcome back, Explorer
           </Title>
+
           <Text className="auth-subtitle">
             Check in fast. Earn XP. Keep it moving.
           </Text>
         </div>
 
         {/* Boarding Pass Card */}
-        <div className="pass" onKeyDown={onKeyDown}>
+        <div className="pass" onKeyDown={onKeyDown} role="form">
           {/* Ticket notch */}
           <div className="pass-notch" aria-hidden />
 
@@ -130,7 +152,9 @@ export default function LoginPage() {
 
             <div className="route-col right">
               <Text className="route-label">To</Text>
-              <div className="route-value">Dashboard</div>
+              <div className="route-value">
+                {redirectTo === "/dashboard" ? "Dashboard" : redirectTo}
+              </div>
             </div>
           </div>
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, Typography, Button, Space } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Card, Typography, Button } from "antd";
 import {
   GiftOutlined,
   ThunderboltOutlined,
@@ -31,14 +30,11 @@ function getDisplayName() {
 }
 
 export default function LandingPage() {
-  const nav = useNavigate();
-
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
 
   const displayName = useMemo(() => getDisplayName(), []);
 
-  // Auto open tutorial on first visit
   useEffect(() => {
     const seen = localStorage.getItem("skyrio_tutorial_seen");
     if (!seen) setTutorialOpen(true);
@@ -65,7 +61,6 @@ export default function LandingPage() {
       />
 
       <div className="landing-wrap public-landing">
-        {/* HERO */}
         <section className="hero-public" aria-label="Skyrio Public Landing">
           <div className="lp-container hero-center">
             <Title className="hero-title">Plan smarter. Travel better.</Title>
@@ -75,28 +70,8 @@ export default function LandingPage() {
               explorers.
             </Text>
 
-            {/* CTA */}
-            <div className="hero-cta-row">
-              <Button
-                type="primary"
-                size="large"
-                className="btn-orange btn-pill"
-                onClick={() => nav("/register")}
-              >
-                Get Started
-              </Button>
-
-              <Button
-                size="large"
-                className="btn-pill"
-                onClick={() => nav("/login")}
-              >
-                Log in
-              </Button>
-            </div>
-
-            {/* Tour + Help */}
-            <div style={{ marginTop: 10 }}>
+            {/* CTA — Navbar owns auth buttons */}
+            <div className="hero-cta-row hero-cta-row--links">
               <Button
                 type="link"
                 className="hero-login-link"
@@ -114,7 +89,6 @@ export default function LandingPage() {
               </Button>
             </div>
 
-            {/* Trust */}
             <div className="hero-trust">
               <Text className="hero-trust-text">
                 Trusted by explorers worldwide
@@ -122,7 +96,6 @@ export default function LandingPage() {
               <div className="hero-stars">★★★★★</div>
             </div>
 
-            {/* Destinations */}
             <div className="lp-dest-row" aria-label="Featured destinations">
               {destinations.map((d) => (
                 <div
@@ -139,11 +112,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 3 FEATURES ONLY */}
         <section className="lp-section section-gap" aria-label="Top Features">
           <div className="lp-container">
             <div className="lp-features-3">
-              {/* Rewards */}
               <Card className="lp-feature-card" bordered>
                 <div className="lp-feature-inner">
                   <div className="lp-feature-icon">
@@ -159,7 +130,6 @@ export default function LandingPage() {
                 </div>
               </Card>
 
-              {/* AI */}
               <Card className="lp-feature-card" bordered>
                 <div className="lp-feature-inner">
                   <div className="lp-feature-icon">
@@ -175,7 +145,6 @@ export default function LandingPage() {
                 </div>
               </Card>
 
-              {/* Price Tracking */}
               <Card className="lp-feature-card" bordered>
                 <div className="lp-feature-inner">
                   <div className="lp-feature-icon">
@@ -195,7 +164,6 @@ export default function LandingPage() {
         </section>
       </div>
 
-      {/* Support modal */}
       <SupportFormModal
         open={supportOpen}
         onClose={() => setSupportOpen(false)}
@@ -203,7 +171,6 @@ export default function LandingPage() {
         defaults={{ name: displayName }}
       />
 
-      {/* AI support FAB */}
       <AISupportFab
         page="landing"
         onOpenSupport={() => setSupportOpen(true)}
