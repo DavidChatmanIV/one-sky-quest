@@ -1,3 +1,7 @@
+/* =========================================================
+   Skyrio – Profile Passport Styles (FINAL)
+   ========================================================= */
+
 :root {
   --bg-start: #0f1020;
   --bg-mid: #231a3a;
@@ -20,7 +24,9 @@
   --stroke: rgba(255, 255, 255, 0.10);
 }
 
-/* Page wrapper */
+/* =========================================================
+   Page Wrapper
+   ========================================================= */
 .passport-wrap {
   max-width: 1180px;
   margin: 0 auto;
@@ -28,12 +34,17 @@
   color: var(--text);
 }
 
-/* Tiny layout helpers */
+/* =========================================================
+   Utility Helpers
+   ========================================================= */
 .sk-row { display: flex; align-items: center; gap: 10px; }
 .sk-row-between { justify-content: space-between; }
 .sk-mb-2 { margin-bottom: 8px; }
+.muted { color: var(--muted) !important; }
 
-/* Soft glass surface used by SoftCard */
+/* =========================================================
+   Glass Surfaces
+   ========================================================= */
 .osq-surface {
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
@@ -42,10 +53,9 @@
   backdrop-filter: blur(10px);
 }
 
-/* Tabs row */
-.tabs-row { margin: 10px 0 12px; }
-
-/* Make Segmented readable on dark */
+/* =========================================================
+   Ant Design Overrides (Scoped)
+   ========================================================= */
 .passport-wrap .ant-segmented {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
@@ -61,347 +71,235 @@
   color: #fff;
 }
 
+.passport-wrap .ant-tag {
+  color: #fff !important;
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  font-weight: 800 !important;
+}
+
 /* =========================================================
-   TRAVEL PASS HEADER (make it match the mock + white text)
+   Travel Passport Header
    ========================================================= */
 .tp-card {
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(120, 90, 255, 0.18), rgba(255, 138, 42, 0.10));
+  background: linear-gradient(
+    135deg,
+    rgba(120, 90, 255, 0.18),
+    rgba(255, 138, 42, 0.10)
+  );
   border: 1px solid rgba(255,255,255,0.12);
   box-shadow: var(--shadow);
-  color: var(--text);
   backdrop-filter: blur(12px);
   margin-bottom: 12px;
 }
 
 .tp-title {
   color: rgba(255, 138, 42, 0.95);
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 
 .tp-top {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  align-items: center;
 }
 
 .tp-tier {
   color: #111 !important;
   background: rgba(255, 255, 255, 0.88) !important;
+  font-weight: 900;
   border: none !important;
-  font-weight: 800;
 }
 
-.tp-id {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-}
-
+.tp-id { display: flex; gap: 14px; align-items: center; }
 .tp-avatar {
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.18);
 }
-
-.tp-identity { min-width: 0; }
-.tp-name { color: #fff !important; letter-spacing: 0.2px; }
+.tp-name { color: #fff !important; font-weight: 900; }
 .tp-tagline {
   color: rgba(255,255,255,0.78);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   font-size: 12px;
-  margin-top: 2px;
+  letter-spacing: 0.05em;
 }
 
 .tp-chips { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .chip {
-  color: #fff !important;
   background: rgba(255,255,255,0.14) !important;
   border: 1px solid rgba(255,255,255,0.18) !important;
-  font-weight: 700;
+  color: #fff !important;
+  font-weight: 800;
 }
 
-.icon-btn {
+/* =========================================================
+   Passport Meta
+   ========================================================= */
+.passport-meta {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.passport-meta__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  gap: 10px;
+  font-size: 12px;
+}
+.passport-meta__k {
+  color: rgba(244,246,251,0.70);
+  font-weight: 800;
+}
+.passport-meta__v {
+  color: rgba(244,246,251,0.92);
+  font-weight: 900;
+}
+
+/* =========================================================
+   Music Embed + Preview
+   ========================================================= */
+.music-embed,
+.music-preview {
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.music-empty {
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(0,0,0,0.16);
+  border: 1px dashed rgba(255,255,255,0.14);
+}
+
+/* =========================================================
+   ✨ READABLE MODAL (Profile Music + future modals)
+   Usage: <Modal wrapClassName="sk-modal-readable" />
+   ========================================================= */
+
+/* modal shell */
+.sk-modal-readable .ant-modal-content {
+  background: rgba(14, 12, 26, 0.92) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.55) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 16px !important;
+  color: var(--text) !important;
+}
+
+/* header */
+.sk-modal-readable .ant-modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+.sk-modal-readable .ant-modal-title {
+  color: rgba(244,246,251,0.95) !important;
+  font-weight: 900 !important;
+}
+
+/* close */
+.sk-modal-readable .ant-modal-close,
+.sk-modal-readable .ant-modal-close-x {
+  color: rgba(244,246,251,0.85) !important;
+}
+.sk-modal-readable .ant-modal-close:hover,
+.sk-modal-readable .ant-modal-close:focus-visible {
+  color: #fff !important;
+}
+
+/* body typography */
+.sk-modal-readable .ant-modal-body {
+  color: rgba(244,246,251,0.88) !important;
+}
+.sk-modal-readable .ant-typography,
+.sk-modal-readable .ant-typography * {
+  color: rgba(244,246,251,0.88) !important;
+}
+/* Ant "secondary" text is often too dim on glass */
+.sk-modal-readable .ant-typography.ant-typography-secondary,
+.sk-modal-readable .ant-typography-secondary {
+  color: rgba(244,246,251,0.72) !important;
+}
+
+/* inputs */
+.sk-modal-readable .ant-input,
+.sk-modal-readable .ant-input-affix-wrapper,
+.sk-modal-readable input {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  color: rgba(244,246,251,0.92) !important;
+  border-radius: 12px !important;
+}
+
+.sk-modal-readable .ant-input::placeholder,
+.sk-modal-readable input::placeholder {
+  color: rgba(244,246,251,0.55) !important;
+}
+
+/* focus ring */
+.sk-modal-readable .ant-input:focus,
+.sk-modal-readable .ant-input-focused,
+.sk-modal-readable .ant-input-affix-wrapper-focused {
+  border-color: rgba(255,138,42,0.65) !important;
+  box-shadow: 0 0 0 3px rgba(255,138,42,0.18) !important;
+}
+
+/* segmented */
+.sk-modal-readable .ant-segmented {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 999px !important;
+}
+.sk-modal-readable .ant-segmented-item-label {
+  color: rgba(244,246,251,0.80) !important;
+  font-weight: 800 !important;
+}
+.sk-modal-readable .ant-segmented-item-selected {
+  background: rgba(255,138,42,0.22) !important;
+  border-radius: 999px !important;
+}
+.sk-modal-readable .ant-segmented-item-selected .ant-segmented-item-label {
+  color: #fff !important;
+}
+
+/* footer + buttons */
+.sk-modal-readable .ant-modal-footer {
+  border-top: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+.sk-modal-readable .ant-btn-default {
   background: rgba(255,255,255,0.10) !important;
   border: 1px solid rgba(255,255,255,0.14) !important;
   color: #fff !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
 }
-.icon-btn:hover { filter: brightness(1.05); }
-
-.tp-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 14px 0 10px;
-  flex-wrap: wrap;
-}
-
-.cta {
+.sk-modal-readable .ant-btn-primary {
   background: linear-gradient(135deg, var(--cta), #ff6b6b) !important;
   border: none !important;
-  font-weight: 900 !important;
-  color: #fff !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
-}
-
-.tp-miles { min-width: 220px; }
-.tp-mile-row { display: flex; justify-content: space-between; }
-.muted { color: var(--muted) !important; }
-
-.tp-divider {
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #fff;
-  padding: 7px 10px;
-  border-radius: 10px;
-  font-weight: 900;
-  letter-spacing: 0.10em;
-  margin: 10px 0 10px;
-  text-align: center;
-}
-
-.tp-memo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-  color: #fff;
-}
-
-/* Top 8 tiles */
-.tp-tile {
-  border-radius: 14px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.20);
-}
-.tp-tile-art {
-  height: 86px;
-  background: linear-gradient(180deg, rgba(255, 176, 140, 0.95), rgba(158, 199, 223, 0.90));
-}
-.tp-tile-label {
-  text-align: center;
-  padding: 7px 0;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 0.06em;
-  background: rgba(0,0,0,0.25);
-}
-
-.tp-promo { margin-top: 12px; display: flex; align-items: center; gap: 8px; color: #fff; }
-.tp-promo .line { flex: 1; border-bottom: 2px solid rgba(255,255,255,0.22); }
-.tp-promo .xp-bonus { color: #fff; font-weight: 900; opacity: 0.9; }
-
-/* =========================================================
-   STAMPS (better contrast + cleaner)
-   ========================================================= */
-.stamp {
-  position: relative;
-  padding: 14px 12px;
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
-  border: 1px dashed rgba(255,255,255,0.20);
-  color: var(--text);
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-.stamp__ring {
-  position: absolute;
-  inset: auto auto -14px -14px;
-  width: 120px;
-  height: 120px;
-  border: 3px solid rgba(255,255,255,0.18);
-  border-radius: 50%;
-  transform: rotate(12deg);
-  filter: blur(0.2px);
-}
-.stamp__title { font-weight: 900; color: #fff; }
-.stamp__meta { color: rgba(255,255,255,0.78); font-size: 12px; }
-
-/* =========================================================
-   VISA + TRIP (fix unreadable text + status pills)
-   ========================================================= */
-.visa,
-.trip {
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.12);
-  padding: 12px;
-  color: #fff;
-  backdrop-filter: blur(10px);
-}
-
-.visa__row, .trip__row { display: flex; align-items: center; justify-content: space-between; }
-.visa__title, .trip__title { font-weight: 900; color: #fff; }
-.visa__type, .trip__range { color: rgba(255,255,255,0.78); }
-.visa__exp { color: rgba(255,255,255,0.78); margin-top: 4px; }
-
-.trip__notes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-
-.note-tag {
-  color: #fff !important;
-  background: rgba(255,255,255,0.14) !important;
-  border: 1px solid rgba(255,255,255,0.18) !important;
-  border-radius: 999px !important;
-  font-weight: 800 !important;
-  padding: 4px 10px !important;
-}
-
-/* Status tags (used by Visa + Trip) */
-.status-tag {
-  color: #fff !important;
-  border: none !important;
-  font-weight: 900 !important;
-  border-radius: 999px !important;
-  padding: 2px 10px !important;
-  letter-spacing: 0.02em;
-}
-
-.status-tag.approved,
-.status-tag.booked {
-  background: rgba(24,178,106,0.95) !important;
-}
-
-.status-tag.pending {
-  background: rgba(255,138,42,0.95) !important;
-}
-
-.status-tag.completed {
-  background: rgba(120, 90, 255, 0.95) !important;
-}
-
-/* =========================================================
-   INVITE & EARN (fix orange unreadable + inputs)
-   ========================================================= */
-.invite-card {
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #fff;
-  backdrop-filter: blur(10px);
-}
-
-.rewards-chip {
-  color: #111 !important;
-  background: rgba(255, 255, 255, 0.88) !important;
-  border: none !important;
-  font-weight: 900 !important;
-}
-
-.invite-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  width: 100%;
-}
-
-.invite-card .ant-input {
-  background: rgba(0,0,0,0.28) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  color: #fff !important;
-  border-radius: 12px !important;
-  height: 40px;
-}
-.invite-card .ant-input::placeholder {
-  color: rgba(244,246,251,0.70) !important;
-}
-
-/* Copy button */
-.reward-copy-btn {
-  background: linear-gradient(135deg, var(--cta), #ff6b6b) !important;
-  color: #fff !important;
-  border: none !important;
-  font-weight: 900 !important;
-  border-radius: 12px !important;
-  height: 40px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
-}
-.reward-copy-btn:hover { filter: brightness(1.05); }
-.reward-copy-btn.is-copied {
-  background: rgba(24,178,106,0.95) !important;
-}
-
-/* Apply button */
-.apply-btn {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border: 1px solid rgba(255,255,255,0.18) !important;
   color: #fff !important;
   font-weight: 900 !important;
   border-radius: 12px !important;
-  height: 40px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25) !important;
 }
-.apply-btn:hover { filter: brightness(1.06); }
 
-.invite-card .reward { color: rgba(255,255,255,0.90) !important; font-weight: 900; }
+/* modal overlay */
+.ant-modal-root .ant-modal-mask {
+  background: rgba(0,0,0,0.60) !important;
+  backdrop-filter: blur(6px);
+}
 
 /* =========================================================
-   BADGES GRID
+   Responsive
    ========================================================= */
-.visa-stickers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-}
-.visa-sticker {
-  border: 1px solid rgba(255,255,255,.16);
-  background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
-  border-radius: 14px;
-  padding: 10px 12px;
-  color: #fff;
-}
-.visa-sticker__title { font-weight: 900; color: #fff; }
-.visa-sticker__meta { color: rgba(255,255,255,0.78); font-size: 12px; }
-
-/* Top 8 friends */
-.top8-card.friend {
-  text-align: center;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 14px;
-  padding: 14px;
-  background: rgba(255,255,255,.05);
-  color: #fff;
-}
-.top8-title { font-weight: 900; color: #fff; }
-.top8-sub { color: rgba(255,255,255,0.78); font-size: 12px; }
-.stamp-frame {
-  border: 3px dashed rgba(255,255,255,.20);
-  padding: 4px;
-  background: rgba(255,255,255,.04);
-}
-
-/* Subtle small buttons (Add Stamp, Add Visa, etc.) */
-.subtle-btn {
-  background: rgba(255,255,255,0.12) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  color: #fff !important;
-  font-weight: 800 !important;
-}
-.subtle-btn:hover { filter: brightness(1.06); }
-
-/* Music embed container */
-.music-embed {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.22);
-}
-.music-empty {
-  border-radius: 14px;
-  border: 1px dashed rgba(255,255,255,0.14);
-  padding: 12px;
-  background: rgba(0,0,0,0.16);
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-  .tp-actions { justify-content: center; }
-  .tp-miles { min-width: 180px; }
-  .tp-memo { flex-direction: column; align-items: flex-start; }
-  .invite-row { flex-direction: column; align-items: stretch; }
-  .reward-copy-btn, .apply-btn { width: 100%; }
+  .tp-chips { justify-content: center; }
+  .passport-meta__row { grid-template-columns: 1fr 1fr; }
 }

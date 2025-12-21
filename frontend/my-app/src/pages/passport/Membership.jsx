@@ -18,11 +18,16 @@ import {
   RocketOutlined,
   HomeOutlined,
 } from "@ant-design/icons";
-import PageLayout from "../components/PageLayout";
-import "../styles/Membership.css";
+import PageLayout from "../../components/PageLayout";
+import "../../styles/Membership.css";
 
 const { Title, Paragraph, Text } = Typography;
 
+/**
+ * ✅ Soft-launch note:
+ * These are display plans. Checkout route is stubbed.
+ * Later you can map these IDs to Stripe priceIds.
+ */
 const PLANS = [
   {
     id: "free",
@@ -32,7 +37,7 @@ const PLANS = [
     tag: { text: "Free", color: "green" },
     className: "m-card",
     features: [
-      { icon: <CheckCircleOutlined />, text: "Access to booking & Quest Feed" },
+      { icon: <CheckCircleOutlined />, text: "Access to booking & SkyStream" },
       { icon: <CheckCircleOutlined />, text: "Earn XP & unlock badges" },
       { icon: <CheckCircleOutlined />, text: "Save up to 3 trips" },
     ],
@@ -82,16 +87,17 @@ function Price({ amount, period }) {
 export default function MembershipPage() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState("monthly"); // 'monthly' | 'yearly'
+
   useEffect(() => {
     const prev = document.title;
-    document.title = "One Sky Quest • Membership";
+    document.title = "Skyrio • Membership";
     return () => (document.title = prev);
   }, []);
 
   const plans = useMemo(() => PLANS, []);
 
   const handleUpgrade = (planId) => {
-    // Route stub you can implement later:
+    // Soft-launch route stub (wire later to Stripe checkout)
     navigate(`/membership/checkout?plan=${planId}&period=${period}`);
   };
 
@@ -100,8 +106,9 @@ export default function MembershipPage() {
       {/* Top bar */}
       <div className="m-top">
         <Title level={2} className="m-title">
-          One Sky Quest Membership
+          Skyrio Membership
         </Title>
+
         <Paragraph className="m-sub">
           Unlock premium perks, boost your XP, and get exclusive travel tools by
           upgrading your membership.
@@ -155,6 +162,7 @@ export default function MembershipPage() {
           {plans.map((p) => {
             const amount = period === "monthly" ? p.monthly : p.yearly;
             const label = period === "monthly" ? "month" : "year";
+
             return (
               <Col xs={24} md={12} lg={8} key={p.id}>
                 <Card

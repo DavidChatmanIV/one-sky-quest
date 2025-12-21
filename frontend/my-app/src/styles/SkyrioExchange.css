@@ -1,0 +1,112 @@
+/* =========================================================
+   Premium mapping for existing sv-* markup
+   (so you don’t have to rename classes in JSX)
+   ========================================================= */
+
+.skyrio-exchange .sv-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skyrio-exchange .sv-header.glass {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--sx-radius-lg);
+  border: 1px solid var(--sx-stroke);
+  background: linear-gradient(180deg, var(--sx-glass-2), var(--sx-glass));
+  box-shadow: var(--sx-shadow);
+  padding: 16px;
+}
+
+.skyrio-exchange .sv-header.glass::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  background:
+    radial-gradient(600px 220px at 16% 0%,
+      rgba(255, 138, 42, 0.28),
+      transparent 60%),
+    radial-gradient(560px 240px at 92% 30%,
+      rgba(160, 120, 255, 0.22),
+      transparent 60%),
+    radial-gradient(520px 220px at 40% 120%,
+      rgba(255, 255, 255, 0.10),
+      transparent 65%);
+  filter: blur(2px);
+  opacity: 0.95;
+}
+
+.skyrio-exchange .sv-title,
+.skyrio-exchange .sv-name {
+  color: var(--sx-text) !important;
+}
+
+.skyrio-exchange .sv-sub,
+.skyrio-exchange .sv-desc,
+.skyrio-exchange .muted,
+.skyrio-exchange .sv-active-label {
+  color: var(--sx-muted) !important;
+}
+
+.skyrio-exchange .sv-card.glass {
+  border-radius: var(--sx-radius);
+  border: 1px solid var(--sx-stroke);
+  background: linear-gradient(180deg, var(--sx-glass-2), var(--sx-glass));
+  box-shadow: var(--sx-shadow-soft);
+}
+
+.skyrio-exchange .sv-card .ant-card-body {
+  padding: 14px !important;
+}
+
+.skyrio-exchange .sv-cta.ant-btn-primary {
+  border: none !important;
+  border-radius: 14px !important;
+  height: 40px !important;
+  font-weight: 900 !important;
+  background: linear-gradient(180deg, var(--sx-cta), #ff7a00) !important;
+  box-shadow: 0 12px 26px rgba(255, 138, 42, 0.22) !important;
+}
+
+.skyrio-exchange .sv-cta.ant-btn-primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.skyrio-exchange .sv-home-btn {
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.skyrio-exchange .sv-search {
+  border-radius: 14px !important;
+}
+
+.skyrio-exchange .sv-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.skyrio-exchange .sv-kind {
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.skyrio-exchange .sv-req {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.78) !important;
+}

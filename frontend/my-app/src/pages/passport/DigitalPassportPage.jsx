@@ -1,0 +1,358 @@
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import {
+  Row,
+  Col,
+  Card,
+  Typography,
+  Space,
+  Avatar,
+  Button,
+  Segmented,
+  Progress,
+  Input,
+  Tag,
+  message as antdMessage,
+} from "antd";
+import {
+  UserOutlined,
+  CopyOutlined,
+  ShareAltOutlined,
+  PlayCircleOutlined,
+  SoundOutlined,
+} from "@ant-design/icons";
+
+import ProfileMusicModal, {
+  SKYRIO_PROFILE_MUSIC_KEY,
+} from "./music/ProfileMusicModal";
+
+import PassportFooter from "./PassportFooter";
+import PassportHighlights from "./PassportHighlights";
+import PassportIdentity from "./PassportIdentity";
+import StampStrip from "./StampStrip";
+import TravelHistory from "./TravelHistory";
+import TripList from "./TripList";
+import VisaList from "./VisaList";
+import SkyrioExchange from "./SkyrioExchange";
+import Membership from "./Membership";
+
+/* Top 8 (same folder) */
+import TopEight from "./TopEight";
+import TopEightItemFriend from "./TopEightItemFriend";
+import TopEightItemPlace from "./TopEightItemPlace";
+
+/* Auth */
+import { useAuth } from "../../hooks/useAuth";
+
+const { Title, Text } = Typography;
+
+/* ---------------- helpers ---------------- */
+
+function safeEmailPrefix(email) {
+  if (!email) return "";
+  const idx = email.indexOf("@");
+  return idx > 0 ? email.slice(0, idx) : email;
+}
+
+function makeReferralCode(user) {
+  const base =
+    user?.username || user?.name || safeEmailPrefix(user?.email) || "EXPLORER";
+
+  return `SKYRIO-${String(base)
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")}-001`;
+}
+
+/* ---------------- component ---------------- */
+
+export default function DigitalPassportPage() {
+  const auth = useAuth();
+
+  const [musicOpen, setMusicOpen] = useState(false);
+  const [profileMusic, setProfileMusic] = useState(null);
+  const [segment, setSegment] = useState("overview");
+
+  const [xp, setXp] = useState(0);
+  const [xpToNextBadge, setXpToNextBadge] = useState(0);
+  const [nextBadgeName, setNextBadgeName] = useState("Wanderer");
+
+  /* ---------- derived display ---------- */
+
+  const displayName = useMemo(() => {
+    const u = auth?.user;
+    if (!u) return "Guest";
+    return (
+      u.username || u.name || (u.email ? safeEmailPrefix(u.email) : "Explorer")
+    );
+  }, [auth?.user]);
+
+  const levelLabel = useMemo(() => {
+    const lvl = auth?.user?.level ?? 1;
+    return `Explorer • Level ${lvl}`;
+  }, [auth?.user]);
+
+  const referralCode = useMemo(
+    () => makeReferralCode(auth?.user),
+    [auth?.user]
+  );
+
+  /* ---------- TOP 8 (soft-launch mock) ---------- */
+
+  const canEditTop8 = !!auth?.user;
+
+  const top8Friends = useMemo(
+    () => [
+      {
+        id: "f1",
+        name: "David (CEO)",
+        username: "skyrio_ceo",
+        verified: true,
+        vibe: "Founder Energy",
+      },
+      {
+        id: "f2",
+        name: "Skyrio Explorer",
+        username: "explorer_01",
+        verified: false,
+        vibe: "Chill",
+      },
+    ],
+    []
+  );
+
+  const top8Places = useMemo(
+    () => [
+      { id: "p1", name: "Tokyo", country: "Japan", badge: "Dream Trip" },
+      { id: "p2", name: "Paris", country: "France", badge: "Favorite" },
+      { id: "p3", name: "Dubai", country: "UAE", badge: "Luxury" },
+      { id: "p4", name: "Honolulu", country: "USA", badge: "Beach" },
+    ],
+    []
+  );
+
+  /* ---------- profile music ---------- */
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SKYRIO_PROFILE_MUSIC_KEY);
+      if (raw) setProfileMusic(JSON.parse(raw));
+    } catch {
+      // ignore (soft launch)
+    }
+  }, []);
+
+  /* ---------- profile data (SAFE) ---------- */
+
+  useEffect(() => {
+    let ignore = false;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/profile/me", {
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("profile fetch failed");
+
+        const data = await res.json();
+        if (ignore) return;
+
+        setXp(Number(data?.xp ?? 0));
+        setXpToNextBadge(Number(data?.xpToNextBadge ?? 0));
+        setNextBadgeName(String(data?.nextBadgeName ?? "Wanderer"));
+      } catch {
+        if (!ignore) {
+          setXp(0);
+          setXpToNextBadge(0);
+          setNextBadgeName("Wanderer");
+        }
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const xpPercent = useMemo(() => {
+    if (!xpToNextBadge) return 0;
+    return Math.round((Math.min(xp, 1000) / 1000) * 100);
+  }, [xp, xpToNextBadge]);
+
+  const segments = useMemo(
+    () => [
+      { label: "Overview", value: "overview" },
+      { label: "Trips", value: "trips" },
+      { label: "Visas", value: "visas" },
+      { label: "Rewards", value: "rewards" },
+    ],
+    []
+  );
+
+  const copyReferral = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      antdMessage.success("Referral code copied");
+    } catch {
+      antdMessage.error("Copy failed");
+    }
+  }, [referralCode]);
+
+  /* ---------------- render ---------------- */
+
+  return (
+    <>
+      <div className="passport-wrap">
+        {/* HEADER */}
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Card className="passport-hero">
+              <Space align="center" size={16} style={{ width: "100%" }}>
+                <Avatar size={64} icon={<UserOutlined />} />
+
+                <div style={{ minWidth: 260 }}>
+                  <Title level={3} style={{ margin: 0 }}>
+                    {displayName}
+                  </Title>
+                  <Text type="secondary">{levelLabel}</Text>
+
+                  {profileMusic && (
+                    <div style={{ marginTop: 8 }}>
+                      <Tag icon={<SoundOutlined />} color="purple">
+                        Music On
+                      </Tag>
+                      <Text style={{ marginLeft: 8, opacity: 0.8 }}>
+                        {profileMusic?.title || "Selected track"}
+                      </Text>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginLeft: "auto" }}>
+                  <Button
+                    icon={<PlayCircleOutlined />}
+                    onClick={() => setMusicOpen(true)}
+                  >
+                    Profile Music
+                  </Button>
+                </div>
+              </Space>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* SEGMENTS */}
+        <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+          <Col span={24}>
+            <Segmented
+              block
+              options={segments}
+              value={segment}
+              onChange={setSegment}
+            />
+          </Col>
+        </Row>
+
+        {/* OVERVIEW */}
+        {segment === "overview" && (
+          <>
+            <PassportIdentity />
+            <PassportHighlights />
+
+            {/* TOP 8 */}
+            <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+              <Col xs={24} lg={12}>
+                <TopEight
+                  title="Top 8 Friends"
+                  subtitle="Your inner circle"
+                  canEdit={canEditTop8}
+                  storageKey={`skyrio_top8_friends_${
+                    auth?.user?.id || "guest"
+                  }`}
+                  defaultItems={top8Friends}
+                  renderItem={(item, ctx) => (
+                    <TopEightItemFriend {...item} isDragging={ctx.isDragging} />
+                  )}
+                />
+              </Col>
+
+              <Col xs={24} lg={12}>
+                <TopEight
+                  title="Top 8 Locations"
+                  subtitle="Favorites & dream trips"
+                  canEdit={canEditTop8}
+                  storageKey={`skyrio_top8_places_${auth?.user?.id || "guest"}`}
+                  defaultItems={top8Places}
+                  renderItem={(item, ctx) => (
+                    <TopEightItemPlace {...item} isDragging={ctx.isDragging} />
+                  )}
+                />
+              </Col>
+            </Row>
+
+            {/* XP */}
+            <Card style={{ marginTop: 16 }}>
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <Title level={5}>XP Progress</Title>
+                <Progress
+                  percent={xpPercent}
+                  status={xpPercent > 0 ? "active" : "normal"}
+                />
+                <Text type="secondary">
+                  {xpToNextBadge} XP to next badge — {nextBadgeName}
+                </Text>
+              </Space>
+            </Card>
+
+            <StampStrip />
+          </>
+        )}
+
+        {/* TRIPS */}
+        {segment === "trips" && (
+          <>
+            <TripList />
+            <TravelHistory />
+          </>
+        )}
+
+        {/* VISAS */}
+        {segment === "visas" && <VisaList />}
+
+        {/* REWARDS */}
+        {segment === "rewards" && (
+          <>
+            <Membership />
+            <SkyrioExchange />
+
+            <Card>
+              <Title level={5}>Invite & Earn</Title>
+              <Space wrap>
+                <Input
+                  value={referralCode}
+                  readOnly
+                  style={{ minWidth: 280 }}
+                />
+                <Button icon={<CopyOutlined />} onClick={copyReferral} />
+                <Button
+                  icon={<ShareAltOutlined />}
+                  onClick={() =>
+                    antdMessage.info("Sharing enabled post-launch")
+                  }
+                />
+              </Space>
+            </Card>
+          </>
+        )}
+
+        <PassportFooter />
+      </div>
+
+      <ProfileMusicModal
+        open={musicOpen}
+        onClose={() => setMusicOpen(false)}
+        onSave={setProfileMusic}
+      />
+    </>
+  );
+}

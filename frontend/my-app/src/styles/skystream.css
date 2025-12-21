@@ -1,553 +1,217 @@
-:root{
-  --sk-bg-1:#2b0f3f;
-  --sk-bg-2:#6b2d7c;
-  --sk-bg-3:#ff7a18;
-
-  --sk-surface-1: rgba(255,255,255,.10);
-  --sk-surface-2: rgba(255,255,255,.06);
-  --sk-border: rgba(255,255,255,.14);
-
-  --sk-text: rgba(255,255,255,.94);
-  --sk-muted: rgba(255,255,255,.70);
-
-  --sk-shadow: 0 18px 44px rgba(0,0,0,.22);
-  --sk-shadow-soft: 0 12px 30px rgba(0,0,0,.18);
-
-  --sk-r-xl: 26px;
-  --sk-r-lg: 18px;
-  --sk-r-md: 16px;
-  --sk-r-pill: 999px;
+.skystream-wrap {
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(255, 138, 42, 0.12), transparent 60%),
+    linear-gradient(180deg, var(--bg-start, #0f1020), var(--bg-mid, #231a3a), var(--bg-end, #3a2430));
 }
 
-html { scrollbar-gutter: stable; }
-
-/* =====================================================
-   PAGE BACKGROUND
-   ===================================================== */
-.skystream-page{
-  min-height:100vh;
-  color: var(--sk-text);
-  background:
-    radial-gradient(900px 520px at 30% 22%, rgba(175,60,255,.30), transparent 62%),
-    radial-gradient(820px 520px at 72% 78%, rgba(255,122,24,.24), transparent 60%),
-    linear-gradient(180deg, rgba(0,0,0,.18), transparent 34%),
-    linear-gradient(135deg, var(--sk-bg-1), var(--sk-bg-2) 60%, rgba(255,122,24,.16));
-}
-
-.skystream-content{
-  padding: 34px 22px 44px;
-}
-
-/* Kill wrapper rectangles */
-.skystream-shell,
-.skystream-grid,
-.skystream-feed,
-.skystream-feed-stack{
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-.skystream-shell{
-  max-width:1100px;
-  margin:0 auto;
-}
-
-/* =====================================================
-  HERO
-   ===================================================== */
-.skystream-hero{
-  position: relative;
-  padding: 10px 0 14px;
-}
-
-.skystream-hero-inner{
-  max-width: 1100px;
+.skystream-content {
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 0 22px;
+  padding: 14px 16px 28px;
 }
 
-.skystream-top{
+.sk-muted {
+  color: rgba(244, 246, 251, 0.75) !important;
+}
+
+.sk-strong {
+  color: rgba(244, 246, 251, 0.95);
+  font-weight: 700;
+}
+
+.btn-orange {
+  background: var(--cta, #ff8a2a) !important;
+  border-color: transparent !important;
+  box-shadow: 0 12px 24px rgba(255, 138, 42, 0.22);
+}
+.btn-orange:hover {
+  background: var(--cta-hover, #ff7a00) !important;
+}
+
+/* Header */
+.sk-headerCard {
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.30);
+  backdrop-filter: blur(10px);
+}
+
+.sk-headerRow {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.skystream-title{
-  font-size: 56px;
-  font-weight: 950;
-  letter-spacing: -.03em;
-  margin: 0;
-  color: #fff;
-}
-
-.skystream-for{
-  font-size: 20px;
-  font-weight: 850;
-  opacity: .92;
-}
-
-.skystream-subtitle{
-  margin-top: 8px;
-  font-weight: 650;
-  color: rgba(255,255,255,.90) !important;
-}
-
-.skystream-post{
-  height: 46px;
-  padding: 0 22px;
-  border-radius: 14px !important;
-
-  background: linear-gradient(180deg, #ffb15a, #ff7a18) !important;
-  border: none !important;
-
-  color: #fff !important;
-  font-weight: 950 !important;
-  letter-spacing: .03em;
-
-  box-shadow:
-    0 18px 38px rgba(255,122,24,.55),
-    0 0 0 2px rgba(255,122,24,.30),
-    0 0 34px rgba(255,122,24,.45),
-    inset 0 1px 0 rgba(255,255,255,.40);
-
-  cursor: pointer;
-
-  transition:
-    transform .18s ease,
-    box-shadow .18s ease,
-    filter .18s ease;
-}
-
-.skystream-post:hover{
-  transform: translateY(-3px);
-  filter: brightness(1.08);
-
-  box-shadow:
-    0 22px 44px rgba(255,122,24,.65),
-    0 0 38px rgba(255,122,24,.55),
-    inset 0 1px 0 rgba(255,255,255,.45);
-}
-
-.skystream-post:active{
-  transform: translateY(0);
-  box-shadow:
-    0 12px 22px rgba(255,122,24,.40),
-    inset 0 3px 8px rgba(0,0,0,.30);
-}
-
-/* =====================================================
-  HERO MINI BADGES (XP / PRO)
-   ===================================================== */
-.skystream-hero .ant-tag{
-  background: rgba(0,0,0,.22) !important;
-  border: 1px solid rgba(255,255,255,.18) !important;
-  color: rgba(255,255,255,.94) !important;
-  font-weight: 900 !important;
-  border-radius: 10px !important;
-  padding: 2px 8px !important;
-  line-height: 18px !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-}
-
-.skystream-hero .ant-tag[class*="ant-tag-"]{
-  background: rgba(0,0,0,.22) !important;
-}
-
-.skystream-hero .ant-tag .anticon{
-  color: rgba(255,255,255,.92) !important;
-}
-
-.skystream-hero .ant-badge-count{
-  background: linear-gradient(90deg,#ff7a18,#ffb15a) !important;
-  color:#fff !important;
-  box-shadow:
-    0 10px 18px rgba(0,0,0,.20),
-    0 0 18px rgba(255,122,24,.22) !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
-}
-
-.skystream-subbadges{
-  display: flex;
-  gap: 10px;
-  margin-top: 6px;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* =====================================================
-  SEARCH
-   ===================================================== */
-.skystream-searchrow{ margin-top:18px; }
-
-.skystream-search.ant-input-affix-wrapper{
-  height:56px;
-  border-radius:var(--sk-r-pill) !important;
-
-  background:rgba(255,255,255,.10) !important;
-  border:1px solid rgba(255,255,255,.16) !important;
-
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  /* FIX: remove the “double input” look */
-  padding: 0 18px !important;
+.sk-headerTitle {
+  margin: 0 !important;
+  color: rgba(244,246,251,0.95) !important;
 }
 
-/* AntD inner input (the actual text field) */
-.skystream-search.ant-input-affix-wrapper .ant-input{
-  background:transparent !important;
-  color:#fff !important;
-
-  /* FIX: kill inner border/outline so you only see ONE pill */
-  border:none !important;
-  outline:none !important;
-  box-shadow:none !important;
-
-  height:100% !important;
+.sk-headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Icon colors (prefix/suffix) */
-.skystream-search.ant-input-affix-wrapper .anticon{
-  color: rgba(255,255,255,.78) !important;
-}
-
-/* Focus glow */
-.skystream-search.ant-input-affix-wrapper:focus-within{
-  border-color: rgba(255,122,24,.45) !important;
-  box-shadow:0 0 0 4px rgba(255,122,24,.12);
-}
-
-
-/* =====================================================
-  TABS
-   ===================================================== */
-.skystream-tabs{
-  display:flex;
-  gap:34px;
-  margin-top:18px;
-  padding-bottom:12px;
-  border-bottom:1px solid rgba(255,255,255,.10);
-}
-
-.skystream-tab{
-  background:none;
-  border:none;
-  font-size:18px;
-  font-weight:900;
-  color:rgba(255,255,255,.74);
-  cursor:pointer;
-}
-
-.skystream-tab.is-active{
-  color:#fff;
-  position:relative;
-}
-
-.skystream-tab.is-active::after{
-  content:"";
-  position:absolute;
-  left:0;
-  bottom:-12px;
-  width:62px;
-  height:3px;
-  background:#fff;
-  border-radius:999px;
-}
-
-/* =====================================================
-   GRID
-   ===================================================== */
-.skystream-grid{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 320px;
-  gap:22px;
-  margin-top:18px;
-}
-
-.skystream-feed-stack{
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
-
-.skystream-aside{
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
-
-/* =====================================================
-   GLASS CARDS
-   ===================================================== */
-.skystream-card{
-  position:relative;
-  padding:18px;
-  border-radius:26px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.055));
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 18px 44px rgba(0,0,0,.18);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.skystream-card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:26px;
-  pointer-events:none;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
-}
-
-.skystream-row{
-  display:flex;
-  gap:14px;
-}
-
-.skystream-avatar{
-  width:46px;
-  height:46px;
-  border-radius:999px;
-  background:rgba(0,0,0,.22);
-  border:1px solid rgba(255,255,255,.12);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:950;
-}
-
-/* Card inner layout */
-.skystream-main{ flex:1; min-width:0; }
-
-.skystream-headrow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.skystream-cardtitle{
-  font-size:24px;
-  font-weight:950;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.skystream-cardbody{
-  margin-top:6px;
-  font-size:15px;
-  color:rgba(255,255,255,.86);
-}
-
-/* Chips */
-.skystream-chips{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
-
-.skystream-chip{
-  padding:8px 14px;
-  border-radius:999px;
-  background:rgba(0,0,0,.14);
-  border:1px solid rgba(255,255,255,.12);
-  font-size:12px;
-  font-weight:850;
-}
-
-/* =====================================================
-   XP PILL — MAKE IT POP (high contrast + glow + depth)
-   ===================================================== */
-
-/* XP badge */
-.skystream-xp{
-  color: #fff !important;
-  font-weight: 950 !important;
-  letter-spacing: .01em;
-
-  /* More vibrant orange with a highlight */
-  background: linear-gradient(90deg, #ff7a18, #ffb15a) !important;
-
-  /* Stronger edge so it separates from the glass */
-  border: 1px solid rgba(255,255,255,.22) !important;
-
-  /* Pop + glow */
-  box-shadow:
-    0 14px 28px rgba(0,0,0,.22),
-    0 0 0 4px rgba(255,122,24,.14),
-    0 0 26px rgba(255,122,24,.22) !important;
-
-  /* Slightly bigger so it feels like a badge */
-  padding: 9px 14px !important;
-  border-radius: 999px !important;
-}
-
-/* Optional: tiny shimmer highlight */
-.skystream-xp::after{
-  content:"";
-  position:absolute;
-  inset: 2px 2px auto 2px;
-  height: 44%;
+.sk-xpPill {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(244,246,251,0.92);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,0));
-  pointer-events:none;
-  opacity:.55;
-}
-.skystream-xp{ position: relative; }
-
-/* Hover makes it feel interactive (even if it’s not clickable) */
-.skystream-card:hover .skystream-xp{
-  transform: translateY(-1px);
-  filter: brightness(1.03);
+  padding: 6px 10px;
 }
 
-
-/* Safety net if any nested element sneaks in */
-.skystream-xp *{
-  color: #ffffff !important;
+.sk-headerControls {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
-
-/* Safety net if any nested element sneaks in */
-.skystream-xp *{
-  color: #ffffff !important;
+.sk-tabs {
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
-/* Actions */
-.skystream-actions{
-  display:flex;
-  gap:14px;
-  margin-top:14px;
-  color:rgba(255,255,255,.78);
+.sk-search {
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
-.skystream-actions-spacer{ flex:1; }
-
-/* =====================================================
-   RIGHT PANELS – SMOOTHED
-   ===================================================== */
-.skystream-panel{
-  position:relative;
-  border-radius:26px;
-  background:
-    radial-gradient(600px 220px at 20% 10%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.085), rgba(255,255,255,.045));
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow:0 18px 44px rgba(0,0,0,.16);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  padding:18px;
+/* Cards */
+.sk-card {
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.28);
+  backdrop-filter: blur(10px);
 }
 
-.skystream-panel::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:26px;
-  pointer-events:none;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+.sk-feedCard {
+  padding: 2px;
 }
 
-.skystream-panelhead{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-  font-weight:950;
+.sk-feedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-/* Orange Clear CTA */
-.skystream-panelclear{
-  padding:7px 14px;
-  border-radius:999px;
-  background:linear-gradient(90deg,#ff7a18,#ffa24f);
-  color:#fff;
-  font-weight:900;
-  border:1px solid rgba(255,255,255,.18);
-  box-shadow:0 10px 22px rgba(0,0,0,.18);
+.sk-feedList {
+  display: grid;
+  gap: 12px;
 }
 
-/* Hotspot rows */
-.skystream-hotlist{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+/* Post */
+.sk-post {
+  border-radius: 14px;
+  background: rgba(0,0,0,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.sk-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.35);
 }
 
-.skystream-hotbar{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 14px;
-  border-radius:14px;
-  background:rgba(0,0,0,.12);
-  border:1px solid rgba(255,255,255,.10);
-  font-weight:850;
+.sk-postTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
-/* =====================================================
-   TRENDING CARD FIX (makes #tags smooth like Hotspots)
-   ===================================================== */
-
-/* If you have a wrapper like <div className="skystream-trendinglist"> */
-.skystream-trendinglist{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.sk-postMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Style common tag line classes if you add them */
-.skystream-trendinglist .trendline,
-.skystream-trendinglist .trending-item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
-  border-radius:14px;
-  background:rgba(0,0,0,.12);
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
-  font-weight: 850;
-  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+.sk-postUser {
+  color: rgba(244,246,251,0.95);
+  font-weight: 700;
 }
 
-.skystream-trendinglist .trendline:hover,
-.skystream-trendinglist .trending-item:hover{
-  transform: translateY(-1px);
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.16);
+.sk-dot {
+  color: rgba(244,246,251,0.45);
 }
 
-/* Fallback: if trending lines are plain <div> inside the panel */
-.skystream-panel .skystream-panelhead + div{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.sk-tag {
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: rgba(244,246,251,0.9) !important;
 }
 
-.skystream-panel .skystream-panelhead + div > div{
-  padding:10px 12px;
-  border-radius:14px;
-  background:rgba(0,0,0,.12);
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
-  font-weight: 850;
-  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+.sk-postTitle {
+  margin: 0 0 6px 0 !important;
+  color: rgba(244,246,251,0.95) !important;
 }
 
-.skystream-panel .skystream-panelhead + div > div:hover{
-  transform: translateY(-1px);
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.16);
+.sk-postBody {
+  color: rgba(244,246,251,0.82) !important;
 }
 
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
-@media (max-width:980px){
-  .skystream-grid{ grid-template-columns:1fr; }
-  .skystream-title{ font-size:42px; }
+.sk-postActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sk-actionBtn {
+  color: rgba(244,246,251,0.85) !important;
+}
+
+.sk-xpChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255,138,42,0.12);
+  border: 1px solid rgba(255,138,42,0.18);
+  color: rgba(244,246,251,0.92);
+}
+
+/* Right panel tags */
+.sk-trendTag {
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(244,246,251,0.92);
+}
+.sk-trendTag:hover {
+  box-shadow: 0 12px 22px rgba(0,0,0,0.25);
+}
+
+.sk-divider {
+  height: 1px;
+  margin: 14px 0;
+  background: rgba(255,255,255,0.10);
+}
+
+.sk-ghostBtn {
+  width: 100%;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(244,246,251,0.9);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .sk-headerControls {
+    grid-template-columns: 1fr;
+  }
 }

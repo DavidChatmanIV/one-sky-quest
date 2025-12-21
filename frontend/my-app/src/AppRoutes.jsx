@@ -7,13 +7,20 @@ import AppLayout from "./layout/AppLayout";
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
 import SkyStreamPage from "./pages/SkyStreamPage";
-import DigitalPassportPage from "./pages/DigitalPassportPage";
+
+// Passport pages moved into /pages/passport
+import DigitalPassportPage from "./pages/passport/DigitalPassportPage";
+
+// Auth + misc
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/NotFound";
 
 // ---------- Optional / Legacy ----------
-import MembershipPage from "./pages/Membership";
+// Membership moved into /pages/passport (based on your screenshot)
+import MembershipPage from "./pages/passport/Membership";
+
+// If TeamTravel is still in ./pages/TeamTravelPage keep this:
 import TeamTravelPage from "./pages/TeamTravelPage";
 
 // ---------- Protected ----------
@@ -37,7 +44,7 @@ export default function AppRoutes() {
         <Route path="skystream" element={<SkyStreamPage />} />
         <Route path="feed" element={<Navigate to="/skystream" replace />} />
 
-        {/* ---------- Passport (FIXED) ---------- */}
+        {/* ---------- Passport ---------- */}
         <Route path="passport" element={<DigitalPassportPage />} />
         <Route
           path="digital-passport"
