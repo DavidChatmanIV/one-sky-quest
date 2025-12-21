@@ -43,6 +43,78 @@
 .muted { color: var(--muted) !important; }
 
 /* =========================================================
+   Skyrio – Passport + SkyStream + Exchange White Text Fix
+   (Scoped to Passport page)
+   ========================================================= */
+.passport-wrap,
+.passport-wrap * {
+  color: var(--text);
+}
+
+/* Typography defaults */
+.passport-wrap .ant-typography,
+.passport-wrap .ant-typography * {
+  color: var(--text) !important;
+}
+
+/* Common “secondary” text */
+.passport-wrap .ant-typography-secondary,
+.passport-wrap .ant-text-secondary,
+.passport-wrap .ant-form-item-explain,
+.passport-wrap .ant-form-item-extra {
+  color: var(--muted) !important;
+}
+
+/* Cards / Panels */
+.passport-wrap .ant-card,
+.passport-wrap .ant-card * {
+  color: var(--text) !important;
+}
+
+/* Tabs */
+.passport-wrap .ant-tabs-tab,
+.passport-wrap .ant-tabs-tab-btn {
+  color: rgba(255,255,255,0.78) !important;
+}
+.passport-wrap .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #fff !important;
+}
+
+/* Inputs */
+.passport-wrap .ant-input,
+.passport-wrap .ant-input-affix-wrapper,
+.passport-wrap input {
+  color: #fff !important;
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+}
+.passport-wrap .ant-input::placeholder,
+.passport-wrap input::placeholder {
+  color: rgba(255,255,255,0.55) !important;
+}
+.passport-wrap .ant-input-prefix,
+.passport-wrap .ant-input-suffix {
+  color: rgba(255,255,255,0.65) !important;
+}
+
+/* Empty */
+.passport-wrap .ant-empty-description {
+  color: rgba(255,255,255,0.78) !important;
+}
+
+/* Segmented */
+.passport-wrap .ant-segmented,
+.passport-wrap .ant-segmented * {
+  color: rgba(255,255,255,0.85) !important;
+}
+
+/* Buttons */
+.passport-wrap .ant-btn,
+.passport-wrap .ant-btn span {
+  color: #fff !important;
+}
+
+/* =========================================================
    Glass Surfaces
    ========================================================= */
 .osq-surface {

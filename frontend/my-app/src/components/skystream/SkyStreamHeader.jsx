@@ -18,13 +18,14 @@ export default function SkyStreamHeader({
   activeTab = "forYou",
   onTabChange,
 
-  // if parent passes these, we’ll sync to them
   search,
   onSearchChange,
 
   xpToday = 0,
   onCompose,
   onPost,
+
+  showSearch = true, // ✅ NEW
 }) {
   useAuth(); // reserved for future personalization
 
@@ -43,8 +44,8 @@ export default function SkyStreamHeader({
 
   const handleSearchChange = (e) => {
     const next = e.target.value;
-    setLocalSearch(next); // ✅ keeps typing responsive
-    onSearchChange?.(next); // ✅ still informs parent if wired
+    setLocalSearch(next);
+    onSearchChange?.(next);
   };
 
   return (
@@ -89,17 +90,19 @@ export default function SkyStreamHeader({
           </Button>
         </div>
 
-        {/* SEARCH */}
-        <div className="skystream-searchrow">
-          <Input
-            className="skystream-search"
-            prefix={<SearchOutlined />}
-            placeholder="Search SkyStream"
-            value={localSearch}
-            onChange={handleSearchChange}
-            allowClear
-          />
-        </div>
+        {/* SEARCH (OPTIONAL) */}
+        {showSearch && (
+          <div className="skystream-searchrow">
+            <Input
+              className="skystream-search"
+              prefix={<SearchOutlined />}
+              placeholder="Search SkyStream"
+              value={localSearch}
+              onChange={handleSearchChange}
+              allowClear
+            />
+          </div>
+        )}
 
         {/* TABS */}
         <nav className="skystream-tabs">

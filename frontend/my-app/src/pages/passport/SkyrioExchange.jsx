@@ -26,13 +26,10 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
-// ✅ Fix: keep CSS next to this component (no more broken relative paths)
 import "../../styles/SkyrioExchange.css";
-
 
 const { Title, Text, Paragraph } = Typography;
 
-/* ---------- Small label component for Segmented ---------- */
 function SegmentLabel({ icon, text, count }) {
   return (
     <div className="sv-tab">
@@ -43,9 +40,7 @@ function SegmentLabel({ icon, text, count }) {
   );
 }
 
-/* ---------- Mock data (replace with real API later) ---------- */
 const ALL_ITEMS = [
-  // Boosts
   {
     id: "boost-1",
     kind: "Boost",
@@ -65,8 +60,6 @@ const ALL_ITEMS = [
     levelReq: 1,
     icon: <ThunderboltOutlined />,
   },
-
-  // Badges
   {
     id: "badge-1",
     kind: "Badge",
@@ -86,8 +79,6 @@ const ALL_ITEMS = [
     levelReq: 2,
     icon: <TrophyOutlined />,
   },
-
-  // Perks
   {
     id: "perk-1",
     kind: "Perk",
@@ -109,36 +100,32 @@ const ALL_ITEMS = [
   },
 ];
 
-export default function SkyrioExchange() {
-  // Replace with real profile fetch later
+export default function SkyrioExchange({ showSearch = true }) {
   const [xp, setXp] = useState(860);
   const [level] = useState(5);
   const nextLevelPct = 80;
 
-  // UI state
   const [segment, setSegment] = useState("All");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
 
   const navigate = useNavigate();
 
-  // Filtered list
   const filtered = useMemo(() => {
     const byKind =
       segment === "All"
         ? ALL_ITEMS
         : ALL_ITEMS.filter((i) => i.kind === segment);
-    const byQuery = query.trim()
-      ? byKind.filter(
-          (i) =>
-            i.name.toLowerCase().includes(query.toLowerCase()) ||
-            i.desc.toLowerCase().includes(query.toLowerCase())
-        )
-      : byKind;
-    return byQuery;
+
+    const q = query.trim().toLowerCase();
+    if (!q) return byKind;
+
+    return byKind.filter((i) => {
+      const blob = `${i.name} ${i.desc} ${i.kind}`.toLowerCase();
+      return blob.includes(q);
+    });
   }, [segment, query]);
 
-  // Counts for tabs
   const counts = useMemo(
     () => ({
       All: ALL_ITEMS.length,
@@ -149,7 +136,6 @@ export default function SkyrioExchange() {
     []
   );
 
-  // Options for Segmented (icon + text + count)
   const tabOptions = useMemo(
     () => [
       {
@@ -221,15 +207,11 @@ export default function SkyrioExchange() {
     });
   };
 
-  // ✅ Merge: wrap existing UI inside skyrio-exchange
   return (
     <div className="skyrio-exchange">
-      {/* Keep your existing layout wrapper so your sv-* styling still works */}
       <div className="sv-wrap">
-        {/* Sticky header strip (minimal scroll, quick actions) */}
         <div className="sv-header glass">
           <Row gutter={[16, 16]} align="middle" wrap={false}>
-            {/* Home button */}
             <Col flex="none">
               <Button
                 className="sv-home-btn"
@@ -275,7 +257,6 @@ export default function SkyrioExchange() {
             </Col>
           </Row>
 
-          {/* Controls */}
           <Row gutter={[12, 12]} className="sv-controls">
             <Col xs={24} md="auto">
               <div className={`sv-segment seg--${segment.toLowerCase()}`}>
@@ -284,7 +265,6 @@ export default function SkyrioExchange() {
                   value={segment}
                   onChange={(v) => setSegment(v)}
                   block
-                  aria-label="Filter Skyrio Exchange items by category"
                 />
               </div>
 
@@ -294,16 +274,18 @@ export default function SkyrioExchange() {
               </div>
             </Col>
 
-            <Col xs={24} md={12}>
-              <Input
-                allowClear
-                prefix={<SearchOutlined />}
-                placeholder="Search boosts, badges, perks…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="sv-search"
-              />
-            </Col>
+            {showSearch && (
+              <Col xs={24} md={12}>
+                <Input
+                  allowClear
+                  prefix={<SearchOutlined />}
+                  placeholder="Search boosts, badges, perks…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="sv-search"
+                />
+              </Col>
+            )}
 
             <Col xs={24} md="auto">
               <Tooltip title="Coming soon: filter by level, price, owned">
@@ -313,12 +295,12 @@ export default function SkyrioExchange() {
           </Row>
         </div>
 
-        {/* Content grid (3 columns on desktop) */}
         <div className="sv-grid">
           <Row gutter={[16, 16]}>
             {filtered.map((item) => {
               const locked = level < item.levelReq;
               const afford = xp >= item.cost;
+
               return (
                 <Col key={item.id} xs={24} sm={12} lg={8}>
                   <Card
@@ -330,6 +312,7 @@ export default function SkyrioExchange() {
                       <div className={`sv-icon ${item.kind.toLowerCase()}`}>
                         {item.icon}
                       </div>
+
                       <div className="sv-body">
                         <Space size={8} align="center" wrap>
                           <Tag className={`sv-kind ${item.kind.toLowerCase()}`}>
@@ -338,15 +321,18 @@ export default function SkyrioExchange() {
                           {item.tag && <Tag color="gold">{item.tag}</Tag>}
                           <Tag className="sv-req">Lvl {item.levelReq}+</Tag>
                         </Space>
+
                         <Title level={5} className="sv-name">
                           {item.name}
                         </Title>
+
                         <Paragraph className="sv-desc">{item.desc}</Paragraph>
+
                         <div className="sv-footer">
                           <div className="sv-cost">
-                            <StarOutlined />
-                            {item.cost} XP
+                            <StarOutlined /> {item.cost} XP
                           </div>
+
                           <div className="sv-cta-row">
                             <Button
                               className="sv-cta"
@@ -402,12 +388,16 @@ export default function SkyrioExchange() {
                 </Tag>
                 <Tag className="sv-req">Lvl {selected.levelReq}+</Tag>
               </Space>
+
               <Paragraph style={{ marginTop: 8 }}>{selected.desc}</Paragraph>
+
               <div className="sv-modal-cost">
                 <StarOutlined /> <b>{selected.cost} XP</b>
               </div>
+
               <Text type="secondary">
-                Tip: XP refills by booking, reviewing trips, and inviting friends.
+                Tip: XP refills by booking, reviewing trips, and inviting
+                friends.
               </Text>
             </div>
           )}

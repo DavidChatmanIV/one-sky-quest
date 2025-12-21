@@ -18,6 +18,26 @@
 }
 
 /* ============================= */
+/* FINAL PREMIUM TEXT LOCK */
+/* (prevents any black text) */
+/* ============================= */
+
+.sk-bookingPage,
+.sk-bookingPage * {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sk-bookingPage .ant-typography,
+.sk-bookingPage .ant-typography * {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* keep CTA text dark on purpose */
+.sk-bookingPage .sk-cta {
+  color: #1b1024 !important;
+}
+
+/* ============================= */
 /* Ant Design RangePicker Fixes */
 /* ============================= */
 
@@ -27,7 +47,7 @@
 }
 
 .sk-bookingPage .ant-picker-input > input::placeholder {
-  color: rgba(255, 255, 255, 0.60) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .sk-bookingPage .ant-picker .anticon,
@@ -35,10 +55,6 @@
 .sk-bookingPage .ant-picker-suffix,
 .sk-bookingPage .ant-picker-clear {
   color: rgba(255, 255, 255, 0.75) !important;
-}
-
-.sk-bookingPage .ant-picker-input > input[disabled] {
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.70) !important;
 }
 
 /* ============================= */
@@ -64,6 +80,7 @@
   color: rgba(255, 255, 255, 0.92) !important;
   margin-bottom: 10px !important;
   letter-spacing: 0.2px;
+  font-weight: 900;
 }
 
 .sk-pillRow {
@@ -83,7 +100,7 @@
 
 .sk-heroHint {
   display: block;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* ============================= */
@@ -129,9 +146,9 @@
 .sk-tab {
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.86) !important;
   cursor: pointer;
   transition: transform 140ms ease, background 140ms ease;
 }
@@ -174,16 +191,12 @@
 .sk-input .ant-picker,
 .sk-inputBtn {
   background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 
 .sk-input .ant-input::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.sk-input .ant-picker-input > input {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 
 .sk-searchBtn {
@@ -195,7 +208,7 @@
     rgba(255, 204, 120, 0.95)
   ) !important;
   color: #1b1024 !important;
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .sk-inputBtn {
@@ -218,8 +231,27 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.78) !important;
   cursor: pointer;
+}
+
+/* ============================= */
+/* Premium hint row */
+/* ============================= */
+
+.sk-premiumHintRow {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sk-premiumHint {
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 13px;
 }
 
 /* ============================= */
@@ -266,13 +298,13 @@
 }
 
 .sk-stayTitle {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.92) !important;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .sk-stayPrice {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.75) !important;
   margin-top: 2px;
 }
 
@@ -284,8 +316,7 @@
     rgba(255, 152, 80, 0.95),
     rgba(255, 204, 120, 0.95)
   ) !important;
-  color: #1b1024 !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
 }
 
 .sk-stayTags {
@@ -295,18 +326,22 @@
 .sk-tag {
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
   border-radius: 999px !important;
 }
 
 /* ============================= */
-/* Budget Panel */
+/* Sticky right column */
 /* ============================= */
 
 .sk-sticky {
   position: sticky;
   top: 14px;
 }
+
+/* ============================= */
+/* Budget Panel */
+/* ============================= */
 
 .sk-budgetCard {
   background: rgba(255, 255, 255, 0.06);
@@ -321,22 +356,23 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  gap: 10px;
 }
 
 .sk-budgetTitle {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.92) !important;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .sk-budgetValue {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.92) !important;
   font-size: 18px;
   font-weight: 900;
 }
 
 .sk-budgetSub {
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.7) !important;
   margin-top: 6px;
 }
 
@@ -347,26 +383,66 @@
 }
 
 .sk-budgetBlockTitle {
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 900;
   margin-bottom: 8px;
 }
 
 .sk-budgetEmpty {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* ============================= */
-/* Budget Panel Buttons */
+/* Buttons */
 /* ============================= */
 
 .sk-ghostBtn {
   border-radius: 12px !important;
   background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  color: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 
 .sk-ghostBtn:hover {
-  background: rgba(255, 255, 255, 0.10) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ============================= */
+/* Premium Segmented (Budget Solo/Group) */
+/* ============================= */
+
+/* Make the segmented container feel like Skyrio glass */
+.sk-budgetCard .ant-segmented {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+  padding: 3px !important;
+}
+
+/* The moving pill */
+.sk-budgetCard .ant-segmented-thumb {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 152, 80, 0.98),
+    rgba(255, 204, 120, 0.98)
+  ) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 10px 22px rgba(255, 152, 80, 0.22) !important;
+}
+
+/* Default (unselected) label */
+.sk-budgetCard .ant-segmented-item-label {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-weight: 800 !important;
+}
+
+/* Selected label: dark text on orange pill */
+.sk-budgetCard .ant-segmented-item-selected .ant-segmented-item-label {
+  color: #1b1024 !important;
+  font-weight: 900 !important;
+}
+
+/* Hover polish */
+.sk-budgetCard .ant-segmented-item:hover .ant-segmented-item-label {
+  color: rgba(255, 255, 255, 0.92) !important;
 }

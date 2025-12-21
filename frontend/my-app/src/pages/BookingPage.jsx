@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Layout,
   Typography,
@@ -12,6 +12,11 @@ import {
   Menu,
   Modal,
   InputNumber,
+  Drawer,
+  Divider,
+  Select,
+  Switch,
+  message,
 } from "antd";
 import {
   EnvironmentOutlined,
@@ -19,6 +24,9 @@ import {
   UserOutlined,
   SearchOutlined,
   SettingOutlined,
+  TeamOutlined,
+  CopyOutlined,
+  SaveOutlined,
 } from "@ant-design/icons";
 
 import "../styles/bookingPage.css";
@@ -99,16 +107,198 @@ function StayCard() {
   );
 }
 
+/**
+ * Team Travel Drawer (Premium)
+ * - Soft launch: stores to localStorage
+ */
+function TeamTravelDrawer({ open, onClose, team, onSave }) {
+  const [draft, setDraft] = useState(team);
+
+  useEffect(() => {
+    setDraft(team);
+  }, [team]);
+
+  const update = (patch) => setDraft((prev) => ({ ...prev, ...patch }));
+
+  const genInvite = () => {
+    const code =
+      "SKY-" +
+      Math.random().toString(16).slice(2, 6).toUpperCase() +
+      "-" +
+      Math.random().toString(16).slice(2, 6).toUpperCase();
+    update({ inviteCode: code });
+    message.success("Invite code generated");
+  };
+
+  const copyInvite = async () => {
+    if (!draft?.inviteCode)
+      return message.info("Generate an invite code first");
+    try {
+      await navigator.clipboard.writeText(draft.inviteCode);
+      message.success("Invite code copied");
+    } catch {
+      message.error("Couldn’t copy—try again");
+    }
+  };
+
+  return (
+    <Drawer
+      title={
+        <Space size={10}>
+          <TeamOutlined />
+          <span>Team Travel Setup</span>
+          <Tag className="sk-tag sk-tagPremium">Premium</Tag>
+        </Space>
+      }
+      placement="right"
+      width={420}
+      open={open}
+      onClose={onClose}
+      className="sk-teamDrawer"
+      extra={
+        <Button
+          icon={<SaveOutlined />}
+          className="sk-cta"
+          onClick={() => onSave?.(draft)}
+        >
+          Save
+        </Button>
+      }
+    >
+      <div className="sk-drawerSection">
+        <div className="sk-sectionTitle">Step 1 — Team Basics</div>
+
+        <div className="sk-field">
+          <div className="sk-fieldLabel">Team name</div>
+          <Input
+            value={draft.teamName}
+            onChange={(e) => update({ teamName: e.target.value })}
+            placeholder="Example: Bloomfield Eagles"
+            allowClear
+          />
+        </div>
+
+        <div className="sk-field">
+          <div className="sk-fieldLabel">Event type</div>
+          <Select
+            value={draft.eventType}
+            onChange={(v) => update({ eventType: v })}
+            style={{ width: "100%" }}
+            options={[
+              { value: "Tournament", label: "Tournament" },
+              { value: "Away Game", label: "Away Game" },
+              { value: "Camp", label: "Camp" },
+              { value: "Showcase", label: "Showcase" },
+              { value: "Other", label: "Other" },
+            ]}
+          />
+        </div>
+
+        <Divider className="sk-divider" />
+
+        <div className="sk-sectionTitle">Step 2 — Rooms</div>
+
+        <div className="sk-fieldRow">
+          <div className="sk-field">
+            <div className="sk-fieldLabel">Athletes</div>
+            <InputNumber
+              min={0}
+              value={draft.athletes}
+              onChange={(v) => update({ athletes: Number(v || 0) })}
+              style={{ width: "100%" }}
+            />
+          </div>
+          <div className="sk-field">
+            <div className="sk-fieldLabel">Adults</div>
+            <InputNumber
+              min={0}
+              value={draft.adults}
+              onChange={(v) => update({ adults: Number(v || 0) })}
+              style={{ width: "100%" }}
+            />
+          </div>
+        </div>
+
+        <div className="sk-field">
+          <div className="sk-fieldLabel">Room preference</div>
+          <Select
+            value={draft.roomType}
+            onChange={(v) => update({ roomType: v })}
+            style={{ width: "100%" }}
+            options={[
+              { value: "2 Queen", label: "2 Queen" },
+              { value: "King", label: "King" },
+              { value: "Suite", label: "Suite" },
+              { value: "Mix", label: "Mix" },
+            ]}
+          />
+        </div>
+
+        <div className="sk-toggleRow">
+          <div>
+            <div className="sk-fieldLabel">Auto-fill rooms</div>
+            <div className="sk-miniHelp">
+              Skyrio suggests the best room split.
+            </div>
+          </div>
+          <Switch
+            checked={draft.autoFillRooms}
+            onChange={(v) => update({ autoFillRooms: v })}
+          />
+        </div>
+
+        <div className="sk-toggleRow">
+          <div>
+            <div className="sk-fieldLabel">Keep team together</div>
+            <div className="sk-miniHelp">Prioritize same hotel + floors.</div>
+          </div>
+          <Switch
+            checked={draft.keepTogether}
+            onChange={(v) => update({ keepTogether: v })}
+          />
+        </div>
+
+        <Divider className="sk-divider" />
+
+        <div className="sk-sectionTitle">Step 3 — Invite</div>
+
+        <Space wrap>
+          <Button className="sk-ghostBtn" onClick={genInvite}>
+            Generate code
+          </Button>
+          <Button
+            className="sk-ghostBtn"
+            icon={<CopyOutlined />}
+            onClick={copyInvite}
+          >
+            Copy
+          </Button>
+        </Space>
+
+        <div className="sk-inviteBox">
+          <div className="sk-inviteLabel">Invite code</div>
+          <div className="sk-inviteValue">{draft.inviteCode || "—"}</div>
+          <div className="sk-miniHelp">
+            Soft launch uses a simple code. Post-launch: real invite links +
+            roster.
+          </div>
+        </div>
+      </div>
+    </Drawer>
+  );
+}
+
+/**
+ * Budget panel (Budget only — no Team Travel here)
+ */
 function BudgetPanel() {
   const [mode, setMode] = useState("Solo");
 
-  // budget state (default 2500, but loads from localStorage)
   const [budget, setBudget] = useState(() => {
     const saved = localStorage.getItem("sk_budget");
     return saved ? Number(saved) : 2500;
   });
 
-  // example “current plan total” (swap with real planned items later)
   const planTotal = 1150;
   const underBy = Math.max(0, budget - planTotal);
 
@@ -189,11 +379,64 @@ function BudgetPanel() {
   );
 }
 
+/**
+ * Standalone Team Travel Card (Premium, NOT inside budget)
+ */
+function TeamTravelCard({ team, onEdit }) {
+  const title = team?.teamName?.trim() ? team.teamName : "Team Trip";
+  const sub = `${team?.eventType || "Tournament"} • ${
+    team?.roomType || "2 Queen"
+  } • ${team?.athletes ?? 0} athletes, ${team?.adults ?? 0} adults`;
+
+  return (
+    <div className="sk-teamCard">
+      <div className="sk-teamCardHeader">
+        <div>
+          <div className="sk-teamTitleRow">
+            <div className="sk-teamTitle">{title}</div>
+            <Tag className="sk-tag sk-tagPremium">Premium</Tag>
+          </div>
+          <div className="sk-teamSub">{sub}</div>
+        </div>
+
+        <Button className="sk-ghostBtn" onClick={onEdit}>
+          Edit
+        </Button>
+      </div>
+
+      <div className="sk-teamHint">
+        Team mode keeps everyone aligned and optimizes room splits.
+      </div>
+    </div>
+  );
+}
+
 export default function BookingPage() {
   const [activeTab, setActiveTab] = useState("stays");
   const [destination, setDestination] = useState("");
   const [dates, setDates] = useState(null);
   const [guests, setGuests] = useState("2a1r");
+
+  // Team Travel mode (separate from budget)
+  const [teamMode, setTeamMode] = useState(false);
+
+  const [team, setTeam] = useState(() => {
+    const saved = localStorage.getItem("sk_team_trip");
+    return saved
+      ? JSON.parse(saved)
+      : {
+          teamName: "",
+          eventType: "Tournament",
+          athletes: 12,
+          adults: 6,
+          roomType: "2 Queen",
+          autoFillRooms: true,
+          keepTogether: true,
+          inviteCode: "",
+        };
+  });
+
+  const [teamOpen, setTeamOpen] = useState(false);
 
   const headerPills = useMemo(
     () => [{ label: "XP 60" }, { label: "0 saved trips" }, { label: "1 new" }],
@@ -201,8 +444,25 @@ export default function BookingPage() {
   );
 
   const onSearch = () => {
-    console.log({ activeTab, destination, dates, guests });
+    console.log({ activeTab, destination, dates, guests, teamMode, team });
   };
+
+  const openTeam = () => setTeamOpen(true);
+
+  const saveTeam = (next) => {
+    setTeam(next);
+    localStorage.setItem("sk_team_trip", JSON.stringify(next));
+    setTeamOpen(false);
+    message.success("Team travel saved");
+  };
+
+  // If user enables Team Mode and hasn't named a team yet, open setup once
+  useEffect(() => {
+    if (teamMode && !team?.teamName && !teamOpen) {
+      setTeamOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamMode]);
 
   return (
     <Layout className="sk-bookingPage">
@@ -226,7 +486,7 @@ export default function BookingPage() {
           </Text>
         </div>
 
-        {/* SEARCH + BUDGET ROW */}
+        {/* GRID */}
         <div className="sk-grid">
           {/* LEFT */}
           <div className="sk-left">
@@ -247,7 +507,7 @@ export default function BookingPage() {
                 ))}
               </div>
 
-              {/* Unified Search Row */}
+              {/* Search Row */}
               <div className="sk-searchRow">
                 <Input
                   className="sk-input"
@@ -276,13 +536,28 @@ export default function BookingPage() {
                 </Button>
               </div>
 
-              {/* Quick tags */}
+              {/* Quick Tags */}
               <div className="sk-quickTags">
                 {QUICK_TAGS.map((tag) => (
                   <button className="sk-chip" key={tag} type="button">
                     {tag}
                   </button>
                 ))}
+              </div>
+
+              {/* Premium hint + team toggle */}
+              <div className="sk-premiumHintRow">
+                <Text className="sk-premiumHint">
+                  Tip: Switch to <b>Team Travel</b> for tournaments + parents.
+                </Text>
+
+                <Button
+                  className="sk-ghostBtn"
+                  icon={<TeamOutlined />}
+                  onClick={() => setTeamMode(true)}
+                >
+                  Team Travel
+                </Button>
               </div>
             </div>
 
@@ -296,9 +571,28 @@ export default function BookingPage() {
           <div className="sk-right">
             <div className="sk-sticky">
               <BudgetPanel />
+
+              {teamMode && <TeamTravelCard team={team} onEdit={openTeam} />}
+
+              {teamMode && (
+                <Button
+                  className="sk-ghostBtn sk-teamOffBtn"
+                  onClick={() => setTeamMode(false)}
+                >
+                  Turn off Team Travel
+                </Button>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Team Drawer */}
+        <TeamTravelDrawer
+          open={teamOpen}
+          onClose={() => setTeamOpen(false)}
+          team={team}
+          onSave={saveTeam}
+        />
       </Content>
     </Layout>
   );

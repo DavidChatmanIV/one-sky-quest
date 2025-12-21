@@ -1,7 +1,46 @@
 .skystream-wrap {
   min-height: 100vh;
-  background: radial-gradient(1200px 600px at 50% -10%, rgba(255, 138, 42, 0.12), transparent 60%),
-    linear-gradient(180deg, var(--bg-start, #0f1020), var(--bg-mid, #231a3a), var(--bg-end, #3a2430));
+  background: radial-gradient(
+      1200px 600px at 50% -10%,
+      rgba(255, 138, 42, 0.12),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      var(--bg-start, #0f1020),
+      var(--bg-mid, #231a3a),
+      var(--bg-end, #3a2430)
+    );
+}
+
+/* ===== SkyStream: force readable text on dark glass ===== */
+.skystream-hero,
+.skystream-hero * {
+  color: #fff;
+}
+
+.skystream-subtitle {
+  color: rgba(255,255,255,0.78);
+}
+
+/* Ant Input text + placeholder */
+.skystream-search.ant-input-affix-wrapper,
+.skystream-search.ant-input,
+.skystream-search input {
+  color: #fff !important;
+}
+
+.skystream-search input::placeholder {
+  color: rgba(255,255,255,0.55) !important;
+}
+
+.skystream-search .ant-input-prefix {
+  color: rgba(255,255,255,0.65) !important;
+}
+
+/* Fix Ant clear icon */
+.skystream-search .ant-input-clear-icon {
+  color: rgba(255,255,255,0.65) !important;
 }
 
 .skystream-content {
@@ -9,6 +48,7 @@
   margin: 0 auto;
   padding: 14px 16px 28px;
 }
+
 
 .sk-muted {
   color: rgba(244, 246, 251, 0.75) !important;

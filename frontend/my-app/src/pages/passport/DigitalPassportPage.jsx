@@ -323,7 +323,7 @@ export default function DigitalPassportPage() {
         {segment === "rewards" && (
           <>
             <Membership />
-            <SkyrioExchange />
+            <SkyrioExchange showSearch={false} />
 
             <Card>
               <Title level={5}>Invite & Earn</Title>
