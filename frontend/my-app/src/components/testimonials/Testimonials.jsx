@@ -122,68 +122,71 @@ export default function Testimonials() {
   /* ---------------------------------------
      Render
   ---------------------------------------- */
-  return (
-    <section
-      id="testimonials-section"
-      className={`sk-testimonials ${visible ? "show" : ""}`}
-    >
-      <Title level={3} style={{ color: "#fff" }}>
-        What Travelers Are Saying
-      </Title>
+ return (
+   <section
+     id="testimonials-section"
+     className={`sk-testimonials ${visible ? "is-visible" : ""}`}
+   >
+     <div className="sk-testimonials__inner">
+       <div className="sk-testimonials__panel">
+         <Title level={3} className="sk-testimonials__title">
+           What Travelers Are Saying
+         </Title>
 
-      <div className="sk-testimonials-grid">
-        {testimonials.length === 0 && (
-          <Text type="secondary">No testimonials yet.</Text>
-        )}
+         <Text className="sk-testimonials__sub">
+           Real feedback from early explorers — premium, simple, fast.
+         </Text>
 
-        {testimonials.map((t) => (
-          <Card key={t.id} className="sk-testimonial-card">
-            <Rate disabled value={t.rating} character={<StarFilled />} />
-            <Text className="sk-testimonial-text">“{t.comment}”</Text>
-            <Text type="secondary" className="sk-testimonial-author">
-              — {t.name}
-            </Text>
-          </Card>
-        ))}
-      </div>
+         <div className="sk-testimonials__grid">
+           {testimonials.length === 0 && (
+             <Text className="sk-muted">No testimonials yet.</Text>
+           )}
 
-      {/* ---------------------------------------
-          Feedback Form (Logged-in only)
-      ---------------------------------------- */}
-      {loggedIn && (
-        <Card className="sk-feedback-card">
-          <Title level={4} style={{ color: "#fff" }}>
-            Leave Feedback
-          </Title>
+           {testimonials.map((t) => (
+             <Card key={t.id} className="sk-testimonials__card">
+               <Rate disabled value={t.rating} character={<StarFilled />} />
+               <Text className="sk-testimonial-text">“{t.comment}”</Text>
+               <Text className="sk-testimonial-author">— {t.name}</Text>
+             </Card>
+           ))}
+         </div>
 
-          <Form form={form} layout="vertical" onFinish={onSubmit}>
-            <Form.Item
-              name="rating"
-              label="Rating"
-              rules={[{ required: true }]}
-            >
-              <Rate />
-            </Form.Item>
+         {/* Feedback Form (Logged-in only) */}
+         {loggedIn && (
+           <Card className="sk-feedback-card">
+             <Title level={4} className="sk-testimonials__h4">
+               Leave Feedback
+             </Title>
 
-            <Form.Item
-              name="comment"
-              label="Your experience"
-              rules={[{ required: true, min: 10 }]}
-            >
-              <Input.TextArea rows={4} />
-            </Form.Item>
+             <Form form={form} layout="vertical" onFinish={onSubmit}>
+               <Form.Item
+                 name="rating"
+                 label={<span className="sk-label">Rating</span>}
+                 rules={[{ required: true }]}
+               >
+                 <Rate />
+               </Form.Item>
 
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={submitting}
-              className="btn-orange"
-            >
-              Submit & Earn XP
-            </Button>
-          </Form>
-        </Card>
-      )}
-    </section>
-  );
+               <Form.Item
+                 name="comment"
+                 label={<span className="sk-label">Your experience</span>}
+                 rules={[{ required: true, min: 10 }]}
+               >
+                 <Input.TextArea rows={4} className="sk-textarea" />
+               </Form.Item>
+
+               <Button
+                 htmlType="submit"
+                 loading={submitting}
+                 className="sk-btn-cta"
+               >
+                 Submit & Earn XP
+               </Button>
+             </Form>
+           </Card>
+         )}
+       </div>
+     </div>
+   </section>
+ );
 }
