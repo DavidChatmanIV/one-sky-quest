@@ -15,6 +15,7 @@ import { Server as SocketIOServer } from "socket.io";
 import apiRouter from "./routes/api/index.js";
 import healthRouter from "./routes/health.routes.js";
 import Contact from "./models/contact.js";
+import { startJobs } from "./jobs/scheduler.js";
 
 // ---------- Path helpers ----------
 const __filename = fileURLToPath(import.meta.url);
@@ -208,12 +209,22 @@ const io = new SocketIOServer(httpServer, {
   },
 });
 
+// ✅ make io accessible inside routes via req.app.get("io")
 app.set("io", io);
 
-// ---------- Socket logic ----------
+// ---------- Socket logic (ONE connection handler only) ----------
 io.on("connection", (socket) => {
   console.log("🔥 Socket connected", socket.id);
 
+  // 🔔 Notifications room join
+  socket.on("notifications:join", ({ userId }) => {
+    if (userId) {
+      socket.join(String(userId));
+      console.log("🔔 Notifications room joined:", userId);
+    }
+  });
+
+  // DM rooms
   socket.on("dm:join", ({ conversationId }) => {
     if (conversationId) socket.join(String(conversationId));
   });
@@ -253,6 +264,9 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 // ---------- Start ----------
 await connectMongo();
+
+// ✅ best spot: after DB is up, before the server starts accepting traffic
+startJobs();
 
 // Render provides PORT. Locally default to 5050.
 const PORT = Number(process.env.PORT) || 5050;

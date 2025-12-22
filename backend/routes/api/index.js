@@ -46,6 +46,8 @@ await mount("/bookings", "../bookings.routes.js");
 await mount("/dm", "../dm.js");
 await mount("/admin", "../admin.routes.js");
 
+// Watches (price watch / alerts)
+await mount("/watches", "../watches.js");
 
 // Root of the API namespace
 api.get("/", (_req, res) => {

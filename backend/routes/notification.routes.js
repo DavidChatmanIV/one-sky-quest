@@ -5,6 +5,48 @@ import { auth as authRequired } from "../middleware/auth.js";
 const router = Router();
 
 /**
+ * Safe Socket.io helper
+ * - Won’t crash if io is not set
+ * - Emits to the user's room: io.to(userId)
+ */
+function emitToUser(req, userId, event, payload) {
+  try {
+    const io = req.app.get("io");
+    if (!io || !userId) return;
+    io.to(String(userId)).emit(event, payload);
+  } catch (_e) {
+    // ignore socket failures
+  }
+}
+
+/**
+ * GET /api/notifications/mine
+ * Bell dropdown payload:
+ *  - unread: number
+ *  - items: latest 20 notifications
+ */
+router.get("/mine", authRequired, async (req, res) => {
+  try {
+    const userId = req.user.id; // JWT payload
+
+    const items = await Notification.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean();
+
+    const unread = await Notification.countDocuments({
+      user: userId,
+      isRead: false,
+    });
+
+    return res.json({ unread, items });
+  } catch (err) {
+    console.error("❌ GET /api/notifications/mine failed:", err);
+    return res.status(500).json({ message: "Error fetching notifications." });
+  }
+});
+
+/**
  * GET /api/notifications
  * Query params:
  *  - unread=true -> only unread
@@ -14,28 +56,25 @@ const router = Router();
 router.get("/", authRequired, async (req, res) => {
   try {
     const { unread, limit = 50, sort = "desc" } = req.query;
-    const userId = req.user.id; // comes from JWT payload
+    const userId = req.user.id;
 
     const query = { user: userId };
-    if (unread === "true") {
-      query.isRead = false;
-    }
+    if (unread === "true") query.isRead = false;
 
     const notifications = await Notification.find(query)
       .sort({ createdAt: sort === "asc" ? 1 : -1 })
       .limit(Number(limit))
       .lean();
 
-    res.json(notifications);
+    return res.json(notifications);
   } catch (err) {
-    console.error("❌ Failed to fetch notifications:", err);
-    res.status(500).json({ message: "Error fetching notifications." });
+    console.error("❌ GET /api/notifications failed:", err);
+    return res.status(500).json({ message: "Error fetching notifications." });
   }
 });
 
 /**
  * GET /api/notifications/unread-count
- * For showing the bell badge number
  */
 router.get("/unread-count", authRequired, async (req, res) => {
   try {
@@ -46,32 +85,23 @@ router.get("/unread-count", authRequired, async (req, res) => {
       isRead: false,
     });
 
-    res.json({ count });
+    return res.json({ count });
   } catch (err) {
-    console.error("❌ Failed to fetch unread count:", err);
-    res.status(500).json({ message: "Error fetching unread count." });
+    console.error("❌ GET /api/notifications/unread-count failed:", err);
+    return res.status(500).json({ message: "Error fetching unread count." });
   }
 });
 
 /**
  * POST /api/notifications
  * Create a new notification for the logged-in user
- * Body example:
- * {
- *   "type": "booking",
- *   "event": "booking_created",
- *   "title": "Booking confirmed",
- *   "message": "Your trip to Tokyo is confirmed!",
- *   "targetType": "booking",
- *   "targetId": "<bookingId>",
- *   "link": "/dashboard/trips/123"
- * }
  */
 router.post("/", authRequired, async (req, res) => {
   try {
     const userId = req.user.id;
+
     const { type, event, title, message, targetType, targetId, link } =
-      req.body;
+      req.body || {};
 
     if (!event || !message) {
       return res
@@ -79,7 +109,7 @@ router.post("/", authRequired, async (req, res) => {
         .json({ message: "event and message are required." });
     }
 
-    const notification = new Notification({
+    const notification = await Notification.create({
       user: userId,
       type,
       event,
@@ -88,20 +118,16 @@ router.post("/", authRequired, async (req, res) => {
       targetType,
       targetId,
       link,
+      // isRead defaults false in your schema (assuming)
     });
 
-    await notification.save();
+    // 🔔 Real-time push
+    emitToUser(req, userId, "notification:new", notification);
 
-    // 🔔 Socket.io hook (optional, keep commented until wired):
-    // const io = req.app.get("io");
-    // if (io) {
-    //   io.to(userId.toString()).emit("notification:new", notification);
-    // }
-
-    res.status(201).json(notification);
+    return res.status(201).json(notification);
   } catch (err) {
-    console.error("❌ Failed to create notification:", err);
-    res.status(500).json({ message: "Error creating notification." });
+    console.error("❌ POST /api/notifications failed:", err);
+    return res.status(500).json({ message: "Error creating notification." });
   }
 });
 
@@ -124,16 +150,21 @@ router.patch("/:id/read", authRequired, async (req, res) => {
       return res.status(404).json({ message: "Notification not found." });
     }
 
-    res.json(notification);
+    // 🔔 Optional: sync other tabs/devices
+    emitToUser(req, userId, "notification:read", { id });
+
+    return res.json(notification);
   } catch (err) {
-    console.error("❌ Failed to mark notification as read:", err);
-    res.status(500).json({ message: "Error marking notification as read." });
+    console.error("❌ PATCH /api/notifications/:id/read failed:", err);
+    return res
+      .status(500)
+      .json({ message: "Error marking notification read." });
   }
 });
 
 /**
  * PATCH /api/notifications/read-all
- * Mark ALL notifications as read for the logged-in user
+ * Mark ALL notifications as read
  */
 router.patch("/read-all", authRequired, async (req, res) => {
   try {
@@ -144,13 +175,16 @@ router.patch("/read-all", authRequired, async (req, res) => {
       { $set: { isRead: true } }
     );
 
-    res.json({
+    // 🔔 Optional: sync other tabs/devices
+    emitToUser(req, userId, "notification:readAll", { ok: true });
+
+    return res.json({
       message: "All notifications marked as read.",
       modifiedCount: result.modifiedCount,
     });
   } catch (err) {
-    console.error("❌ Failed to mark all as read:", err);
-    res.status(500).json({ message: "Error marking all as read." });
+    console.error("❌ PATCH /api/notifications/read-all failed:", err);
+    return res.status(500).json({ message: "Error marking all as read." });
   }
 });
 
@@ -172,10 +206,13 @@ router.delete("/:id", authRequired, async (req, res) => {
       return res.status(404).json({ message: "Notification not found." });
     }
 
-    res.json({ message: "Notification deleted." });
+    // 🔔 Optional: sync other tabs/devices
+    emitToUser(req, userId, "notification:deleted", { id });
+
+    return res.json({ message: "Notification deleted." });
   } catch (err) {
-    console.error("❌ Failed to delete notification:", err);
-    res.status(500).json({ message: "Error deleting notification." });
+    console.error("❌ DELETE /api/notifications/:id failed:", err);
+    return res.status(500).json({ message: "Error deleting notification." });
   }
 });
 
@@ -208,10 +245,15 @@ router.post("/test", authRequired, async (req, res) => {
       link,
     });
 
-    res.status(201).json(notification);
+    // 🔔 Real-time push
+    emitToUser(req, userId, "notification:new", notification);
+
+    return res.status(201).json(notification);
   } catch (err) {
     console.error("[notifications] POST /test error:", err);
-    res.status(500).json({ message: "Failed to create test notification" });
+    return res
+      .status(500)
+      .json({ message: "Failed to create test notification" });
   }
 });
 

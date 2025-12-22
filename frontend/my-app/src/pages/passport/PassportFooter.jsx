@@ -1,33 +1,24 @@
-// src/components/skystream/SkyStreamHeader.jsx
-import React, { useMemo } from "react";
-import { Card, Space, Typography, Segmented, Input, Button, Tag } from "antd";
+// src/pages/passport/PassportFooter.jsx
+import React, { useMemo, useState } from "react";
+import { Card, Typography, Space, Button, Input, Tag } from "antd";
 import {
-  SearchOutlined,
   PlusOutlined,
+  SearchOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
-// If you already have it, keep path consistent
+// IMPORTANT: PassportFooter is inside /pages/passport, so hook path is:
 import { useAuth } from "../../hooks/useAuth";
 
 const { Title, Text } = Typography;
 
-export default function SkyStreamHeader({
-  brand = "Skyrio",
-
-  activeTab = "forYou",
-  onTabChange,
-  tabOptions = [],
-
-  search = "",
-  onSearchChange,
-
-  xpToday = 0,
-  onCompose,
-}) {
+export default function PassportFooter() {
+  const nav = useNavigate();
   const auth = useAuth();
 
-  // ✅ Real user display name
+  const [search, setSearch] = useState("");
+
   const displayName = useMemo(() => {
     const u = auth?.user;
     if (!u) return "Guest";
@@ -36,51 +27,52 @@ export default function SkyStreamHeader({
     );
   }, [auth?.user]);
 
-  return (
-    <Card className="sk-headerCard" bordered={false}>
-      <div className="sk-headerRow">
-        <div className="sk-headerLeft">
-          <Title level={4} className="sk-headerTitle">
-            {brand} • SkyStream
-          </Title>
-          <Text className="sk-muted">
-            Welcome, <span className="sk-strong">{displayName}</span>
-          </Text>
-        </div>
+  const xpToday = 0; // soft-launch placeholder
 
-        <div className="sk-headerRight">
-          <Tag className="sk-xpPill">
-            <ThunderboltOutlined /> XP Today: {Number(xpToday || 0)}
+  return (
+    <>
+      {/* You can keep your other footer stuff ABOVE this if you want */}
+
+      {/* ✅ SkyStream preview card (SINGLE search bar) */}
+      <Card className="sk-card" bordered={false} style={{ marginTop: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <Title level={4} style={{ margin: 0 }}>
+              Skyrio • SkyStream
+            </Title>
+            <Text type="secondary">Welcome, {displayName}</Text>
+          </div>
+
+          <Tag icon={<ThunderboltOutlined />} style={{ margin: 0 }}>
+            XP Today: {xpToday}
           </Tag>
 
           <Button
             type="primary"
-            icon={<PlusOutlined />}
             className="btn-orange"
-            onClick={onCompose}
+            icon={<PlusOutlined />}
+            onClick={() => nav("/skystream")}
           >
             Post
           </Button>
         </div>
-      </div>
 
-      <div className="sk-headerControls">
-        <Segmented
-          value={activeTab}
-          options={tabOptions}
-          onChange={(val) => onTabChange?.(val)}
-          className="sk-tabs"
-        />
+        {/* ✅ ONLY ONE SEARCH INPUT */}
+        <div style={{ marginTop: 12 }}>
+          <Input
+            prefix={<SearchOutlined />}
+            placeholder="Search SkyStream..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+            onPressEnter={() =>
+              nav(`/skystream?search=${encodeURIComponent(search)}`)
+            }
+          />
+        </div>
+      </Card>
 
-        <Input
-          value={search}
-          onChange={(e) => onSearchChange?.(e.target.value)}
-          allowClear
-          prefix={<SearchOutlined />}
-          placeholder="Search SkyStream..."
-          className="sk-search"
-        />
-      </div>
-    </Card>
+      {/* You can keep your other footer stuff BELOW this if you want */}
+    </>
   );
 }

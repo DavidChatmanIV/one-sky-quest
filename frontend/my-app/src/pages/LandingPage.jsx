@@ -10,6 +10,7 @@ import PageLayout from "../components/PageLayout";
 import TutorialModal from "../components/TutorialModal";
 import SupportFormModal from "../components/SupportFormModal";
 import AISupportFab from "../components/AISupportFab";
+import Testimonials from "../components/testimonials/Testimonials";
 
 import "../styles/LandingPage.css";
 
@@ -61,6 +62,7 @@ export default function LandingPage() {
       />
 
       <div className="landing-wrap public-landing">
+        {/* ================= HERO ================= */}
         <section className="hero-public" aria-label="Skyrio Public Landing">
           <div className="lp-container hero-center">
             <Title className="hero-title">Plan smarter. Travel better.</Title>
@@ -70,7 +72,6 @@ export default function LandingPage() {
               explorers.
             </Text>
 
-            {/* CTA — Navbar owns auth buttons */}
             <div className="hero-cta-row hero-cta-row--links">
               <Button
                 type="link"
@@ -112,6 +113,10 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ================= TESTIMONIALS ================= */}
+        <Testimonials />
+
+        {/* ================= FEATURES ================= */}
         <section className="lp-section section-gap" aria-label="Top Features">
           <div className="lp-container">
             <div className="lp-features-3">

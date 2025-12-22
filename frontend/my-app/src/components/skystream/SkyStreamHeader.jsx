@@ -1,125 +1,75 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input, Badge, Tooltip, Tag } from "antd";
+import React, { useMemo } from "react";
+import { Row, Col, Typography, Space, Button, Input, Segmented, Tag } from "antd";
 import {
-  ThunderboltOutlined,
-  StarOutlined,
   SearchOutlined,
   PlusOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
-import { useAuth } from "../../hooks/useAuth";
 
-const TAB_OPTIONS = [
-  { key: "forYou", label: "For You" },
-  { key: "following", label: "Following" },
-  { key: "deals", label: "Deals" },
-];
+const { Title, Text } = Typography;
 
 export default function SkyStreamHeader({
+  brand = "Skyrio",
   activeTab = "forYou",
   onTabChange,
-
-  search,
+  tabOptions = [],
+  search = "",
   onSearchChange,
-
   xpToday = 0,
   onCompose,
-  onPost,
-
-  showSearch = true, // ✅ NEW
 }) {
-  useAuth(); // reserved for future personalization
-
-  // ✅ Local state so typing ALWAYS works
-  const [localSearch, setLocalSearch] = useState(search ?? "");
-
-  // ✅ If parent changes `search`, reflect it
-  useEffect(() => {
-    if (typeof search === "string") setLocalSearch(search);
-  }, [search]);
-
-  const handlePost = () => {
-    if (onCompose) return onCompose();
-    if (onPost) return onPost();
-  };
-
-  const handleSearchChange = (e) => {
-    const next = e.target.value;
-    setLocalSearch(next);
-    onSearchChange?.(next);
-  };
+  const options = useMemo(() => {
+    // Supports either [{key,label}] or segmented-ready [{value,label}]
+    if (!tabOptions?.length) return [];
+    if (tabOptions[0]?.value) return tabOptions;
+    return tabOptions.map((t) => ({ value: t.key, label: t.label }));
+  }, [tabOptions]);
 
   return (
-    <header className="skystream-hero">
-      <div className="skystream-hero-inner">
-        {/* TOP ROW */}
-        <div className="skystream-top">
-          <div className="skystream-titleblock">
-            <h1 className="skystream-title">SkyStream</h1>
+    <div className="sk-header glass">
+      <Row gutter={[12, 12]} align="middle">
+        <Col xs={24} md={14}>
+          <Title level={2} style={{ margin: 0 }}>
+            SkyStream
+          </Title>
+          <Text className="sk-muted">Live travel moments across {brand}</Text>
+        </Col>
 
-            <div className="skystream-subtitle">
-              Live travel moments across Skyrio
-            </div>
-
-            {/* XP + PRO */}
-            <div className="skystream-subbadges">
-              <Tooltip title="XP earned today">
-                <Badge count={xpToday} overflowCount={999}>
-                  <Tag
-                    className="skystream-pill"
-                    icon={<ThunderboltOutlined />}
-                  >
-                    XP
-                  </Tag>
-                </Badge>
-              </Tooltip>
-
-              <Tooltip title="Premium perks">
-                <Tag className="skystream-pill" icon={<StarOutlined />}>
-                  Pro
-                </Tag>
-              </Tooltip>
-            </div>
-          </div>
-
-          <Button
-            className="skystream-post"
-            icon={<PlusOutlined />}
-            onClick={handlePost}
-          >
-            Post
-          </Button>
-        </div>
-
-        {/* SEARCH (OPTIONAL) */}
-        {showSearch && (
-          <div className="skystream-searchrow">
-            <Input
-              className="skystream-search"
-              prefix={<SearchOutlined />}
-              placeholder="Search SkyStream"
-              value={localSearch}
-              onChange={handleSearchChange}
-              allowClear
-            />
-          </div>
-        )}
-
-        {/* TABS */}
-        <nav className="skystream-tabs">
-          {TAB_OPTIONS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => onTabChange?.(t.key)}
-              className={`skystream-tab ${
-                activeTab === t.key ? "is-active" : ""
-              }`}
+        <Col xs={24} md={10} style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Space wrap>
+            <Tag icon={<ThunderboltOutlined />}>XP Today: {xpToday}</Tag>
+            <Button
+              type="primary"
+              className="btn-orange"
+              icon={<PlusOutlined />}
+              onClick={onCompose}
             >
-              {t.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-    </header>
+              Post
+            </Button>
+          </Space>
+        </Col>
+
+        {/* Tabs */}
+        <Col xs={24} md={14}>
+          <Segmented
+            options={options}
+            value={activeTab}
+            onChange={(v) => onTabChange?.(v)}
+            block
+          />
+        </Col>
+
+        {/* ✅ SINGLE SEARCH INPUT (only one) */}
+        <Col xs={24} md={10}>
+          <Input
+            allowClear
+            prefix={<SearchOutlined />}
+            placeholder="Search SkyStream..."
+            value={search}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+          />
+        </Col>
+      </Row>
+    </div>
   );
 }

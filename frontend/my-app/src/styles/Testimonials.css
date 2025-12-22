@@ -1,0 +1,194 @@
+/* ============================= */
+/* Premium Skyrio testimonials */
+/* ============================= */
+
+.sk-testimonials {
+  padding: 56px 16px;
+  background:
+    radial-gradient(900px 520px at 70% 0%, rgba(255, 138, 42, 0.18), transparent 60%),
+    radial-gradient(900px 520px at 20% 10%, rgba(120, 90, 255, 0.22), transparent 60%),
+    linear-gradient(180deg, rgba(12, 14, 28, 0.92), rgba(10, 10, 22, 0.92));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  /* Fade-in base state (merged) */
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 520ms ease, transform 520ms ease;
+  will-change: opacity, transform;
+}
+
+/* New preferred class */
+.sk-testimonials.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Backwards compatibility with previous code */
+.sk-testimonials.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================= */
+/* Layout + Typography */
+/* ============================= */
+
+.sk-testimonials__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sk-testimonials__title {
+  text-align: center;
+  margin-bottom: 8px !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+.sk-testimonials__sub {
+  text-align: center;
+  margin-bottom: 28px !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* ============================= */
+/* Grid (merged) */
+/* ============================= */
+
+.sk-testimonials__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-bottom: 24px;
+}
+
+/* Alias for old class name */
+.sk-testimonials-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-bottom: 24px;
+}
+
+/* ============================= */
+/* Cards (merged) */
+/* ============================= */
+
+.sk-testimonials__card {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Alias old testimonial card class -> premium */
+.sk-testimonial-card {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Old text styles kept */
+.sk-testimonial-text {
+  display: block;
+  margin: 12px 0;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sk-testimonial-author {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Premium header inside cards */
+.sk-testimonials__h4 {
+  margin-top: 0 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.sk-testimonials__cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* ============================= */
+/* Form + UI helpers */
+/* ============================= */
+
+.sk-muted {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.sk-divider {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.sk-label {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.sk-input,
+.sk-textarea {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  border-radius: 12px !important;
+}
+
+/* Existing feedback wrapper (kept + upgraded) */
+.sk-feedback-card {
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.18) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.20) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Buttons */
+.sk-btn-ghost {
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.sk-btn-cta {
+  border-radius: 12px !important;
+  border: none !important;
+  background: linear-gradient(135deg, #ff8a2a, #ff6a00) !important;
+  box-shadow: 0 14px 30px rgba(255, 138, 42, 0.25) !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+}
+
+.sk-tag-vibe {
+  border-radius: 999px !important;
+  background: rgba(255, 138, 42, 0.12) !important;
+  border: 1px solid rgba(255, 138, 42, 0.25) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.sk-tag-pending {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+.sk-pendingRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.18);
+}
