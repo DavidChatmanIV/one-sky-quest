@@ -77,9 +77,9 @@ export default function Navbar() {
           <span className="sk-logoText">Skyrio</span>
         </button>
 
-        {/* CENTER */}
-        <div className="sk-mid">
-          <nav className="sk-links">
+        {/* CENTER (TRUE CENTER) */}
+        <nav className="sk-centerNav" aria-label="Primary">
+          <div className="sk-links">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -94,8 +94,8 @@ export default function Navbar() {
                 {item.label}
               </NavLink>
             ))}
-          </nav>
-        </div>
+          </div>
+        </nav>
 
         {/* RIGHT */}
         <div className="sk-actions">
@@ -125,7 +125,7 @@ export default function Navbar() {
                   trigger={["click"]}
                   overlayClassName="sk-dropdown"
                 >
-                  <button className="sk-avatarBtn">
+                  <button className="sk-avatarBtn" type="button">
                     <Avatar
                       size={34}
                       src={user?.avatarUrl}
@@ -137,10 +137,13 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile */}
+          {/* Mobile hamburger */}
           <button
             className={`hamburger ${mobileOpen ? "is-open" : ""}`}
             onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            type="button"
           >
             <span />
             <span />
