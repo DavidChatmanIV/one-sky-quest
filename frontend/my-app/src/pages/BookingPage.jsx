@@ -29,7 +29,7 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 
-import "../styles/bookingPage.css";
+import "../styles/BookingPage.css";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
