@@ -5,7 +5,7 @@ import PageLayout from "../components/PageLayout";
 import TutorialModal from "../components/TutorialModal";
 import SupportFormModal from "../components/SupportFormModal";
 
-import "../styles/Landingpage.css";
+import "../styles/LandingPage.css";
 
 const { Title, Text } = Typography;
 
