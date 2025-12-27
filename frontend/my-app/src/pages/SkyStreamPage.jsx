@@ -1,343 +1,363 @@
-// src/pages/SkyStreamPage.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Layout,
   Row,
   Col,
   Card,
   Typography,
-  Empty,
-  Modal,
   Input,
   Button,
   Space,
+  Segmented,
+  Empty,
   Tag,
-  message,
 } from "antd";
 import {
+  SearchOutlined,
   PlusOutlined,
-  LikeOutlined,
-  MessageOutlined,
   FireOutlined,
   ThunderboltOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 
-import SkyStreamHeader from "../components/skystream/SkyStreamHeader";
 import "../styles/skystream.css";
-
-// If you already have this hook, keep your import path:
-import { useAuth } from "../hooks/useAuth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
+/* ---------------------------
+   Reusable SkyrioPill component
+   --------------------------- */
+function SkyrioPill({
+  label,
+  pulse = false,
+  percent = null,
+  onClick,
+  title,
+  className = "",
+}) {
+  const clickable = typeof onClick === "function";
+  const pct =
+    typeof percent === "number" && Number.isFinite(percent)
+      ? Math.max(0, Math.min(100, percent))
+      : null;
+
+  return (
+    <Tag
+      title={title}
+      className={[
+        "sk-pill",
+        clickable ? "sk-pill--clickable" : "",
+        pulse ? "sk-pill--pulse" : "",
+        pct !== null ? "sk-pill--hasPct" : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      onClick={clickable ? onClick : undefined}
+    >
+      <span className="sk-pillLabel">{label}</span>
+
+      {pct !== null && (
+        <span className="sk-pillPctWrap" aria-hidden="true">
+          <span className="sk-pillPctText">{pct}%</span>
+          <span className="sk-pillPctBar">
+            <span className="sk-pillPctFill" style={{ width: `${pct}%` }} />
+          </span>
+        </span>
+      )}
+    </Tag>
+  );
+}
+
 const TAB_OPTIONS = [
   { key: "forYou", label: "For You" },
   { key: "following", label: "Following" },
-  { key: "trending", label: "Trending" },
+  { key: "deals", label: "Deals" },
   { key: "news", label: "News" },
 ];
 
 export default function SkyStreamPage() {
-  const auth = useAuth();
-
-  // ✅ Soft launch: XP starts at 0 unless backend provides it
-  const [xpToday, setXpToday] = useState(0);
-
   const [activeTab, setActiveTab] = useState("forYou");
   const [search, setSearch] = useState("");
 
-  const [composeOpen, setComposeOpen] = useState(false);
-  const [composeText, setComposeText] = useState("");
-
-  // ✅ Always show REAL username (no "David" hardcode)
-  const displayName = useMemo(() => {
-    const u = auth?.user;
-    if (!u) return "Guest";
-    return (
-      u.username || u.name || (u.email ? u.email.split("@")[0] : "Explorer")
-    );
-  }, [auth?.user]);
-
-  // ✅ If you later add /api/profile, this is safe:
-  useEffect(() => {
-    let ignore = false;
-
-    (async () => {
-      try {
-        // if you don't have this endpoint yet, it will fail and we keep 0
-        const res = await fetch("/api/profile/me", { credentials: "include" });
-        if (!res.ok) throw new Error("profile fetch failed");
-        const data = await res.json();
-        if (!ignore) setXpToday(Number(data?.xpToday ?? 0));
-      } catch {
-        if (!ignore) setXpToday(0);
-      }
-    })();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  // Soft-launch demo feed (safe and simple)
-  const posts = useMemo(() => {
-    return [
+  // Demo posts (replace with API later)
+  const posts = useMemo(
+    () => [
       {
-        id: "p1",
-        user: "Skyrio",
-        tag: "#welcome",
+        id: "1",
+        tab: "forYou",
+        author: "Skyrio",
+        time: "just now",
+        xp: 10,
         title: "Welcome to SkyStream ✈️",
         body: "Drop your next destination. Earn XP for posting, saving, and booking.",
-        time: "just now",
-        likes: 12,
-        comments: 3,
-        xp: 10,
+        tags: ["#welcome", "#Japan", "#Kyoto"],
       },
       {
-        id: "p2",
-        user: displayName,
-        tag: "#mytrip",
+        id: "2",
+        tab: "forYou",
+        author: "Guest",
+        time: "2m ago",
+        xp: 5,
         title: "Planning something soon",
         body: "Looking at a weekend getaway — any city vibe recs?",
-        time: "2m ago",
-        likes: 0,
-        comments: 0,
-        xp: 5,
+        tags: ["#mytrip", "#weekend"],
       },
       {
-        id: "p3",
-        user: "Travel Desk",
-        tag: "#deals",
-        title: "Price drop alert idea",
-        body: "Post-launch: price tracking + seasonal best-month hints will be 🔥",
-        time: "15m ago",
-        likes: 21,
-        comments: 7,
+        id: "3",
+        tab: "deals",
+        author: "Skyrio",
+        time: "10m ago",
         xp: 15,
+        title: "Weekend Deal Drop",
+        body: "Flash hotel deals are live for coastal cities.",
+        tags: ["#deals", "#weekend"],
       },
-    ];
-  }, [displayName]);
+    ],
+    []
+  );
 
-  // ✅ Single source of truth for search + tab filtering
-  const filtered = useMemo(() => {
+  const trending = useMemo(
+    () => ["#Japan", "#Kyoto", "#HiddenGem", "#Weekend", "#deals"],
+    []
+  );
+
+  const hotspots = useMemo(
+    () => [
+      { label: "Kyoto", pct: 42 },
+      { label: "Santorini", pct: 31 },
+      { label: "Puerto Rico", pct: 28 },
+      { label: "Seoul", pct: 18 },
+    ],
+    []
+  );
+
+  function applyPillFilter(rawLabel) {
+    const clean = String(rawLabel || "")
+      .trim()
+      .replace(/^#/, "");
+
+    if (!clean) return;
+
+    const tag = `#${clean}`;
+    setSearch(tag);
+
+    // Smart tab switch (optional but feels great)
+    if (clean.toLowerCase().includes("deal")) setActiveTab("deals");
+    else setActiveTab("forYou");
+  }
+
+  function clearFilters() {
+    setSearch("");
+    setActiveTab("forYou");
+  }
+
+  const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const qClean = q.replace(/^#/, "");
 
-    const base =
-      activeTab === "following"
-        ? posts.filter((p) => p.user === displayName) // simple soft-launch behavior
-        : activeTab === "trending"
-        ? posts.filter((p) => (p.likes ?? 0) >= 10)
-        : activeTab === "news"
-        ? posts.filter((p) => p.tag === "#deals" || p.tag === "#news")
-        : posts;
+    return posts
+      .filter((p) => p.tab === activeTab)
+      .filter((p) => {
+        if (!qClean) return true;
+        const text = `${p.title || ""} ${p.body || ""}`.toLowerCase();
+        const tags = (p.tags || []).map((t) => String(t).toLowerCase());
+        return (
+          text.includes(qClean) ||
+          tags.some((t) => t.replace(/^#/, "").includes(qClean))
+        );
+      });
+  }, [posts, activeTab, search]);
 
-    if (!q) return base;
-
-    return base.filter((p) => {
-      const blob = `${p.title} ${p.body} ${p.user} ${p.tag}`.toLowerCase();
-      return blob.includes(q);
-    });
-  }, [posts, activeTab, search, displayName]);
-
-  const trendingTags = useMemo(() => {
-    return [
-      { tag: "#deals", icon: <FireOutlined /> },
-      { tag: "#weekend", icon: <ThunderboltOutlined /> },
-      { tag: "#food", icon: <FireOutlined /> },
-      { tag: "#beach", icon: <FireOutlined /> },
-      { tag: "#hiddenGems", icon: <ThunderboltOutlined /> },
-    ];
-  }, []);
-
-  const openCompose = () => setComposeOpen(true);
-
-  const submitPost = () => {
-    if (!composeText.trim()) {
-      message.warning("Write something quick first.");
-      return;
-    }
-    // Soft launch: just confirm. Later wire to backend.
-    message.success("Posted to SkyStream ✅");
-    setComposeText("");
-    setComposeOpen(false);
-  };
+  const activeTag = useMemo(
+    () => search.trim().replace(/^#/, "").toLowerCase(),
+    [search]
+  );
 
   return (
-    <Layout className="skystream-wrap">
+    <Layout className="skystream">
       <Content className="skystream-content">
-        <SkyStreamHeader
-          brand="Skyrio"
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          tabOptions={TAB_OPTIONS}
-          search={search}
-          onSearchChange={setSearch}
-          xpToday={xpToday}
-          onCompose={openCompose}
-        />
+        {/* Hero */}
+        <div className="skystream-hero">
+          <div>
+            <Title level={1} className="skystream-title">
+              SkyStream
+            </Title>
+            <Text className="skystream-subtitle">
+              Live travel moments across Skyrio
+            </Text>
+          </div>
 
-        <Row gutter={[16, 16]} style={{ marginTop: 14 }}>
-          {/* FEED */}
+          <Button
+            className="skystream-postBtn"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              /* open post modal later */
+            }}
+          >
+            Post
+          </Button>
+        </div>
+
+        {/* Controls */}
+        <div className="skystream-controls">
+          <Input
+            className="skystream-search"
+            prefix={<SearchOutlined />}
+            placeholder="Search SkyStream"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+          />
+
+          <Segmented
+            className="skystream-tabs"
+            value={activeTab}
+            onChange={setActiveTab}
+            options={TAB_OPTIONS.map((t) => ({ label: t.label, value: t.key }))}
+          />
+        </div>
+
+        {/* Optional “Search:” chip */}
+        {search.trim() && (
+          <div className="skystream-searchChipRow">
+            <SkyrioPill
+              label={`Search: "${search}"`}
+              onClick={() => setSearch("")}
+              title="Click to clear search"
+            />
+          </div>
+        )}
+
+        {/* Main grid */}
+        <Row gutter={[16, 16]} className="skystream-grid">
+          {/* Feed */}
           <Col xs={24} lg={16}>
-            <Card className="sk-card sk-feedCard" bordered={false}>
-              <div className="sk-feedHeader">
-                <div>
-                  <Title level={4} style={{ margin: 0 }}>
-                    SkyStream
-                  </Title>
-                  <Text className="sk-muted">
-                    Your travel feed — simple, fast, premium.
-                  </Text>
-                </div>
-
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  className="btn-orange"
-                  onClick={openCompose}
-                >
-                  Post
-                </Button>
-              </div>
-
-              <div className="sk-feedList">
-                {filtered.length === 0 ? (
-                  <Empty
-                    description={
-                      <span className="sk-muted">
-                        No posts match that search.
-                      </span>
-                    }
-                  />
-                ) : (
-                  filtered.map((p) => (
-                    <Card
-                      key={p.id}
-                      className="sk-post"
-                      bordered={false}
-                      hoverable
-                    >
-                      <div className="sk-postTop">
-                        <div className="sk-postMeta">
-                          <Text className="sk-postUser">{p.user}</Text>
-                          <Text className="sk-dot">•</Text>
-                          <Text className="sk-muted">{p.time}</Text>
-                        </div>
-
-                        <Tag className="sk-tag" bordered={false}>
-                          {p.tag}
-                        </Tag>
+            <Card className="sk-card" title="SkyStream">
+              {filteredPosts.length === 0 ? (
+                <Empty description="No posts match your filters yet." />
+              ) : (
+                <div className="sk-feed">
+                  {filteredPosts.map((p) => (
+                    <div key={p.id} className="sk-post">
+                      <div className="sk-postMeta">
+                        <Text className="sk-postAuthor">
+                          {p.author} · <span className="muted">{p.time}</span>{" "}
+                          <span className="muted">+{p.xp} XP</span>
+                        </Text>
                       </div>
 
-                      <Title level={5} className="sk-postTitle">
+                      <Title level={4} className="sk-postTitle">
                         {p.title}
                       </Title>
 
                       <Text className="sk-postBody">{p.body}</Text>
 
-                      <div className="sk-postActions">
-                        <Button
-                          type="text"
-                          icon={<LikeOutlined />}
-                          className="sk-actionBtn"
-                        >
-                          {p.likes}
-                        </Button>
-
-                        <Button
-                          type="text"
-                          icon={<MessageOutlined />}
-                          className="sk-actionBtn"
-                        >
-                          {p.comments}
-                        </Button>
-
-                        <div className="sk-xpChip">
-                          <ThunderboltOutlined /> <span>+{p.xp} XP</span>
-                        </div>
+                      <div className="sk-postTags">
+                        {(p.tags || []).map((t) => (
+                          <SkyrioPill
+                            key={t}
+                            label={t}
+                            pulse={false}
+                            className={
+                              activeTag &&
+                              t.replace(/^#/, "").toLowerCase() === activeTag
+                                ? "sk-pill--active"
+                                : ""
+                            }
+                            onClick={() => applyPillFilter(t)}
+                            title="Click to filter"
+                          />
+                        ))}
                       </div>
-                    </Card>
-                  ))
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           </Col>
 
-          {/* RIGHT SIDE (PREMIUM, SIMPLE) */}
+          {/* Right rail */}
           <Col xs={24} lg={8}>
-            <Card className="sk-card" bordered={false}>
-              <Title level={5} style={{ marginTop: 0 }}>
-                Trending
-              </Title>
+            <div className="sk-rail">
+              <Card
+                className="sk-card"
+                title={
+                  <span className="sk-cardTitle">
+                    Trending <FireOutlined />
+                  </span>
+                }
+                extra={
+                  <Button type="link" onClick={() => setSearch("")}>
+                    Clear
+                  </Button>
+                }
+              >
+                <div className="sk-pillGrid">
+                  {trending.map((t, idx) => (
+                    <SkyrioPill
+                      key={t}
+                      label={t}
+                      pulse={idx === 0} // ✅ subtle pulse on top pill
+                      className={
+                        activeTag &&
+                        t.replace(/^#/, "").toLowerCase() === activeTag
+                          ? "sk-pill--active"
+                          : ""
+                      }
+                      onClick={() => applyPillFilter(t)}
+                      title="Click to filter the feed"
+                    />
+                  ))}
+                </div>
+              </Card>
 
-              <Space wrap>
-                {trendingTags.map((t) => (
-                  <Tag
-                    key={t.tag}
-                    className="sk-trendTag"
-                    onClick={() => setSearch(t.tag)}
+              <Card className="sk-card" title="Today’s hotspots">
+                <div className="sk-pillGrid">
+                  {hotspots.map((h) => (
+                    <SkyrioPill
+                      key={h.label}
+                      label={h.label}
+                      percent={h.pct} // ✅ micro-bar + %
+                      className={
+                        activeTag && h.label.toLowerCase() === activeTag
+                          ? "sk-pill--active"
+                          : ""
+                      }
+                      onClick={() => applyPillFilter(h.label)}
+                      title="Click to filter by destination"
+                    />
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="sk-card" title="Quick Actions">
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Button
+                    block
+                    icon={<ReloadOutlined />}
+                    onClick={() => setActiveTab("forYou")}
                   >
-                    {t.icon} {t.tag}
-                  </Tag>
-                ))}
-              </Space>
+                    Reset to For You
+                  </Button>
 
-              <div className="sk-divider" />
+                  <Button block onClick={() => setSearch("")}>
+                    Clear Search
+                  </Button>
 
-              <Title level={5} style={{ marginTop: 0 }}>
-                Quick Actions
-              </Title>
-
-              <Space direction="vertical" style={{ width: "100%" }} size={10}>
-                <Button
-                  className="sk-ghostBtn"
-                  onClick={() => setActiveTab("forYou")}
-                >
-                  Reset to For You
-                </Button>
-                <Button className="sk-ghostBtn" onClick={() => setSearch("")}>
-                  Clear Search
-                </Button>
-                <Button className="sk-ghostBtn" onClick={openCompose}>
-                  Create a Post
-                </Button>
-              </Space>
-            </Card>
+                  <Button
+                    block
+                    icon={<ThunderboltOutlined />}
+                    onClick={clearFilters}
+                  >
+                    Clear All
+                  </Button>
+                </Space>
+              </Card>
+            </div>
           </Col>
         </Row>
-
-        {/* COMPOSE MODAL */}
-        <Modal
-          title="Post to SkyStream"
-          open={composeOpen}
-          onCancel={() => setComposeOpen(false)}
-          footer={
-            <Space>
-              <Button onClick={() => setComposeOpen(false)}>Cancel</Button>
-              <Button
-                type="primary"
-                className="btn-orange"
-                onClick={submitPost}
-              >
-                Post
-              </Button>
-            </Space>
-          }
-        >
-          <Text className="sk-muted">
-            Keep it simple for soft launch. You can add images, tags, and
-            threads post-launch.
-          </Text>
-
-          <Input.TextArea
-            value={composeText}
-            onChange={(e) => setComposeText(e.target.value)}
-            placeholder="What’s your next move? ✈️"
-            rows={5}
-            style={{ marginTop: 10 }}
-          />
-        </Modal>
       </Content>
     </Layout>
   );

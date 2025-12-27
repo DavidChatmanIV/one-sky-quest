@@ -1,18 +1,28 @@
+/* -------------------------------------------------
+   Skyrio Navbar Shell (Premium + Responsive + Shrink)
+------------------------------------------------- */
+
+:root {
+  --nav-h: 88px; /* default premium height */
+}
+
 .sk-nav {
   position: sticky;
   top: 0;
   z-index: 1000;
 
-  height: 76px;
+  height: var(--nav-h);
   display: flex;
   align-items: center;
 
-  /* ✅ Make navbar cover the page behind (no bleed-through) */
-  background: #0b0f1d; /* solid base */
+  /* Solid cover (no background bleed) */
+  background: #0b0f1d;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+
+  transition: height 220ms ease, background 220ms ease, box-shadow 220ms ease;
 }
 
-/* ✅ Premium depth overlay (still solid — covers behind) */
+/* Premium depth overlay */
 .sk-nav::before {
   content: "";
   position: absolute;
@@ -26,17 +36,19 @@
   z-index: 0;
 }
 
-/* optional compact state */
+/* Scrolled shrink */
 .sk-nav.is-scrolled.is-compact {
+  --nav-h: 72px;
   background: #070a14;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 /* The inner row */
 .sk-nav-inner {
-  position: relative; /* needed for absolute centering + above overlay */
+  position: relative; /* absolute centering + above overlay */
   z-index: 1;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px; /* premium default */
   margin: 0 auto;
 
   display: flex;
@@ -47,36 +59,69 @@
 }
 
 /* -------------------------------------------------
-   LEFT
+   LEFT (Brand Lockup)
 ------------------------------------------------- */
 
 .sk-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 
   background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
+
+  transition: transform 180ms ease;
+}
+
+.sk-brand:hover {
+  transform: translateY(-1px);
 }
 
 .sk-logoImg {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
+
+  transition: width 220ms ease, height 220ms ease, transform 220ms ease;
+}
+
+.sk-nav.is-scrolled.is-compact .sk-logoImg {
+  width: 40px;
+  height: 40px;
 }
 
 .sk-logoText {
   color: #f4f6fb;
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 0.2px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+
+  transition: opacity 200ms ease, transform 200ms ease, width 200ms ease;
 }
+
+/* Brand lockup: hide text on smaller screens */
+@media (max-width: 1060px) {
+  .sk-logoText {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transform: translateX(-6px);
+  }
+}
+
+/* Optional: hide brand text when scrolled (even on desktop) */
+/* .sk-nav.is-scrolled.is-compact .sk-logoText {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transform: translateX(-6px);
+} */
 
 /* -------------------------------------------------
    TRUE CENTER NAV
-   This is the fix: absolute center to viewport row
 ------------------------------------------------- */
 
 .sk-centerNav {
@@ -88,14 +133,21 @@
 .sk-links {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 
-  padding: 6px;
+  padding: 8px;
   border-radius: 999px;
 
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+  transition: padding 220ms ease, transform 220ms ease;
+}
+
+.sk-nav.is-scrolled.is-compact .sk-links {
+  padding: 6px;
+  transform: translateY(-1px);
 }
 
 /* Link pills */
@@ -104,16 +156,15 @@
   align-items: center;
   justify-content: center;
 
-  padding: 8px 16px;
+  padding: 10px 18px;
   border-radius: 999px;
 
   color: rgba(244, 246, 251, 0.86);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   text-decoration: none;
 
-  /* ✅ fix the broken transition */
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sk-link:hover {
@@ -125,16 +176,12 @@
 .sk-link.is-active {
   background: linear-gradient(135deg, #ff8a2a, #ffb86b);
   color: #0b1220;
-  font-weight: 700;
-}
-
-/* Optional: special passport pill styling if you want */
-.passport-pill {
-  /* leave blank or add subtle accent */
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(255, 138, 42, 0.25);
 }
 
 /* -------------------------------------------------
-   RIGHT
+   RIGHT (Premium buttons)
 ------------------------------------------------- */
 
 .sk-actions {
@@ -159,7 +206,7 @@
 .sk-hello {
   color: rgba(244, 246, 251, 0.86);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .sk-avatarBtn {
@@ -169,11 +216,19 @@
   cursor: pointer;
 }
 
+.sk-btnPrimary,
+.sk-btnGhost {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 14.5px;
+}
+
 .sk-btnPrimary {
   background: linear-gradient(135deg, #ff8a2a, #ffb86b) !important;
   border: none !important;
   color: #0b1220 !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
 }
 
 .sk-btnGhost {
@@ -183,14 +238,14 @@
 }
 
 /* -------------------------------------------------
-   Glow line
+   Glow line (sticks to bottom of navbar)
 ------------------------------------------------- */
 
 .sk-glowline {
   position: absolute;
   left: 0;
   right: 0;
-  top: 75px;
+  top: calc(var(--nav-h) - 1px);
   height: 1px;
   background: linear-gradient(
     90deg,
@@ -200,7 +255,7 @@
     transparent
   );
   pointer-events: none;
-  z-index: 2; /* ✅ above overlay */
+  z-index: 2;
 }
 
 /* -------------------------------------------------
@@ -228,32 +283,18 @@
   transition: transform 0.2s ease, opacity 0.2s ease, top 0.2s ease;
 }
 
-.hamburger span:nth-child(1) {
-  top: 12px;
-}
-.hamburger span:nth-child(2) {
-  top: 18px;
-}
-.hamburger span:nth-child(3) {
-  top: 24px;
-}
+.hamburger span:nth-child(1) { top: 12px; }
+.hamburger span:nth-child(2) { top: 18px; }
+.hamburger span:nth-child(3) { top: 24px; }
 
-.hamburger.is-open span:nth-child(1) {
-  top: 18px;
-  transform: rotate(45deg);
-}
-.hamburger.is-open span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.is-open span:nth-child(3) {
-  top: 18px;
-  transform: rotate(-45deg);
-}
+.hamburger.is-open span:nth-child(1) { top: 18px; transform: rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { top: 18px; transform: rotate(-45deg); }
 
-/* Mobile panel (keep your existing styles if you already have them) */
+/* Mobile panel */
 .mobile-panel {
   position: absolute;
-  top: 76px;
+  top: var(--nav-h);
   left: 0;
   right: 0;
   background: rgba(12, 10, 24, 0.98);
@@ -262,7 +303,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 3; /* ✅ above overlay */
+  z-index: 3;
 }
 
 .mobile-panel.open {
@@ -272,7 +313,7 @@
 }
 
 .mobile-panel-inner {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 14px 18px 18px;
   display: grid;
@@ -306,5 +347,25 @@
   }
   .hamburger {
     display: inline-block;
+  }
+}
+
+/* -------------------------------------------------
+   1440p / 4K tuning
+------------------------------------------------- */
+
+@media (min-width: 1440px) {
+  .sk-nav-inner {
+    max-width: 1380px;
+  }
+}
+
+@media (min-width: 2200px) {
+  .sk-nav-inner {
+    max-width: 1560px;
+  }
+  .sk-link {
+    font-size: 15px;
+    padding: 11px 20px;
   }
 }

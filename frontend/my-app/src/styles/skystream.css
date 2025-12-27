@@ -1,257 +1,325 @@
-.skystream-wrap {
+:root {
+  --sk-bg-1: #0b1220;
+  --sk-bg-2: #1a1c3b;
+
+  --sk-surface: rgba(255, 255, 255, 0.08);
+  --sk-surface-2: rgba(255, 255, 255, 0.10);
+  --sk-stroke: rgba(255, 255, 255, 0.12);
+
+  --sk-text: #f4f6fb;
+  --sk-muted: rgba(244, 246, 251, 0.72);
+
+  --sk-cta: #ff8a2a;
+  --sk-cta-2: #ffb066;
+
+  --sk-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* ===============================
+   Page wrapper + background
+   =============================== */
+
+.skystream {
   min-height: 100vh;
-  background: radial-gradient(
-      1200px 600px at 50% -10%,
-      rgba(255, 138, 42, 0.12),
-      transparent 60%
-    ),
-    linear-gradient(
-      180deg,
-      var(--bg-start, #0f1020),
-      var(--bg-mid, #231a3a),
-      var(--bg-end, #3a2430)
-    );
-}
-
-/* ===== SkyStream: force readable text on dark glass ===== */
-.skystream-hero,
-.skystream-hero * {
-  color: #fff;
-}
-
-.skystream-subtitle {
-  color: rgba(255,255,255,0.78);
-}
-
-/* Ant Input text + placeholder */
-.skystream-search.ant-input-affix-wrapper,
-.skystream-search.ant-input,
-.skystream-search input {
-  color: #fff !important;
-}
-
-.skystream-search input::placeholder {
-  color: rgba(255,255,255,0.55) !important;
-}
-
-.skystream-search .ant-input-prefix {
-  color: rgba(255,255,255,0.65) !important;
-}
-
-/* Fix Ant clear icon */
-.skystream-search .ant-input-clear-icon {
-  color: rgba(255,255,255,0.65) !important;
+  background:
+    radial-gradient(900px 500px at 75% 18%, rgba(255, 140, 90, 0.24), transparent 60%),
+    radial-gradient(900px 600px at 25% 22%, rgba(120, 90, 255, 0.30), transparent 65%),
+    linear-gradient(135deg, var(--sk-bg-1), var(--sk-bg-2));
 }
 
 .skystream-content {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 14px 16px 28px;
+  padding: 18px 16px 40px;
 }
 
+/* ===============================
+   FORCE TEXT WHITE (SkyStream only)
+   =============================== */
 
-.sk-muted {
+.skystream,
+.skystream * {
+  color: var(--sk-text) !important;
+}
+
+.skystream .muted,
+.skystream .ant-typography-secondary,
+.skystream .ant-text-secondary {
+  color: var(--sk-muted) !important;
+}
+
+/* ===============================
+   Hero
+   =============================== */
+
+.skystream-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 2px 14px;
+}
+
+.skystream-title {
+  margin: 0 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+.skystream-subtitle {
+  display: block;
+  margin-top: 4px;
+  color: var(--sk-muted) !important;
+  font-weight: 600;
+}
+
+.skystream-postBtn {
+  background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  height: 44px !important;
+  padding: 0 18px !important;
+  box-shadow: 0 14px 30px rgba(255, 138, 42, 0.28);
+}
+
+.skystream-postBtn:hover {
+  filter: brightness(1.03);
+}
+
+/* ===============================
+   Controls (Search + Tabs)
+   =============================== */
+
+.skystream-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 6px 0 8px;
+}
+
+.skystream-search {
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--sk-stroke) !important;
+  height: 46px !important;
+  box-shadow: var(--sk-shadow);
+}
+
+.skystream .ant-input-affix-wrapper .ant-input-prefix {
+  color: rgba(244, 246, 251, 0.65) !important;
+}
+
+.skystream-tabs {
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--sk-stroke) !important;
+  border-radius: 16px !important;
+  padding: 6px !important;
+}
+
+.skystream .ant-segmented-item {
   color: rgba(244, 246, 251, 0.75) !important;
-}
-
-.sk-strong {
-  color: rgba(244, 246, 251, 0.95);
   font-weight: 700;
 }
 
-.btn-orange {
-  background: var(--cta, #ff8a2a) !important;
-  border-color: transparent !important;
-  box-shadow: 0 12px 24px rgba(255, 138, 42, 0.22);
-}
-.btn-orange:hover {
-  background: var(--cta-hover, #ff7a00) !important;
+.skystream .ant-segmented-item-selected {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-radius: 12px !important;
+  color: var(--sk-text) !important;
 }
 
-/* Header */
-.sk-headerCard {
-  border-radius: 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.30);
-  backdrop-filter: blur(10px);
+/* Search chip row */
+.skystream-searchChipRow {
+  margin: 8px 0 10px;
 }
 
-.sk-headerRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
+/* ===============================
+   Cards / layout
+   =============================== */
 
-.sk-headerTitle {
-  margin: 0 !important;
-  color: rgba(244,246,251,0.95) !important;
-}
-
-.sk-headerRight {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sk-xpPill {
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color: rgba(244,246,251,0.92);
-  border-radius: 999px;
-  padding: 6px 10px;
-}
-
-.sk-headerControls {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.sk-tabs {
-  border-radius: 12px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-}
-
-.sk-search {
-  border-radius: 12px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-}
-
-/* Cards */
 .sk-card {
-  border-radius: 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.28);
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--sk-shadow);
   backdrop-filter: blur(10px);
 }
 
-.sk-feedCard {
-  padding: 2px;
+.sk-card .ant-card-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
-.sk-feedHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.sk-feedList {
-  display: grid;
-  gap: 12px;
-}
-
-/* Post */
-.sk-post {
-  border-radius: 14px;
-  background: rgba(0,0,0,0.12) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  transition: transform 160ms ease, box-shadow 160ms ease;
-}
-.sk-post:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.35);
-}
-
-.sk-postTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.sk-postMeta {
-  display: flex;
+.sk-cardTitle {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.sk-postUser {
-  color: rgba(244,246,251,0.95);
+.sk-rail {
+  display: grid;
+  gap: 12px;
+}
+
+/* ===============================
+   Feed styling
+   =============================== */
+
+.sk-feed {
+  display: grid;
+  gap: 14px;
+}
+
+.sk-post {
+  padding: 12px 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.sk-postMeta {
+  margin-bottom: 6px;
+}
+
+.sk-postAuthor {
   font-weight: 700;
 }
 
-.sk-dot {
-  color: rgba(244,246,251,0.45);
-}
-
-.sk-tag {
-  border-radius: 999px;
-  background: rgba(255,255,255,0.08) !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  color: rgba(244,246,251,0.9) !important;
-}
-
 .sk-postTitle {
-  margin: 0 0 6px 0 !important;
-  color: rgba(244,246,251,0.95) !important;
+  margin: 2px 0 6px !important;
+  font-weight: 800 !important;
 }
 
 .sk-postBody {
-  color: rgba(244,246,251,0.82) !important;
+  display: block;
+  margin-bottom: 10px;
+  color: rgba(244, 246, 251, 0.86) !important;
 }
 
-.sk-postActions {
-  display: flex;
+.sk-postTags {
+  margin-top: 6px;
+}
+
+/* ===============================
+   ORANGE PILLS (SkyrioPill)
+   =============================== */
+
+.skystream .sk-pill {
+  background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
+  color: #111 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.2px;
+
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 6px 12px !important;
+
+  display: inline-flex !important;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  margin-top: 10px;
+
+  margin-inline-end: 8px !important;
+  margin-bottom: 8px !important;
+
+  box-shadow:
+    0 6px 14px rgba(255, 138, 42, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  user-select: none;
+  opacity: 1 !important;
 }
 
-.sk-actionBtn {
-  color: rgba(244,246,251,0.85) !important;
+.skystream .sk-pill * {
+  color: #111 !important;
 }
 
-.sk-xpChip {
+.sk-pillGrid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Click feel */
+.skystream .sk-pill--clickable {
+  cursor: pointer;
+  transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.skystream .sk-pill--clickable:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.skystream .sk-pill--clickable:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+}
+
+/* Active pill outline */
+.skystream .sk-pill--active {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
+/* Subtle pulse for top Trending pill */
+.skystream .sk-pill--pulse {
+  animation: skPillPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes skPillPulse {
+  0% {
+    box-shadow:
+      0 6px 14px rgba(255, 138, 42, 0.40),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  }
+  55% {
+    box-shadow:
+      0 0 0 6px rgba(255, 138, 42, 0.10),
+      0 10px 20px rgba(255, 138, 42, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  }
+  100% {
+    box-shadow:
+      0 6px 14px rgba(255, 138, 42, 0.40),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  }
+}
+
+/* Hotspots % micro-bar */
+.skystream .sk-pillPctWrap {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+
+.skystream .sk-pillPctText {
+  font-weight: 950;
+  font-size: 12px;
+  color: #111 !important;
+  opacity: 0.85;
+}
+
+.skystream .sk-pillPctBar {
+  width: 66px;
+  height: 7px;
   border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255,138,42,0.12);
-  border: 1px solid rgba(255,138,42,0.18);
-  color: rgba(244,246,251,0.92);
+  background: rgba(17, 17, 17, 0.22);
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
 }
 
-/* Right panel tags */
-.sk-trendTag {
-  cursor: pointer;
+.skystream .sk-pillPctFill {
+  height: 100%;
+  display: block;
   border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(244,246,251,0.92);
-}
-.sk-trendTag:hover {
-  box-shadow: 0 12px 22px rgba(0,0,0,0.25);
+  background: rgba(17, 17, 17, 0.55);
 }
 
-.sk-divider {
-  height: 1px;
-  margin: 14px 0;
-  background: rgba(255,255,255,0.10);
-}
+/* ===============================
+   Responsive tweaks
+   =============================== */
 
-.sk-ghostBtn {
-  width: 100%;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: rgba(244,246,251,0.9);
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .sk-headerControls {
-    grid-template-columns: 1fr;
+@media (min-width: 900px) {
+  .skystream-controls {
+    grid-template-columns: 1fr auto;
+    align-items: center;
   }
 }

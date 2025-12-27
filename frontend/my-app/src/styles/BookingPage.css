@@ -339,57 +339,183 @@
   top: 14px;
 }
 
-/* ============================= */
-/* Budget Panel */
+//* ============================= */
+/* Premium Budget Card Upgrade   */
 /* ============================= */
 
-.sk-budgetCard {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+.sk-budgetCard--premium {
+  border-radius: 18px;
   padding: 14px;
-  backdrop-filter: blur(10px);
+  background: linear-gradient(
+      135deg,
+      rgba(255, 140, 90, 0.12),
+      rgba(120, 90, 255, 0.10)
+    ),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
 }
 
-.sk-budgetHeader {
+.sk-budgetHint {
+  font-size: 12px;
+  color: rgba(244, 246, 251, 0.75);
+  margin-top: 2px;
+}
+
+.sk-budgetHero {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sk-budgetRemaining {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: rgba(244, 246, 251, 0.98);
+}
+
+.sk-budgetRemainingSub {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(244, 246, 251, 0.72);
+  margin-left: 6px;
+}
+
+.sk-budgetMetaRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 10px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(244, 246, 251, 0.72);
 }
 
-.sk-budgetTitle {
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-size: 16px;
-  font-weight: 900;
+.sk-budgetBar {
+  height: 12px;
+  border-radius: 999px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-.sk-budgetValue {
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-size: 18px;
-  font-weight: 900;
+.sk-budgetBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(120, 90, 255, 0.95), rgba(255, 140, 90, 0.95));
+  box-shadow: 0 10px 22px rgba(255, 140, 90, 0.20);
 }
 
 .sk-budgetSub {
-  color: rgba(255, 255, 255, 0.7) !important;
-  margin-top: 6px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(244, 246, 251, 0.72);
 }
 
-.sk-budgetBlock {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+.sk-budgetQuickAdd {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.sk-budgetBlockTitle {
-  color: rgba(255, 255, 255, 0.85) !important;
+.sk-budgetSectionTitle {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 246, 251, 0.78);
+  margin-bottom: 10px;
+}
+
+.sk-budgetAddRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.sk-budgetAmount .ant-input-number-input {
+  color: rgba(244, 246, 251, 0.95) !important;
+}
+
+.sk-budgetAmount,
+.sk-budgetNote {
+  border-radius: 12px !important;
+  background: rgba(0, 0, 0, 0.20) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: rgba(244, 246, 251, 0.95) !important;
+}
+
+.sk-budgetActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sk-budgetAddBtn {
+  flex: 1;
+  height: 40px;
+  border-radius: 14px !important;
+}
+
+.sk-budgetDetailPills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.sk-budgetPill {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.sk-budgetPillLabel {
+  font-size: 11px;
+  color: rgba(244, 246, 251, 0.72);
+}
+
+.sk-budgetPillValue {
+  margin-top: 2px;
+  font-size: 14px;
   font-weight: 900;
-  margin-bottom: 8px;
+  color: rgba(244, 246, 251, 0.96);
 }
 
-.sk-budgetEmpty {
-  color: rgba(255, 255, 255, 0.7) !important;
+.sk-budgetList {
+  display: grid;
+  gap: 10px;
+}
+
+.sk-budgetItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.sk-budgetItemAmt {
+  font-weight: 900;
+  color: rgba(244, 246, 251, 0.96);
+}
+
+.sk-budgetItemNote {
+  font-size: 12px;
+  color: rgba(244, 246, 251, 0.72);
+}
+
+.sk-budgetItemTime {
+  color: rgba(244, 246, 251, 0.55);
 }
 
 /* ============================= */

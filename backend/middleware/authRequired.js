@@ -3,7 +3,7 @@ import User from "../models/user.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 
-async function authRequired(req, res, next) {
+export async function authRequired(req, res, next) {
   try {
     const header = req.headers.authorization || "";
     const [scheme, token] = header.split(" ");
@@ -16,15 +16,21 @@ async function authRequired(req, res, next) {
 
     const payload = jwt.verify(token, JWT_SECRET);
 
-    // Optional but recommended: confirm user still exists
-    const user = await User.findById(payload.id).lean();
+    // ✅ Your tokens use `sub`. Support legacy `id` too.
+    const userId = payload.sub || payload.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
+
+    // Confirm user still exists
+    const user = await User.findById(userId).lean();
     if (!user) {
       return res
         .status(401)
         .json({ message: "User no longer exists or was removed" });
     }
 
-    // Attach a safe user object to the request
+    // Attach safe user payload
     req.user = {
       id: user._id.toString(),
       email: user.email,
@@ -32,13 +38,14 @@ async function authRequired(req, res, next) {
       name: user.name,
       role: user.role,
       xp: user.xp,
+      isOfficial: !!user.isOfficial,
+      preferences: user.preferences || {},
     };
 
     next();
   } catch (err) {
     console.error("[authRequired] error:", err.message);
 
-    // Tiny UX upgrade: clearer expired-token message
     if (err.name === "TokenExpiredError") {
       return res
         .status(401)
@@ -48,5 +55,3 @@ async function authRequired(req, res, next) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
-
-export default authRequired;

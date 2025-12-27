@@ -43,6 +43,10 @@ import TopEightItemPlace from "./TopEightItemPlace";
 /* Auth */
 import { useAuth } from "../../hooks/useAuth";
 
+/* Rewards opt-in prompt (NEW) */
+import RewardsOptInPrompt from "../../components/rewards/RewardsOptInPrompt";
+import useRewardsOptInPrompt from "../../hooks/useRewardsOptInPrompt";
+
 const { Title, Text } = Typography;
 
 /* ---------------- helpers ---------------- */
@@ -68,6 +72,9 @@ function makeReferralCode(user) {
 export default function DigitalPassportPage() {
   const auth = useAuth();
 
+  /* ✅ Rewards opt-in hook (NEW) */
+  const rewardsOptIn = useRewardsOptInPrompt();
+
   const [musicOpen, setMusicOpen] = useState(false);
   const [profileMusic, setProfileMusic] = useState(null);
   const [segment, setSegment] = useState("overview");
@@ -75,6 +82,9 @@ export default function DigitalPassportPage() {
   const [xp, setXp] = useState(0);
   const [xpToNextBadge, setXpToNextBadge] = useState(0);
   const [nextBadgeName, setNextBadgeName] = useState("Wanderer");
+
+  /* ✅ NEW: whether rewards are enabled for the signed-in user */
+  const rewardsEnabled = !!auth?.user?.settings?.rewardsEnabled;
 
   /* ---------- derived display ---------- */
 
@@ -176,6 +186,7 @@ export default function DigitalPassportPage() {
 
   const xpPercent = useMemo(() => {
     if (!xpToNextBadge) return 0;
+    // soft-launch: keep simple. (You can swap to xp / (xp + xpToNextBadge) later)
     return Math.round((Math.min(xp, 1000) / 1000) * 100);
   }, [xp, xpToNextBadge]);
 
@@ -202,6 +213,13 @@ export default function DigitalPassportPage() {
 
   return (
     <>
+      {/* ✅ Rewards Opt-in Prompt (NEW) */}
+      <RewardsOptInPrompt
+        open={rewardsOptIn.open}
+        onClose={rewardsOptIn.close}
+        onConfirm={rewardsOptIn.confirm}
+      />
+
       <div className="passport-wrap">
         {/* HEADER */}
         <Row gutter={[16, 16]}>
@@ -319,13 +337,69 @@ export default function DigitalPassportPage() {
         {/* VISAS */}
         {segment === "visas" && <VisaList />}
 
-        {/* REWARDS */}
+        {/* ✅ REWARDS (UPDATED) */}
         {segment === "rewards" && (
           <>
             <Membership />
             <SkyrioExchange showSearch={false} />
 
-            <Card>
+            {/* ✅ Seasonal Rewards gated by rewardsEnabled */}
+            {rewardsEnabled ? (
+              <Card style={{ marginTop: 16 }}>
+                <Title level={5} style={{ marginBottom: 6 }}>
+                  Seasonal Rewards
+                </Title>
+
+                <Text type="secondary">
+                  Limited-time XP missions and rewards. You control when seasons
+                  go live.
+                </Text>
+
+                <div style={{ marginTop: 12 }}>
+                  <Tag color="gold">Soft Launch</Tag>
+                  <Tag color="purple">Coming Soon</Tag>
+                </div>
+
+                <div style={{ marginTop: 12 }}>
+                  <Button type="primary" disabled style={{ marginRight: 8 }}>
+                    View Season Rewards
+                  </Button>
+
+                  <Button
+                    onClick={() =>
+                      antdMessage.info(
+                        "Seasonal rewards go live when you turn on a season."
+                      )
+                    }
+                  >
+                    How it works
+                  </Button>
+                </div>
+              </Card>
+            ) : (
+              <Card style={{ marginTop: 16 }}>
+                <Title level={5} style={{ marginBottom: 6 }}>
+                  Rewards are off
+                </Title>
+
+                <Text type="secondary">
+                  Turn on Rewards to unlock XP missions, badges, and seasonal
+                  rewards.
+                </Text>
+
+                <div style={{ marginTop: 12 }}>
+                  <Button
+                    type="primary"
+                    onClick={() => rewardsOptIn.confirm(true)}
+                  >
+                    Turn on Rewards
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Invite & Earn */}
+            <Card style={{ marginTop: 16 }}>
               <Title level={5}>Invite & Earn</Title>
               <Space wrap>
                 <Input

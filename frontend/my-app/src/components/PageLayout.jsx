@@ -1,22 +1,16 @@
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
-/**
- * Base PageLayout (no Navbar).
- *
- * Props:
- * - fullBleed  : boolean — children span full width (default true)
- * - maxWidth   : number  — max width when not fullBleed (default 1180)
- * - className  : string  — extra class on the main wrapper
- */
 export default function PageLayout({
   children,
   fullBleed = true,
   maxWidth = 1180,
   className = "",
+  withNavOffset = true,
 }) {
   const { pathname } = useLocation();
 
+  // Normalize path (removes trailing slashes)
   const cleanPath = useMemo(() => {
     const p = (pathname || "/").replace(/\/+$/, "");
     return p === "" ? "/" : p;
@@ -30,9 +24,10 @@ export default function PageLayout({
       role="main"
       className={[
         "page-root",
-        "no-nav", // base layout has no navbar (navbar handled by AppLayout)
+        "no-nav", // navbar handled elsewhere
         isBooking ? "page--booking" : "",
         fullBleed ? "full-bleed" : "constrained",
+        withNavOffset ? "with-nav-offset" : "",
         className,
       ]
         .filter(Boolean)
@@ -40,7 +35,12 @@ export default function PageLayout({
       style={
         fullBleed
           ? undefined
-          : { maxWidth, margin: "0 auto", paddingLeft: 16, paddingRight: 16 }
+          : {
+              maxWidth,
+              margin: "0 auto",
+              paddingLeft: 16,
+              paddingRight: 16,
+            }
       }
     >
       {children}

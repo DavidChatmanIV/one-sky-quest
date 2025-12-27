@@ -5,25 +5,40 @@ import Follow from "../../models/follow.js";
 import { getOrCreateOfficialUser } from "../../lib/official.js";
 import { auth as authRequired } from "../../middleware/auth.js";
 
+// If you already have a notification route/model, use that.
+// Otherwise, create a model and import it here:
 import Notification from "../../models/notification.js";
 
 const router = Router();
+
 router.use(authRequired);
 
 /* -----------------------------
-   Ensure Official Follow (auto-add)
+   Helpers
 ----------------------------- */
 
+function oid(id) {
+  return new mongoose.Types.ObjectId(id);
+}
+
+/**
+ * Ensure the current user follows Official.
+ * - Creates Follow if missing
+ * - Increments counts (once)
+ * - Creates Welcome notification (once)
+ *
+ * Safe to call repeatedly.
+ */
 async function ensureOfficialFollow(meId) {
   const official = await getOrCreateOfficialUser();
   const officialId = String(official._id);
 
-  // If the logged-in user IS the official account, skip
+  // Don’t try to follow yourself if you are the official account
   if (String(meId) === officialId) {
-    return { ok: true, created: false, officialUserId: officialId };
+    return { ok: true, created: false, officialId };
   }
 
-  // Upsert follow relationship (unique index prevents dup if you have it)
+  // Upsert follow relationship
   const r = await Follow.updateOne(
     { followerId: meId, followingId: officialId },
     { $setOnInsert: { followerId: meId, followingId: officialId } },
@@ -36,32 +51,32 @@ async function ensureOfficialFollow(meId) {
     !!r?.upsertedId;
 
   if (created) {
+    // Increment counts once (guard against missing fields)
     await Promise.all([
       User.updateOne({ _id: meId }, { $inc: { followingCount: 1 } }),
       User.updateOne({ _id: officialId }, { $inc: { followersCount: 1 } }),
 
-      // ✅ Welcome notification (matches your schema)
+      // Create welcome notification once per user
       Notification.create({
-        user: meId,
-        type: "system",
-        event: "welcome",
+        userId: meId,
+        type: "WELCOME",
         title: "Welcome to Skyrio ✈️",
-        message:
-          "Your Digital Passport is ready. Earn XP when you book, save trips, and explore.",
-        targetType: "passport",
-        targetId: String(meId),
-        link: "/passport",
-        isRead: false,
-      }).catch(() => {}),
+        body: "Your Digital Passport is ready. Earn XP when you book, save trips, and explore.",
+        fromUserId: officialId,
+        read: false,
+        meta: { kind: "official_welcome" },
+      }).catch(() => {
+        // If notification fails, don’t break login flow
+      }),
     ]);
   }
 
-  return { ok: true, created, officialUserId: officialId };
+  return { ok: true, created, officialId };
 }
 
 /**
- * Auto-run on every request (safe + cheap):
- * Guarantees Official is followed after auth.
+ * Auto-run on every request (cheap + safe):
+ * guarantees Official is followed after login.
  */
 router.use(async (req, _res, next) => {
   try {
@@ -69,8 +84,8 @@ router.use(async (req, _res, next) => {
     if (meId && mongoose.isValidObjectId(meId)) {
       await ensureOfficialFollow(meId);
     }
-  } catch {
-    // Never block the request
+  } catch (e) {
+    // Never block normal routes if this fails
   }
   next();
 });
@@ -112,17 +127,15 @@ router.post("/follow/:targetId", async (req, res) => {
         User.updateOne({ _id: meId }, { $inc: { followingCount: 1 } }),
         User.updateOne({ _id: targetId }, { $inc: { followersCount: 1 } }),
 
-        // Optional “someone followed you” notif (schema-compatible)
+        // Optional follow notification (nice polish)
         Notification.create({
-          user: targetId,
-          type: "social",
-          event: "follow",
+          userId: targetId,
+          type: "FOLLOW",
           title: "New follower",
-          message: "Someone followed you on Skyrio.",
-          targetType: "user",
-          targetId: String(meId),
-          link: `/profile/${meId}`,
-          isRead: false,
+          body: "Someone followed you on Skyrio.",
+          fromUserId: meId,
+          read: false,
+          meta: { kind: "follow" },
         }).catch(() => {}),
       ]);
     }
@@ -149,7 +162,7 @@ router.post("/follow/:targetId", async (req, res) => {
 /* ======================================================
    DELETE /api/social/follow/:targetId
    Block unfollowing official
-   Safe decrement (no negatives)
+   + safe decrement (no negatives)
    ====================================================== */
 router.delete("/follow/:targetId", async (req, res) => {
   try {
@@ -179,6 +192,7 @@ router.delete("/follow/:targetId", async (req, res) => {
     });
 
     if (deleted.deletedCount > 0) {
+      // Decrement safely: only decrement if > 0
       await Promise.all([
         User.updateOne(
           { _id: meId, followingCount: { $gt: 0 } },
@@ -212,7 +226,7 @@ router.delete("/follow/:targetId", async (req, res) => {
 
 /* ======================================================
    GET /api/social/passport/stats
-   (keep for backward compatibility)
+   (Backwards compatible; ok to keep)
    ====================================================== */
 router.get("/passport/stats", async (req, res) => {
   try {
@@ -264,7 +278,7 @@ router.patch("/official/mute", async (req, res) => {
 
 /* ======================================================
    POST /api/social/ensure-official
-   Optional helper (debug/testing)
+   Optional endpoint (handy for debugging)
    ====================================================== */
 router.post("/ensure-official", async (req, res) => {
   try {

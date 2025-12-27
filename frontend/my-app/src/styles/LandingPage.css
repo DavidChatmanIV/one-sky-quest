@@ -1,15 +1,22 @@
-/* =====================================================
-   Skyrio Landing Page Styles (FULL)
-   ===================================================== */
-
-/* ---------- Page base ---------- */
-.lp-page {
+.lp-page{
   position: relative;
+  width: 100%;
+  min-height: 100vh;
   overflow-x: hidden;
+
+  /* 🔥 Background starts at the TOP (behind sticky navbar) */
+  background:
+    radial-gradient(900px 500px at 75% 18%, rgba(255,140,90,0.25), transparent 60%),
+    radial-gradient(900px 600px at 25% 22%, rgba(120,90,255,0.32), transparent 65%),
+    linear-gradient(135deg, #0b1220, #1a1c3b);
+
+  /* ✅ Critical: ensures hero background sits under navbar (no strip) */
+  margin-top: calc(-1 * var(--nav-h));
+  padding-top: var(--nav-h);
 }
 
 /* Shared container */
-.lp-container {
+.lp-container{
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
@@ -17,19 +24,21 @@
 }
 
 /* =====================================================
-   HERO SECTION (PUBLIC)
+   HERO SECTION
    ===================================================== */
+.hero-public{
+  min-height: 100vh;
 
-.hero-public {
-  min-height: calc(100vh - var(--nav-h));
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 0;
+
+  /* ✅ Premium spacing without weird subtraction math */
+  padding: 64px 0 40px;
 }
 
-/* 🔥 True centering */
-.lp-container.hero-center {
+/* True centering */
+.lp-container.hero-center{
   max-width: 760px;
   width: 100%;
   margin: 0 auto;
@@ -41,39 +50,29 @@
   text-align: center;
 }
 
-/* ✅ Force hero typography back to WHITE (AntD overrides) */
-.hero-public .hero-title,
-.hero-public .hero-title.ant-typography,
-.hero-public .ant-typography.hero-title {
-  color: var(--text) !important;
-}
-
-/* Safety: prevent global rules from making headings black */
-.hero-public h1,
-.hero-public h2,
-.hero-public h3 {
-  color: var(--text);
-}
-
-/* Hero Title */
-.hero-title {
+/* =====================================================
+   HERO TEXT
+   ===================================================== */
+.hero-title{
   margin: 0 auto;
-  font-size: clamp(2.3rem, 5vw, 3.2rem);
+  font-size: clamp(2.4rem, 5vw, 3.3rem);
   font-weight: 800;
   line-height: 1.15;
+  color: var(--text-1);
 }
 
-/* Hero Subtext */
-.hero-subtag {
+.hero-subtag{
   margin-top: 14px;
   max-width: 620px;
-  color: var(--muted) !important;
   font-size: 1.05rem;
   line-height: 1.6;
+  color: rgba(244,246,251,0.80);
 }
 
-/* CTA Row */
-.hero-cta-row {
+/* =====================================================
+   CTA ROW
+   ===================================================== */
+.hero-cta-row{
   margin-top: 18px;
   display: flex;
   gap: 18px;
@@ -81,18 +80,19 @@
   justify-content: center;
 }
 
-.hero-login-link {
+.hero-login-link{
   padding: 0;
   font-weight: 600;
-  color: rgba(244, 246, 251, 0.9);
+  color: rgba(244,246,251,0.92);
 }
-
-.hero-login-link:hover {
+.hero-login-link:hover{
   color: var(--cta);
 }
 
-/* Trust */
-.hero-trust {
+/* =====================================================
+   TRUST
+   ===================================================== */
+.hero-trust{
   margin-top: 18px;
   display: flex;
   flex-direction: column;
@@ -100,19 +100,21 @@
   gap: 6px;
 }
 
-.hero-trust-text {
+.hero-trust-text{
   font-size: 0.85rem;
-  color: var(--muted);
+  color: rgba(244,246,251,0.70);
 }
 
-.hero-stars {
+.hero-stars{
   font-size: 0.95rem;
   letter-spacing: 2px;
   color: var(--cta);
 }
 
-/* Destinations */
-.lp-dest-row {
+/* =====================================================
+   DESTINATION PILLS
+   ===================================================== */
+.lp-dest-row{
   margin-top: 22px;
   display: flex;
   gap: 10px;
@@ -120,42 +122,37 @@
   justify-content: center;
 }
 
-.lp-dest-card {
+.lp-dest-card{
   display: flex;
   align-items: center;
   gap: 6px;
+
   padding: 6px 12px;
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
 
   font-size: 0.85rem;
-  color: var(--text);
+  color: var(--text-1);
   cursor: pointer;
 
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.lp-dest-card:hover {
+.lp-dest-card:hover{
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.12);
 }
 
-.lp-dest-emoji {
-  font-size: 1rem;
-}
-
-.lp-dest-label {
-  font-weight: 600;
-}
+.lp-dest-emoji{ font-size: 1rem; }
+.lp-dest-label{ font-weight: 600; }
 
 /* =====================================================
    TESTIMONIALS SECTION (premium glass)
    ===================================================== */
-
-.testimonials-section {
+.testimonials-section{
   margin-top: 70px;
   padding: 26px 18px;
   max-width: 1100px;
@@ -173,10 +170,9 @@
 }
 
 /* =====================================================
-   FEATURE CARDS — MATCH REF IMAGE (3 IN A ROW)
+   FEATURE CARDS — 3 IN A ROW
    ===================================================== */
-
-.lp-feature-grid {
+.lp-feature-grid{
   max-width: 1100px;
   margin: 28px auto 0;
   padding: 0 18px;
@@ -187,7 +183,7 @@
   align-items: stretch;
 }
 
-.lp-feature-card {
+.lp-feature-card{
   border-radius: 18px;
   padding: 16px 16px;
 
@@ -197,11 +193,11 @@
 
   display: flex;
   gap: 12px;
-  align-items: center; /* ✅ shorter like ref */
+  align-items: center;
   backdrop-filter: blur(8px);
 }
 
-.lp-feature-icon {
+.lp-feature-icon{
   width: 34px;
   height: 34px;
   border-radius: 12px;
@@ -217,31 +213,23 @@
   font-size: 16px;
 }
 
-.lp-feature-title {
+.lp-feature-title{
   font-weight: 800;
-  color: var(--text);
+  color: var(--text-1);
   margin-bottom: 4px;
   line-height: 1.2;
 }
 
-.lp-feature-text {
+.lp-feature-text{
   color: rgba(244, 246, 251, 0.78);
   line-height: 1.35;
   font-size: 0.95rem;
 }
 
-/* ✅ Only stack on phones */
-@media (max-width: 680px) {
-  .lp-feature-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* =====================================================
    FOOTER
    ===================================================== */
-
-.lp-footer {
+.lp-footer{
   padding: 18px 0 26px;
   text-align: center;
   color: rgba(244, 246, 251, 0.65);
@@ -250,14 +238,21 @@
 /* =====================================================
    RESPONSIVE
    ===================================================== */
-
-@media (max-width: 640px) {
-  .hero-cta-row {
-    flex-direction: column;
-    gap: 10px;
+@media (max-width: 680px){
+  .lp-feature-grid{
+    grid-template-columns: 1fr;
   }
+}
 
-  .hero-subtag {
+@media (max-width: 640px){
+  .hero-cta-row{
+    flex-direction: column;
+    gap: 12px;
+  }
+  .hero-subtag{
     font-size: 1rem;
+  }
+  .hero-public{
+    padding: 54px 0 36px;
   }
 }

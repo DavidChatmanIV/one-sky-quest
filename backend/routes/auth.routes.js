@@ -1,8 +1,15 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
-import { authRequired } from "../middleware/authRequired.js";
+import User from "../../models/user.js";
+
+// ✅ NEW: soft-launch bootstrap deps
+import Follow from "../../models/follow.js";
+import Notification from "../../models/notification.js";
+import { getOrCreateOfficialUser } from "../../lib/official.js";
+
+// ✅ your middleware (named export)
+import { authRequired } from "../../middleware/authRequired.js";
 
 const router = Router();
 
@@ -10,16 +17,18 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 // ---------- Helpers ----------
-
 const normalizeEmail = (email) =>
   String(email || "")
     .trim()
     .toLowerCase();
 
 function signToken(user) {
+  const id = user.id || user._id.toString();
+
   return jwt.sign(
     {
-      sub: user.id || user._id.toString(),
+      sub: id,
+      id, // ✅ compatibility (your middleware can read either)
       email: user.email,
       role: user.role,
     },
@@ -38,6 +47,11 @@ function buildPublicUser(user) {
     bio: user.bio,
     xp: user.xp,
     role: user.role,
+    isOfficial: user.isOfficial,
+    followersCount: user.followersCount,
+    followingCount: user.followingCount,
+    preferences: user.preferences,
+    settings: user.settings,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -66,6 +80,57 @@ async function generateUsername(base) {
 
   // Worst-case fallback
   return `${safeBase}_${Date.now()}`;
+}
+
+/**
+ * Soft-launch bootstrap:
+ * ✅ ensure official user exists
+ * ✅ auto-follow official (idempotent + safe counts)
+ * ✅ welcome notification (idempotent)
+ */
+async function postSignupBootstrap(newUser) {
+  const newUserId = newUser._id;
+  const official = await getOrCreateOfficialUser();
+
+  // 1) Auto-follow official (idempotent)
+  // Only increment counts if the follow was newly created
+  if (String(official._id) !== String(newUserId)) {
+    const r = await Follow.updateOne(
+      { followerId: newUserId, followingId: official._id },
+      { $setOnInsert: { followerId: newUserId, followingId: official._id } },
+      { upsert: true }
+    );
+
+    const created =
+      r?.upsertedCount > 0 ||
+      (Array.isArray(r?.upserted) && r.upserted.length > 0) ||
+      !!r?.upsertedId;
+
+    if (created) {
+      await Promise.all([
+        User.updateOne({ _id: newUserId }, { $inc: { followingCount: 1 } }),
+        User.updateOne({ _id: official._id }, { $inc: { followersCount: 1 } }),
+      ]);
+    }
+  }
+
+  // 2) Welcome notification (idempotent) — matches your notifications router/schema
+  await Notification.updateOne(
+    { user: newUserId, event: "welcome" },
+    {
+      $setOnInsert: {
+        user: newUserId,
+        type: "system",
+        event: "welcome",
+        title: "Welcome to Skyrio ✈️",
+        message:
+          "Your Digital Passport is ready. Start exploring SkyStream and plan your first trip.",
+        link: "/passport",
+        isRead: false,
+      },
+    },
+    { upsert: true }
+  );
 }
 
 // --------- POST /api/auth/register ---------
@@ -105,27 +170,41 @@ router.post("/register", async (req, res) => {
           .status(409)
           .json({ error: "Username is already taken, choose another" });
       }
+      finalUsername = finalUsername.toLowerCase();
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // ✅ Create user with soft-launch defaults (your schema supports these)
     const user = await User.create({
       email: normalizedEmail,
       passwordHash,
       name: name?.trim() || normalizedEmail.split("@")[0],
       username: finalUsername,
       role: "user",
+      isOfficial: false,
+
+      // counts + preferences default safely even if omitted, but explicit is fine
+      followersCount: 0,
+      followingCount: 0,
+      preferences: { officialUpdatesMuted: false },
+
+      // your schema default is false; set explicitly if you want:
+      settings: { rewardsEnabled: false },
     });
+
+    // ✅ Soft-launch bootstrap (official auto-follow + welcome notification)
+    await postSignupBootstrap(user);
 
     const token = signToken(user);
 
-    res.status(201).json({
+    return res.status(201).json({
       token,
       user: buildPublicUser(user),
     });
   } catch (err) {
     console.error("REGISTER error:", err);
-    res.status(500).json({ error: "Registration failed" });
+    return res.status(500).json({ error: "Registration failed" });
   }
 });
 
@@ -139,15 +218,18 @@ router.post("/login", async (req, res) => {
     }
 
     const normalizedEmail = normalizeEmail(email);
-    const user = await User.findOne({ email: normalizedEmail });
+
+    // passwordHash is select:false in your model, so we must include it
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+passwordHash"
+    );
 
     // Generic error to avoid leaking which field failed
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Support legacy "password" field if it was a hash
-    const storedHash = user.passwordHash || user.password;
+    const storedHash = user.passwordHash;
     if (!storedHash) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
@@ -157,29 +239,25 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Optional: migrate legacy users to passwordHash automatically
-    if (!user.passwordHash && user.password) {
-      user.passwordHash = user.password;
-      user.password = undefined;
-      await user.save();
-    }
+    // Re-fetch safe user fields (since we selected passwordHash above)
+    const safeUser = await User.findById(user._id);
 
-    const token = signToken(user);
+    const token = signToken(safeUser);
 
-    res.json({
+    return res.json({
       token,
-      user: buildPublicUser(user),
+      user: buildPublicUser(safeUser),
     });
   } catch (err) {
     console.error("LOGIN error:", err);
-    res.status(500).json({ error: "Login failed" });
+    return res.status(500).json({ error: "Login failed" });
   }
 });
 
 // --------- GET /api/auth/check ---------
 router.get("/check", authRequired, (req, res) => {
-  // authRequired should attach a safe user payload to req.user
-  res.json({
+  // authRequired attaches safe user payload to req.user
+  return res.json({
     ok: true,
     user: req.user,
   });
@@ -187,7 +265,7 @@ router.get("/check", authRequired, (req, res) => {
 
 // --------- GET /api/auth/health ---------
 router.get("/health", (_req, res) => {
-  res.json({ ok: true, scope: "auth" });
+  return res.json({ ok: true, scope: "auth" });
 });
 
 export default router;
