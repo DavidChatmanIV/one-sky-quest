@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState,} from "react";
 import {
   Layout,
   Row,
@@ -11,6 +11,7 @@ import {
   Segmented,
   Empty,
   Tag,
+  message,
 } from "antd";
 import {
   SearchOutlined,
@@ -21,13 +22,14 @@ import {
 } from "@ant-design/icons";
 
 import "../styles/skystream.css";
+import { useSkystreamFeed } from "../hooks/useSkystreamFeed";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 /* ---------------------------
    Reusable SkyrioPill component
-   --------------------------- */
+--------------------------- */
 function SkyrioPill({
   label,
   pulse = false,
@@ -81,42 +83,30 @@ export default function SkyStreamPage() {
   const [activeTab, setActiveTab] = useState("forYou");
   const [search, setSearch] = useState("");
 
-  // Demo posts (replace with API later)
-  const posts = useMemo(
-    () => [
-      {
-        id: "1",
-        tab: "forYou",
-        author: "Skyrio",
-        time: "just now",
-        xp: 10,
-        title: "Welcome to SkyStream ✈️",
-        body: "Drop your next destination. Earn XP for posting, saving, and booking.",
-        tags: ["#welcome", "#Japan", "#Kyoto"],
-      },
-      {
-        id: "2",
-        tab: "forYou",
-        author: "Guest",
-        time: "2m ago",
-        xp: 5,
-        title: "Planning something soon",
-        body: "Looking at a weekend getaway — any city vibe recs?",
-        tags: ["#mytrip", "#weekend"],
-      },
-      {
-        id: "3",
-        tab: "deals",
-        author: "Skyrio",
-        time: "10m ago",
-        xp: 15,
-        title: "Weekend Deal Drop",
-        body: "Flash hotel deals are live for coastal cities.",
-        tags: ["#deals", "#weekend"],
-      },
-    ],
-    []
-  );
+  // ✅ grab auth user id (until JWT middleware is final)
+  const userId = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      const u = raw ? JSON.parse(raw) : null;
+      return u?.id || u?._id || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const {
+    items: posts,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    loadingMore,
+  } = useSkystreamFeed({
+    tab: activeTab,
+    search,
+    userId,
+    pageSize: 20,
+  });
 
   const trending = useMemo(
     () => ["#Japan", "#Kyoto", "#HiddenGem", "#Weekend", "#deals"],
@@ -143,9 +133,12 @@ export default function SkyStreamPage() {
     const tag = `#${clean}`;
     setSearch(tag);
 
-    // Smart tab switch (optional but feels great)
+    // Smart tab switch
     if (clean.toLowerCase().includes("deal")) setActiveTab("deals");
-    else setActiveTab("forYou");
+    else if (activeTab === "following") {
+      // keep following if user is in following tab
+      setActiveTab("following");
+    } else setActiveTab("forYou");
   }
 
   function clearFilters() {
@@ -153,27 +146,38 @@ export default function SkyStreamPage() {
     setActiveTab("forYou");
   }
 
-  const filteredPosts = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const qClean = q.replace(/^#/, "");
-
-    return posts
-      .filter((p) => p.tab === activeTab)
-      .filter((p) => {
-        if (!qClean) return true;
-        const text = `${p.title || ""} ${p.body || ""}`.toLowerCase();
-        const tags = (p.tags || []).map((t) => String(t).toLowerCase());
-        return (
-          text.includes(qClean) ||
-          tags.some((t) => t.replace(/^#/, "").includes(qClean))
-        );
-      });
-  }, [posts, activeTab, search]);
-
   const activeTag = useMemo(
     () => search.trim().replace(/^#/, "").toLowerCase(),
     [search]
   );
+
+  async function handleFollow(targetUserId) {
+    if (!userId) {
+      message.info("Sign in to follow travelers.");
+      return;
+    }
+    if (!targetUserId) return;
+
+    try {
+      const res = await fetch(`/api/follow/${targetUserId}`, {
+        method: "POST",
+        headers: { "x-user-id": userId },
+      });
+      const data = await res.json();
+      if (!res.ok || data?.ok === false) {
+        throw new Error(data?.error || "Follow failed");
+      }
+      message.success(data.followed ? "Followed" : "Already following");
+    } catch (e) {
+      message.error(e.message || "Could not follow");
+    }
+  }
+
+  // helpful empty messages
+  const emptyDescription =
+    activeTab === "following"
+      ? "Follow travelers to see their posts here."
+      : "No posts match your filters yet.";
 
   return (
     <Layout className="skystream">
@@ -235,44 +239,129 @@ export default function SkyStreamPage() {
           {/* Feed */}
           <Col xs={24} lg={16}>
             <Card className="sk-card" title="SkyStream">
-              {filteredPosts.length === 0 ? (
-                <Empty description="No posts match your filters yet." />
+              {error ? (
+                <div style={{ padding: 8 }}>
+                  <Empty description={error} />
+                </div>
+              ) : loading ? (
+                <div style={{ padding: 10 }}>
+                  <Text className="muted">Loading…</Text>
+                </div>
+              ) : posts.length === 0 ? (
+                <div>
+                  <Empty description={emptyDescription} />
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      marginTop: 12,
+                      justifyContent: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <Button onClick={() => setActiveTab("forYou")}>
+                      Go to For You
+                    </Button>
+                    <Button onClick={() => setSearch("")}>Clear Search</Button>
+                    <Button
+                      icon={<ThunderboltOutlined />}
+                      onClick={clearFilters}
+                    >
+                      Clear All
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <div className="sk-feed">
-                  {filteredPosts.map((p) => (
-                    <div key={p.id} className="sk-post">
-                      <div className="sk-postMeta">
-                        <Text className="sk-postAuthor">
-                          {p.author} · <span className="muted">{p.time}</span>{" "}
-                          <span className="muted">+{p.xp} XP</span>
-                        </Text>
-                      </div>
+                  {posts.map((p) => {
+                    const author = p.authorId || {};
+                    const authorName =
+                      author?.name || author?.username || "Traveler";
+                    const authorUsername = author?.username
+                      ? `@${author.username}`
+                      : "";
+                    const createdAt = p.createdAt
+                      ? new Date(p.createdAt).toLocaleString()
+                      : "";
 
-                      <Title level={4} className="sk-postTitle">
-                        {p.title}
-                      </Title>
+                    return (
+                      <div key={p._id || p.id} className="sk-post">
+                        <div className="sk-postMeta">
+                          <div className="sk-postMetaLeft">
+                            <Text className="sk-postAuthor">
+                              {authorName}{" "}
+                              <span className="muted">
+                                {authorUsername ? `· ${authorUsername}` : ""}
+                                {createdAt ? ` · ${createdAt}` : ""}
+                              </span>
+                              {typeof p.xpAward === "number" &&
+                                p.xpAward > 0 && (
+                                  <span className="muted">
+                                    {" "}
+                                    · +{p.xpAward} XP
+                                  </span>
+                                )}
+                            </Text>
+                          </div>
 
-                      <Text className="sk-postBody">{p.body}</Text>
+                          <div className="sk-postMetaRight">
+                            <Button
+                              size="small"
+                              className="sk-followBtn"
+                              onClick={() => handleFollow(author?._id)}
+                            >
+                              Follow
+                            </Button>
+                          </div>
+                        </div>
 
-                      <div className="sk-postTags">
-                        {(p.tags || []).map((t) => (
-                          <SkyrioPill
-                            key={t}
-                            label={t}
-                            pulse={false}
-                            className={
+                        {p.title ? (
+                          <Title level={4} className="sk-postTitle">
+                            {p.title}
+                          </Title>
+                        ) : null}
+
+                        {p.body ? (
+                          <Text className="sk-postBody">{p.body}</Text>
+                        ) : null}
+
+                        <div className="sk-postTags">
+                          {(p.tags || []).map((t) => {
+                            const key = `${p._id || p.id}-${t}`;
+                            const isActive =
                               activeTag &&
-                              t.replace(/^#/, "").toLowerCase() === activeTag
-                                ? "sk-pill--active"
-                                : ""
-                            }
-                            onClick={() => applyPillFilter(t)}
-                            title="Click to filter"
-                          />
-                        ))}
+                              String(t).replace(/^#/, "").toLowerCase() ===
+                                activeTag;
+
+                            return (
+                              <SkyrioPill
+                                key={key}
+                                label={t}
+                                className={isActive ? "sk-pill--active" : ""}
+                                onClick={() => applyPillFilter(t)}
+                                title="Click to filter"
+                              />
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+
+                  <div className="sk-loadMoreRow">
+                    {hasMore ? (
+                      <Button
+                        block
+                        className="sk-loadMoreBtn"
+                        onClick={loadMore}
+                        loading={loadingMore}
+                      >
+                        Load more
+                      </Button>
+                    ) : (
+                      <Text className="muted">You’re all caught up.</Text>
+                    )}
+                  </div>
                 </div>
               )}
             </Card>
@@ -299,7 +388,7 @@ export default function SkyStreamPage() {
                     <SkyrioPill
                       key={t}
                       label={t}
-                      pulse={idx === 0} // ✅ subtle pulse on top pill
+                      pulse={idx === 0} // subtle pulse for #1 trending
                       className={
                         activeTag &&
                         t.replace(/^#/, "").toLowerCase() === activeTag
@@ -319,7 +408,7 @@ export default function SkyStreamPage() {
                     <SkyrioPill
                       key={h.label}
                       label={h.label}
-                      percent={h.pct} // ✅ micro-bar + %
+                      percent={h.pct}
                       className={
                         activeTag && h.label.toLowerCase() === activeTag
                           ? "sk-pill--active"

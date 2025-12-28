@@ -41,7 +41,7 @@ const UserSchema = new Schema(
     passwordHash: {
       type: String,
       required: true,
-      select: false, // extra safety: don’t return unless explicitly selected
+      select: false,
     },
 
     // ---------- Profile ----------
@@ -51,7 +51,15 @@ const UserSchema = new Schema(
     // ---------- Social Core ----------
     isOfficial: { type: Boolean, default: false },
 
-    // Keep counts here for fast reads (update via follow/unfollow logic)
+    // ✅ Relationship lists (ObjectId-based, scalable)
+    followers: [
+      { type: Schema.Types.ObjectId, ref: "User", index: true, default: [] },
+    ],
+    following: [
+      { type: Schema.Types.ObjectId, ref: "User", index: true, default: [] },
+    ],
+
+    // Fast counters for UI (kept in sync by follow/unfollow logic)
     followersCount: { type: Number, default: 0, min: 0 },
     followingCount: { type: Number, default: 0, min: 0 },
 
@@ -61,7 +69,7 @@ const UserSchema = new Schema(
     xp: { type: Number, default: 0, min: 0 },
 
     settings: {
-      rewardsEnabled: { type: Boolean, default: false }, // user opts in
+      rewardsEnabled: { type: Boolean, default: false },
     },
 
     // ---------- RBAC ROLE SYSTEM ----------
@@ -74,7 +82,7 @@ const UserSchema = new Schema(
 
     isActive: { type: Boolean, default: true },
 
-    // ---------- Moderation / Trust & Safety (lightweight) ----------
+    // ---------- Moderation / Trust & Safety ----------
     moderation: {
       status: {
         type: String,
@@ -86,8 +94,8 @@ const UserSchema = new Schema(
       warningsCount: { type: Number, default: 0, min: 0 },
       strikesCount: { type: Number, default: 0, min: 0 },
 
-      mutedUntil: { type: Date, default: null }, // e.g., mute posting/commenting
-      suspendedUntil: { type: Date, default: null }, // temporary suspension
+      mutedUntil: { type: Date, default: null },
+      suspendedUntil: { type: Date, default: null },
 
       lastReviewedAt: { type: Date, default: null },
       lastReviewedBy: {
@@ -96,10 +104,10 @@ const UserSchema = new Schema(
         default: null,
       },
 
-      notesCount: { type: Number, default: 0, min: 0 }, // quick dashboard stat
+      notesCount: { type: Number, default: 0, min: 0 },
     },
 
-    // ---------- Saved Trips (Skyrio Feature) ----------
+    // ---------- Saved Trips ----------
     savedTrips: [{ type: Schema.Types.ObjectId, ref: "Place" }],
   },
   { timestamps: true }
@@ -110,33 +118,29 @@ const UserSchema = new Schema(
 ------------------------------ */
 UserSchema.methods.isMuted = function () {
   const until = this?.moderation?.mutedUntil;
-  if (!until) return false;
-  return new Date(until).getTime() > Date.now();
+  return until ? new Date(until).getTime() > Date.now() : false;
 };
 
 UserSchema.methods.isSuspended = function () {
   const until = this?.moderation?.suspendedUntil;
-  if (!until) return false;
-  return new Date(until).getTime() > Date.now();
+  return until ? new Date(until).getTime() > Date.now() : false;
 };
 
 UserSchema.methods.isRestricted = function () {
-  const status = this?.moderation?.status || "ok";
-  return status === "restricted";
+  return this?.moderation?.status === "restricted";
 };
 
 UserSchema.methods.canPost = function () {
   if (!this.isActive) return false;
   if (this.isSuspended()) return false;
   if (this.isMuted()) return false;
-  if (this.isRestricted()) return false; // optional: you can allow posting but disable DMs, etc.
+  if (this.isRestricted()) return false;
   return true;
 };
 
-// Optional: keep moderation status "suspended" while suspendedUntil is active
 UserSchema.methods.getModerationStatus = function () {
   if (this.isSuspended()) return "suspended";
-  if (this.isMuted()) return "restricted"; // or "warned" depending on your vibe
+  if (this.isMuted()) return "restricted";
   return this?.moderation?.status || "ok";
 };
 
@@ -180,13 +184,15 @@ UserSchema.set("toJSON", {
     ret.id = ret._id.toString();
     delete ret._id;
     delete ret.__v;
-    delete ret.passwordHash; // in case it ever sneaks in
+    delete ret.passwordHash;
+    delete ret.followers; // 👈 don’t expose raw lists by default
+    delete ret.following;
     return ret;
   },
 });
 
 /* -----------------------------
-   Render/Linux safe export
+   Export
 ------------------------------ */
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 export default User;

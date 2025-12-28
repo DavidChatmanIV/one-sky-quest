@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Row,
   Col,
@@ -21,6 +27,8 @@ import {
   SoundOutlined,
 } from "@ant-design/icons";
 
+import { io } from "socket.io-client";
+
 import ProfileMusicModal, {
   SKYRIO_PROFILE_MUSIC_KEY,
 } from "./music/ProfileMusicModal";
@@ -34,6 +42,9 @@ import TripList from "./TripList";
 import VisaList from "./VisaList";
 import SkyrioExchange from "./SkyrioExchange";
 import Membership from "./Membership";
+
+/* Followers/Following Modal */
+import FollowersModal from "./FollowersModal";
 
 /* Top 8 (same folder) */
 import TopEight from "./TopEight";
@@ -72,7 +83,7 @@ function makeReferralCode(user) {
 export default function DigitalPassportPage() {
   const auth = useAuth();
 
-  /* ✅ Rewards opt-in hook (NEW) */
+  /* Rewards opt-in hook (NEW) */
   const rewardsOptIn = useRewardsOptInPrompt();
 
   const [musicOpen, setMusicOpen] = useState(false);
@@ -83,7 +94,18 @@ export default function DigitalPassportPage() {
   const [xpToNextBadge, setXpToNextBadge] = useState(0);
   const [nextBadgeName, setNextBadgeName] = useState("Wanderer");
 
-  /* ✅ NEW: whether rewards are enabled for the signed-in user */
+  /* Follow counts + modal control */
+  const [passportStats, setPassportStats] = useState({
+    followers: 0,
+    following: 0,
+  });
+  const [followOpen, setFollowOpen] = useState(false);
+  const [followMode, setFollowMode] = useState("following"); // "following" | "followers"
+
+  /* Socket ref (prevents reconnect loops) */
+  const socketRef = useRef(null);
+
+  /* NEW: whether rewards are enabled for the signed-in user */
   const rewardsEnabled = !!auth?.user?.settings?.rewardsEnabled;
 
   /* ---------- derived display ---------- */
@@ -105,6 +127,11 @@ export default function DigitalPassportPage() {
     () => makeReferralCode(auth?.user),
     [auth?.user]
   );
+
+  const myId = useMemo(() => {
+    const u = auth?.user;
+    return u?._id || u?.id || null;
+  }, [auth?.user]);
 
   /* ---------- TOP 8 (soft-launch mock) ---------- */
 
@@ -184,6 +211,73 @@ export default function DigitalPassportPage() {
     };
   }, []);
 
+  /* load passport stats (followers/following) */
+  useEffect(() => {
+    let ignore = false;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/passport/stats", {
+          credentials: "include",
+        });
+        const data = await res.json();
+
+        if (ignore) return;
+        if (data?.ok) {
+          setPassportStats({
+            followers: Number(data?.stats?.followers ?? 0),
+            following: Number(data?.stats?.following ?? 0),
+          });
+        }
+      } catch {
+        if (!ignore) {
+          setPassportStats({ followers: 0, following: 0 });
+        }
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  /* socket live sync for counts */
+  useEffect(() => {
+    if (!myId) return;
+
+    if (!socketRef.current) {
+      socketRef.current = io("/", { transports: ["websocket"] });
+    }
+
+    const s = socketRef.current;
+
+    // join user room
+    s.emit("auth:join", { userId: myId });
+
+    const handler = (payload) => {
+      if (!payload) return;
+      setPassportStats((prev) => ({
+        ...prev,
+        followers:
+          typeof payload.followers === "number"
+            ? payload.followers
+            : prev.followers,
+        following:
+          typeof payload.following === "number"
+            ? payload.following
+            : prev.following,
+      }));
+    };
+
+    s.on("social:counts:update", handler);
+
+    return () => {
+      s.off("social:counts:update", handler);
+      // Keep socket open during page life (prevents flicker). If you want full cleanup:
+      // s.disconnect(); socketRef.current = null;
+    };
+  }, [myId]);
+
   const xpPercent = useMemo(() => {
     if (!xpToNextBadge) return 0;
     // soft-launch: keep simple. (You can swap to xp / (xp + xpToNextBadge) later)
@@ -213,7 +307,7 @@ export default function DigitalPassportPage() {
 
   return (
     <>
-      {/* ✅ Rewards Opt-in Prompt (NEW) */}
+      {/* Rewards Opt-in Prompt (NEW) */}
       <RewardsOptInPrompt
         open={rewardsOptIn.open}
         onClose={rewardsOptIn.close}
@@ -232,10 +326,38 @@ export default function DigitalPassportPage() {
                   <Title level={3} style={{ margin: 0 }}>
                     {displayName}
                   </Title>
+
                   <Text type="secondary">{levelLabel}</Text>
 
+                  {/* ✅ NEW: Following / Followers (under level label) */}
+                  <div className="passport-social" style={{ marginTop: 10 }}>
+                    <button
+                      className="passport-socialBtn"
+                      onClick={() => {
+                        setFollowMode("following");
+                        setFollowOpen(true);
+                      }}
+                      type="button"
+                    >
+                      <strong>{passportStats.following}</strong>
+                      <span>Following</span>
+                    </button>
+
+                    <button
+                      className="passport-socialBtn"
+                      onClick={() => {
+                        setFollowMode("followers");
+                        setFollowOpen(true);
+                      }}
+                      type="button"
+                    >
+                      <strong>{passportStats.followers}</strong>
+                      <span>Followers</span>
+                    </button>
+                  </div>
+
                   {profileMusic && (
-                    <div style={{ marginTop: 8 }}>
+                    <div style={{ marginTop: 10 }}>
                       <Tag icon={<SoundOutlined />} color="purple">
                         Music On
                       </Tag>
@@ -421,6 +543,13 @@ export default function DigitalPassportPage() {
 
         <PassportFooter />
       </div>
+
+      {/* ✅ NEW: Followers/Following modal */}
+      <FollowersModal
+        open={followOpen}
+        onClose={() => setFollowOpen(false)}
+        mode={followMode}
+      />
 
       <ProfileMusicModal
         open={musicOpen}

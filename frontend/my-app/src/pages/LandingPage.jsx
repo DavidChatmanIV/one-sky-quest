@@ -5,6 +5,9 @@ import PageLayout from "../components/PageLayout";
 import TutorialModal from "../components/TutorialModal";
 import SupportFormModal from "../components/SupportFormModal";
 
+// ✅ Add this banner component (code below)
+import MemberBenefitsBanner from "../components/landing/MemberBenefitsBanner";
+
 import "../styles/LandingPage.css";
 
 const { Title, Text } = Typography;
@@ -21,41 +24,50 @@ export default function LandingPage() {
 
   return (
     <PageLayout>
+      {/* ✅ Expedia-style membership notice (guest vs member) */}
+      <MemberBenefitsBanner />
+
       {/* ===============================
           HERO SECTION
       =============================== */}
       <section className="hero-public" aria-label="Skyrio Public Landing">
         <div className="lp-container hero-center">
-          <Title className="hero-title">Plan smarter. Travel better.</Title>
+          <div className="hero-glass">
+            <Title className="hero-title">
+              Plan smarter.
+              <br />
+              Travel better.
+            </Title>
 
-          <Text className="hero-subtag">
-            Calm planning, real rewards, and price tracking — built for
-            explorers.
-          </Text>
-
-          <div className="hero-cta-row hero-cta-row--links">
-            <Button
-              type="link"
-              className="hero-login-link"
-              onClick={() => setTutorialOpen(true)}
-            >
-              Take a 30-sec tour
-            </Button>
-
-            <Button
-              type="link"
-              className="hero-login-link"
-              onClick={() => setSupportOpen(true)}
-            >
-              Need help?
-            </Button>
-          </div>
-
-          <div className="hero-trust">
-            <Text className="hero-trust-text">
-              Trusted by explorers worldwide
+            <Text className="hero-subtag">
+              Calm planning, real rewards, and price tracking — built for
+              explorers.
             </Text>
-            <div className="hero-stars">★★★★★</div>
+
+            <div className="hero-cta-row hero-cta-row--links">
+              <Button
+                type="link"
+                className="hero-login-link"
+                onClick={() => setTutorialOpen(true)}
+              >
+                Take a 30-sec tour
+              </Button>
+
+              <Button
+                type="link"
+                className="hero-login-link"
+                onClick={() => setSupportOpen(true)}
+              >
+                Need help?
+              </Button>
+            </div>
+
+            <div className="hero-trust">
+              <Text className="hero-trust-text">
+                Trusted by early explorers worldwide
+              </Text>
+              <div className="hero-stars">★★★★★</div>
+            </div>
           </div>
 
           <div className="lp-dest-row" aria-label="Featured destinations">
@@ -78,25 +90,28 @@ export default function LandingPage() {
           TESTIMONIALS (placeholder)
       =============================== */}
       <section className="testimonials-section">
-        <Title level={4} style={{ color: "var(--text)", textAlign: "center" }}>
+        <Title
+          level={4}
+          style={{ color: "var(--sk-text)", textAlign: "center" }}
+        >
           What Travelers Are Saying
         </Title>
         <Text
           style={{
             display: "block",
             textAlign: "center",
-            color: "var(--muted)",
+            color: "var(--sk-muted)",
             marginBottom: 8,
           }}
         >
           Real feedback from early explorers — premium, simple, fast.
         </Text>
 
-        <Text style={{ color: "var(--muted)" }}>No testimonials yet.</Text>
+        <Text style={{ color: "var(--sk-muted)" }}>No testimonials yet.</Text>
       </section>
 
       {/* ===============================
-          FEATURES GRID (FIXED)
+          FEATURES GRID
       =============================== */}
       <section aria-label="Skyrio features">
         <div className="lp-feature-grid">
@@ -142,7 +157,6 @@ export default function LandingPage() {
         open={tutorialOpen}
         onClose={() => setTutorialOpen(false)}
       />
-
       <SupportFormModal
         open={supportOpen}
         onClose={() => setSupportOpen(false)}

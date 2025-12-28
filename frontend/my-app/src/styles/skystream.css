@@ -159,7 +159,6 @@
   display: grid;
   gap: 12px;
 }
-
 /* ===============================
    Feed styling
    =============================== */
@@ -169,20 +168,41 @@
   gap: 14px;
 }
 
+/* Individual post card */
 .sk-post {
   padding: 12px 12px 14px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--sk-shadow);
 }
 
+/* --------------------------------
+   Post header row (author + actions)
+---------------------------------- */
+
 .sk-postMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 6px;
 }
 
+.sk-postMetaRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Author text */
 .sk-postAuthor {
   font-weight: 700;
 }
+
+/* --------------------------------
+   Post content
+---------------------------------- */
 
 .sk-postTitle {
   margin: 2px 0 6px !important;
@@ -197,8 +217,75 @@
 
 .sk-postTags {
   margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
+/* --------------------------------
+   Premium Follow button
+---------------------------------- */
+
+.sk-followBtn {
+  border-radius: 999px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: var(--sk-text) !important;
+
+  backdrop-filter: blur(10px);
+  font-weight: 700;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.sk-followBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 138, 42, 0.45) !important;
+  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.14);
+}
+
+/* Optional state when already following */
+.sk-followBtn.isFollowing {
+  background: rgba(255, 138, 42, 0.14) !important;
+  border-color: rgba(255, 138, 42, 0.45) !important;
+  color: var(--sk-text) !important;
+}
+
+/* --------------------------------
+   Load More
+---------------------------------- */
+
+.sk-loadMoreRow {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.sk-loadMoreBtn {
+  border-radius: 14px !important;
+  height: 42px !important;
+
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: var(--sk-text) !important;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.sk-loadMoreBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 138, 42, 0.40) !important;
+  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.12);
+}
 /* ===============================
    ORANGE PILLS (SkyrioPill)
    =============================== */

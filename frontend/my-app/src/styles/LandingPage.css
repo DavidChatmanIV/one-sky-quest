@@ -1,16 +1,27 @@
+:root{
+  --sk-text: rgba(244,246,251,0.92);
+  --sk-muted: rgba(244,246,251,0.72);
+
+  --sk-glass-bg: rgba(255,255,255,0.08);
+  --sk-glass-bg-strong: rgba(255,255,255,0.12);
+  --sk-glass-border: rgba(255,255,255,0.14);
+  --sk-glass-shadow: 0 18px 60px rgba(0,0,0,0.28);
+}
+
+/* =====================================================
+   PAGE BASE
+   ===================================================== */
 .lp-page{
   position: relative;
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
 
-  /* 🔥 Background starts at the TOP (behind sticky navbar) */
   background:
     radial-gradient(900px 500px at 75% 18%, rgba(255,140,90,0.25), transparent 60%),
     radial-gradient(900px 600px at 25% 22%, rgba(120,90,255,0.32), transparent 65%),
     linear-gradient(135deg, #0b1220, #1a1c3b);
 
-  /* ✅ Critical: ensures hero background sits under navbar (no strip) */
   margin-top: calc(-1 * var(--nav-h));
   padding-top: var(--nav-h);
 }
@@ -24,49 +35,158 @@
 }
 
 /* =====================================================
+   MEMBER BENEFITS BANNER (Expedia-style)
+   ===================================================== */
+.lp-memberWrap{
+  max-width: 1100px;
+  margin: 14px auto 0;
+  padding: 0 18px;
+  position: relative;
+  z-index: 5;
+}
+
+.lp-memberCard{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  border-radius: 18px;
+  padding: 14px 16px;
+
+  background: linear-gradient(
+    180deg,
+    var(--sk-glass-bg-strong),
+    rgba(255,255,255,0.06)
+  );
+
+  border: 1px solid var(--sk-glass-border);
+  box-shadow: var(--sk-glass-shadow);
+
+  backdrop-filter: blur(14px);
+}
+
+.lp-memberLeft{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lp-memberTitle{
+  color: var(--sk-text);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-memberSub{
+  color: var(--sk-muted);
+}
+
+.lp-memberRight{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lp-memberBtn{
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.22);
+}
+
+.lp-memberLink{
+  font-weight: 800;
+  color: rgba(244,246,251,0.9);
+}
+
+.lp-memberCard--active{
+  border: 1px solid rgba(255,140,90,0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(255,140,90,0.12),
+    rgba(255,255,255,0.06)
+  );
+}
+
+.lp-memberBtnGhost{
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: var(--sk-text);
+  font-weight: 900;
+}
+
+/* =====================================================
    HERO SECTION
    ===================================================== */
 .hero-public{
   min-height: 100vh;
+  padding: 64px 0 40px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  /* ✅ Premium spacing without weird subtraction math */
-  padding: 64px 0 40px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* True centering */
+.hero-public::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(120,90,255,0.22),
+    rgba(255,140,90,0.12),
+    transparent
+  );
+  z-index: 0;
+}
+
 .lp-container.hero-center{
   max-width: 760px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 /* =====================================================
-   HERO TEXT
+   HERO GLASS
    ===================================================== */
+.hero-glass{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.18),
+    rgba(255,255,255,0.10)
+  );
+  border-radius: 22px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--sk-glass-border);
+  box-shadow: var(--sk-glass-shadow);
+  backdrop-filter: blur(14px);
+}
+
+/* HERO TEXT — WHITE */
 .hero-title{
-  margin: 0 auto;
   font-size: clamp(2.4rem, 5vw, 3.3rem);
-  font-weight: 800;
-  line-height: 1.15;
-  color: var(--text-1);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--sk-text);
 }
 
 .hero-subtag{
   margin-top: 14px;
-  max-width: 620px;
   font-size: 1.05rem;
   line-height: 1.6;
-  color: rgba(244,246,251,0.80);
+  color: var(--sk-muted);
 }
 
 /* =====================================================
@@ -75,18 +195,27 @@
 .hero-cta-row{
   margin-top: 18px;
   display: flex;
-  gap: 18px;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-login-link{
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--sk-text);
+  font-weight: 800;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.hero-login-link{
-  padding: 0;
-  font-weight: 600;
-  color: rgba(244,246,251,0.92);
-}
-.hero-login-link:hover{
-  color: var(--cta);
+.hero-login-link:first-child{
+  background: rgba(255,140,90,0.22);
+  border-color: rgba(255,140,90,0.34);
 }
 
 /* =====================================================
@@ -94,10 +223,6 @@
    ===================================================== */
 .hero-trust{
   margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
 }
 
 .hero-trust-text{
@@ -106,9 +231,9 @@
 }
 
 .hero-stars{
-  font-size: 0.95rem;
+  margin-top: 4px;
   letter-spacing: 2px;
-  color: var(--cta);
+  color: #ff9f45;
 }
 
 /* =====================================================
@@ -118,121 +243,74 @@
   margin-top: 22px;
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .lp-dest-card{
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
   padding: 6px 12px;
   border-radius: 999px;
-
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  backdrop-filter: blur(6px);
-
-  font-size: 0.85rem;
-  color: var(--text-1);
-  cursor: pointer;
-
-  transition: transform 0.2s ease, background 0.2s ease;
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(10px);
+  color: var(--sk-text);
+  font-weight: 700;
 }
-
-.lp-dest-card:hover{
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.12);
-}
-
-.lp-dest-emoji{ font-size: 1rem; }
-.lp-dest-label{ font-weight: 600; }
 
 /* =====================================================
-   TESTIMONIALS SECTION (premium glass)
+   TESTIMONIALS
    ===================================================== */
 .testimonials-section{
-  margin-top: 70px;
-  padding: 26px 18px;
+  margin: 70px auto 0;
   max-width: 1100px;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 26px 18px;
 
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.07),
-    rgba(255, 255, 255, 0.03)
+    var(--sk-glass-bg-strong),
+    rgba(255,255,255,0.06)
   );
-  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--sk-glass-border);
+  box-shadow: var(--sk-glass-shadow);
+  backdrop-filter: blur(14px);
 }
 
 /* =====================================================
-   FEATURE CARDS — 3 IN A ROW
+   FEATURE GRID
    ===================================================== */
 .lp-feature-grid{
   max-width: 1100px;
   margin: 28px auto 0;
   padding: 0 18px;
-
   display: grid;
-  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  align-items: stretch;
 }
 
 .lp-feature-card{
+  padding: 16px;
   border-radius: 18px;
-  padding: 16px 16px;
-
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22);
-
+  background: linear-gradient(
+    180deg,
+    var(--sk-glass-bg-strong),
+    rgba(255,255,255,0.06)
+  );
+  border: 1px solid var(--sk-glass-border);
+  box-shadow: var(--sk-glass-shadow);
   display: flex;
   gap: 12px;
   align-items: center;
-  backdrop-filter: blur(8px);
-}
-
-.lp-feature-icon{
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(255, 138, 42, 0.16);
-  border: 1px solid rgba(255, 138, 42, 0.26);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
-
-  font-size: 16px;
 }
 
 .lp-feature-title{
-  font-weight: 800;
-  color: var(--text-1);
-  margin-bottom: 4px;
-  line-height: 1.2;
+  font-weight: 900;
+  color: var(--sk-text);
 }
 
 .lp-feature-text{
-  color: rgba(244, 246, 251, 0.78);
-  line-height: 1.35;
+  color: var(--sk-muted);
   font-size: 0.95rem;
-}
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
-.lp-footer{
-  padding: 18px 0 26px;
-  text-align: center;
-  color: rgba(244, 246, 251, 0.65);
 }
 
 /* =====================================================
@@ -247,12 +325,16 @@
 @media (max-width: 640px){
   .hero-cta-row{
     flex-direction: column;
-    gap: 12px;
   }
-  .hero-subtag{
-    font-size: 1rem;
+
+  .hero-login-link,
+  .lp-memberBtn,
+  .lp-memberBtnGhost{
+    width: 100%;
   }
-  .hero-public{
-    padding: 54px 0 36px;
+
+  .lp-memberCard{
+    flex-direction: column;
+    align-items: stretch;
   }
 }

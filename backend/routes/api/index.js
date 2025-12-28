@@ -2,10 +2,6 @@ import { Router } from "express";
 
 const api = Router();
 
-/**
- * Dynamically mounts a router module at a given base path.
- * Works with ESM default exports.
- */
 async function mount(routeBase, modulePath) {
   try {
     const mod = await import(modulePath);
@@ -43,7 +39,13 @@ await mount("/uploads", "./uploads.routes.js");
 // 👥 Social (follow/unfollow, mute official, ensure-official, etc.)
 await mount("/social", "./social.routes.js");
 
-// 🧾 Passport stats (one endpoint for passport header)
+// Follow system (ObjectId based)
+await mount("/follow", "./follow.routes.js");
+
+// SkyStream feed + Following feed (cursor pagination)
+await mount("/skystream", "./skystream.routes.js");
+
+// 🧾 Passport stats
 await mount("/passport", "./passport.routes.js");
 
 /* ======================================================
@@ -53,10 +55,7 @@ await mount("/conversations", "../conversations.js");
 await mount("/feed", "../feed.js");
 await mount("/health", "../health.js");
 await mount("/message", "../message.routes.js");
-
-// notifications router
 await mount("/notifications", "../notification.routes.js");
-
 await mount("/bookings", "../bookings.routes.js");
 await mount("/dm", "../dm.js");
 await mount("/admin", "../admin.routes.js");
@@ -64,14 +63,8 @@ await mount("/admin", "../admin.routes.js");
 /* ======================================================
    Feature Modules
    ====================================================== */
-
-// 🔥 Today's Hotspots
 await mount("/hotspots", "../hotspots.js");
-
-// 👀 Price Watches / Alerts
 await mount("/watches", "../watches.js");
-
-// ⭐ XP + Seasonal Rewards
 await mount("/xp", "../xp.js");
 
 /* ======================================================

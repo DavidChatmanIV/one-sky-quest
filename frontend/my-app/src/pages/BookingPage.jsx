@@ -14,7 +14,6 @@ import {
   InputNumber,
   Drawer,
   Divider,
-  Select,
   Switch,
   message,
 } from "antd";
@@ -24,8 +23,6 @@ import {
   UserOutlined,
   SearchOutlined,
   SettingOutlined,
-  TeamOutlined,
-  CopyOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
 
@@ -54,7 +51,7 @@ const QUICK_TAGS = [
 
 /* ---------------- Guests Dropdown ---------------- */
 
-function GuestsDropdown({ value, onChange }) {
+function GuestsDropdown({ value, onChange, className = "" }) {
   const menu = (
     <Menu
       items={[
@@ -76,7 +73,7 @@ function GuestsDropdown({ value, onChange }) {
 
   return (
     <Dropdown overlay={menu} trigger={["click"]}>
-      <Button className="sk-inputBtn" icon={<UserOutlined />}>
+      <Button className={`sk-fieldBtn ${className}`} icon={<UserOutlined />}>
         {labelMap[value] || "2 adults • 1 room"}
       </Button>
     </Dropdown>
@@ -205,7 +202,8 @@ function BudgetPanel() {
   );
 
   const remaining = Math.max(0, budget - planTotal);
-  const usedPct = budget > 0 ? Math.min(100, Math.round((planTotal / budget) * 100)) : 0;
+  const usedPct =
+    budget > 0 ? Math.min(100, Math.round((planTotal / budget) * 100)) : 0;
 
   const saveBudget = () => {
     const next = Number(draftBudget || 0);
@@ -321,7 +319,11 @@ function BudgetPanel() {
         </div>
 
         <div className="sk-budgetActions">
-          <Button className="sk-cta sk-budgetAddBtn" onClick={addExpense} icon={<SaveOutlined />}>
+          <Button
+            className="sk-cta sk-budgetAddBtn"
+            onClick={addExpense}
+            icon={<SaveOutlined />}
+          >
             Add
           </Button>
 
@@ -360,21 +362,33 @@ function BudgetPanel() {
           <div className="sk-budgetDetailPills">
             <div className="sk-budgetPill">
               <div className="sk-budgetPillLabel">Budget</div>
-              <div className="sk-budgetPillValue">${budget.toLocaleString()}</div>
+              <div className="sk-budgetPillValue">
+                ${budget.toLocaleString()}
+              </div>
             </div>
             <div className="sk-budgetPill">
               <div className="sk-budgetPillLabel">Used</div>
-              <div className="sk-budgetPillValue">${planTotal.toLocaleString()}</div>
+              <div className="sk-budgetPillValue">
+                ${planTotal.toLocaleString()}
+              </div>
             </div>
             <div className="sk-budgetPill">
               <div className="sk-budgetPillLabel">Left</div>
-              <div className="sk-budgetPillValue">${remaining.toLocaleString()}</div>
+              <div className="sk-budgetPillValue">
+                ${remaining.toLocaleString()}
+              </div>
             </div>
           </div>
 
           <Divider style={{ borderColor: "rgba(255,255,255,.12)" }} />
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Text style={{ color: "rgba(255,255,255,.85)", fontWeight: 700 }}>
               Recent expenses
             </Text>
@@ -392,7 +406,9 @@ function BudgetPanel() {
               {expenses.map((x) => (
                 <div key={x.id} className="sk-budgetItem">
                   <div>
-                    <div className="sk-budgetItemAmt">${Number(x.amount).toLocaleString()}</div>
+                    <div className="sk-budgetItemAmt">
+                      ${Number(x.amount).toLocaleString()}
+                    </div>
                     <div className="sk-budgetItemNote">
                       {x.note || "Expense"}
                       <span className="sk-budgetItemTime">
@@ -401,7 +417,11 @@ function BudgetPanel() {
                       </span>
                     </div>
                   </div>
-                  <Button size="small" className="sk-ghostBtn" onClick={() => removeExpense(x.id)}>
+                  <Button
+                    size="small"
+                    className="sk-ghostBtn"
+                    onClick={() => removeExpense(x.id)}
+                  >
                     Remove
                   </Button>
                 </div>
@@ -413,6 +433,7 @@ function BudgetPanel() {
     </div>
   );
 }
+
 /* ---------------- Booking Page ---------------- */
 
 export default function BookingPage() {
@@ -421,10 +442,26 @@ export default function BookingPage() {
   const [dates, setDates] = useState(null);
   const [guests, setGuests] = useState("2a1r");
 
+  // ✅ Landing-style filters + toggles
+  const [filters, setFilters] = useState([]);
+  const [rewardsOn, setRewardsOn] = useState(true);
+  const [trackPrices, setTrackPrices] = useState(false);
+
+  const toggleFilter = (label) => {
+    setFilters((prev) =>
+      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
+    );
+  };
+
   const headerPills = useMemo(
     () => [{ label: "XP 60" }, { label: "0 saved trips" }, { label: "1 new" }],
     []
   );
+
+  const handleSearch = () => {
+    message.success("Searching…");
+    // hook into your real search later
+  };
 
   return (
     <Layout className="sk-bookingPage">
@@ -465,36 +502,93 @@ export default function BookingPage() {
                 ))}
               </div>
 
-              <div className="sk-searchRow">
-                <Input
-                  className="sk-input"
-                  prefix={<EnvironmentOutlined />}
-                  placeholder="Destination"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  allowClear
-                />
+              {/* ✅ Landing-style search bar */}
+              <div className="sk-searchBar">
+                <div className="sk-searchBarRow">
+                  <div className="sk-field sk-field--dest">
+                    <EnvironmentOutlined className="sk-fieldIcon" />
+                    <Input
+                      className="sk-fieldInput"
+                      placeholder="Where to?"
+                      value={destination}
+                      onChange={(e) => setDestination(e.target.value)}
+                      allowClear
+                      bordered={false}
+                    />
+                  </div>
 
-                <DatePicker.RangePicker
-                  className="sk-input"
-                  suffixIcon={<CalendarOutlined />}
-                  value={dates}
-                  onChange={setDates}
-                />
+                  <div className="sk-field sk-field--dates">
+                    <DatePicker.RangePicker
+                      className="sk-fieldPicker"
+                      value={dates}
+                      onChange={setDates}
+                      bordered={false}
+                      suffixIcon={<CalendarOutlined className="sk-fieldIcon" />}
+                    />
+                  </div>
 
-                <GuestsDropdown value={guests} onChange={setGuests} />
+                  <GuestsDropdown value={guests} onChange={setGuests} />
 
-                <Button className="sk-searchBtn" icon={<SearchOutlined />}>
-                  Search +50 XP
-                </Button>
-              </div>
+                  <Button
+                    className="sk-askSoraBtn"
+                    onClick={() =>
+                      message.info("Sora suggestions (hook later)")
+                    }
+                  >
+                    ⚡ Ask Sora
+                  </Button>
 
-              <div className="sk-quickTags">
-                {QUICK_TAGS.map((tag) => (
-                  <button key={tag} className="sk-chip">
-                    {tag}
-                  </button>
-                ))}
+                  <Button
+                    className="sk-searchBtn2"
+                    icon={<SearchOutlined />}
+                    onClick={handleSearch}
+                  >
+                    Search
+                  </Button>
+                </div>
+
+                <div className="sk-filterPills">
+                  {[
+                    "Under $500",
+                    "Under $1000",
+                    "Luxury",
+                    "Chill",
+                    "Adventure",
+                    "Romantic",
+                    "Family",
+                  ].map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      className={`sk-filterPill ${
+                        filters.includes(p) ? "isOn" : ""
+                      }`}
+                      onClick={() => toggleFilter(p)}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="sk-searchToggles">
+                  <div className="sk-toggleRow">
+                    <span className="sk-toggleLabel">Rewards</span>
+                    <Switch checked={rewardsOn} onChange={setRewardsOn} />
+                  </div>
+
+                  <div className="sk-toggleRow">
+                    <span className="sk-toggleLabel">Track prices</span>
+                    <Switch checked={trackPrices} onChange={setTrackPrices} />
+                  </div>
+                </div>
+
+                <div className="sk-quickTags sk-quickTags--below">
+                  {QUICK_TAGS.map((tag) => (
+                    <button key={tag} className="sk-chip" type="button">
+                      {tag}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -507,6 +601,9 @@ export default function BookingPage() {
                     ? dates.map((d) => d?.toISOString?.() || String(d))
                     : null,
                   guests,
+                  filters,
+                  rewardsOn,
+                  trackPrices,
                 }}
               />
             </div>
