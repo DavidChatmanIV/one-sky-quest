@@ -32,11 +32,24 @@ export function useSkystreamFeed({ tab, search, userId, pageSize = 20 }) {
     return url.pathname + url.search;
   }
 
+  async function safeReadJson(res) {
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const text = await res.text();
+      throw new Error(
+        `API returned non-JSON (${
+          res.status
+        }). Check Vite proxy. Body: ${text.slice(0, 120)}`
+      );
+    }
+    return res.json();
+  }
+
   async function fetchPage({ cursor, append }) {
     const url = buildUrl({ cursor });
 
     const res = await fetch(url, { headers });
-    const data = await res.json();
+    const data = await safeReadJson(res);
 
     if (!res.ok || data?.ok === false) {
       throw new Error(data?.error || "Failed to load feed");

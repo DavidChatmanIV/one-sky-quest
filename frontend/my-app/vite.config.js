@@ -38,8 +38,12 @@ export default defineConfig({
 
     proxy: {
       "/api": {
+        // ✅ Use your backend port here (pick the one your backend is actually running on)
+        // If your backend is on 5000, keep 5000.
+        // If your backend is on 5050, change it to 5050.
         target: "http://localhost:5000",
         changeOrigin: true,
+        secure: false,
       },
     },
   },
