@@ -1,0 +1,49 @@
+.sk-flightCard {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  backdrop-filter: blur(10px);
+}
+
+.sk-flightLogo {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: rgba(255,140,90,0.18);
+  border: 1px solid rgba(255,140,90,0.25);
+}
+
+.sk-badgeTag {
+  background: rgba(120,90,255,0.16) !important;
+  border: 1px solid rgba(120,90,255,0.22) !important;
+  color: rgba(255,255,255,0.92) !important;
+  border-radius: 999px !important;
+}
+
+.sk-flightRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.sk-flightCol { display: flex; flex-direction: column; gap: 2px; }
+.sk-flightTime { font-size: 18px; font-weight: 800; }
+.sk-flightDate { font-size: 12px; opacity: 0.8; }
+
+.sk-flightMid { flex: 1; display: grid; place-items: center; gap: 6px; }
+.sk-flightMeta { font-size: 12px; }
+.sk-flightArrow { opacity: 0.85; font-size: 18px; }
+
+.sk-flightPrice { font-size: 20px; font-weight: 900; }
+
+.sk-saveBtn { border-radius: 12px; }
+.sk-saveBtn.isSaved { background: rgba(255, 77, 79, 0.14) !important; }
+
+.sk-checkoutBtn { border-radius: 12px; font-weight: 800; }

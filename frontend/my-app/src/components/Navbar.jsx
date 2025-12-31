@@ -2,10 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { Avatar, Dropdown, Button, message } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
-import "../styles/Navbar.css";
-import { useAuth } from "../hooks/useAuth";
 
+import "../styles/Navbar.css";
 import logo from "../assets/logo/skyrio-logo.png";
+
+// ✅ NEW: your global auth + modal controller
+import { useAuth } from "../auth/AuthProvider";
+import { useAuthModal } from "../auth/AuthModalController";
 
 const navItems = [
   { label: "Discover", to: "/" },
@@ -17,8 +20,25 @@ const navItems = [
 export default function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const auth = useAuth?.();
-  const user = auth?.user || null;
+
+  // ✅ use new auth source
+  const auth = useAuth();
+  const { openAuth } = useAuthModal();
+
+  const isAuthed = !!auth?.isAuthed;
+  const isGuest = !!auth?.isGuest;
+
+  // Keep user compatible with your existing UI bits
+  const user =
+    auth?.user ||
+    (() => {
+      try {
+        const raw = localStorage.getItem("user");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    })();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -36,12 +56,12 @@ export default function Navbar() {
     return (
       user?.name ||
       user?.username ||
-      (user?.email ? user.email.split("@")[0] : "")
+      (user?.email ? user.email.split("@")[0] : "") ||
+      (isGuest ? "Guest" : "")
     );
-  }, [user]);
+  }, [user, isGuest]);
 
-  const isLoggedIn = !!user;
-
+  // ✅ unified “logout”
   const handleLogout = () => {
     if (auth?.logout) auth.logout();
     else {
@@ -67,6 +87,19 @@ export default function Navbar() {
       },
     ],
   };
+
+  // ✅ central helper for modal open (login/signup)
+  const openLogin = () =>
+    openAuth({
+      intent: "login",
+      reason: "Log in to access your Passport, DMs, and saves.",
+    });
+
+  const openSignup = () =>
+    openAuth({
+      intent: "signup",
+      reason: "Create an account to save trips and join SkyStream.",
+    });
 
   return (
     <header className={`sk-nav ${scrolled ? "is-scrolled is-compact" : ""}`}>
@@ -100,39 +133,52 @@ export default function Navbar() {
         {/* RIGHT */}
         <div className="sk-actions">
           <div className="sk-actions-desktop">
-            {!isLoggedIn ? (
+            {!isAuthed ? (
               <>
+                <Button className="sk-btnGhost" onClick={openLogin}>
+                  Log in
+                </Button>
+
                 <Button
                   type="primary"
                   className="sk-btnPrimary"
-                  onClick={() => navigate("/register")}
+                  onClick={openSignup}
                 >
-                  Get Started
-                </Button>
-                <Button
-                  className="sk-btnGhost"
-                  onClick={() => navigate("/login")}
-                >
-                  Log in
+                  Sign up
                 </Button>
               </>
             ) : (
               <div className="sk-user">
-                <span className="sk-hello">Hey, {displayName}</span>
-                <Dropdown
-                  menu={avatarMenu}
-                  placement="bottomRight"
-                  trigger={["click"]}
-                  overlayClassName="sk-dropdown"
-                >
-                  <button className="sk-avatarBtn" type="button">
-                    <Avatar
-                      size={34}
-                      src={user?.avatarUrl}
-                      icon={!user?.avatarUrl ? <UserOutlined /> : null}
-                    />
-                  </button>
-                </Dropdown>
+                <span className="sk-hello">
+                  Hey, {displayName}
+                  {isGuest ? " ✨" : ""}
+                </span>
+
+                {isGuest ? (
+                  // ✅ Guest users: CTA to “upgrade” via auth modal
+                  <Button
+                    type="primary"
+                    className="sk-btnPrimary"
+                    onClick={openSignup}
+                  >
+                    Upgrade
+                  </Button>
+                ) : (
+                  <Dropdown
+                    menu={avatarMenu}
+                    placement="bottomRight"
+                    trigger={["click"]}
+                    overlayClassName="sk-dropdown"
+                  >
+                    <button className="sk-avatarBtn" type="button">
+                      <Avatar
+                        size={34}
+                        src={user?.avatarUrl}
+                        icon={!user?.avatarUrl ? <UserOutlined /> : null}
+                      />
+                    </button>
+                  </Dropdown>
+                )}
               </div>
             )}
           </div>
@@ -168,18 +214,34 @@ export default function Navbar() {
             </NavLink>
           ))}
 
-          {!isLoggedIn ? (
-            <Button
-              type="primary"
-              className="mobile-primary"
-              onClick={() => navigate("/login")}
-            >
-              Log in
-            </Button>
+          {!isAuthed ? (
+            <>
+              <Button className="mobile-ghost" onClick={openLogin}>
+                Log in
+              </Button>
+              <Button
+                type="primary"
+                className="mobile-primary"
+                onClick={openSignup}
+              >
+                Sign up
+              </Button>
+            </>
           ) : (
-            <Button danger onClick={handleLogout}>
-              Log out
-            </Button>
+            <>
+              {isGuest ? (
+                <Button
+                  type="primary"
+                  className="mobile-primary"
+                  onClick={openSignup}
+                >
+                  Upgrade
+                </Button>
+              ) : null}
+              <Button danger onClick={handleLogout}>
+                Log out
+              </Button>
+            </>
           )}
         </div>
       </div>

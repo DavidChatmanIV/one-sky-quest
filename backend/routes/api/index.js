@@ -35,18 +35,15 @@ async function mount(routeBase, modulePath) {
 await mount("/auth", "./auth.routes.js");
 await mount("/profile", "./profile.routes.js");
 await mount("/uploads", "./uploads.routes.js");
-
-// 👥 Social (follow/unfollow, mute official, ensure-official, etc.)
 await mount("/social", "./social.routes.js");
-
-// Follow system (ObjectId based)
 await mount("/follow", "./follow.routes.js");
-
-// SkyStream feed + Following feed (cursor pagination)
 await mount("/skystream", "./skystream.routes.js");
-
-// 🧾 Passport stats
 await mount("/passport", "./passport.routes.js");
+await mount("/flights", "./flights.routes.js");
+
+// ✅ NEW: Amadeus provider routes (lives in backend/providers/amadeus/routes.js)
+await mount("/providers/amadeus", "../../providers/amadeus/routes.js");
+
 
 /* ======================================================
    Routes inside: backend/routes/
@@ -65,6 +62,8 @@ await mount("/admin", "../admin.routes.js");
    ====================================================== */
 await mount("/hotspots", "../hotspots.js");
 await mount("/watches", "../watches.js");
+
+/* XP ROUTE (fixed path) */
 await mount("/xp", "../xp.js");
 
 /* ======================================================

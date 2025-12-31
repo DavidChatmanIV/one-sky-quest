@@ -1,87 +1,40 @@
-import React, { useState } from "react";
-import { Card, List, Input, Button, Space, Typography, message } from "antd";
-const { Text } = Typography;
+import React from "react";
+import { Alert, Button, Space } from "antd";
+import { useAuth } from "../hooks/useAuth";
 
-export default function Guestbook({ className, style, onEarnXp, ...rest }) {
-  const [entries, setEntries] = useState([
-    {
-      id: "emily",
-      name: "Emily",
-      note: "Loved your Paris pics! 🇫🇷",
-      ts: "2h ago",
-    },
-  ]);
-  const [note, setNote] = useState("");
+export default function GuestBanner() {
+  const auth = useAuth();
+  const isAuthed = !!auth?.user;
 
-  const addEntry = () => {
-    const val = note.trim();
-    if (!val) return;
-    const next = {
-      id: `${Date.now()}`,
-      name: "You",
-      note: val,
-      ts: "just now",
-    };
-    setEntries([next, ...entries]);
-    setNote("");
-    onEarnXp?.(5);
-    message.success("Guestbook updated (+5 XP)");
-  };
+  if (isAuthed) return null;
 
   return (
-    <Card
-      className={`osq-surface ${className || ""}`}
-      data-surface={rest["data-surface"] ?? "2"}
-      styles={{ body: { padding: 12 } }}
-      style={{ borderRadius: 12, ...(style || {}) }}
-      {...rest}
-    >
-      <div
-        style={{
-          marginBottom: 8,
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text strong>Guestbook</Text>
-        <Text type="secondary">
-          {entries.length} note{entries.length !== 1 ? "s" : ""}
-        </Text>
-      </div>
-
-      <Space.Compact style={{ width: "100%", marginBottom: 10 }}>
-        <Input
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Leave a friendly note…"
-          onPressEnter={addEntry}
-        />
-        <Button type="primary" onClick={addEntry}>
-          Post
-        </Button>
-      </Space.Compact>
-
-      <List
-        itemLayout="vertical"
-        dataSource={entries}
-        renderItem={(it) => (
-          <List.Item style={{ padding: "8px 0" }}>
-            <List.Item.Meta
-              title={
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  <Text strong>{it.name}</Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {it.ts}
-                  </Text>
-                </div>
-              }
-              description={<Text>{it.note}</Text>}
-            />
-          </List.Item>
-        )}
+    <div style={{ maxWidth: 1100, margin: "12px auto" }}>
+      <Alert
+        type="info"
+        showIcon
+        message="You’re browsing as a guest"
+        description={
+          <Space wrap>
+            <span>
+              Log in to unlock your Passport, DMs, rewards, and saved trips.
+            </span>
+            <Button
+              size="small"
+              type="primary"
+              onClick={() => auth?.openAuthModal?.({ mode: "login" })}
+            >
+              Log in
+            </Button>
+            <Button
+              size="small"
+              onClick={() => auth?.openAuthModal?.({ mode: "signup" })}
+            >
+              Sign up
+            </Button>
+          </Space>
+        }
       />
-    </Card>
+    </div>
   );
 }

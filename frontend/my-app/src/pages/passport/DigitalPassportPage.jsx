@@ -54,9 +54,13 @@ import TopEightItemPlace from "./TopEightItemPlace";
 /* Auth */
 import { useAuth } from "../../hooks/useAuth";
 
-/* Rewards opt-in prompt (NEW) */
+/* Rewards opt-in prompt */
 import RewardsOptInPrompt from "../../components/rewards/RewardsOptInPrompt";
 import useRewardsOptInPrompt from "../../hooks/useRewardsOptInPrompt";
+
+/* ✅ Soft-block gate + guest banner (paths FIXED) */
+import RequireAuthBlock from "../../auth/RequireAuthBlock";
+import GuestBanner from "../../components/GuestBanner";
 
 const { Title, Text } = Typography;
 
@@ -83,7 +87,7 @@ function makeReferralCode(user) {
 export default function DigitalPassportPage() {
   const auth = useAuth();
 
-  /* Rewards opt-in hook (NEW) */
+  /* Rewards opt-in hook */
   const rewardsOptIn = useRewardsOptInPrompt();
 
   const [musicOpen, setMusicOpen] = useState(false);
@@ -105,7 +109,7 @@ export default function DigitalPassportPage() {
   /* Socket ref (prevents reconnect loops) */
   const socketRef = useRef(null);
 
-  /* NEW: whether rewards are enabled for the signed-in user */
+  /* Rewards enabled for signed-in user */
   const rewardsEnabled = !!auth?.user?.settings?.rewardsEnabled;
 
   /* ---------- derived display ---------- */
@@ -273,14 +277,13 @@ export default function DigitalPassportPage() {
 
     return () => {
       s.off("social:counts:update", handler);
-      // Keep socket open during page life (prevents flicker). If you want full cleanup:
-      // s.disconnect(); socketRef.current = null;
+      // Keep socket open during page life (prevents flicker)
     };
   }, [myId]);
 
   const xpPercent = useMemo(() => {
     if (!xpToNextBadge) return 0;
-    // soft-launch: keep simple. (You can swap to xp / (xp + xpToNextBadge) later)
+    // soft-launch: simple percent
     return Math.round((Math.min(xp, 1000) / 1000) * 100);
   }, [xp, xpToNextBadge]);
 
@@ -303,11 +306,11 @@ export default function DigitalPassportPage() {
     }
   }, [referralCode]);
 
-  /* ---------------- render ---------------- */
+  /* ---------------- Passport content (wrapped by soft-block) ---------------- */
 
-  return (
+  const PassportContent = (
     <>
-      {/* Rewards Opt-in Prompt (NEW) */}
+      {/* Rewards Opt-in Prompt */}
       <RewardsOptInPrompt
         open={rewardsOptIn.open}
         onClose={rewardsOptIn.close}
@@ -329,7 +332,7 @@ export default function DigitalPassportPage() {
 
                   <Text type="secondary">{levelLabel}</Text>
 
-                  {/* ✅ NEW: Following / Followers (under level label) */}
+                  {/* Following / Followers */}
                   <div className="passport-social" style={{ marginTop: 10 }}>
                     <button
                       className="passport-socialBtn"
@@ -459,13 +462,13 @@ export default function DigitalPassportPage() {
         {/* VISAS */}
         {segment === "visas" && <VisaList />}
 
-        {/* ✅ REWARDS (UPDATED) */}
+        {/* REWARDS */}
         {segment === "rewards" && (
           <>
             <Membership />
             <SkyrioExchange showSearch={false} />
 
-            {/* ✅ Seasonal Rewards gated by rewardsEnabled */}
+            {/* Seasonal Rewards gated by rewardsEnabled */}
             {rewardsEnabled ? (
               <Card style={{ marginTop: 16 }}>
                 <Title level={5} style={{ marginBottom: 6 }}>
@@ -544,7 +547,7 @@ export default function DigitalPassportPage() {
         <PassportFooter />
       </div>
 
-      {/* ✅ NEW: Followers/Following modal */}
+      {/* Followers/Following modal */}
       <FollowersModal
         open={followOpen}
         onClose={() => setFollowOpen(false)}
@@ -556,6 +559,20 @@ export default function DigitalPassportPage() {
         onClose={() => setMusicOpen(false)}
         onSave={setProfileMusic}
       />
+    </>
+  );
+
+  /* ---------------- render ---------------- */
+
+  return (
+    <>
+      {/* ✅ Always visible (soft launch) */}
+      <GuestBanner />
+
+      {/* ✅ Soft-block gate (no redirects) */}
+      <RequireAuthBlock feature="your Passport">
+        {PassportContent}
+      </RequireAuthBlock>
     </>
   );
 }

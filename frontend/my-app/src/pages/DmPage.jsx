@@ -25,6 +25,10 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { useAuth } from "../hooks/useAuth";
 
+// ✅ NEW (SoftBlock wrappers)
+import RequireAuthBlock from "../auth/RequireAuthBlock";
+import GuestBanner from "../components/GuestBanner";
+
 const { Content, Sider } = Layout;
 const { Title, Text } = Typography;
 
@@ -57,8 +61,9 @@ function timeAgoString(dateLike) {
   return `${diffDay}d ago`;
 }
 
-const DmPage = () => {
+export default function DmPage() {
   const { user: currentUser } = useAuth();
+
   const [conversations, setConversations] = useState([]);
   const [loadingConvos, setLoadingConvos] = useState(true);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -79,13 +84,14 @@ const DmPage = () => {
   const [creatingConvo, setCreatingConvo] = useState(false);
 
   // ---- Socket.io client (single connection) ----
-  const socket = useMemo(
-    () =>
-      io(SOCKET_URL, {
-        withCredentials: true,
-      }),
-    []
-  );
+  const socket = useMemo(() => {
+    // If your server supports auth on handshake, you can include token here:
+    // const token = localStorage.getItem("token");
+    // return io(SOCKET_URL, { withCredentials: true, auth: { token } });
+
+    return io(SOCKET_URL, { withCredentials: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Clean up socket on unmount
   useEffect(() => {
@@ -114,12 +120,14 @@ const DmPage = () => {
             },
           }
         );
+
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to load DMs");
 
         setConversations(data || []);
+
         // auto-select first conversation if none selected
-        if (!selectedConversation && data.length > 0) {
+        if (!selectedConversation && (data || []).length > 0) {
           setSelectedConversation(data[0]);
         }
       } catch (err) {
@@ -173,7 +181,6 @@ const DmPage = () => {
 
     const conversationId = selectedConversation._id;
 
-    // Join DM room (your server listens on "dm:join" and also generic "join_conversation")
     socket.emit("dm:join", { conversationId });
     socket.emit("join_conversation", {
       conversationId,
@@ -226,13 +233,11 @@ const DmPage = () => {
 
     if (!selectedConversation?._id || !currentUser?._id) return;
 
-    // DM-specific typing event
     socket.emit("dm:typing", {
       conversationId: selectedConversation._id,
       fromUserId: currentUser._id,
     });
 
-    // Generic typing event for compatibility
     socket.emit("typing", {
       conversationId: selectedConversation._id,
       user: {
@@ -245,9 +250,7 @@ const DmPage = () => {
   // ---- Image change handler ----
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-    }
+    if (file) setImageFile(file);
   };
 
   // ---- Send message (text and/or image) ----
@@ -255,7 +258,7 @@ const DmPage = () => {
     if (!selectedConversation?._id || !currentUser?._id) return;
 
     const trimmed = inputMsg.trim();
-    if (!trimmed && !imageFile) return; // nothing to send
+    if (!trimmed && !imageFile) return;
 
     try {
       let imageUrl;
@@ -268,7 +271,6 @@ const DmPage = () => {
         const uploadRes = await fetch(`${API_BASE}/api/uploads/image`, {
           method: "POST",
           headers: {
-            // don't set Content-Type manually for FormData
             ...getAuthHeaders(),
           },
           body: formData,
@@ -282,7 +284,7 @@ const DmPage = () => {
         imageUrl = uploadData.url;
       }
 
-      // 2) Send DM message (text and/or image)
+      // 2) Send DM message
       const payload = {
         conversationId: selectedConversation._id,
         text: trimmed,
@@ -301,11 +303,7 @@ const DmPage = () => {
       const saved = await res.json();
       if (!res.ok) throw new Error(saved.error || "Failed to send message");
 
-      // We rely on Socket.io (dm:newMessage or message_received) to append,
-      // but we can also optimistically add:
-      // setMessages((prev) => [...prev, saved]);
-
-      // Also emit generic send_message so older listeners see it
+      // For compatibility with older listeners
       socket.emit("send_message", saved);
 
       setInputMsg("");
@@ -338,7 +336,6 @@ const DmPage = () => {
       if (!res.ok)
         throw new Error(data.error || "Failed to create conversation");
 
-      // Add to list if it's not already there
       setConversations((prev) => {
         const exists = prev.find((c) => String(c._id) === String(data._id));
         if (exists) return prev;
@@ -367,7 +364,6 @@ const DmPage = () => {
   };
 
   const renderMessageBubble = (msg, idx) => {
-    // Support both schemas: senderId or sender
     const rawSender = msg.senderId !== undefined ? msg.senderId : msg.sender;
 
     const senderId =
@@ -387,12 +383,10 @@ const DmPage = () => {
             fromMe ? "bg-indigo-600 text-white" : "bg-white border"
           }`}
         >
-          {/* Text (if any) */}
           {msg.text && (
             <div className="whitespace-pre-wrap break-words">{msg.text}</div>
           )}
 
-          {/* Image (if any) */}
           {msg.imageUrl && (
             <div className={msg.text ? "mt-2" : ""}>
               <img
@@ -403,7 +397,6 @@ const DmPage = () => {
             </div>
           )}
 
-          {/* Timestamp */}
           {msg.createdAt && (
             <div className="text-[10px] mt-1 opacity-70 text-right">
               {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -417,252 +410,272 @@ const DmPage = () => {
     );
   };
 
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Spin tip="Loading user..." />
-      </div>
-    );
-  }
-
   return (
     <>
-      <Layout className="min-h-screen">
-        {/* Sidebar – conversations list */}
-        <Sider width={260} className="bg-white p-4 border-r">
-          <div className="flex items-center justify-between mb-4 gap-2">
-            <div className="flex items-center gap-2">
-              <Title level={4} className="!mb-0">
-                💬 Direct Messages
-              </Title>
-              <MessageOutlined style={{ opacity: 0.6 }} />
-            </div>
-            <Tooltip title="Start a new conversation">
-              <Button
-                size="small"
-                type="primary"
-                icon={<UserAddOutlined />}
-                onClick={() => setShowNewConvoModal(true)}
-              />
-            </Tooltip>
+      {/* ✅ Always visible (even for guests) */}
+      <GuestBanner />
+
+      {/* ✅ SoftBlock: no redirects, just blocks feature + shows modal */}
+      <RequireAuthBlock feature="Direct Messages">
+        {/* If RequireAuthBlock allows render but user still loading */}
+        {!currentUser ? (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Spin tip="Loading user..." />
           </div>
+        ) : (
+          <>
+            <Layout className="min-h-screen">
+              {/* Sidebar – conversations list */}
+              <Sider width={260} className="bg-white p-4 border-r">
+                <div className="flex items-center justify-between mb-4 gap-2">
+                  <div className="flex items-center gap-2">
+                    <Title level={4} className="!mb-0">
+                      💬 Direct Messages
+                    </Title>
+                    <MessageOutlined style={{ opacity: 0.6 }} />
+                  </div>
+                  <Tooltip title="Start a new conversation">
+                    <Button
+                      size="small"
+                      type="primary"
+                      icon={<UserAddOutlined />}
+                      onClick={() => setShowNewConvoModal(true)}
+                    />
+                  </Tooltip>
+                </div>
 
-          {loadingConvos ? (
-            <div className="flex items-center justify-center h-40">
-              <Spin />
-            </div>
-          ) : conversations.length === 0 ? (
-            <Empty
-              description="No conversations yet"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-          ) : (
-            <div className="space-y-2 mt-2">
-              {conversations.map((convo) => {
-                const other = getOtherParticipant(convo);
-                const isActive =
-                  selectedConversation &&
-                  String(selectedConversation._id) === String(convo._id);
+                {loadingConvos ? (
+                  <div className="flex items-center justify-center h-40">
+                    <Spin />
+                  </div>
+                ) : conversations.length === 0 ? (
+                  <Empty
+                    description="No conversations yet"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  />
+                ) : (
+                  <div className="space-y-2 mt-2">
+                    {conversations.map((convo) => {
+                      const other = getOtherParticipant(convo);
+                      const isActive =
+                        selectedConversation &&
+                        String(selectedConversation._id) === String(convo._id);
 
-                const isOnline = other?.isOnline || other?.online;
-                const lastSeen =
-                  other?.lastSeen || convo.lastActivity || convo.updatedAt;
+                      const isOnline = other?.isOnline || other?.online;
+                      const lastSeen =
+                        other?.lastSeen ||
+                        convo.lastActivity ||
+                        convo.updatedAt;
 
-                return (
-                  <div
-                    key={convo._id}
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 ${
-                      isActive ? "bg-gray-200" : ""
-                    }`}
-                    onClick={() => setSelectedConversation(convo)}
-                  >
-                    <Badge
-                      dot={!!isOnline}
-                      status={isOnline ? "success" : "default"}
-                      offset={[-2, 40]}
-                    >
-                      <Avatar
-                        src={other?.avatar}
-                        icon={<UserOutlined />}
-                        size="large"
-                      />
-                    </Badge>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-medium truncate">
-                        {other?.username || "Traveler"}
-                      </span>
-                      {convo.lastMessage && (
-                        <span className="text-xs text-gray-500 truncate max-w-[150px]">
-                          {convo.lastMessage}
-                        </span>
+                      return (
+                        <div
+                          key={convo._id}
+                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 ${
+                            isActive ? "bg-gray-200" : ""
+                          }`}
+                          onClick={() => setSelectedConversation(convo)}
+                        >
+                          <Badge
+                            dot={!!isOnline}
+                            status={isOnline ? "success" : "default"}
+                            offset={[-2, 40]}
+                          >
+                            <Avatar
+                              src={other?.avatar}
+                              icon={<UserOutlined />}
+                              size="large"
+                            />
+                          </Badge>
+
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium truncate">
+                              {other?.username || "Traveler"}
+                            </span>
+
+                            {convo.lastMessage && (
+                              <span className="text-xs text-gray-500 truncate max-w-[150px]">
+                                {convo.lastMessage}
+                              </span>
+                            )}
+
+                            {lastSeen && (
+                              <span className="text-[11px] text-gray-400">
+                                {isOnline
+                                  ? "Online now"
+                                  : `Last seen ${timeAgoString(lastSeen)}`}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </Sider>
+
+              {/* Chat Area */}
+              <Layout>
+                <Content className="bg-gray-50 p-6 flex flex-col justify-between">
+                  {/* Header + messages */}
+                  <div className="mb-4 flex-1 flex flex-col">
+                    <div className="flex items-center justify-between">
+                      <Title level={4} className="!mb-0">
+                        {selectedConversation
+                          ? `🧑‍💬 Chatting with ${
+                              getOtherParticipant(selectedConversation)
+                                ?.username || "Traveler"
+                            }`
+                          : "Select a conversation"}
+                      </Title>
+                    </div>
+
+                    {/* Chat Messages */}
+                    <div className="space-y-3 mt-4 max-h-[65vh] flex-1 overflow-y-auto pr-2">
+                      {loadingMessages && (
+                        <div className="flex justify-center my-4">
+                          <Spin />
+                        </div>
                       )}
-                      {lastSeen && (
-                        <span className="text-[11px] text-gray-400">
-                          {isOnline
-                            ? "Online now"
-                            : `Last seen ${timeAgoString(lastSeen)}`}
-                        </span>
+
+                      {!loadingMessages &&
+                        messages.length === 0 &&
+                        selectedConversation && (
+                          <Text type="secondary">
+                            No messages yet. Say hi 👋
+                          </Text>
+                        )}
+
+                      {!loadingMessages &&
+                        messages.map((msg, idx) =>
+                          renderMessageBubble(msg, idx)
+                        )}
+
+                      {isPartnerTyping && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          ✍️ Typing…
+                        </div>
                       )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </Sider>
 
-        {/* Chat Area */}
-        <Layout>
-          <Content className="bg-gray-50 p-6 flex flex-col justify-between">
-            {/* Header + messages */}
-            <div className="mb-4 flex-1 flex flex-col">
-              <div className="flex items-center justify-between">
-                <Title level={4} className="!mb-0">
-                  {selectedConversation
-                    ? `🧑‍💬 Chatting with ${
-                        getOtherParticipant(selectedConversation)?.username ||
-                        "Traveler"
-                      }`
-                    : "Select a conversation"}
-                </Title>
-              </div>
+                  {/* Message Input + Image + Emoji */}
+                  <div className="relative">
+                    {/* Image preview (if selected) */}
+                    {imageFile && (
+                      <div className="mb-2 flex items-center gap-3 p-2 rounded-lg bg-white border shadow-sm max-w-sm">
+                        <img
+                          src={URL.createObjectURL(imageFile)}
+                          alt="Preview"
+                          className="max-h-24 rounded-md"
+                        />
+                        <Button size="small" onClick={() => setImageFile(null)}>
+                          Remove
+                        </Button>
+                      </div>
+                    )}
 
-              {/* Chat Messages */}
-              <div className="space-y-3 mt-4 max-h-[65vh] flex-1 overflow-y-auto pr-2">
-                {loadingMessages && (
-                  <div className="flex justify-center my-4">
-                    <Spin />
+                    <Input.TextArea
+                      rows={2}
+                      value={inputMsg}
+                      onChange={handleTypingChange}
+                      placeholder="Type a message..."
+                      className="rounded-lg"
+                      onPressEnter={(e) => {
+                        if (!e.shiftKey) {
+                          e.preventDefault();
+                          handleSend();
+                        }
+                      }}
+                      disabled={!selectedConversation}
+                    />
+
+                    <div className="absolute bottom-3 left-3 flex gap-2">
+                      {/* Emoji */}
+                      <Tooltip title="Emoji">
+                        <Button
+                          icon={<SmileOutlined />}
+                          shape="circle"
+                          onClick={() => setShowEmojiPicker((prev) => !prev)}
+                          disabled={!selectedConversation}
+                        />
+                      </Tooltip>
+
+                      {/* Image upload */}
+                      <Tooltip title="Attach image">
+                        <label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={handleImageChange}
+                            disabled={!selectedConversation}
+                          />
+                          <Button
+                            icon={<PictureOutlined />}
+                            shape="circle"
+                            disabled={!selectedConversation}
+                          />
+                        </label>
+                      </Tooltip>
+
+                      {/* Send */}
+                      <Tooltip title="Send">
+                        <Button
+                          icon={<SendOutlined />}
+                          shape="circle"
+                          type="primary"
+                          onClick={handleSend}
+                          disabled={
+                            (!inputMsg.trim() && !imageFile) ||
+                            !selectedConversation
+                          }
+                        />
+                      </Tooltip>
+                    </div>
+
+                    {/* Emoji Picker */}
+                    {showEmojiPicker && (
+                      <div className="absolute bottom-20 left-3 z-50 max-w-xs rounded-xl border border-gray-300 shadow-md bg-white">
+                        <Picker
+                          data={data}
+                          onEmojiSelect={(emoji) => {
+                            setInputMsg((prev) => prev + emoji.native);
+                            setShowEmojiPicker(false);
+                          }}
+                          theme="light"
+                          emojiSize={20}
+                          maxFrequentRows={2}
+                          previewPosition="none"
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-                {!loadingMessages &&
-                  messages.length === 0 &&
-                  selectedConversation && (
-                    <Text type="secondary">No messages yet. Say hi 👋</Text>
-                  )}
-                {!loadingMessages &&
-                  messages.map((msg, idx) => renderMessageBubble(msg, idx))}
+                </Content>
+              </Layout>
+            </Layout>
 
-                {isPartnerTyping && (
-                  <div className="text-xs text-gray-500 mt-1">✍️ Typing…</div>
-                )}
-              </div>
-            </div>
-
-            {/* Message Input + Image + Emoji */}
-            <div className="relative">
-              {/* Image preview (if selected) */}
-              {imageFile && (
-                <div className="mb-2 flex items-center gap-3 p-2 rounded-lg bg-white border shadow-sm max-w-sm">
-                  <img
-                    src={URL.createObjectURL(imageFile)}
-                    alt="Preview"
-                    className="max-h-24 rounded-md"
-                  />
-                  <Button size="small" onClick={() => setImageFile(null)}>
-                    Remove
-                  </Button>
-                </div>
-              )}
-
-              <Input.TextArea
-                rows={2}
-                value={inputMsg}
-                onChange={handleTypingChange}
-                placeholder="Type a message..."
-                className="rounded-lg"
-                onPressEnter={(e) => {
-                  if (!e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                disabled={!selectedConversation}
+            {/* New Conversation Modal */}
+            <Modal
+              title="Start a new conversation"
+              open={showNewConvoModal}
+              onOk={handleCreateConversation}
+              onCancel={() => setShowNewConvoModal(false)}
+              okText="Create"
+              confirmLoading={creatingConvo}
+            >
+              <p className="mb-2 text-sm text-gray-500">
+                MVP: paste your friend&apos;s user ID here. Later we can upgrade
+                this to a username / search UI.
+              </p>
+              <Input
+                placeholder="Receiver user ID"
+                value={receiverIdInput}
+                onChange={(e) => setReceiverIdInput(e.target.value)}
               />
-              <div className="absolute bottom-3 left-3 flex gap-2">
-                {/* Emoji */}
-                <Tooltip title="Emoji">
-                  <Button
-                    icon={<SmileOutlined />}
-                    shape="circle"
-                    onClick={() => setShowEmojiPicker((prev) => !prev)}
-                    disabled={!selectedConversation}
-                  />
-                </Tooltip>
-
-                {/* Image upload */}
-                <Tooltip title="Attach image">
-                  <label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleImageChange}
-                      disabled={!selectedConversation}
-                    />
-                    <Button
-                      icon={<PictureOutlined />}
-                      shape="circle"
-                      disabled={!selectedConversation}
-                    />
-                  </label>
-                </Tooltip>
-
-                {/* Send */}
-                <Tooltip title="Send">
-                  <Button
-                    icon={<SendOutlined />}
-                    shape="circle"
-                    type="primary"
-                    onClick={handleSend}
-                    disabled={
-                      (!inputMsg.trim() && !imageFile) || !selectedConversation
-                    }
-                  />
-                </Tooltip>
-              </div>
-
-              {/* Emoji Picker */}
-              {showEmojiPicker && (
-                <div className="absolute bottom-20 left-3 z-50 max-w-xs rounded-xl border border-gray-300 shadow-md bg-white">
-                  <Picker
-                    data={data}
-                    onEmojiSelect={(emoji) => {
-                      setInputMsg((prev) => prev + emoji.native);
-                      setShowEmojiPicker(false);
-                    }}
-                    theme="light"
-                    emojiSize={20}
-                    maxFrequentRows={2}
-                    previewPosition="none"
-                  />
-                </div>
-              )}
-            </div>
-          </Content>
-        </Layout>
-      </Layout>
-
-      {/* New Conversation Modal */}
-      <Modal
-        title="Start a new conversation"
-        open={showNewConvoModal}
-        onOk={handleCreateConversation}
-        onCancel={() => setShowNewConvoModal(false)}
-        okText="Create"
-        confirmLoading={creatingConvo}
-      >
-        <p className="mb-2 text-sm text-gray-500">
-          MVP: paste your friend&apos;s user ID here. Later we can upgrade this
-          to a username / search UI.
-        </p>
-        <Input
-          placeholder="Receiver user ID"
-          value={receiverIdInput}
-          onChange={(e) => setReceiverIdInput(e.target.value)}
-        />
-      </Modal>
+            </Modal>
+          </>
+        )}
+      </RequireAuthBlock>
     </>
   );
-};
-
-export default DmPage;
+}

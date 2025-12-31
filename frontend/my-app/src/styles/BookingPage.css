@@ -150,7 +150,8 @@
   background: rgba(255, 255, 255, 0.05);
   color: rgba(255, 255, 255, 0.86) !important;
   cursor: pointer;
-  transition: transform 140ms ease, background 140ms ease;
+  transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease,
+    border-color 140ms ease;
 }
 
 .sk-tab:hover {
@@ -158,9 +159,15 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* ✅ MERGED: Upgraded Active Tab (gradient + glow) */
 .sk-tab.isActive {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 140, 90, 0.28),
+    rgba(120, 90, 255, 0.24)
+  );
+  border-color: rgba(255, 180, 120, 0.6);
+  box-shadow: 0 8px 22px rgba(255, 140, 90, 0.25);
 }
 
 /* ============================= */
@@ -233,6 +240,12 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.78) !important;
   cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.sk-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 /* ============================= */
@@ -260,10 +273,12 @@
 
 .sk-results {
   margin-top: 14px;
+  display: grid;
+  gap: 12px;
 }
 
 /* ============================= */
-/* Stay Card */
+/* Stay / Listing Card */
 /* ============================= */
 
 .sk-stayCard {
@@ -297,6 +312,13 @@
   align-items: center;
 }
 
+@media (max-width: 720px) {
+  .sk-stayTitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .sk-stayTitle {
   color: rgba(255, 255, 255, 0.92) !important;
   font-size: 20px;
@@ -328,6 +350,52 @@
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: rgba(255, 255, 255, 0.9) !important;
   border-radius: 999px !important;
+}
+
+/* ============================= */
+/* NEW: Save (Heart) mini button */
+/* Used by BookingPage.jsx: .sk-saveMini */
+/* ============================= */
+
+.sk-saveMini {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.sk-saveMini:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  transform: translateY(-1px);
+}
+
+.sk-saveMini .anticon {
+  font-size: 18px;
+}
+
+/* Make the filled heart pop a bit without changing theme */
+.sk-saveMini .anticon-heart {
+  filter: drop-shadow(0 10px 18px rgba(255, 140, 90, 0.18));
+}
+
+/* ============================= */
+/* NEW: Ant Design Rate polish */
+/* ============================= */
+
+.sk-bookingPage .ant-rate-star-zero .anticon,
+.sk-bookingPage .ant-rate-star-half .anticon,
+.sk-bookingPage .ant-rate-star-full .anticon {
+  color: rgba(255, 204, 120, 0.95) !important;
+}
+
+.sk-bookingPage .ant-rate-star:not(:last-child) {
+  margin-inline-end: 4px !important;
 }
 
 /* ============================= */
@@ -538,10 +606,51 @@
 }
 
 /* ============================= */
+/* AntD Drawer / Modal dark theme */
+/* (prevents default white page + black text) */
+/* ============================= */
+
+.sk-bookingPage .ant-drawer-content,
+.sk-bookingPage .ant-modal-content {
+  background: rgba(15, 18, 35, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  backdrop-filter: blur(14px);
+}
+
+.sk-bookingPage .ant-drawer-header,
+.sk-bookingPage .ant-modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+.sk-bookingPage .ant-drawer-title,
+.sk-bookingPage .ant-modal-title {
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-weight: 900 !important;
+}
+
+.sk-bookingPage .ant-drawer-close,
+.sk-bookingPage .ant-modal-close {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ============================= */
+/* Empty / Skeleton polish */
+/* ============================= */
+
+.sk-bookingPage .ant-empty-description {
+  color: rgba(255, 255, 255, 0.70) !important;
+}
+
+.sk-bookingPage .ant-skeleton-title,
+.sk-bookingPage .ant-skeleton-paragraph > li {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* ============================= */
 /* Premium Segmented (Budget Solo/Group) */
 /* ============================= */
 
-/* Make the segmented container feel like Skyrio glass */
 .sk-budgetCard .ant-segmented {
   background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -549,7 +658,6 @@
   padding: 3px !important;
 }
 
-/* The moving pill */
 .sk-budgetCard .ant-segmented-thumb {
   background: linear-gradient(
     90deg,
@@ -560,19 +668,16 @@
   box-shadow: 0 10px 22px rgba(255, 152, 80, 0.22) !important;
 }
 
-/* Default (unselected) label */
 .sk-budgetCard .ant-segmented-item-label {
   color: rgba(255, 255, 255, 0.75) !important;
   font-weight: 800 !important;
 }
 
-/* Selected label: dark text on orange pill */
 .sk-budgetCard .ant-segmented-item-selected .ant-segmented-item-label {
   color: #1b1024 !important;
   font-weight: 900 !important;
 }
 
-/* Hover polish */
 .sk-budgetCard .ant-segmented-item:hover .ant-segmented-item-label {
   color: rgba(255, 255, 255, 0.92) !important;
 }
@@ -587,7 +692,6 @@
   gap: 12px;
 }
 
-/* Row layout */
 .sk-searchBarRow {
   display: grid;
   grid-template-columns: 1.25fr 1fr 1fr auto auto;
@@ -595,7 +699,6 @@
   align-items: center;
 }
 
-/* Field shells */
 .sk-field {
   height: 48px;
   border-radius: 14px;
@@ -646,7 +749,6 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* Guests button should look like a field */
 .sk-fieldBtn {
   height: 48px;
   border-radius: 14px !important;
@@ -658,7 +760,6 @@
   align-items: center;
 }
 
-/* Ask Sora */
 .sk-askSoraBtn {
   height: 48px;
   border-radius: 14px !important;
@@ -677,6 +778,15 @@
   font-weight: 950 !important;
   background: linear-gradient(90deg, #ffb26a, #ff7a45) !important;
   box-shadow: 0 14px 32px rgba(255, 122, 69, 0.22);
+
+  /* ✅ MERGED: subtle scale */
+  transform: scale(1.02);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.sk-searchBtn2:hover {
+  transform: scale(1.04);
+  filter: brightness(1.02);
 }
 
 /* Filter pills row */
@@ -694,6 +804,12 @@
   color: rgba(255, 255, 255, 0.78);
   font-weight: 800;
   cursor: pointer;
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+}
+
+.sk-filterPill:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .sk-filterPill.isOn {
@@ -707,6 +823,7 @@
   display: flex;
   gap: 18px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .sk-toggleRow {
@@ -720,7 +837,6 @@
   font-weight: 800;
 }
 
-/* Optional: keep chips below bar */
 .sk-quickTags--below {
   margin-top: 4px;
 }

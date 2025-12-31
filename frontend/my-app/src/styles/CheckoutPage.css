@@ -1,0 +1,56 @@
+.sk-checkoutPage {
+  min-height: 100vh;
+  padding: 20px;
+  background: radial-gradient(
+      900px 500px at 75% 35%,
+      rgba(255, 140, 90, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 600px at 25% 40%,
+      rgba(120, 90, 255, 0.28),
+      transparent 65%
+    ),
+    linear-gradient(135deg, #0b1220, #1a1c3b 45%, #2a1340);
+}
+
+.sk-checkoutWrap {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+/* Text lock (prevents random black text) */
+.sk-checkoutPage,
+.sk-checkoutPage * {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sk-checkoutHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.sk-checkoutTitle {
+  margin: 0 !important;
+  letter-spacing: -0.02em;
+}
+
+.sk-checkoutSub {
+  display: block;
+  opacity: 0.72;
+  margin-top: 4px;
+}
+
+.sk-checkoutAlert {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Cards */
+.sk-checkoutCard {
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border

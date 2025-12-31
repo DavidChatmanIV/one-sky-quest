@@ -29,18 +29,19 @@ export default defineConfig({
   ----------------------------------------- */
   server: {
     host: "localhost",
-    port: 5173,
+
+    // 🔒 Rare port to avoid conflicts permanently
+    port: 5273,
     strictPort: true,
 
+    // Clean dev UX
     hmr: {
       overlay: false,
     },
 
+    // API proxy → backend
     proxy: {
       "/api": {
-        // ✅ Use your backend port here (pick the one your backend is actually running on)
-        // If your backend is on 5000, keep 5000.
-        // If your backend is on 5050, change it to 5050.
         target: "http://localhost:5000",
         changeOrigin: true,
         secure: false,
@@ -52,7 +53,7 @@ export default defineConfig({
      Production Build (Vercel)
   ----------------------------------------- */
   build: {
-    outDir: "dist", // ✅ REQUIRED for Vercel
+    outDir: "dist",
     emptyOutDir: true,
     sourcemap: false,
   },

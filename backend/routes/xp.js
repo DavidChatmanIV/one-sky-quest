@@ -1,171 +1,111 @@
-import express from "express";
+import { Router } from "express";
 import mongoose from "mongoose";
-import User from "../models/User.js";
-import Season from "../models/Season.js";
-import XpLedger from "../models/XpLedger.js";
-import {
-  XP_RULES,
-  XP_DAILY_CAP,
-  XP_MAX_SINGLE_AWARD,
-} from "../config/xpRules.js";
-import { requireAuth } from "../middleware/requireAuth.js"; // use your existing one
-import { requireRole } from "../middleware/requireRole.js";
+import User from "../models/user.js";
 
-const router = express.Router();
+const router = Router();
 
-/**
- * POST /api/xp/add
- * Admin-only (support/manager/admin) so YOU control seasonal + manual awards during soft launch.
- *
- * Body:
- * {
- *   userId: "mongoId",
- *   reason: "BOOKING_CONFIRMED" | "SAVED_TRIP" | "SEASONAL_AWARD" | ...
- *   amount?: number,            // required for variable reasons like SEASONAL_AWARD/ADMIN_GRANT
- *   meta?: object,
- *   applySeason?: boolean       // default true for normal reasons, but still only if season is active
- * }
- */
-router.post(
-  "/add",
-  requireAuth,
-  requireRole("support", "manager", "admin"),
-  async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+/* -----------------------------
+   Tiny auth helper (matches your other routes)
+----------------------------- */
+function requireAuth(req, res, next) {
+  const id = req.user?.id || req.user?._id || req.headers["x-user-id"];
+  if (!id) return res.status(401).json({ ok: false, error: "Unauthorized" });
+  req.authUserId = String(id);
+  next();
+}
 
-    try {
-      const {
-        userId,
-        reason,
-        amount,
-        meta,
-        applySeason = true,
-      } = req.body || {};
-
-      if (!userId || !reason) {
-        return res
-          .status(400)
-          .json({ message: "userId and reason are required" });
-      }
-
-      const rule = XP_RULES[reason];
-      if (!rule) {
-        return res.status(400).json({ message: `Unknown reason: ${reason}` });
-      }
-
-      // Determine base XP
-      let delta = typeof rule.xp === "number" ? rule.xp : 0;
-
-      // Variable reasons: require amount
-      const variable = reason === "SEASONAL_AWARD" || reason === "ADMIN_GRANT";
-      if (variable) {
-        if (typeof amount !== "number" || !Number.isFinite(amount)) {
-          return res
-            .status(400)
-            .json({ message: "amount must be a number for this reason" });
-        }
-        delta = amount;
-      }
-
-      // Guardrails (soft launch)
-      if (Math.abs(delta) > XP_MAX_SINGLE_AWARD) {
-        return res
-          .status(400)
-          .json({
-            message: `Award too large. Max single award: ${XP_MAX_SINGLE_AWARD}`,
-          });
-      }
-
-      const user = await User.findById(userId).session(session);
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      // Respect opt-in (unless admin intentionally overrides with a special meta flag)
-      const rewardsEnabled = !!user.settings?.rewardsEnabled;
-      const overrideOptIn = meta?.overrideOptIn === true;
-
-      if (!rewardsEnabled && !overrideOptIn) {
-        return res.status(409).json({
-          message: "Rewards are disabled for this user",
-          code: "REWARDS_DISABLED",
-        });
-      }
-
-      // Daily cap check (simple)
-      const since = new Date();
-      since.setHours(0, 0, 0, 0);
-
-      const today = await XpLedger.aggregate([
-        { $match: { userId: user._id, createdAt: { $gte: since } } },
-        { $group: { _id: "$userId", sum: { $sum: "$delta" } } },
-      ]).session(session);
-
-      const todaySum = today?.[0]?.sum ?? 0;
-      if (todaySum + delta > XP_DAILY_CAP && !overrideOptIn) {
-        return res.status(429).json({
-          message: "Daily XP cap reached",
-          code: "XP_DAILY_CAP",
-        });
-      }
-
-      // Seasonal multiplier (ONLY if active and you allow it)
-      let seasonKey = null;
-
-      if (applySeason) {
-        const activeSeason = await Season.findOne({ isActive: true }).session(
-          session
-        );
-
-        if (activeSeason) {
-          seasonKey = activeSeason.key;
-
-          const boosted =
-            !activeSeason.boostedReasons?.length ||
-            activeSeason.boostedReasons.includes(reason);
-
-          if (boosted) {
-            const mult = Number(activeSeason.xpMultiplier || 1);
-            delta = Math.round(delta * mult);
-          }
-        }
-      }
-
-      // Apply XP + ledger entry (atomic-ish inside transaction)
-      user.xp = Math.max(0, (user.xp || 0) + delta);
-      await user.save({ session });
-
-      await XpLedger.create(
-        [
-          {
-            userId: user._id,
-            delta,
-            reason,
-            meta: meta || {},
-            seasonKey,
-            createdBy: req.user?.id,
-          },
-        ],
-        { session }
-      );
-
-      await session.commitTransaction();
-      session.endSession();
-
-      return res.json({
-        ok: true,
-        userId: user._id.toString(),
-        newXp: user.xp,
-        delta,
-        reason,
-        seasonKey,
-      });
-    } catch (err) {
-      await session.abortTransaction();
-      session.endSession();
-      console.error("[xp/add] error:", err);
-      return res.status(500).json({ message: "Server error" });
+/* -----------------------------
+   GET /api/xp/me
+   Returns your current XP (and a few optional fields if present)
+----------------------------- */
+router.get("/me", requireAuth, async (req, res) => {
+  try {
+    const me = req.authUserId;
+    if (!mongoose.Types.ObjectId.isValid(me)) {
+      return res.status(400).json({ ok: false, error: "Invalid user id" });
     }
+
+    const u = await User.findById(me)
+      .select("xp level badges xpSeason xpSeasonName")
+      .lean();
+
+    if (!u) return res.status(404).json({ ok: false, error: "User not found" });
+
+    res.json({ ok: true, me: { id: me, ...u } });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
   }
-);
+});
+
+/* -----------------------------
+   POST /api/xp/award
+   Body: { amount: number, reason?: string }
+   Adds XP safely (simple + clean)
+----------------------------- */
+router.post("/award", requireAuth, async (req, res) => {
+  try {
+    const me = req.authUserId;
+    const amount = Number(req.body?.amount || 0);
+    const reason = String(req.body?.reason || "xp_award");
+
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 5000) {
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid amount (must be 1..5000)",
+      });
+    }
+
+    const r = await User.findByIdAndUpdate(
+      me,
+      {
+        $inc: { xp: amount, xpSeason: amount },
+        $setOnInsert: { xp: 0, xpSeason: 0 },
+      },
+      { new: true, upsert: false }
+    ).select("xp xpSeason xpSeasonName level");
+
+    if (!r) return res.status(404).json({ ok: false, error: "User not found" });
+
+    res.json({
+      ok: true,
+      awarded: amount,
+      reason,
+      xp: r.xp ?? 0,
+      xpSeason: r.xpSeason ?? 0,
+      xpSeasonName: r.xpSeasonName ?? null,
+      level: r.level ?? null,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/* -----------------------------
+   POST /api/xp/season/set
+   Body: { name: string }
+   Sets a season name + resets season XP (optional but useful for “2K seasons”)
+----------------------------- */
+router.post("/season/set", requireAuth, async (req, res) => {
+  try {
+    const me = req.authUserId;
+    const name = String(req.body?.name || "").trim();
+
+    if (!name || name.length > 40) {
+      return res.status(400).json({ ok: false, error: "Invalid season name" });
+    }
+
+    const r = await User.findByIdAndUpdate(
+      me,
+      { $set: { xpSeasonName: name, xpSeason: 0 } },
+      { new: true }
+    ).select("xp xpSeason xpSeasonName");
+
+    if (!r) return res.status(404).json({ ok: false, error: "User not found" });
+
+    res.json({ ok: true, xpSeasonName: r.xpSeasonName, xpSeason: r.xpSeason });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
 
 export default router;
