@@ -6,7 +6,6 @@ import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 import "../styles/Navbar.css";
 import logo from "../assets/logo/skyrio-logo.png";
 
-// ✅ NEW: your global auth + modal controller
 import { useAuth } from "../auth/useAuth";
 import { useAuthModal } from "../auth/AuthModalController";
 
@@ -21,14 +20,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // ✅ use new auth source
   const auth = useAuth();
   const { openAuth } = useAuthModal();
 
   const isAuthed = !!auth?.isAuthed;
   const isGuest = !!auth?.isGuest;
 
-  // Keep user compatible with your existing UI bits
   const user =
     auth?.user ||
     (() => {
@@ -61,7 +58,6 @@ export default function Navbar() {
     );
   }, [user, isGuest]);
 
-  // ✅ unified “logout”
   const handleLogout = () => {
     if (auth?.logout) auth.logout();
     else {
@@ -88,7 +84,6 @@ export default function Navbar() {
     ],
   };
 
-  // ✅ central helper for modal open (login/signup)
   const openLogin = () =>
     openAuth({
       intent: "login",
@@ -101,14 +96,19 @@ export default function Navbar() {
       reason: "Create an account to save trips and join SkyStream.",
     });
 
+  // ✅ If you consider the "Skyrio" text a second logo, toggle it off here:
+  const SHOW_BRAND_TEXT = false;
+
   return (
     <header className={`sk-nav ${scrolled ? "is-scrolled is-compact" : ""}`}>
       <div className="sk-nav-inner">
         {/* LEFT */}
-        <button className="sk-brand" onClick={() => navigate("/")}>
-          <img src={logo} alt="Skyrio" className="sk-logoImg" />
-          <span className="sk-logoText">Skyrio</span>
-        </button>
+        <div className="sk-left">
+          <button className="sk-brand" onClick={() => navigate("/")} type="button">
+            <img src={logo} alt="Skyrio" className="sk-logoImg" />
+            {SHOW_BRAND_TEXT ? <span className="sk-logoText">Skyrio</span> : null}
+          </button>
+        </div>
 
         {/* CENTER (TRUE CENTER) */}
         <nav className="sk-centerNav" aria-label="Primary">
@@ -131,70 +131,71 @@ export default function Navbar() {
         </nav>
 
         {/* RIGHT */}
-        <div className="sk-actions">
-          <div className="sk-actions-desktop">
-            {!isAuthed ? (
-              <>
-                <Button className="sk-btnGhost" onClick={openLogin}>
-                  Log in
-                </Button>
+        <div className="sk-right">
+          <div className="sk-actions">
+            <div className="sk-actions-desktop">
+              {!isAuthed ? (
+                <>
+                  <Button className="sk-btnGhost" onClick={openLogin}>
+                    Log in
+                  </Button>
 
-                <Button
-                  type="primary"
-                  className="sk-btnPrimary"
-                  onClick={openSignup}
-                >
-                  Sign up
-                </Button>
-              </>
-            ) : (
-              <div className="sk-user">
-                <span className="sk-hello">
-                  Hey, {displayName}
-                  {isGuest ? " ✨" : ""}
-                </span>
-
-                {isGuest ? (
-                  // ✅ Guest users: CTA to “upgrade” via auth modal
                   <Button
                     type="primary"
                     className="sk-btnPrimary"
                     onClick={openSignup}
                   >
-                    Upgrade
+                    Sign up
                   </Button>
-                ) : (
-                  <Dropdown
-                    menu={avatarMenu}
-                    placement="bottomRight"
-                    trigger={["click"]}
-                    overlayClassName="sk-dropdown"
-                  >
-                    <button className="sk-avatarBtn" type="button">
-                      <Avatar
-                        size={34}
-                        src={user?.avatarUrl}
-                        icon={!user?.avatarUrl ? <UserOutlined /> : null}
-                      />
-                    </button>
-                  </Dropdown>
-                )}
-              </div>
-            )}
-          </div>
+                </>
+              ) : (
+                <div className="sk-user">
+                  <span className="sk-hello">
+                    Hey, {displayName}
+                    {isGuest ? " ✨" : ""}
+                  </span>
 
-          {/* Mobile hamburger */}
-          <button
-            className={`hamburger ${mobileOpen ? "is-open" : ""}`}
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
-            type="button"
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+                  {isGuest ? (
+                    <Button
+                      type="primary"
+                      className="sk-btnPrimary"
+                      onClick={openSignup}
+                    >
+                      Upgrade
+                    </Button>
+                  ) : (
+                    <Dropdown
+                      menu={avatarMenu}
+                      placement="bottomRight"
+                      trigger={["click"]}
+                      overlayClassName="sk-dropdown"
+                    >
+                      <button className="sk-avatarBtn" type="button" aria-label="Account menu">
+                        <Avatar
+                          size={34}
+                          src={user?.avatarUrl}
+                          icon={!user?.avatarUrl ? <UserOutlined /> : null}
+                        />
+                      </button>
+                    </Dropdown>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              className={`hamburger ${mobileOpen ? "is-open" : ""}`}
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Open menu"
+              aria-expanded={mobileOpen}
+              type="button"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
       </div>
 
