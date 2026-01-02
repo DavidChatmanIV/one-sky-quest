@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 /* ----------------------------------------
-   Path helpers (ESM safe)
+   ESM-safe __dirname
 ----------------------------------------- */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,7 +16,7 @@ export default defineConfig({
   plugins: [react()],
 
   /* ----------------------------------------
-     Aliases
+     Aliases (IMPORTANT for Vercel)
   ----------------------------------------- */
   resolve: {
     alias: {
@@ -29,17 +29,10 @@ export default defineConfig({
   ----------------------------------------- */
   server: {
     host: "localhost",
-
-    // 🔒 Rare port to avoid conflicts permanently
     port: 5273,
     strictPort: true,
+    hmr: { overlay: false },
 
-    // Clean dev UX
-    hmr: {
-      overlay: false,
-    },
-
-    // API proxy → backend
     proxy: {
       "/api": {
         target: "http://localhost:5000",
