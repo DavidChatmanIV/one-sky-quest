@@ -269,7 +269,7 @@ await connectMongo();
 startJobs();
 
 // Render provides PORT. Locally default to 5050.
-const PORT = Number(process.env.PORT) || 5050;
+const PORT = Number(process.env.PORT) || 4000;
 
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`);

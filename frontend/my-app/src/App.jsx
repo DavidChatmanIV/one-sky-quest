@@ -1,9 +1,10 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import SkyStreamPage from "./pages/SkyStreamPage";
 import DigitalPassportPage from "./pages/DigitalPassportPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -22,6 +23,7 @@ export default function App() {
 
         {/* Core */}
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/skystream" element={<SkyStreamPage />} />
 
         {/* Passport ✅ (support both paths to avoid 404) */}
@@ -37,4 +39,3 @@ export default function App() {
     </main>
   );
 }
-// deploy-bump

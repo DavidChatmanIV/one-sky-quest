@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Alert, Button, Space } from "antd";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../auth/useAuth";
 import { useAuthModal } from "../auth/AuthModalController";
 
 export default function GuestBanner() {

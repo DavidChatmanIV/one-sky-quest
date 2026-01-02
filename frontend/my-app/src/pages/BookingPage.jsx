@@ -1,46 +1,46 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Layout,
   Typography,
+  Segmented,
   Button,
-  Tag,
   Space,
-  Input,
+  AutoComplete,
   DatePicker,
-  Dropdown,
-  Menu,
   Modal,
   InputNumber,
   Drawer,
   Divider,
   Switch,
+  Tag,
+  Card,
+  Row,
+  Col,
+  Badge,
   message,
-  Skeleton,
-  Empty,
-  Rate,
+  Tooltip,
+  Dropdown,
+  Tour,
 } from "antd";
 import {
-  EnvironmentOutlined,
   CalendarOutlined,
   UserOutlined,
   SearchOutlined,
   SettingOutlined,
+  TeamOutlined,
+  CopyOutlined,
   SaveOutlined,
-  HeartOutlined,
-  HeartFilled,
-  CarOutlined,
+  DollarOutlined,
+  ThunderboltOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import "../styles/BookingPage.css";
 
-// ✅ New premium flight component
-import FlightCard from "../components/flights/FlightCard";
-
 const { Content } = Layout;
 const { Title, Text } = Typography;
-
-/* ---------------- Tabs ---------------- */
+const { RangePicker } = DatePicker;
 
 const TAB_OPTIONS = [
   { key: "stays", label: "Stays" },
@@ -53,1528 +53,1249 @@ const TAB_OPTIONS = [
   { key: "lastMinute", label: "Last-Minute" },
 ];
 
-const QUICK_TAGS = [
-  "Beach Weekend",
-  "Adventure Escape",
-  "City Vibes",
-  "Events Nearby",
-  "Romantic Getaway",
+const SORT_OPTIONS = [
+  { key: "recommended", label: "Recommended" },
+  { key: "priceLow", label: "Price: Low → High" },
+  { key: "priceHigh", label: "Price: High → Low" },
+  { key: "rating", label: "Guest rating" },
+  { key: "stars", label: "Star rating" },
 ];
 
-/* ---------------- Mock Data ---------------- */
-
-const MOCK_STAYS = [
-  {
-    id: "stay_1",
-    title: "Lisbon, Portugal",
-    location: "Lisbon • City Center",
-    price: 1120,
-    rating: 4.6,
-    reviews: 1229,
-    tags: ["City", "Europe", "Within Budget", "★ Popular"],
-    image:
-      "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1400&q=60",
-    amenities: ["Wi-Fi", "Breakfast", "Gym", "Late checkout", "City view"],
-  },
-  {
-    id: "stay_2",
-    title: "Miami, Florida",
-    location: "South Beach • Oceanfront",
-    price: 680,
-    rating: 4.2,
-    reviews: 847,
-    tags: ["Beach", "Pool", "Couples", "Free cancellation"],
-    image:
-      "https://images.unsplash.com/photo-1501117716987-c8e1ecb210e7?auto=format&fit=crop&w=1400&q=60",
-    amenities: ["Wi-Fi", "Pool", "Beach access", "Balcony", "Room service"],
-  },
-  {
-    id: "stay_3",
-    title: "Tokyo, Japan",
-    location: "Shinjuku • Near Transit",
-    price: 980,
-    rating: 4.8,
-    reviews: 391,
-    tags: ["Hidden gem", "Transit", "City", "Top rated"],
-    image:
-      "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1400&q=60",
-    amenities: ["Wi-Fi", "Transit access", "Laundry", "Concierge", "City view"],
-  },
+const VIBE_CHIPS = [
+  { key: "under500", label: "Under $500" },
+  { key: "under1000", label: "Under $1000" },
+  { key: "luxury", label: "Luxury" },
+  { key: "unwind", label: "Unwind" },
+  { key: "adventure", label: "Adventure" },
+  { key: "romantic", label: "Romantic" },
+  { key: "family", label: "Family" },
 ];
 
-// Old mock flight format (we’ll normalize to FlightCard shape)
-const MOCK_FLIGHTS_RAW = [
+/**
+ * ✅ Quick filters (single-active)
+ * - Shows an “on” state
+ * - Applies a preset set of vibes (and optional tab)
+ * - Tiny “Clear” button (no clutter)
+ */
+const QUICK_FILTERS = [
   {
-    id: "flt_1",
-    carrierCode: "SK",
-    priceLabel: "$168",
-    outbound: {
-      origin: "EWR",
-      destination: "MIA",
-      durationLabel: "3h 15m",
-      stops: 0,
-      departTime: "8:20 AM",
-      arriveTime: "11:35 AM",
-    },
-    tags: ["Best value", "Carry-on included"],
+    key: "beachWeekend",
+    label: "Beach Weekend",
+    tab: null,
+    vibes: ["unwind", "under1000"],
+    toast: "Beach Weekend applied: Unwind + Under $1000",
   },
   {
-    id: "flt_2",
-    carrierCode: "JW",
-    priceLabel: "$256",
-    outbound: {
-      origin: "JFK",
-      destination: "LAX",
-      durationLabel: "6h 23m",
-      stops: 0,
-      departTime: "2:05 PM",
-      arriveTime: "5:28 PM",
-    },
-    tags: ["Fastest", "On-time"],
+    key: "adventureEscape",
+    label: "Adventure Escape",
+    tab: null,
+    vibes: ["adventure"],
+    toast: "Adventure Escape applied: Adventure",
   },
   {
-    id: "flt_3",
-    carrierCode: "BS",
-    priceLabel: "$221",
-    outbound: {
-      origin: "EWR",
-      destination: "SJU",
-      durationLabel: "4h 30m",
-      stops: 1,
-      departTime: "9:10 AM",
-      arriveTime: "1:40 PM",
-    },
-    tags: ["Popular", "1 stop"],
+    key: "cityVibes",
+    label: "City Vibes",
+    tab: null,
+    vibes: ["luxury", "under1000"],
+    toast: "City Vibes applied: Luxury + Under $1000",
+  },
+  {
+    key: "eventsNearby",
+    label: "Events Nearby",
+    tab: "excursions",
+    vibes: ["adventure"],
+    toast: "Events Nearby applied: Switched to Excursions + Adventure",
+  },
+  {
+    key: "romanticGetaway",
+    label: "Romantic Getaway",
+    tab: null,
+    vibes: ["romantic"],
+    toast: "Romantic Getaway applied: Romantic",
   },
 ];
 
-const MOCK_CARS = [
-  {
-    id: "car_1",
-    brand: "Toyota",
-    model: "Corolla",
-    type: "Compact",
-    seats: 5,
-    bags: 2,
-    transmission: "Automatic",
-    pickup: "Miami Intl Airport (MIA)",
-    pricePerDay: 48,
-    rating: 4.6,
-    tags: ["Free cancellation", "Great value"],
-    image:
-      "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1400&q=60",
-    amenities: ["Unlimited miles", "Free cancellation", "Airport pickup"],
+const EXPLAINERS = {
+  rewards: {
+    title: "Rewards (optional)",
+    body: [
+      "Rewards lets you earn XP for bookings, saves, and challenges.",
+      "It never blocks booking. If you just want to book, keep it off.",
+      "You can change this anytime.",
+    ],
   },
-  {
-    id: "car_2",
-    brand: "Jeep",
-    model: "Wrangler",
-    type: "SUV",
-    seats: 5,
-    bags: 3,
-    transmission: "Automatic",
-    pickup: "Los Angeles (LAX)",
-    pricePerDay: 89,
-    rating: 4.3,
-    tags: ["Unlimited miles", "Popular"],
-    image:
-      "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1400&q=60",
-    amenities: ["Unlimited miles", "Flexible pickup", "Insurance options"],
+  priceWatch: {
+    title: "Track prices",
+    body: [
+      "Price Watch can notify you when prices change for this trip.",
+      "It’s optional and designed to help you decide, not pressure you.",
+      "You can turn it on/off anytime.",
+    ],
   },
-  {
-    id: "car_3",
-    brand: "Tesla",
-    model: "Model 3",
-    type: "Electric",
-    seats: 5,
-    bags: 2,
-    transmission: "Automatic",
-    pickup: "Newark (EWR)",
-    pricePerDay: 104,
-    rating: 4.8,
-    tags: ["Premium", "EV"],
-    image:
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1400&q=60",
-    amenities: ["EV charging", "Premium support", "Express pickup"],
+  budget: {
+    title: "Trip Budget (assistive, not strict)",
+    body: [
+      "This is a simple helper to keep spending visible while you plan.",
+      "It doesn’t judge you and it doesn’t block checkout.",
+      "Use it for quick math—or ignore it completely.",
+    ],
   },
-];
+  sort: {
+    title: "Sorting results",
+    body: [
+      "Sorting changes how results are ordered (price, rating, etc.).",
+      "It doesn’t change availability—just helps you compare faster.",
+    ],
+  },
+  vibes: {
+    title: "Vibe filters (optional)",
+    body: [
+      "Vibes are quick filters to narrow options (budget, style, etc.).",
+      "Skip them if you’re not sure—search first, refine later.",
+    ],
+  },
+  teamTravel: {
+    title: "Team Travel",
+    body: [
+      "Built for groups: room roles, auto-fill, and shared planning.",
+      "Not needed for most trips—use it only when it helps.",
+    ],
+  },
+};
 
-/* ---------------- Helpers ---------------- */
-
-function guessAirportCode(text, fallback = "LAX") {
-  const t = (text || "").trim().toUpperCase();
-  if (/^[A-Z]{3}$/.test(t)) return t;
-
-  const map = {
-    "LOS ANGELES": "LAX",
-    LA: "LAX",
-    "NEW YORK": "JFK",
-    NYC: "JFK",
-    "SAN FRANCISCO": "SFO",
-    MIAMI: "MIA",
-    ORLANDO: "MCO",
-    CHICAGO: "ORD",
-    DALLAS: "DFW",
-    ATLANTA: "ATL",
-    NEWARK: "EWR",
-  };
-
-  return map[t] || fallback;
+function getQueryParam(search, key) {
+  const params = new URLSearchParams(search);
+  return params.get(key);
 }
 
-function parseAdultsFromGuestsKey(guestsKey) {
-  const k = String(guestsKey || "");
-  if (k.startsWith("1")) return 1;
-  if (k.startsWith("2")) return 2;
-  if (k.startsWith("4")) return 4;
-  return 1;
+function setQueryParam(search, key, value) {
+  const params = new URLSearchParams(search);
+  if (!value) params.delete(key);
+  else params.set(key, value);
+  const s = params.toString();
+  return s ? `?${s}` : "";
 }
 
-function readSavedIds() {
+// Small helper – keeps UI stable without fighting timezones
+function toISODate(d) {
+  if (!d) return null;
   try {
-    const raw = localStorage.getItem("sk_saved_listings");
-    return raw ? JSON.parse(raw) : [];
-  } catch (err) {
-    return [];
+    return d.format("YYYY-MM-DD");
+  } catch {
+    // if date parsing fails, just return null (no need to surface)
+    return null;
   }
 }
-function writeSavedIds(ids) {
-  localStorage.setItem("sk_saved_listings", JSON.stringify(ids));
-}
-
-function safeParseNum(v, fallback = 0) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function moneyFromLabel(label) {
-  const num = String(label || "").replace(/[^0-9.]/g, "");
-  const total = num ? Number(num) : 0;
-  return { currency: "USD", total: Number.isFinite(total) ? total : 0 };
-}
-
-// ✅ Normalize ANY flight into the shape your new FlightCard expects
-function normalizeFlight(f) {
-  // Already in new shape?
-  if (f?.origin && f?.destination && f?.price?.total !== undefined) return f;
-
-  // Old mock shape?
-  const out = f?.outbound || {};
-  return {
-    id: f?.id || crypto?.randomUUID?.() || String(Date.now()),
-    airline: f?.airline || "Skyrio Air",
-    airlineCode: f?.carrierCode || "SK",
-    flightNumber: f?.flightNumber || "—",
-    origin: out?.origin || "—",
-    destination: out?.destination || "—",
-    departAt: f?.departAt || null,
-    arriveAt: f?.arriveAt || null,
-    durationMinutes: f?.durationMinutes || null,
-    stops: typeof out?.stops === "number" ? out.stops : 0,
-    cabin: f?.cabin || "ECONOMY",
-    price: f?.price || moneyFromLabel(f?.priceLabel),
-    badges: f?.badges || f?.tags || [],
-  };
-}
-
-/* ---------------- Guests Dropdown ---------------- */
-
-function GuestsDropdown({ value, onChange, className = "" }) {
-  const menu = (
-    <Menu
-      items={[
-        { key: "1a1r", label: "1 adult • 1 room" },
-        { key: "2a1r", label: "2 adults • 1 room" },
-        { key: "2a2r", label: "2 adults • 2 rooms" },
-        { key: "4a2r", label: "4 adults • 2 rooms" },
-      ]}
-      onClick={(info) => onChange?.(info.key)}
-    />
-  );
-
-  const labelMap = {
-    "1a1r": "1 adult • 1 room",
-    "2a1r": "2 adults • 1 room",
-    "2a2r": "2 adults • 2 rooms",
-    "4a2r": "4 adults • 2 rooms",
-  };
-
-  return (
-    <Dropdown overlay={menu} trigger={["click"]}>
-      <Button className={`sk-fieldBtn ${className}`} icon={<UserOutlined />}>
-        {labelMap[value] || "2 adults • 1 room"}
-      </Button>
-    </Dropdown>
-  );
-}
-
-/* ---------------- Save / Heart Button (mini) ---------------- */
-
-function SaveBtn({ saved, onToggle }) {
-  return (
-    <Button
-      type="text"
-      className="sk-saveMini"
-      icon={saved ? <HeartFilled /> : <HeartOutlined />}
-      onClick={onToggle}
-      aria-label={saved ? "Unsave" : "Save"}
-    />
-  );
-}
-
-/* ---------------- Stay Card ---------------- */
-
-function StayCard({ item, saved, onToggleSave, onOpen, watchPayload }) {
-  const [watching, setWatching] = useState(false);
-  const [watchId, setWatchId] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const createWatch = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/watches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(watchPayload),
-      });
-
-      if (!res.ok) throw new Error("Failed to watch");
-      const data = await res.json();
-
-      setWatchId(data?._id || data?.watch?._id || null);
-      setWatching(true);
-      message.success("Watching price ✅");
-    } catch (err) {
-      message.error("Couldn’t start watching. Try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const removeWatch = async () => {
-    if (!watchId) {
-      setWatching(false);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/watches/${watchId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error("Failed to remove watch");
-
-      setWatching(false);
-      setWatchId(null);
-      message.success("Watch removed");
-    } catch (err) {
-      message.error("Couldn’t remove watch. Try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="sk-stayCard" style={{ marginBottom: 12 }}>
-      <div
-        className="sk-stayMedia"
-        style={{
-          backgroundImage: `url(${item.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-
-      <div className="sk-stayMeta">
-        <div className="sk-stayTitleRow">
-          <div>
-            <div className="sk-stayTitle">{item.title}</div>
-            <div style={{ opacity: 0.85, marginTop: 4 }}>
-              <EnvironmentOutlined /> {item.location}
-            </div>
-            <div className="sk-stayPrice">
-              From ${item.price.toLocaleString()}
-            </div>
-            <div
-              style={{
-                marginTop: 6,
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}
-            >
-              <Rate
-                allowHalf
-                disabled
-                value={Math.round(item.rating * 2) / 2}
-              />
-              <span style={{ opacity: 0.85 }}>
-                {item.rating.toFixed(1)} · {item.reviews} reviews
-              </span>
-            </div>
-          </div>
-
-          <Space size={8}>
-            <SaveBtn saved={saved} onToggle={onToggleSave} />
-            <Button className="sk-ghostBtn" onClick={onOpen}>
-              Details
-            </Button>
-            <Button className="sk-cta">Select</Button>
-            <Button
-              className="sk-ghostBtn"
-              loading={loading}
-              onClick={watching ? removeWatch : createWatch}
-            >
-              {watching ? "Watching ✅" : "Watch 🔔"}
-            </Button>
-          </Space>
-        </div>
-
-        <Space size={8} wrap className="sk-stayTags">
-          {(item.tags || []).slice(0, 4).map((t) => (
-            <Tag key={t} className="sk-tag">
-              {t}
-            </Tag>
-          ))}
-        </Space>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Car Card ---------------- */
-
-function CarCard({ item, saved, onToggleSave, onOpen }) {
-  return (
-    <div className="sk-stayCard" style={{ marginBottom: 12 }}>
-      <div
-        className="sk-stayMedia"
-        style={{
-          backgroundImage: `url(${item.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div className="sk-stayMeta">
-        <div className="sk-stayTitleRow">
-          <div>
-            <div className="sk-stayTitle">
-              <CarOutlined /> {item.brand} {item.model} · {item.type}
-            </div>
-            <div style={{ opacity: 0.85, marginTop: 4 }}>
-              Pickup: {item.pickup}
-            </div>
-            <div className="sk-stayPrice">${item.pricePerDay}/day</div>
-            <div
-              style={{
-                marginTop: 6,
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}
-            >
-              <Rate
-                allowHalf
-                disabled
-                value={Math.round(item.rating * 2) / 2}
-              />
-              <span style={{ opacity: 0.85 }}>{item.rating.toFixed(1)}</span>
-              <span style={{ opacity: 0.85 }}>
-                · {item.seats} seats · {item.bags} bags · {item.transmission}
-              </span>
-            </div>
-          </div>
-
-          <Space size={8}>
-            <SaveBtn saved={saved} onToggle={onToggleSave} />
-            <Button className="sk-ghostBtn" onClick={onOpen}>
-              Details
-            </Button>
-            <Button className="sk-cta">Select</Button>
-          </Space>
-        </div>
-
-        <Space size={8} wrap className="sk-stayTags">
-          {(item.tags || []).slice(0, 4).map((t) => (
-            <Tag key={t} className="sk-tag">
-              {t}
-            </Tag>
-          ))}
-        </Space>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Budget Panel (UNCHANGED) ---------------- */
-
-function BudgetPanel() {
-  const [mode, setMode] = useState("Solo");
-
-  const [budget, setBudget] = useState(() => {
-    const saved = localStorage.getItem("sk_trip_budget");
-    return saved ? Number(saved) : 2500;
-  });
-
-  const [expenses, setExpenses] = useState(() => {
-    try {
-      const raw = localStorage.getItem("sk_trip_expenses");
-      return raw ? JSON.parse(raw) : [];
-    } catch (err) {
-      return [];
-    }
-  });
-
-  const [openBudget, setOpenBudget] = useState(false);
-  const [openDetails, setOpenDetails] = useState(false);
-
-  const [draftBudget, setDraftBudget] = useState(budget);
-
-  const [amount, setAmount] = useState(null);
-  const [note, setNote] = useState("");
-
-  const planTotal = useMemo(
-    () => expenses.reduce((sum, x) => sum + (Number(x.amount) || 0), 0),
-    [expenses]
-  );
-
-  const remaining = Math.max(0, budget - planTotal);
-  const usedPct =
-    budget > 0 ? Math.min(100, Math.round((planTotal / budget) * 100)) : 0;
-
-  const saveBudget = () => {
-    const next = Number(draftBudget || 0);
-    setBudget(next);
-    localStorage.setItem("sk_trip_budget", String(next));
-    setOpenBudget(false);
-    message.success("Budget updated ✅");
-  };
-
-  const addExpense = () => {
-    const v = Number(amount || 0);
-    if (!v || v <= 0) return message.warning("Enter an amount.");
-
-    const item = {
-      id: crypto?.randomUUID?.() || String(Date.now()),
-      amount: v,
-      note: (note || "").trim(),
-      ts: Date.now(),
-    };
-
-    const next = [item, ...expenses].slice(0, 50);
-    setExpenses(next);
-    localStorage.setItem("sk_trip_expenses", JSON.stringify(next));
-
-    setAmount(null);
-    setNote("");
-    message.success(`Added $${v.toLocaleString()} ✅`);
-  };
-
-  const removeExpense = (id) => {
-    const next = expenses.filter((x) => x.id !== id);
-    setExpenses(next);
-    localStorage.setItem("sk_trip_expenses", JSON.stringify(next));
-  };
-
-  const clearAll = () => {
-    setExpenses([]);
-    localStorage.setItem("sk_trip_expenses", JSON.stringify([]));
-    message.success("Cleared ✅");
-  };
-
-  return (
-    <div className="sk-budgetCard sk-budgetCard--premium">
-      <div className="sk-budgetHeader">
-        <div>
-          <div className="sk-budgetTitle">Trip Budget</div>
-          <div className="sk-budgetHint">Quick add • instant progress</div>
-        </div>
-
-        <Space size={8}>
-          <Button
-            className="sk-ghostBtn"
-            icon={<SettingOutlined />}
-            onClick={() => {
-              setDraftBudget(budget);
-              setOpenBudget(true);
-            }}
-          >
-            Edit
-          </Button>
-
-          <div style={{ display: "inline-flex" }}>
-            <Button
-              size="small"
-              className={`sk-ghostBtn ${mode === "Solo" ? "isOn" : ""}`}
-              onClick={() => setMode("Solo")}
-            >
-              Solo
-            </Button>
-            <Button
-              size="small"
-              className={`sk-ghostBtn ${mode === "Group" ? "isOn" : ""}`}
-              onClick={() => setMode("Group")}
-              style={{ marginLeft: 6 }}
-            >
-              Group
-            </Button>
-          </div>
-        </Space>
-      </div>
-
-      <div className="sk-budgetHero">
-        <div className="sk-budgetRemaining">
-          ${remaining.toLocaleString()}
-          <span className="sk-budgetRemainingSub"> left to use</span>
-        </div>
-
-        <div className="sk-budgetMetaRow">
-          <span>Used: ${planTotal.toLocaleString()}</span>
-          <span>{usedPct}%</span>
-        </div>
-
-        <div className="sk-budgetBar">
-          <div className="sk-budgetBarFill" style={{ width: `${usedPct}%` }} />
-        </div>
-
-        <div className="sk-budgetSub">
-          Budget: ${budget.toLocaleString()} • Mode: {mode}
-        </div>
-      </div>
-
-      <div className="sk-budgetQuickAdd">
-        <div className="sk-budgetSectionTitle">+ Add Expense</div>
-
-        <div className="sk-budgetAddRow">
-          <InputNumber
-            className="sk-budgetAmount"
-            prefix="$"
-            min={1}
-            step={5}
-            value={amount}
-            onChange={setAmount}
-            placeholder="Amount"
-          />
-          <Input
-            className="sk-budgetNote"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Note (optional)"
-            onPressEnter={addExpense}
-          />
-        </div>
-
-        <div className="sk-budgetActions">
-          <Button
-            className="sk-cta sk-budgetAddBtn"
-            onClick={addExpense}
-            icon={<SaveOutlined />}
-          >
-            Add
-          </Button>
-
-          <Button className="sk-ghostBtn" onClick={() => setOpenDetails(true)}>
-            View details →
-          </Button>
-        </div>
-      </div>
-
-      <Modal
-        title="Set your trip budget"
-        open={openBudget}
-        onCancel={() => setOpenBudget(false)}
-        onOk={saveBudget}
-        okText="Save"
-      >
-        <InputNumber
-          style={{ width: "100%" }}
-          min={100}
-          step={50}
-          value={draftBudget}
-          onChange={(v) => setDraftBudget(Number(v || 0))}
-        />
-      </Modal>
-
-      <Drawer
-        title="Budget Details"
-        open={openDetails}
-        onClose={() => setOpenDetails(false)}
-        placement="right"
-        width={380}
-      >
-        <div style={{ display: "grid", gap: 10 }}>
-          <div className="sk-budgetDetailPills">
-            <div className="sk-budgetPill">
-              <div className="sk-budgetPillLabel">Budget</div>
-              <div className="sk-budgetPillValue">
-                ${budget.toLocaleString()}
-              </div>
-            </div>
-            <div className="sk-budgetPill">
-              <div className="sk-budgetPillLabel">Used</div>
-              <div className="sk-budgetPillValue">
-                ${planTotal.toLocaleString()}
-              </div>
-            </div>
-            <div className="sk-budgetPill">
-              <div className="sk-budgetPillLabel">Left</div>
-              <div className="sk-budgetPillValue">
-                ${remaining.toLocaleString()}
-              </div>
-            </div>
-          </div>
-
-          <Divider style={{ borderColor: "rgba(255,255,255,.12)" }} />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: "rgba(255,255,255,.85)", fontWeight: 700 }}>
-              Recent expenses
-            </Text>
-            <Button size="small" danger onClick={clearAll}>
-              Clear
-            </Button>
-          </div>
-
-          {expenses.length === 0 ? (
-            <Text style={{ color: "rgba(255,255,255,.7)" }}>
-              No expenses yet. Add your first one from the card.
-            </Text>
-          ) : (
-            <div className="sk-budgetList">
-              {expenses.map((x) => (
-                <div key={x.id} className="sk-budgetItem">
-                  <div>
-                    <div className="sk-budgetItemAmt">
-                      ${Number(x.amount).toLocaleString()}
-                    </div>
-                    <div className="sk-budgetItemNote">
-                      {x.note || "Expense"}
-                      <span className="sk-budgetItemTime">
-                        {" "}
-                        • {new Date(x.ts).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    size="small"
-                    className="sk-ghostBtn"
-                    onClick={() => removeExpense(x.id)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Drawer>
-    </div>
-  );
-}
-
-/* ---------------- Booking Page ---------------- */
 
 export default function BookingPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
-  const qsTab = searchParams.get("tab") || "stays";
-  const qsWhere = searchParams.get("where") || "";
-  const qsMinRating = safeParseNum(searchParams.get("minRating"), 0);
-  const qsTags = (searchParams.get("tags") || "").split(",").filter(Boolean);
+  const whereRef = useRef(null);
+  const travelersRef = useRef(null);
+  const searchRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState(qsTab);
-  const [destination, setDestination] = useState(qsWhere);
+  const initialTab = useMemo(() => {
+    const t = getQueryParam(location.search, "tab");
+    return TAB_OPTIONS.some((x) => x.key === t) ? t : "stays";
+  }, [location.search]);
+
+  const [tab, setTab] = useState(initialTab);
+
+  const [whereQuery, setWhereQuery] = useState("");
+  const [whereOptions, setWhereOptions] = useState([]);
+  const [whereLoading, setWhereLoading] = useState(false);
+
   const [dates, setDates] = useState(null);
-  const [guests, setGuests] = useState("2a1r");
+  const [travDrawerOpen, setTravDrawerOpen] = useState(false);
+  const [teamTravelOpen, setTeamTravelOpen] = useState(false);
 
-  const [filters, setFilters] = useState(qsTags.length ? qsTags : []);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [rooms, setRooms] = useState(1);
+
+  const [sortKey, setSortKey] = useState("recommended");
+
   const [rewardsOn, setRewardsOn] = useState(true);
-  const [trackPrices, setTrackPrices] = useState(false);
+  const [trackPricesOn, setTrackPricesOn] = useState(false);
 
-  // ✅ flights now store normalized shape for FlightCard
-  const [flightResults, setFlightResults] = useState(() =>
-    MOCK_FLIGHTS_RAW.map(normalizeFlight)
-  );
-  const [carsResults, setCarsResults] = useState([]);
-  const [staysResults, setStaysResults] = useState(MOCK_STAYS);
+  const [activeVibes, setActiveVibes] = useState(() => new Set());
+
+  // ✅ Quick filter active state (single-active)
+  const [activeQuickKey, setActiveQuickKey] = useState(null);
 
   const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState([]);
 
-  const [selected, setSelected] = useState(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
-  const [savedIds, setSavedIds] = useState(() => readSavedIds());
+  const [savedCount, setSavedCount] = useState(() => {
+    try {
+      const raw = localStorage.getItem("skyrio_saved_trips");
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.length : 0;
+    } catch {
+      return 0;
+    }
+  });
 
-  const minRating = qsMinRating;
+  const [budgetMode, setBudgetMode] = useState("solo");
+  const [budgetTotal, setBudgetTotal] = useState(2500);
+  const [expenseAmount, setExpenseAmount] = useState(null);
+  const [expenseNote, setExpenseNote] = useState("");
+  const [expenses, setExpenses] = useState([]);
 
-  const headerPills = useMemo(
-    () => [
-      { label: rewardsOn ? "XP 60" : "XP Off" },
-      { label: `${savedIds.length} saved` },
-      { label: trackPrices ? "Price Watch On" : "Price Watch Off" },
-    ],
-    [rewardsOn, savedIds.length, trackPrices]
+  const used = useMemo(
+    () => expenses.reduce((a, e) => a + (e.amount || 0), 0),
+    [expenses]
   );
+  const left = Math.max(0, budgetTotal - used);
+  const pct =
+    budgetTotal > 0 ? Math.min(100, Math.round((used / budgetTotal) * 100)) : 0;
 
-  const updateQS = (patch) => {
-    const sp = new URLSearchParams(searchParams);
-    Object.entries(patch).forEach(([k, v]) => {
-      if (
-        v === undefined ||
-        v === null ||
-        v === "" ||
-        (Array.isArray(v) && v.length === 0)
-      ) {
-        sp.delete(k);
-      } else {
-        sp.set(k, Array.isArray(v) ? v.join(",") : String(v));
-      }
-    });
-    setSearchParams(sp, { replace: true });
-  };
+  // #1 Tour
+  const TOUR_KEY = "skyrio_booking_tour_v1";
+  const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
-    updateQS({
-      tab: activeTab,
-      where: destination,
-      minRating: minRating ? String(minRating) : "",
-      tags: filters,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, destination, filters]);
-
-  const toggleFilter = (label) => {
-    setFilters((prev) =>
-      prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]
-    );
-  };
-
-  const toggleSave = (id) => {
-    const next = savedIds.includes(id)
-      ? savedIds.filter((x) => x !== id)
-      : [...savedIds, id];
-    setSavedIds(next);
-    writeSavedIds(next);
-  };
-
-  const openDetails = (item) => {
-    setSelected(item);
-    setDetailsOpen(true);
-  };
-
-  // ✅ Checkout shell prep
-  const goCheckout = (payload) => {
     try {
-      sessionStorage.setItem("skyrio_checkout_v1", JSON.stringify(payload));
-    } catch (err) {
-      // ignore storage errors (private mode / blocked storage)
+      const seen = localStorage.getItem(TOUR_KEY);
+      if (!seen) setTourOpen(true);
+    } catch {
+      // ignore
     }
-    navigate("/checkout");
+  }, []);
+
+  const tourSteps = useMemo(
+    () => [
+      {
+        title: "Start here",
+        description:
+          "Pick a city or airport. You can change this anytime—nothing is locked in.",
+        target: () => whereRef.current,
+      },
+      {
+        title: "Quick details",
+        description:
+          "Confirm travelers and rooms. If you’re unsure, you can skip this for now.",
+        target: () => travelersRef.current,
+      },
+      {
+        title: "Search",
+        description:
+          "Run the search. Refine filters after results show—keep it simple.",
+        target: () => searchRef.current,
+      },
+    ],
+    []
+  );
+
+  const closeTour = (dontShowAgain = true) => {
+    setTourOpen(false);
+    if (!dontShowAgain) return;
+    try {
+      localStorage.setItem(TOUR_KEY, "1");
+    } catch {
+      // ignore
+    }
   };
 
-  const handleSearch = async () => {
-    setLoading(true);
+  // #2 Why modal
+  const [whyKey, setWhyKey] = useState(null);
+  const whyOpen = !!whyKey;
+  const openWhy = (key) => setWhyKey(key);
+  const closeWhy = () => setWhyKey(null);
+  const whyContent = whyKey ? EXPLAINERS[whyKey] : null;
+
+  // Keep URL in sync with tab
+  useEffect(() => {
+    const next = setQueryParam(location.search, "tab", tab);
+    navigate({ pathname: location.pathname, search: next }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  // AutoComplete (Where)
+  const canned = useMemo(
+    () => [
+      { value: "Newark (EWR)" },
+      { value: "New York (JFK)" },
+      { value: "New York (LGA)" },
+      { value: "Miami (MIA)" },
+      { value: "Los Angeles (LAX)" },
+      { value: "San Francisco (SFO)" },
+      { value: "Atlanta (ATL)" },
+      { value: "Dallas (DFW)" },
+      { value: "Chicago (ORD)" },
+      { value: "Toronto (YYZ)" },
+      { value: "London (LHR)" },
+      { value: "Paris (CDG)" },
+      { value: "Tokyo (HND)" },
+      { value: "Cancún (CUN)" },
+    ],
+    []
+  );
+
+  const onWhereSearch = async (q) => {
+    setWhereQuery(q);
+    const trimmed = (q || "").trim();
+    if (!trimmed) {
+      setWhereOptions([]);
+      return;
+    }
+    setWhereLoading(true);
+    try {
+      const lower = trimmed.toLowerCase();
+      const filtered = canned.filter((o) =>
+        o.value.toLowerCase().includes(lower)
+      );
+      setWhereOptions(filtered.length ? filtered : canned.slice(0, 8));
+    } finally {
+      setWhereLoading(false);
+    }
+  };
+
+  const onWhereSelect = (value) => setWhereQuery(value);
+
+  const travelersLabel = useMemo(() => {
+    const total = adults + children;
+    const roomLabel = rooms > 1 ? `${rooms} rooms` : `${rooms} room`;
+    const pplLabel = total === 1 ? "1 traveler" : `${total} travelers`;
+    return `${pplLabel} · ${roomLabel}`;
+  }, [adults, children, rooms]);
+
+  // AntD v5 Dropdown menu
+  const sortMenu = useMemo(
+    () => ({
+      items: SORT_OPTIONS.map((o) => ({
+        key: o.key,
+        label: (
+          <Space size={8}>
+            <span>{o.label}</span>
+            {o.key === "recommended" ? (
+              <Tag className="sk-miniBadge">Default</Tag>
+            ) : null}
+          </Space>
+        ),
+        onClick: () => setSortKey(o.key),
+      })),
+    }),
+    []
+  );
+
+  const toggleVibe = (key) => {
+    // if user manually toggles vibes, we consider quick filter “mixed”
+    setActiveQuickKey(null);
+
+    setActiveVibes((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const toast = (text) => {
+    message.open({
+      type: "info",
+      content: text,
+      className: "sk-toast",
+      duration: 2.1,
+    });
+  };
+
+  // ✅ Apply quick filter with active “on” state
+  const applyQuickFilter = (f) => {
+    setActiveQuickKey(f.key);
+    if (f.tab) setTab(f.tab);
+
+    // preset vibes (clean + predictable)
+    setActiveVibes(new Set(f.vibes || []));
+    toast(f.toast || `${f.label} applied`);
+  };
+
+  const clearQuickFilters = () => {
+    setActiveQuickKey(null);
+    setActiveVibes(new Set());
+    toast("Quick filters cleared.");
+  };
+
+  const copyTrip = async () => {
+    const payload = {
+      tab,
+      where: whereQuery,
+      dates: dates ? [toISODate(dates?.[0]), toISODate(dates?.[1])] : null,
+      travelers: { adults, children, rooms },
+      sort: sortKey,
+      vibes: Array.from(activeVibes),
+      rewardsOn,
+      trackPricesOn,
+      quickFilter: activeQuickKey,
+    };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      message.success({
+        content: "Trip settings copied.",
+        className: "sk-toast",
+      });
+    } catch {
+      message.error({
+        content: "Couldn’t copy. (Browser blocked clipboard.)",
+        className: "sk-toast",
+      });
+    }
+  };
+
+  const saveTrip = () => {
+    const trip = {
+      id: `${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      tab,
+      where: whereQuery,
+      dates: dates ? [toISODate(dates?.[0]), toISODate(dates?.[1])] : null,
+      travelers: { adults, children, rooms },
+      sort: sortKey,
+      vibes: Array.from(activeVibes),
+      rewardsOn,
+      trackPricesOn,
+      quickFilter: activeQuickKey,
+    };
 
     try {
-      if (activeTab === "saved") {
-        setLoading(false);
-        return;
+      const raw = localStorage.getItem("skyrio_saved_trips");
+      const arr = raw ? JSON.parse(raw) : [];
+      const next = Array.isArray(arr) ? [trip, ...arr].slice(0, 50) : [trip];
+      localStorage.setItem("skyrio_saved_trips", JSON.stringify(next));
+      setSavedCount(next.length);
+      message.success({
+        content: "Saved. View it under Saved.",
+        className: "sk-toast",
+      });
+    } catch {
+      message.error({
+        content: "Save failed (storage issue).",
+        className: "sk-toast",
+      });
+    }
+  };
+
+  const runSearch = async () => {
+    setLoading(true);
+    setResults([]);
+    setSelectedId(null);
+    try {
+      const payload = {
+        tab,
+        where: whereQuery,
+        startDate: dates ? toISODate(dates?.[0]) : null,
+        endDate: dates ? toISODate(dates?.[1]) : null,
+        adults,
+        children,
+        rooms,
+        sort: sortKey,
+        vibes: Array.from(activeVibes),
+        rewardsOn,
+        trackPricesOn,
+        quickFilter: activeQuickKey,
+      };
+
+      const stub = [
+        {
+          id: "stub-1",
+          title:
+            tab === "flights"
+              ? "Skyrio Air — Economy"
+              : "Skyrio Select Stay — Deluxe",
+          from: "EWR",
+          to: "MIA",
+          price: 168,
+          badges: [
+            "Best value",
+            tab === "flights" ? "Carry-on included" : "Free cancellation",
+          ],
+        },
+      ];
+
+      if (!payload.where) {
+        toast("Add a destination (Where) to search.");
+        setResults([]);
+      } else {
+        setResults(stub);
+        setSelectedId(stub[0]?.id || null);
       }
-
-      if (activeTab === "flights") {
-        // ✅ show 1–2 mock cards immediately (even if API fails)
-        setFlightResults(MOCK_FLIGHTS_RAW.slice(0, 2).map(normalizeFlight));
-
-        const origin = "JFK";
-        const dest = guessAirportCode(destination, "LAX");
-
-        let dateStr = "";
-        const start = dates?.[0];
-        if (start?.format) dateStr = start.format("YYYY-MM-DD");
-        else {
-          const d = new Date();
-          d.setDate(d.getDate() + 30);
-          dateStr = d.toISOString().slice(0, 10);
-        }
-
-        const adults = parseAdultsFromGuestsKey(guests);
-
-        const url = `/api/providers/amadeus/flights/search?origin=${encodeURIComponent(
-          origin
-        )}&dest=${encodeURIComponent(dest)}&date=${encodeURIComponent(
-          dateStr
-        )}&adults=${adults}&max=12&nonStop=false`;
-
-        const res = await fetch(url, { credentials: "include" });
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok || !data?.ok) {
-          // fallback: more mocks + filter a little
-          const q = (destination || "").toLowerCase().trim();
-          const fallback = MOCK_FLIGHTS_RAW.filter((f) => {
-            if (!q) return true;
-            const joined =
-              `${f.outbound.origin} ${f.outbound.destination} ${f.carrierCode}`.toLowerCase();
-            return joined.includes(q);
-          })
-            .slice(0, 12)
-            .map(normalizeFlight);
-
-          setFlightResults(
-            fallback.length ? fallback : MOCK_FLIGHTS_RAW.map(normalizeFlight)
-          );
-          message.info("Using mock flight results (API unavailable).");
-        } else {
-          // ✅ normalize whatever backend returns into FlightCard format
-          const normalized = (data.results || []).map(normalizeFlight);
-          setFlightResults(normalized);
-          message.success(`Found ${normalized.length} flights`);
-        }
-
-        setLoading(false);
-        return;
-      }
-
-      if (activeTab === "cars") {
-        const q = (destination || "").toLowerCase().trim();
-        const filtered = MOCK_CARS.filter((c) => {
-          if (!q) return true;
-          const joined =
-            `${c.brand} ${c.model} ${c.type} ${c.pickup}`.toLowerCase();
-          return joined.includes(q);
-        }).filter((c) => (minRating ? c.rating >= minRating : true));
-
-        setCarsResults(filtered);
-        message.success(`Found ${filtered.length} cars`);
-        setLoading(false);
-        return;
-      }
-
-      if (activeTab === "stays") {
-        const q = (destination || "").toLowerCase().trim();
-        const filtered = MOCK_STAYS.filter((s) => {
-          if (!q) return true;
-          const joined = `${s.title} ${s.location}`.toLowerCase();
-          return joined.includes(q);
-        }).filter((s) => (minRating ? s.rating >= minRating : true));
-
-        setStaysResults(filtered);
-        message.success(`Found ${filtered.length} stays`);
-        setLoading(false);
-        return;
-      }
-
-      message.info("This tab will be powered in an upgrade.");
-    } catch (e) {
-      message.error(e?.message || "Search failed");
+    } catch (err) {
+      message.error({
+        content: err?.message || "Search failed",
+        className: "sk-toast",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const activeList = useMemo(() => {
-    if (activeTab === "flights") return flightResults;
-    if (activeTab === "cars") return carsResults;
-    if (activeTab === "stays") return staysResults;
-    return [];
-  }, [activeTab, flightResults, carsResults, staysResults]);
+  const addExpense = () => {
+    const amt = Number(expenseAmount);
+    if (!amt || amt <= 0) return toast("Enter an amount.");
+    setExpenses((prev) => [
+      {
+        id: `${Date.now()}`,
+        amount: amt,
+        note: (expenseNote || "").trim() || "Expense",
+      },
+      ...prev,
+    ]);
+    setExpenseAmount(null);
+    setExpenseNote("");
+    message.success({ content: "Added to budget.", className: "sk-toast" });
+  };
 
-  // ✅ Saved items: build a pool and map by id
-  const savedItems = useMemo(() => {
-    const pool = [
-      ...MOCK_STAYS,
-      ...MOCK_CARS,
-      ...MOCK_FLIGHTS_RAW.map(normalizeFlight),
-      ...staysResults,
-      ...carsResults,
-      ...flightResults,
-    ];
+  const goCheckout = (pick) => {
+    const chosen =
+      pick || results.find((x) => x.id === selectedId) || results[0];
+    if (!chosen) return toast("Select a result first.");
 
-    const map = new Map(pool.map((x) => [x.id, x]));
-    return savedIds.map((id) => map.get(id)).filter(Boolean);
-  }, [savedIds, staysResults, carsResults, flightResults]);
+    const payload = {
+      tab,
+      where: whereQuery,
+      dates: dates ? [toISODate(dates?.[0]), toISODate(dates?.[1])] : null,
+      travelers: { adults, children, rooms },
+      sort: sortKey,
+      vibes: Array.from(activeVibes),
+      rewardsOn,
+      trackPricesOn,
+      quickFilter: activeQuickKey,
+      selected: chosen,
+      budget: {
+        mode: budgetMode,
+        total: budgetTotal,
+        used,
+        left,
+      },
+    };
 
-  const savedGroups = useMemo(() => {
-    const flights = [];
-    const cars = [];
-    const stays = [];
-
-    for (const x of savedItems) {
-      const isFlight =
-        x?.origin && x?.destination && x?.price?.total !== undefined;
-      const isCar = x?.pricePerDay !== undefined;
-      if (isFlight) flights.push(x);
-      else if (isCar) cars.push(x);
-      else stays.push(x);
+    try {
+      sessionStorage.setItem("sk_checkout", JSON.stringify(payload));
+    } catch {
+      // ignore
     }
 
-    return { flights, stays, cars };
-  }, [savedItems]);
+    navigate("/checkout");
+  };
+
+  const heroTitle = "Book Your Next Adventure ✨";
+
+  const topChips = (
+    <Space wrap size={8} style={{ justifyContent: "center" }}>
+      <Tag className="sk-chip" icon={<ThunderboltOutlined />}>
+        XP 60
+      </Tag>
+      <Tag className="sk-chip">{savedCount} saved</Tag>
+      <Tag className="sk-chip">
+        {trackPricesOn ? "Price Watch On" : "Price Watch Off"}
+      </Tag>
+    </Space>
+  );
 
   return (
     <Layout className="sk-bookingPage">
-      <Content className="sk-wrap">
-        <div className="sk-hero">
-          <Title level={1} className="sk-heroTitle">
-            Book Your Next Adventure ✨
+      <Content className="sk-bookingWrap">
+        {/* HERO */}
+        <div className="sk-bookingHero">
+          <Title level={1} className="sk-bookingHeroTitle">
+            {heroTitle}
           </Title>
 
-          <div className="sk-pillRow">
-            {headerPills.map((p) => (
-              <div key={p.label} className="sk-pill">
-                {p.label}
-              </div>
-            ))}
-          </div>
+          <div style={{ marginTop: 10 }}>{topChips}</div>
 
-          <Text className="sk-heroHint">
-            Smart Plan AI will optimize this trip for budget & XP.
+          <Text className="sk-bookingHeroSub">
+            Smart Plan AI will optimize this trip for budget &amp; XP.
           </Text>
         </div>
 
-        <div className="sk-grid">
-          <div className="sk-left">
-            <div className="sk-glass">
-              <div className="sk-tabs">
-                {TAB_OPTIONS.map((t) => {
-                  const isSaved = t.key === "saved";
-                  const label = isSaved
-                    ? `Saved${
-                        savedIds.length > 0 ? ` (${savedIds.length})` : ""
-                      }`
-                    : t.label;
-
-                  return (
-                    <button
-                      key={t.key}
-                      className={`sk-tab ${
-                        activeTab === t.key ? "isActive" : ""
-                      }`}
-                      onClick={() => setActiveTab(t.key)}
-                      type="button"
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+        {/* MAIN GRID */}
+        <div className="sk-bookingGrid">
+          {/* LEFT */}
+          <div className="sk-panel sk-panelLeft sk-bookingLeft">
+            <Card className="sk-glassCard sk-searchCard" bordered={false}>
+              {/* Tabs row */}
+              <div className="sk-tabRow">
+                <Segmented
+                  options={TAB_OPTIONS.map((t) => ({
+                    label: t.label,
+                    value: t.key,
+                  }))}
+                  value={tab}
+                  onChange={setTab}
+                  className="sk-tabPills"
+                />
               </div>
 
-              <div className="sk-searchBar">
-                <div className="sk-searchBarRow">
-                  <div className="sk-field sk-field--dest">
-                    <EnvironmentOutlined className="sk-fieldIcon" />
-                    <Input
-                      className="sk-fieldInput"
-                      placeholder={
-                        activeTab === "flights"
-                          ? "Where to? (Try LAX, MIA, SFO)"
-                          : activeTab === "cars"
-                          ? "Pickup city/airport (Try MIA, LAX, EWR)"
-                          : "Where to?"
+              {/* Search row */}
+              <Row gutter={[12, 12]} align="middle" className="sk-searchRow">
+                <Col xs={24} md={9}>
+                  <div ref={whereRef} className="sk-tourTarget">
+                    <Text className="sk-fieldLabel">Where</Text>
+                    <AutoComplete
+                      options={whereOptions}
+                      value={whereQuery}
+                      onSearch={onWhereSearch}
+                      onSelect={onWhereSelect}
+                      placeholder="City or airport (ex: Newark (EWR))"
+                      notFoundContent={
+                        whereLoading ? "Searching…" : "No matches"
                       }
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
-                      allowClear
-                      bordered={false}
-                      disabled={activeTab === "saved"}
+                      className="sk-whereAuto"
+                      style={{ width: "100%" }}
                     />
                   </div>
+                </Col>
 
-                  <div className="sk-field sk-field--dates">
-                    <DatePicker.RangePicker
-                      className="sk-fieldPicker"
-                      value={dates}
-                      onChange={setDates}
-                      bordered={false}
-                      suffixIcon={<CalendarOutlined className="sk-fieldIcon" />}
-                      disabled={activeTab === "saved"}
-                    />
-                  </div>
-
-                  <GuestsDropdown
-                    value={guests}
-                    onChange={setGuests}
-                    className={activeTab === "saved" ? "isDisabled" : ""}
+                <Col xs={24} md={8}>
+                  <Text className="sk-fieldLabel">Dates</Text>
+                  <RangePicker
+                    value={dates}
+                    onChange={(v) => setDates(v)}
+                    style={{ width: "100%" }}
+                    suffixIcon={<CalendarOutlined />}
+                    placeholder={["Start", "End"]}
+                    className="sk-datePicker"
                   />
+                </Col>
 
-                  <Button
-                    className="sk-askSoraBtn"
-                    onClick={() =>
-                      message.info("Sora suggestions (hook later)")
-                    }
-                    disabled={activeTab === "saved"}
-                  >
-                    ⚡ Ask Sora
-                  </Button>
+                <Col xs={24} md={7}>
+                  <Text className="sk-fieldLabel">Travelers</Text>
+                  <div className="sk-travelersBtnRow" ref={travelersRef}>
+                    <Button
+                      icon={<UserOutlined />}
+                      className="sk-pillBtn"
+                      onClick={() => setTravDrawerOpen(true)}
+                      block
+                    >
+                      {travellersLabelSafe(travelersLabel)}
+                    </Button>
 
+                    <Tooltip title="More settings">
+                      <Button
+                        icon={<SettingOutlined />}
+                        className="sk-iconPillBtn"
+                        onClick={() => setTravDrawerOpen(true)}
+                      />
+                    </Tooltip>
+                  </div>
+                </Col>
+              </Row>
+
+              {/* Action row */}
+              <Row gutter={[10, 10]} align="middle" className="sk-actionRow">
+                <Col xs={24} md={14}>
+                  <Space wrap size={10}>
+                    <Dropdown menu={sortMenu} trigger={["click"]}>
+                      <Button className="sk-sortBtn">
+                        Sort:{" "}
+                        <span className="sk-sortValue">
+                          {SORT_OPTIONS.find((x) => x.key === sortKey)?.label ||
+                            "Recommended"}
+                        </span>
+                      </Button>
+                    </Dropdown>
+
+                    <Tooltip title="Why am I seeing this?">
+                      <Button
+                        type="link"
+                        className="sk-whyBtn"
+                        onClick={() => openWhy("sort")}
+                      >
+                        Why?
+                      </Button>
+                    </Tooltip>
+
+                    <Button
+                      icon={<SaveOutlined />}
+                      className="sk-pillBtn sk-utilityBtn"
+                      onClick={saveTrip}
+                    >
+                      Save Trip
+                    </Button>
+
+                    <Button
+                      icon={<CopyOutlined />}
+                      className="sk-pillBtn sk-utilityBtn"
+                      onClick={copyTrip}
+                    >
+                      Copy
+                    </Button>
+
+                    <Button
+                      icon={<TeamOutlined />}
+                      className="sk-pillBtn sk-utilityBtn"
+                      onClick={() => setTeamTravelOpen(true)}
+                    >
+                      Team Travel
+                    </Button>
+
+                    <Tooltip title="Why am I seeing this?">
+                      <Button
+                        type="link"
+                        className="sk-whyBtn"
+                        onClick={() => openWhy("teamTravel")}
+                      >
+                        Why?
+                      </Button>
+                    </Tooltip>
+                  </Space>
+                </Col>
+
+                <Col
+                  xs={24}
+                  md={10}
+                  style={{ display: "flex", justifyContent: "flex-end" }}
+                >
                   <Button
-                    className="sk-searchBtn2"
+                    ref={searchRef}
+                    type="primary"
                     icon={<SearchOutlined />}
-                    onClick={handleSearch}
+                    className="sk-cta sk-searchCTA"
                     loading={loading}
-                    disabled={activeTab === "saved"}
+                    onClick={runSearch}
                   >
                     Search
                   </Button>
-                </div>
+                </Col>
+              </Row>
 
-                <div className="sk-filterPills">
-                  {[
-                    "Under $500",
-                    "Under $1000",
-                    "Luxury",
-                    "Chill",
-                    "Adventure",
-                    "Romantic",
-                    "Family",
-                  ].map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      className={`sk-filterPill ${
-                        filters.includes(p) ? "isOn" : ""
-                      }`}
-                      onClick={() => toggleFilter(p)}
+              {/* Vibe chips */}
+              <div className="sk-vibeRow">
+                <div className="sk-refineHeader">
+                  <Text className="sk-groupLabel">
+                    Vibes <span className="sk-refineOptional">(optional)</span>
+                  </Text>
+
+                  <Tooltip title="Why am I seeing this?">
+                    <Button
+                      type="link"
+                      className="sk-whyBtn"
+                      onClick={() => openWhy("vibes")}
                     >
-                      {p}
-                    </button>
-                  ))}
+                      Why?
+                    </Button>
+                  </Tooltip>
                 </div>
 
-                <div className="sk-searchToggles">
-                  <div className="sk-toggleRow">
-                    <span className="sk-toggleLabel">Rewards</span>
+                <Space wrap size={10}>
+                  {VIBE_CHIPS.map((c) => {
+                    const on = activeVibes.has(c.key);
+                    return (
+                      <Button
+                        key={c.key}
+                        className={`sk-vibeChip ${on ? "on" : ""}`}
+                        onClick={() => toggleVibe(c.key)}
+                      >
+                        {c.label}
+                      </Button>
+                    );
+                  })}
+                </Space>
+              </div>
+
+              {/* Rewards + Track prices */}
+              <div className="sk-toggleRow">
+                <Space size={22} wrap>
+                  <Space>
+                    <Text className="sk-toggleLabel">Rewards</Text>
+                    <Tooltip title="Why am I seeing this?">
+                      <Button
+                        type="text"
+                        className="sk-whyIconBtn"
+                        icon={<InfoCircleOutlined />}
+                        onClick={() => openWhy("rewards")}
+                      />
+                    </Tooltip>
                     <Switch checked={rewardsOn} onChange={setRewardsOn} />
-                    {rewardsOn && (
-                      <Text style={{ fontSize: 12, opacity: 0.7 }}>
-                        Earn XP on this trip
-                      </Text>
-                    )}
-                  </div>
+                    <Text className="sk-toggleHint">Earn XP on this trip</Text>
+                  </Space>
 
-                  <div className="sk-toggleRow">
-                    <span className="sk-toggleLabel">Track prices</span>
-                    <Switch checked={trackPrices} onChange={setTrackPrices} />
-                    {trackPrices && (
-                      <Text style={{ fontSize: 12, opacity: 0.7 }}>
-                        Price alerts enabled
-                      </Text>
-                    )}
-                  </div>
-                </div>
+                  <Space>
+                    <Text className="sk-toggleLabel">Track prices</Text>
+                    <Tooltip title="Why am I seeing this?">
+                      <Button
+                        type="text"
+                        className="sk-whyIconBtn"
+                        icon={<InfoCircleOutlined />}
+                        onClick={() => openWhy("priceWatch")}
+                      />
+                    </Tooltip>
+                    <Switch
+                      checked={trackPricesOn}
+                      onChange={setTrackPricesOn}
+                    />
+                  </Space>
+                </Space>
 
-                <div className="sk-quickTags sk-quickTags--below">
-                  {QUICK_TAGS.map((tag) => (
-                    <button key={tag} className="sk-chip" type="button">
-                      {tag}
-                    </button>
-                  ))}
+                <Text className="sk-helperText">
+                  You can skip anything optional. Search first, refine after.
+                </Text>
+              </div>
+
+              {/* ✅ Quick filters (active state + tiny clear button) */}
+              <div className="sk-suggestRow">
+                <div className="sk-suggestBar">
+                  <Space wrap size={10}>
+                    {QUICK_FILTERS.map((f) => {
+                      const on = activeQuickKey === f.key;
+                      return (
+                        <Button
+                          key={f.key}
+                          className={`sk-suggestBtn ${on ? "on" : ""}`}
+                          onClick={() => applyQuickFilter(f)}
+                        >
+                          {f.label}
+                        </Button>
+                      );
+                    })}
+                  </Space>
+
+                  {activeQuickKey ? (
+                    <Button
+                      type="text"
+                      className="sk-clearQuickBtn"
+                      onClick={clearQuickFilters}
+                    >
+                      Clear quick filters
+                    </Button>
+                  ) : null}
                 </div>
               </div>
-            </div>
+            </Card>
 
-            <div className="sk-results">
-              {activeTab === "saved" ? (
-                savedItems.length === 0 ? (
-                  <Empty
-                    description="No saved items yet. Tap the heart on a stay/flight/car."
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  />
-                ) : (
-                  <div style={{ display: "grid", gap: 18 }}>
-                    {/* ✅ Intentional Saved layout */}
-                    {savedGroups.flights.length > 0 && (
-                      <div style={{ display: "grid", gap: 10 }}>
-                        <div style={{ fontWeight: 900, opacity: 0.92 }}>
-                          Saved Flights
-                        </div>
-                        {savedGroups.flights.map((flight) => (
-                          <FlightCard
-                            key={flight.id}
-                            flight={flight}
-                            saved={savedIds.includes(flight.id)}
-                            onSave={(f) => {
-                              toggleSave(f.id);
-                              message.success("Saved ✅");
-                            }}
-                            onUnsave={(id) => {
-                              toggleSave(id);
-                              message.info("Removed from Saved");
-                            }}
-                            onCheckout={(f) =>
-                              goCheckout({ type: "flight", flight: f })
-                            }
-                          />
-                        ))}
-                      </div>
-                    )}
+            {/* RESULTS */}
+            <Card className="sk-glassCard sk-resultsCard" bordered={false}>
+              <div className="sk-resultsHeader">
+                <div className="sk-resultsHeaderLeft">
+                  <Title level={3} className="sk-resultsTitle">
+                    Results
+                  </Title>
 
-                    {savedGroups.stays.length > 0 && (
-                      <div style={{ display: "grid", gap: 10 }}>
-                        <div style={{ fontWeight: 900, opacity: 0.92 }}>
-                          Saved Stays
-                        </div>
-                        {savedGroups.stays.map((item) => (
-                          <StayCard
-                            key={item.id}
-                            item={item}
-                            saved={savedIds.includes(item.id)}
-                            onToggleSave={() => {
-                              toggleSave(item.id);
-                              message.success(
-                                savedIds.includes(item.id)
-                                  ? "Removed from Saved"
-                                  : "Saved ✅"
-                              );
-                            }}
-                            onOpen={() => openDetails(item)}
-                            watchPayload={{
-                              type: "stays",
-                              destination: destination || item.title,
-                              dates: dates
-                                ? dates.map((d) =>
-                                    d?.toISOString?.()
-                                      ? d.toISOString()
-                                      : String(d)
-                                  )
-                                : null,
-                              guests,
-                              filters,
-                              rewardsOn,
-                              trackPrices,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    {savedGroups.cars.length > 0 && (
-                      <div style={{ display: "grid", gap: 10 }}>
-                        <div style={{ fontWeight: 900, opacity: 0.92 }}>
-                          Saved Cars
-                        </div>
-                        {savedGroups.cars.map((item) => (
-                          <CarCard
-                            key={item.id}
-                            item={item}
-                            saved={savedIds.includes(item.id)}
-                            onToggleSave={() => {
-                              toggleSave(item.id);
-                              message.success(
-                                savedIds.includes(item.id)
-                                  ? "Removed from Saved"
-                                  : "Saved ✅"
-                              );
-                            }}
-                            onOpen={() => openDetails(item)}
-                          />
-                        ))}
-                      </div>
-                    )}
+                  <div className="sk-resultsMeta">
+                    <Text className="sk-budgetSmall">
+                      Tap a card to select. Checkout is always optional.
+                    </Text>
                   </div>
-                )
-              ) : loading ? (
-                <div style={{ display: "grid", gap: 12 }}>
-                  <Skeleton active />
-                  <Skeleton active />
-                  <Skeleton active />
                 </div>
-              ) : activeList.length === 0 ? (
-                <Empty
-                  description={
-                    <>
-                      <div style={{ fontWeight: 700 }}>No results yet</div>
-                      <div style={{ opacity: 0.7, marginTop: 4 }}>
-                        Try searching a destination like <b>LAX</b>, <b>MIA</b>,
-                        or <b>SFO</b>
+
+                <Badge count={0} size="small" offset={[-4, 4]}>
+                  <Button
+                    className="sk-pillBtn"
+                    onClick={() => goCheckout()}
+                    disabled={!results?.length}
+                  >
+                    Go to Checkout
+                  </Button>
+                </Badge>
+              </div>
+
+              <Divider className="sk-divider" />
+
+              {(!results || results.length === 0) && !loading ? (
+                <div className="sk-emptyState">
+                  <div className="sk-emptyIcon" />
+                  <Text className="sk-emptyText">Search to see options.</Text>
+                </div>
+              ) : null}
+
+              {results?.map((r) => (
+                <Card
+                  key={r.id}
+                  className={`sk-glassCard sk-resultItem ${
+                    selectedId === r.id ? "isSelected" : ""
+                  }`}
+                  bordered={false}
+                  onClick={() => setSelectedId(r.id)}
+                >
+                  <div className="sk-resultTop">
+                    <div className="sk-resultBrand">
+                      <div className="sk-resultLogo">SK</div>
+                      <div>
+                        <Text className="sk-resultName">{r.title}</Text>
+                        <div>
+                          <Text className="sk-resultSub">
+                            {tab === "flights" ? "— ECONOMY" : "— DELUXE"}
+                          </Text>
+                        </div>
                       </div>
-                    </>
-                  }
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                />
-              ) : activeTab === "flights" ? (
-                activeList.map((flight) => (
-                  <FlightCard
-                    key={flight.id}
-                    flight={flight}
-                    saved={savedIds.includes(flight.id)}
-                    onSave={(f) => {
-                      toggleSave(f.id);
-                      message.success("Saved ✅");
-                    }}
-                    onUnsave={(id) => {
-                      toggleSave(id);
-                      message.info("Removed from Saved");
-                    }}
-                    onCheckout={(f) =>
-                      goCheckout({ type: "flight", flight: f })
-                    }
-                  />
-                ))
-              ) : activeTab === "cars" ? (
-                activeList.map((item) => (
-                  <CarCard
-                    key={item.id}
-                    item={item}
-                    saved={savedIds.includes(item.id)}
-                    onToggleSave={() => {
-                      toggleSave(item.id);
-                      message.success(
-                        savedIds.includes(item.id)
-                          ? "Removed from Saved"
-                          : "Saved ✅"
-                      );
-                    }}
-                    onOpen={() => openDetails(item)}
-                  />
-                ))
-              ) : activeTab === "stays" ? (
-                activeList.map((item) => (
-                  <StayCard
-                    key={item.id}
-                    item={item}
-                    saved={savedIds.includes(item.id)}
-                    onToggleSave={() => {
-                      toggleSave(item.id);
-                      message.success(
-                        savedIds.includes(item.id)
-                          ? "Removed from Saved"
-                          : "Saved ✅"
-                      );
-                    }}
-                    onOpen={() => openDetails(item)}
-                    watchPayload={{
-                      type: "stays",
-                      destination: destination || item.title,
-                      dates: dates
-                        ? dates.map((d) =>
-                            d?.toISOString?.() ? d.toISOString() : String(d)
-                          )
-                        : null,
-                      guests,
-                      filters,
-                      rewardsOn,
-                      trackPrices,
-                    }}
-                  />
-                ))
-              ) : (
-                <Empty
-                  description="This tab will be powered in an upgrade."
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                />
-              )}
+                    </div>
 
-              <Drawer
-                title="Details"
-                open={detailsOpen}
-                onClose={() => setDetailsOpen(false)}
-                width={420}
-              >
-                {!selected ? (
-                  <Empty description="No item selected" />
-                ) : (
-                  <div style={{ display: "grid", gap: 10 }}>
-                    {/* Flight details (new shape) */}
-                    {selected?.origin && selected?.destination ? (
-                      <>
-                        <div style={{ fontWeight: 900, fontSize: 16 }}>
-                          {selected.origin} → {selected.destination}
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Total:{" "}
-                          <b>
-                            {selected?.price?.currency || "USD"}{" "}
-                            {Number(selected?.price?.total || 0).toFixed(2)}
-                          </b>
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Airline: <b>{selected?.airlineCode || "—"}</b>
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Cabin: <b>{String(selected?.cabin || "ECONOMY")}</b>
-                        </div>
-
-                        <Divider />
-                        <Space>
-                          <Button
-                            className="sk-cta"
-                            onClick={() =>
-                              goCheckout({ type: "flight", flight: selected })
-                            }
-                          >
-                            Continue to Checkout
-                          </Button>
-                          <Button
-                            className="sk-ghostBtn"
-                            onClick={() => {
-                              toggleSave(selected.id);
-                              message.success(
-                                savedIds.includes(selected.id)
-                                  ? "Removed from Saved"
-                                  : "Saved ✅"
-                              );
-                            }}
-                          >
-                            {savedIds.includes(selected.id)
-                              ? "Saved ✅"
-                              : "Save"}
-                          </Button>
-                        </Space>
-                      </>
-                    ) : selected?.pricePerDay ? (
-                      <>
-                        <div style={{ fontWeight: 900, fontSize: 16 }}>
-                          {selected.brand} {selected.model} · {selected.type}
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Pickup: <b>{selected.pickup}</b>
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Price: <b>${selected.pricePerDay}/day</b>
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Specs: <b>{selected.seats}</b> seats ·{" "}
-                          <b>{selected.bags}</b> bags ·{" "}
-                          <b>{selected.transmission}</b>
-                        </div>
-
-                        <Divider />
-                        <Text style={{ opacity: 0.9, fontWeight: 800 }}>
-                          Perks
-                        </Text>
-                        <Space size={8} wrap style={{ marginTop: 6 }}>
-                          {(selected.amenities || []).map((a) => (
-                            <Tag key={a} className="sk-tag">
-                              {a}
-                            </Tag>
-                          ))}
-                        </Space>
-
-                        <Divider />
-                        <Space>
-                          <Button
-                            className="sk-cta"
-                            onClick={() =>
-                              goCheckout({ type: "car", car: selected })
-                            }
-                          >
-                            Continue to Checkout
-                          </Button>
-                          <Button
-                            className="sk-ghostBtn"
-                            onClick={() => {
-                              toggleSave(selected.id);
-                              message.success(
-                                savedIds.includes(selected.id)
-                                  ? "Removed from Saved"
-                                  : "Saved ✅"
-                              );
-                            }}
-                          >
-                            {savedIds.includes(selected.id)
-                              ? "Saved ✅"
-                              : "Save"}
-                          </Button>
-                        </Space>
-                      </>
-                    ) : (
-                      <>
-                        <div style={{ fontWeight: 900, fontSize: 16 }}>
-                          {selected.title}
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          Location: <b>{selected.location}</b>
-                        </div>
-                        <div style={{ opacity: 0.85 }}>
-                          From:{" "}
-                          <b>
-                            $
-                            {selected.price?.toLocaleString?.() ||
-                              selected.price}
-                          </b>
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 10,
-                            alignItems: "center",
-                          }}
-                        >
-                          <Rate
-                            allowHalf
-                            disabled
-                            value={Math.round((selected.rating || 0) * 2) / 2}
-                          />
-                          <span style={{ opacity: 0.85 }}>
-                            {(selected.rating || 0).toFixed?.(1)} ·{" "}
-                            {selected.reviews || 0} reviews
-                          </span>
-                        </div>
-
-                        <Divider />
-                        <Text style={{ opacity: 0.9, fontWeight: 800 }}>
-                          Amenities
-                        </Text>
-                        <Space size={8} wrap style={{ marginTop: 6 }}>
-                          {(selected.amenities || []).map((a) => (
-                            <Tag key={a} className="sk-tag">
-                              {a}
-                            </Tag>
-                          ))}
-                        </Space>
-
-                        <Divider />
-                        <Space>
-                          <Button
-                            className="sk-cta"
-                            onClick={() =>
-                              goCheckout({ type: "stay", stay: selected })
-                            }
-                          >
-                            Continue to Checkout
-                          </Button>
-                          <Button
-                            className="sk-ghostBtn"
-                            onClick={() => {
-                              toggleSave(selected.id);
-                              message.success(
-                                savedIds.includes(selected.id)
-                                  ? "Removed from Saved"
-                                  : "Saved ✅"
-                              );
-                            }}
-                          >
-                            {savedIds.includes(selected.id)
-                              ? "Saved ✅"
-                              : "Save"}
-                          </Button>
-                        </Space>
-                      </>
-                    )}
+                    <Space wrap size={8}>
+                      {(r.badges || []).map((b) => (
+                        <Tag key={b} className="sk-miniBadge">
+                          {b}
+                        </Tag>
+                      ))}
+                    </Space>
                   </div>
-                )}
-              </Drawer>
-            </div>
+
+                  <Divider className="sk-divider" />
+
+                  <div className="sk-resultMid">
+                    <div className="sk-route">
+                      <div className="sk-airport">{r.from}</div>
+                      <div className="sk-routeLine">
+                        <Text className="sk-routeSub">— · Nonstop</Text>
+                      </div>
+                      <div className="sk-airport">{r.to}</div>
+                    </div>
+                  </div>
+
+                  <div className="sk-resultBottom">
+                    <div>
+                      <Text className="sk-totalLabel">Total</Text>
+                      <div className="sk-price">
+                        USD {Number(r.price).toFixed(2)}
+                      </div>
+                    </div>
+
+                    <Space>
+                      <Button
+                        className="sk-pillBtn"
+                        icon={<SaveOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toast("Save per-item later (demo).");
+                        }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        type="primary"
+                        className="sk-cta"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goCheckout(r);
+                        }}
+                      >
+                        Checkout
+                      </Button>
+                    </Space>
+                  </div>
+                </Card>
+              ))}
+            </Card>
           </div>
 
-          <div className="sk-right">
-            <div className="sk-sticky">
-              <BudgetPanel />
-            </div>
+          {/* RIGHT */}
+          <div className="sk-panel sk-panelRight sk-budgetSticky sk-bookingRight">
+            <Card className="sk-glassCard sk-budgetCard" bordered={false}>
+              <div className="sk-budgetHeader">
+                <div>
+                  <Title level={4} className="sk-budgetTitle">
+                    Trip Budget
+                  </Title>
+                  <Text className="sk-budgetSub">
+                    Assistance only · never blocks checkout
+                  </Text>
+                </div>
+
+                <Tooltip title="Why am I seeing this?">
+                  <Button
+                    type="text"
+                    className="sk-whyIconBtn"
+                    icon={<InfoCircleOutlined />}
+                    onClick={() => openWhy("budget")}
+                  />
+                </Tooltip>
+              </div>
+
+              <Space wrap size={8} style={{ marginBottom: 10 }}>
+                <Button
+                  className="sk-pillBtn"
+                  icon={<SettingOutlined />}
+                  onClick={() => toast("Budget settings later")}
+                >
+                  Edit
+                </Button>
+                <Button
+                  className={`sk-pillBtn ${budgetMode === "solo" ? "on" : ""}`}
+                  onClick={() => setBudgetMode("solo")}
+                >
+                  Solo
+                </Button>
+                <Button
+                  className={`sk-pillBtn ${budgetMode === "group" ? "on" : ""}`}
+                  onClick={() => setBudgetMode("group")}
+                >
+                  Group
+                </Button>
+              </Space>
+
+              <div className="sk-budgetBig">
+                <div className="sk-budgetAmount">${formatMoney(left)}</div>
+                <div className="sk-budgetMeta">
+                  <Text className="sk-budgetMetaText">left to use</Text>
+                </div>
+
+                <div className="sk-budgetProgressRow">
+                  <Text className="sk-budgetSmall">
+                    Used: ${formatMoney(used)}
+                  </Text>
+                  <Text className="sk-budgetSmall">{pct}%</Text>
+                </div>
+
+                <div className="sk-budgetBar">
+                  <div
+                    className="sk-budgetBarFill"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                <div className="sk-budgetFooter">
+                  <Text className="sk-budgetFootText">
+                    Budget: ${formatMoney(budgetTotal)} · Mode:{" "}
+                    {budgetMode === "solo" ? "Solo" : "Group"}
+                  </Text>
+                  <Text className="sk-budgetSoftNote">
+                    Tip: keep it loose. This is just a guide.
+                  </Text>
+                </div>
+              </div>
+
+              <Divider className="sk-divider" />
+
+              <div className="sk-budgetAdd">
+                <Text className="sk-budgetAddTitle">+ ADD EXPENSE</Text>
+
+                <Row gutter={[10, 10]} style={{ marginTop: 10 }}>
+                  <Col span={12}>
+                    <InputNumber
+                      prefix={<DollarOutlined />}
+                      placeholder="Amount"
+                      value={expenseAmount}
+                      onChange={setExpenseAmount}
+                      style={{ width: "100%" }}
+                      className="sk-budgetInput"
+                      min={0}
+                    />
+                  </Col>
+                  <Col span={12}>
+                    <InputNumber
+                      placeholder="Budget total"
+                      value={budgetTotal}
+                      onChange={(v) => setBudgetTotal(Number(v || 0))}
+                      style={{ width: "100%" }}
+                      className="sk-budgetInput"
+                      min={0}
+                    />
+                  </Col>
+                  <Col span={24}>
+                    <input
+                      className="sk-budgetNote"
+                      value={expenseNote}
+                      onChange={(e) => setExpenseNote(e.target.value)}
+                      placeholder="Note (optional)"
+                    />
+                  </Col>
+                </Row>
+
+                <Space style={{ marginTop: 12 }}>
+                  <Button
+                    className="sk-pillBtn"
+                    icon={<ThunderboltOutlined />}
+                    onClick={addExpense}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    className="sk-pillBtn"
+                    onClick={() => toast("Details panel later")}
+                  >
+                    View details →
+                  </Button>
+                </Space>
+
+                {expenses.length ? (
+                  <div className="sk-expenseList">
+                    {expenses.slice(0, 4).map((e) => (
+                      <div key={e.id} className="sk-expenseItem">
+                        <Text className="sk-expenseNote">{e.note}</Text>
+                        <Text className="sk-expenseAmt">
+                          -${formatMoney(e.amount)}
+                        </Text>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </Card>
           </div>
+        </div>
+
+        {/* Travelers Drawer */}
+        <Drawer
+          title="Travelers & Rooms"
+          open={travDrawerOpen}
+          onClose={() => setTravDrawerOpen(false)}
+          placement="right"
+        >
+          <Space direction="vertical" size={14} style={{ width: "100%" }}>
+            <div className="sk-drawerRow">
+              <Text>Adults</Text>
+              <InputNumber
+                min={1}
+                value={adults}
+                onChange={(v) => setAdults(Number(v || 1))}
+              />
+            </div>
+            <div className="sk-drawerRow">
+              <Text>Children</Text>
+              <InputNumber
+                min={0}
+                value={children}
+                onChange={(v) => setChildren(Number(v || 0))}
+              />
+            </div>
+            <div className="sk-drawerRow">
+              <Text>Rooms</Text>
+              <InputNumber
+                min={1}
+                value={rooms}
+                onChange={(v) => setRooms(Number(v || 1))}
+              />
+            </div>
+
+            <Divider />
+
+            <Space>
+              <Button
+                className="sk-pillBtn"
+                onClick={() => setTravDrawerOpen(false)}
+              >
+                Done
+              </Button>
+            </Space>
+          </Space>
+        </Drawer>
+
+        {/* Team Travel Modal */}
+        <Modal
+          open={teamTravelOpen}
+          onCancel={() => setTeamTravelOpen(false)}
+          footer={null}
+          centered
+          title="Team Travel"
+        >
+          <Text style={{ display: "block", marginBottom: 10 }}>
+            Built for groups. Assign room roles, auto-fill rooms, and keep
+            everyone aligned.
+          </Text>
+
+          <Space direction="vertical" size={10} style={{ width: "100%" }}>
+            <Button
+              type="primary"
+              className="sk-cta"
+              icon={<TeamOutlined />}
+              onClick={() => {
+                message.success({
+                  content: "Team Travel saved for this trip (demo).",
+                  className: "sk-toast",
+                });
+                setTeamTravelOpen(false);
+              }}
+              block
+            >
+              Enable Team Travel for this search
+            </Button>
+
+            <Button
+              className="sk-pillBtn"
+              onClick={() => setTeamTravelOpen(false)}
+              block
+            >
+              Not now
+            </Button>
+          </Space>
+        </Modal>
+
+        {/* Why Modal */}
+        <Modal
+          open={whyOpen}
+          onCancel={closeWhy}
+          footer={null}
+          centered
+          title={whyContent?.title || "Why?"}
+        >
+          <Space direction="vertical" size={10} style={{ width: "100%" }}>
+            {(whyContent?.body || []).map((line, idx) => (
+              <Text key={idx} style={{ display: "block" }}>
+                {line}
+              </Text>
+            ))}
+
+            <Divider />
+
+            <Space style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button className="sk-pillBtn" onClick={closeWhy}>
+                Got it
+              </Button>
+            </Space>
+          </Space>
+        </Modal>
+
+        {/* Guided Tour */}
+        <Tour
+          open={tourOpen}
+          onClose={() => closeTour(true)}
+          steps={tourSteps}
+          placement="bottom"
+          mask
+          closable
+          rootClassName="sk-tour"
+          indicatorsRender={(current, total) => (
+            <span style={{ fontWeight: 900, opacity: 0.9 }}>
+              {current + 1} / {total}
+            </span>
+          )}
+          footer={(props, { current }) => (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 10,
+              }}
+            >
+              <Button className="sk-pillBtn" onClick={() => closeTour(true)}>
+                Skip
+              </Button>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <Button className="sk-pillBtn" onClick={() => closeTour(true)}>
+                  Don’t show again
+                </Button>
+
+                <Button
+                  type="primary"
+                  className="sk-cta"
+                  onClick={() => {
+                    if (current === tourSteps.length - 1) closeTour(true);
+                    else props.onNext();
+                  }}
+                >
+                  {current === tourSteps.length - 1 ? "Got it" : "Next"}
+                </Button>
+              </div>
+            </div>
+          )}
+        />
+
+        <div className="sk-footerMark">
+          <Text>© {new Date().getFullYear()} Skyrio</Text>
         </div>
       </Content>
     </Layout>
   );
+}
+
+function formatMoney(n) {
+  const num = Number(n || 0);
+  return num.toLocaleString(undefined, { maximumFractionDigits: 0 });
+}
+
+function travellersLabelSafe(label) {
+  return label || "Travelers";
 }

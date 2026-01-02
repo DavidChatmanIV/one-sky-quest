@@ -7,7 +7,7 @@ import "../styles/Navbar.css";
 import logo from "../assets/logo/skyrio-logo.png";
 
 // ✅ NEW: your global auth + modal controller
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../auth/useAuth";
 import { useAuthModal } from "../auth/AuthModalController";
 
 const navItems = [

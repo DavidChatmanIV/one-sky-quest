@@ -3,15 +3,21 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ConfigProvider } from "antd";
 
+/* ============================= */
 /* Providers */
+/* ============================= */
 import { AssistantProvider } from "./context";
-import AuthProvider from "./auth/AuthProvider.jsx";
-import AuthModalProvider from "./auth/AuthModalController.jsx";
+import AuthProvider from "./auth/AuthProvider";
+import AuthModalProvider from "./auth/AuthModalController";
 
+/* ============================= */
 /* Routes */
+/* ============================= */
 import AppRoutes from "./AppRoutes";
 
+/* ============================= */
 /* CSS load order */
+/* ============================= */
 import "antd/dist/reset.css";
 import "./style.css";
 
@@ -27,7 +33,12 @@ import "./styles/surfaces.css";
 import "./styles/OverlayTone.css";
 import "./styles/theme.css";
 
-createRoot(document.getElementById("root")).render(
+/* ============================= */
+/* Render */
+/* ============================= */
+const root = document.getElementById("root");
+
+createRoot(root).render(
   <React.StrictMode>
     <AuthProvider>
       <AuthModalProvider>
