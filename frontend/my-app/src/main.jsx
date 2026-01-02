@@ -7,8 +7,9 @@ import { ConfigProvider } from "antd";
 /* Providers */
 /* ============================= */
 import { AssistantProvider } from "./context";
-import AuthProvider from "./auth/AuthProvider.jsx";
-import AuthModalProvider from "./auth/AuthModalController.jsx";
+import AuthProvider from "@/auth/AuthProvider.jsx";
+import AuthModalProvider from "@/auth/AuthModalController.jsx";
+
 
 /* ============================= */
 /* Routes */
