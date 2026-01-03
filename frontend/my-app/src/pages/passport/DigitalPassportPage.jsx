@@ -29,6 +29,9 @@ import {
 
 import { io } from "socket.io-client";
 
+/* ✅ IMPORTANT: load Passport CSS on this route */
+import "../../styles/profile-passport.css";
+
 import ProfileMusicModal, {
   SKYRIO_PROFILE_MUSIC_KEY,
 } from "./music/ProfileMusicModal";
@@ -46,7 +49,7 @@ import Membership from "./Membership";
 /* Followers/Following Modal */
 import FollowersModal from "./FollowersModal";
 
-/* Top 8 (same folder) */
+/* Top 8 */
 import TopEight from "./TopEight";
 import TopEightItemFriend from "./TopEightItemFriend";
 import TopEightItemPlace from "./TopEightItemPlace";
@@ -58,7 +61,7 @@ import { useAuth } from "../../hooks/useAuth";
 import RewardsOptInPrompt from "../../components/rewards/RewardsOptInPrompt";
 import useRewardsOptInPrompt from "../../hooks/useRewardsOptInPrompt";
 
-/* ✅ Soft-block gate + guest banner (paths FIXED) */
+/* ✅ Soft-block gate + guest banner */
 import RequireAuthBlock from "../../auth/RequireAuthBlock";
 import GuestBanner from "../../components/GuestBanner";
 
@@ -86,8 +89,6 @@ function makeReferralCode(user) {
 
 export default function DigitalPassportPage() {
   const auth = useAuth();
-
-  /* Rewards opt-in hook */
   const rewardsOptIn = useRewardsOptInPrompt();
 
   const [musicOpen, setMusicOpen] = useState(false);
@@ -98,7 +99,6 @@ export default function DigitalPassportPage() {
   const [xpToNextBadge, setXpToNextBadge] = useState(0);
   const [nextBadgeName, setNextBadgeName] = useState("Wanderer");
 
-  /* Follow counts + modal control */
   const [passportStats, setPassportStats] = useState({
     followers: 0,
     following: 0,
@@ -106,13 +106,9 @@ export default function DigitalPassportPage() {
   const [followOpen, setFollowOpen] = useState(false);
   const [followMode, setFollowMode] = useState("following"); // "following" | "followers"
 
-  /* Socket ref (prevents reconnect loops) */
   const socketRef = useRef(null);
 
-  /* Rewards enabled for signed-in user */
   const rewardsEnabled = !!auth?.user?.settings?.rewardsEnabled;
-
-  /* ---------- derived display ---------- */
 
   const displayName = useMemo(() => {
     const u = auth?.user;
@@ -136,8 +132,6 @@ export default function DigitalPassportPage() {
     const u = auth?.user;
     return u?._id || u?.id || null;
   }, [auth?.user]);
-
-  /* ---------- TOP 8 (soft-launch mock) ---------- */
 
   const canEditTop8 = !!auth?.user;
 
@@ -172,7 +166,6 @@ export default function DigitalPassportPage() {
   );
 
   /* ---------- profile music ---------- */
-
   useEffect(() => {
     try {
       const raw = localStorage.getItem(SKYRIO_PROFILE_MUSIC_KEY);
@@ -183,18 +176,13 @@ export default function DigitalPassportPage() {
   }, []);
 
   /* ---------- profile data (SAFE) ---------- */
-
   useEffect(() => {
     let ignore = false;
 
     (async () => {
       try {
-        const res = await fetch("/api/profile/me", {
-          credentials: "include",
-        });
-
+        const res = await fetch("/api/profile/me", { credentials: "include" });
         if (!res.ok) throw new Error("profile fetch failed");
-
         const data = await res.json();
         if (ignore) return;
 
@@ -234,9 +222,7 @@ export default function DigitalPassportPage() {
           });
         }
       } catch {
-        if (!ignore) {
-          setPassportStats({ followers: 0, following: 0 });
-        }
+        if (!ignore) setPassportStats({ followers: 0, following: 0 });
       }
     })();
 
@@ -254,8 +240,6 @@ export default function DigitalPassportPage() {
     }
 
     const s = socketRef.current;
-
-    // join user room
     s.emit("auth:join", { userId: myId });
 
     const handler = (payload) => {
@@ -277,13 +261,11 @@ export default function DigitalPassportPage() {
 
     return () => {
       s.off("social:counts:update", handler);
-      // Keep socket open during page life (prevents flicker)
     };
   }, [myId]);
 
   const xpPercent = useMemo(() => {
     if (!xpToNextBadge) return 0;
-    // soft-launch: simple percent
     return Math.round((Math.min(xp, 1000) / 1000) * 100);
   }, [xp, xpToNextBadge]);
 
@@ -306,24 +288,24 @@ export default function DigitalPassportPage() {
     }
   }, [referralCode]);
 
-  /* ---------------- Passport content (wrapped by soft-block) ---------------- */
+  /* ---------------- Passport content ---------------- */
 
   const PassportContent = (
     <>
-      {/* Rewards Opt-in Prompt */}
       <RewardsOptInPrompt
         open={rewardsOptIn.open}
         onClose={rewardsOptIn.close}
         onConfirm={rewardsOptIn.confirm}
       />
 
+      {/* ✅ Real page wrapper for layout */}
       <div className="passport-wrap">
         {/* HEADER */}
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Card className="passport-hero">
+            <Card className="passport-hero" bordered={false}>
               <Space align="center" size={16} style={{ width: "100%" }}>
-                <Avatar size={64} icon={<UserOutlined />} />
+                <Avatar size={64} icon={<UserOutlined />} className="tp-avatar" />
 
                 <div style={{ minWidth: 260 }}>
                   <Title level={3} style={{ margin: 0 }}>
@@ -402,16 +384,13 @@ export default function DigitalPassportPage() {
             <PassportIdentity />
             <PassportHighlights />
 
-            {/* TOP 8 */}
             <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
               <Col xs={24} lg={12}>
                 <TopEight
                   title="Top 8 Friends"
                   subtitle="Your inner circle"
                   canEdit={canEditTop8}
-                  storageKey={`skyrio_top8_friends_${
-                    auth?.user?.id || "guest"
-                  }`}
+                  storageKey={`skyrio_top8_friends_${auth?.user?.id || "guest"}`}
                   defaultItems={top8Friends}
                   renderItem={(item, ctx) => (
                     <TopEightItemFriend {...item} isDragging={ctx.isDragging} />
@@ -433,8 +412,7 @@ export default function DigitalPassportPage() {
               </Col>
             </Row>
 
-            {/* XP */}
-            <Card style={{ marginTop: 16 }}>
+            <Card style={{ marginTop: 16 }} bordered={false} className="osq-surface">
               <Space direction="vertical" style={{ width: "100%" }}>
                 <Title level={5}>XP Progress</Title>
                 <Progress
@@ -468,9 +446,8 @@ export default function DigitalPassportPage() {
             <Membership />
             <SkyrioExchange showSearch={false} />
 
-            {/* Seasonal Rewards gated by rewardsEnabled */}
             {rewardsEnabled ? (
-              <Card style={{ marginTop: 16 }}>
+              <Card style={{ marginTop: 16 }} bordered={false} className="osq-surface">
                 <Title level={5} style={{ marginBottom: 6 }}>
                   Seasonal Rewards
                 </Title>
@@ -502,7 +479,7 @@ export default function DigitalPassportPage() {
                 </div>
               </Card>
             ) : (
-              <Card style={{ marginTop: 16 }}>
+              <Card style={{ marginTop: 16 }} bordered={false} className="osq-surface">
                 <Title level={5} style={{ marginBottom: 6 }}>
                   Rewards are off
                 </Title>
@@ -513,31 +490,21 @@ export default function DigitalPassportPage() {
                 </Text>
 
                 <div style={{ marginTop: 12 }}>
-                  <Button
-                    type="primary"
-                    onClick={() => rewardsOptIn.confirm(true)}
-                  >
+                  <Button type="primary" onClick={() => rewardsOptIn.confirm(true)}>
                     Turn on Rewards
                   </Button>
                 </div>
               </Card>
             )}
 
-            {/* Invite & Earn */}
-            <Card style={{ marginTop: 16 }}>
+            <Card style={{ marginTop: 16 }} bordered={false} className="osq-surface">
               <Title level={5}>Invite & Earn</Title>
               <Space wrap>
-                <Input
-                  value={referralCode}
-                  readOnly
-                  style={{ minWidth: 280 }}
-                />
+                <Input value={referralCode} readOnly style={{ minWidth: 280 }} />
                 <Button icon={<CopyOutlined />} onClick={copyReferral} />
                 <Button
                   icon={<ShareAltOutlined />}
-                  onClick={() =>
-                    antdMessage.info("Sharing enabled post-launch")
-                  }
+                  onClick={() => antdMessage.info("Sharing enabled post-launch")}
                 />
               </Space>
             </Card>
@@ -547,7 +514,6 @@ export default function DigitalPassportPage() {
         <PassportFooter />
       </div>
 
-      {/* Followers/Following modal */}
       <FollowersModal
         open={followOpen}
         onClose={() => setFollowOpen(false)}
@@ -565,14 +531,12 @@ export default function DigitalPassportPage() {
   /* ---------------- render ---------------- */
 
   return (
-    <>
-      {/* ✅ Always visible (soft launch) */}
+    /* ✅ NEW: scope wrapper that also covers RequireAuthBlock gate */
+    <div className="passport-scope">
       <GuestBanner />
-
-      {/* ✅ Soft-block gate (no redirects) */}
       <RequireAuthBlock feature="your Passport">
         {PassportContent}
       </RequireAuthBlock>
-    </>
+    </div>
   );
 }

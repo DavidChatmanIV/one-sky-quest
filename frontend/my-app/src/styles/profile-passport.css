@@ -1,3 +1,4 @@
+
 :root {
   --bg-start: #0f1020;
   --bg-mid: #231a3a;
@@ -5,7 +6,6 @@
 
   --surface: rgba(255, 255, 255, 0.06);
   --surface-2: rgba(255, 255, 255, 0.08);
-  --glass: rgba(255, 255, 255, 0.06);
 
   --text: #f4f6fb;
   --muted: rgba(244, 246, 251, 0.78);
@@ -13,233 +13,134 @@
   --cta: #ff8a2a;
   --cta-hover: #ff7a00;
 
-  --success: #18b26a;
-  --danger: #ff5a5a;
-
   --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   --stroke: rgba(255, 255, 255, 0.10);
 }
 
-/* =========================================================
-   Page Wrapper
-   ========================================================= */
+/* =============================
+   Route Scope (MOST IMPORTANT)
+   ============================= */
+.passport-scope {
+  color: var(--text);
+}
+
+/* HARD LOCK: stop dark text anywhere inside passport route */
+.passport-scope,
+.passport-scope * {
+  color: var(--text) !important;
+}
+
+/* Ant Typography */
+.passport-scope .ant-typography,
+.passport-scope .ant-typography * {
+  color: var(--text) !important;
+}
+
+.passport-scope .ant-typography-secondary,
+.passport-scope .ant-text-secondary,
+.passport-scope .ant-form-item-explain,
+.passport-scope .ant-form-item-extra {
+  color: var(--muted) !important;
+}
+
+/* ✅ Critical fix: Ant Card Body */
+.passport-scope .ant-card,
+.passport-scope .ant-card-body,
+.passport-scope .ant-card-body * {
+  color: var(--text) !important;
+}
+
+/* =============================
+   Page Wrapper (layout)
+   ============================= */
 .passport-wrap {
   max-width: 1180px;
   margin: 0 auto;
   padding: 12px 16px 24px;
-  color: var(--text);
 }
 
-/* =========================================================
-   Utility Helpers
-   ========================================================= */
-.sk-row { display: flex; align-items: center; gap: 10px; }
-.sk-row-between { justify-content: space-between; }
-.sk-mb-2 { margin-bottom: 8px; }
-.muted { color: var(--muted) !important; }
+/* =============================
+   Gate (RequireAuthBlock) Premium
+   Works if you updated RequireAuthBlock to add classes,
+   BUT still looks good even without it.
+   ============================= */
 
-/* =========================================================
-   Skyrio – Passport + SkyStream + Exchange White Text Fix
-   (Scoped to Passport page)
-   ========================================================= */
-.passport-wrap,
-.passport-wrap * {
-  color: var(--text);
+/* If you updated RequireAuthBlock.jsx with sk-authBlockCard */
+.passport-scope .sk-authBlock {
+  margin-top: 16px;
 }
 
-/* Typography defaults */
-.passport-wrap .ant-typography,
-.passport-wrap .ant-typography * {
-  color: var(--text) !important;
-}
-
-/* Common “secondary” text */
-.passport-wrap .ant-typography-secondary,
-.passport-wrap .ant-text-secondary,
-.passport-wrap .ant-form-item-explain,
-.passport-wrap .ant-form-item-extra {
-  color: var(--muted) !important;
-}
-
-/* Cards / Panels */
-.passport-wrap .ant-card,
-.passport-wrap .ant-card * {
-  color: var(--text) !important;
-}
-
-/* Tabs */
-.passport-wrap .ant-tabs-tab,
-.passport-wrap .ant-tabs-tab-btn {
-  color: rgba(255,255,255,0.78) !important;
-}
-.passport-wrap .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #fff !important;
-}
-
-/* Inputs */
-.passport-wrap .ant-input,
-.passport-wrap .ant-input-affix-wrapper,
-.passport-wrap input {
-  color: #fff !important;
-  background: rgba(255,255,255,0.08) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-}
-.passport-wrap .ant-input::placeholder,
-.passport-wrap input::placeholder {
-  color: rgba(255,255,255,0.55) !important;
-}
-.passport-wrap .ant-input-prefix,
-.passport-wrap .ant-input-suffix {
-  color: rgba(255,255,255,0.65) !important;
-}
-
-/* Empty */
-.passport-wrap .ant-empty-description {
-  color: rgba(255,255,255,0.78) !important;
-}
-
-/* Segmented */
-.passport-wrap .ant-segmented,
-.passport-wrap .ant-segmented * {
-  color: rgba(255,255,255,0.85) !important;
-}
-
-/* Buttons */
-.passport-wrap .ant-btn,
-.passport-wrap .ant-btn span {
-  color: #fff !important;
-}
-
-/* =========================================================
-   Glass Surfaces
-   ========================================================= */
-.osq-surface {
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  border: 1px solid var(--stroke);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
-}
-
-/* =========================================================
-   Ant Design Overrides (Scoped)
-   ========================================================= */
-.passport-wrap .ant-segmented {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-.passport-wrap .ant-segmented-item-label {
-  color: rgba(255,255,255,0.85);
-  font-weight: 600;
-}
-.passport-wrap .ant-segmented-item-selected {
-  background: rgba(255,255,255,0.16);
-}
-.passport-wrap .ant-segmented-item-selected .ant-segmented-item-label {
-  color: #fff;
-}
-
-.passport-wrap .ant-tag {
-  color: #fff !important;
-  background: rgba(255,255,255,0.12) !important;
-  border: 1px solid rgba(255,255,255,0.16) !important;
-  font-weight: 800 !important;
-}
-
-/* =========================================================
-   Travel Passport Header
-   ========================================================= */
-.tp-card {
-  border-radius: 18px;
+.passport-scope .sk-authBlockCard {
+  border-radius: 18px !important;
   background: linear-gradient(
     135deg,
     rgba(120, 90, 255, 0.18),
     rgba(255, 138, 42, 0.10)
-  );
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: var(--shadow);
+  ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: var(--shadow) !important;
   backdrop-filter: blur(12px);
-  margin-bottom: 12px;
 }
 
-.tp-title {
-  color: rgba(255, 138, 42, 0.95);
-  font-weight: 900;
-  letter-spacing: 0.08em;
+/* Fallback: if RequireAuthBlock has no class yet */
+.passport-scope > .ant-card {
+  border-radius: 18px !important;
+  background: linear-gradient(
+    135deg,
+    rgba(120, 90, 255, 0.18),
+    rgba(255, 138, 42, 0.10)
+  ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(12px);
 }
 
-.tp-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* =============================
+   Passport Hero
+   ============================= */
+.passport-hero {
+  border-radius: 18px !important;
+  background: linear-gradient(
+    135deg,
+    rgba(120, 90, 255, 0.16),
+    rgba(255, 138, 42, 0.08)
+  ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(12px);
 }
 
-.tp-tier {
-  color: #111 !important;
-  background: rgba(255, 255, 255, 0.88) !important;
-  font-weight: 900;
-  border: none !important;
-}
-
-.tp-id { display: flex; gap: 14px; align-items: center; }
 .tp-avatar {
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.18);
-}
-.tp-name { color: #fff !important; font-weight: 900; }
-.tp-tagline {
-  color: rgba(255,255,255,0.78);
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
-.tp-chips { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.chip {
-  background: rgba(255,255,255,0.14) !important;
-  border: 1px solid rgba(255,255,255,0.18) !important;
-  color: #fff !important;
-  font-weight: 800;
+/* =============================
+   Glass Surface Utility
+   ============================= */
+.osq-surface {
+  border-radius: 16px !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.03)
+  ) !important;
+  border: 1px solid var(--stroke) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(10px);
 }
 
-/* =========================================================
-   Passport Meta
-   ========================================================= */
-.passport-meta {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-.passport-meta__row {
-  display: grid;
-  grid-template-columns: auto 1fr auto 1fr;
-  gap: 10px;
-  font-size: 12px;
-}
-.passport-meta__k {
-  color: rgba(244,246,251,0.70);
-  font-weight: 800;
-}
-.passport-meta__v {
-  color: rgba(244,246,251,0.92);
-  font-weight: 900;
-}
-
-/* =========================================================
-   Following / Followers (Passport header mini-stats)
-   ========================================================= */
-
-.passport-social{
+/* =============================
+   Social buttons
+   ============================= */
+.passport-social {
   display: flex;
   gap: 10px;
   margin-top: 10px;
   flex-wrap: wrap;
 }
 
-.passport-socialBtn{
+.passport-socialBtn {
   appearance: none;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
@@ -253,7 +154,7 @@
   backdrop-filter: blur(10px);
 }
 
-.passport-socialBtn strong{
+.passport-socialBtn strong {
   display: block;
   font-size: 18px;
   line-height: 1.05;
@@ -261,7 +162,7 @@
   color: #fff !important;
 }
 
-.passport-socialBtn span{
+.passport-socialBtn span {
   display: block;
   font-size: 12px;
   font-weight: 800;
@@ -269,244 +170,78 @@
   color: rgba(244,246,251,0.75) !important;
 }
 
-.passport-socialBtn:hover{
+.passport-socialBtn:hover {
   border-color: rgba(255,138,42,0.45);
   background: rgba(255,138,42,0.10);
   transform: translateY(-1px);
 }
 
-.passport-socialBtn:active{
-  transform: translateY(0px);
+/* =============================
+   Tabs
+   ============================= */
+.passport-scope .ant-tabs-tab-btn {
+  color: rgba(255,255,255,0.78) !important;
+}
+.passport-scope .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #fff !important;
 }
 
-.passport-socialBtn:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(255,138,42,0.18);
-  border-color: rgba(255,138,42,0.55);
-}
-
-/* =========================================================
-   Music Embed + Preview
-   ========================================================= */
-.music-embed,
-.music-preview {
-  border-radius: 14px;
-  overflow: hidden;
-  background: rgba(0,0,0,0.22);
+/* =============================
+   Segmented
+   ============================= */
+.passport-scope .ant-segmented {
+  background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
 }
 
-.music-empty {
-  border-radius: 14px;
-  padding: 12px;
-  background: rgba(0,0,0,0.16);
-  border: 1px dashed rgba(255,255,255,0.14);
+.passport-scope .ant-segmented-item-label {
+  color: rgba(255,255,255,0.85);
+  font-weight: 700;
 }
 
-/* =========================================================
-   ✨ READABLE MODAL (Profile Music + future modals)
-   Usage: <Modal wrapClassName="sk-modal-readable" />
-   ========================================================= */
-
-/* modal shell */
-.sk-modal-readable .ant-modal-content {
-  background: rgba(14, 12, 26, 0.92) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.55) !important;
-  backdrop-filter: blur(10px);
-  border-radius: 16px !important;
-  color: var(--text) !important;
+.passport-scope .ant-segmented-item-selected {
+  background: rgba(255,255,255,0.16);
 }
 
-/* header */
-.sk-modal-readable .ant-modal-header {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: 16px 16px 0 0 !important;
-}
-.sk-modal-readable .ant-modal-title {
-  color: rgba(244,246,251,0.95) !important;
-  font-weight: 900 !important;
+.passport-scope .ant-segmented-item-selected .ant-segmented-item-label {
+  color: #fff;
 }
 
-/* close */
-.sk-modal-readable .ant-modal-close,
-.sk-modal-readable .ant-modal-close-x {
-  color: rgba(244,246,251,0.85) !important;
-}
-.sk-modal-readable .ant-modal-close:hover,
-.sk-modal-readable .ant-modal-close:focus-visible {
+/* =============================
+   Inputs
+   ============================= */
+.passport-scope .ant-input,
+.passport-scope .ant-input-affix-wrapper,
+.passport-scope input {
   color: #fff !important;
-}
-
-/* body typography */
-.sk-modal-readable .ant-modal-body {
-  color: rgba(244,246,251,0.88) !important;
-}
-.sk-modal-readable .ant-typography,
-.sk-modal-readable .ant-typography * {
-  color: rgba(244,246,251,0.88) !important;
-}
-/* Ant "secondary" text is often too dim on glass */
-.sk-modal-readable .ant-typography.ant-typography-secondary,
-.sk-modal-readable .ant-typography-secondary {
-  color: rgba(244,246,251,0.72) !important;
-}
-
-/* inputs */
-.sk-modal-readable .ant-input,
-.sk-modal-readable .ant-input-affix-wrapper,
-.sk-modal-readable input {
   background: rgba(255,255,255,0.08) !important;
-  border: 1px solid rgba(255,255,255,0.16) !important;
-  color: rgba(244,246,251,0.92) !important;
-  border-radius: 12px !important;
-}
-
-.sk-modal-readable .ant-input::placeholder,
-.sk-modal-readable input::placeholder {
-  color: rgba(244,246,251,0.55) !important;
-}
-
-/* focus ring */
-.sk-modal-readable .ant-input:focus,
-.sk-modal-readable .ant-input-focused,
-.sk-modal-readable .ant-input-affix-wrapper-focused {
-  border-color: rgba(255,138,42,0.65) !important;
-  box-shadow: 0 0 0 3px rgba(255,138,42,0.18) !important;
-}
-
-/* segmented */
-.sk-modal-readable .ant-segmented {
-  background: rgba(255,255,255,0.07) !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: 999px !important;
-}
-.sk-modal-readable .ant-segmented-item-label {
-  color: rgba(244,246,251,0.80) !important;
-  font-weight: 800 !important;
-}
-.sk-modal-readable .ant-segmented-item-selected {
-  background: rgba(255,138,42,0.22) !important;
-  border-radius: 999px !important;
-}
-.sk-modal-readable .ant-segmented-item-selected .ant-segmented-item-label {
-  color: #fff !important;
-}
-
-/* footer + buttons */
-.sk-modal-readable .ant-modal-footer {
-  border-top: 1px solid rgba(255,255,255,0.12) !important;
-}
-
-.sk-modal-readable .ant-btn-default {
-  background: rgba(255,255,255,0.10) !important;
   border: 1px solid rgba(255,255,255,0.14) !important;
+}
+
+.passport-scope .ant-input::placeholder,
+.passport-scope input::placeholder {
+  color: rgba(255,255,255,0.55) !important;
+}
+
+/* =============================
+   Buttons
+   ============================= */
+.passport-scope .ant-btn,
+.passport-scope .ant-btn span {
   color: #fff !important;
-  font-weight: 800 !important;
-  border-radius: 12px !important;
-}
-.sk-modal-readable .ant-btn-primary {
-  background: linear-gradient(135deg, var(--cta), #ff6b6b) !important;
-  border: none !important;
-  color: #fff !important;
-  font-weight: 900 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.25) !important;
 }
 
-/* modal overlay */
-.ant-modal-root .ant-modal-mask {
-  background: rgba(0,0,0,0.60) !important;
-  backdrop-filter: blur(6px);
+/* If your primary button is bright, dark text looks premium */
+.passport-scope .ant-btn-primary,
+.passport-scope .ant-btn-primary span {
+  color: #1b1024 !important;
 }
 
-/* =========================================================
-   Followers / Following Modal (matches Skyrio glass)
-   ========================================================= */
-
-/* If you set: className="sk-followModal sk-modal-readable" this blends perfectly */
-.sk-followModal .ant-modal-content{
-  background: rgba(14, 12, 26, 0.92) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.55) !important;
-  backdrop-filter: blur(10px);
-  border-radius: 16px !important;
-  color: var(--text) !important;
-}
-
-.sk-followModal .ant-modal-header{
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: 16px 16px 0 0 !important;
-}
-
-.sk-followModal .ant-modal-title{
-  color: rgba(244,246,251,0.95) !important;
-  font-weight: 900 !important;
-}
-
-.sk-followModal .ant-modal-close,
-.sk-followModal .ant-modal-close-x{
-  color: rgba(244,246,251,0.85) !important;
-}
-
-.sk-followModal .ant-modal-body{
-  color: rgba(244,246,251,0.88) !important;
-}
-
-/* List rows */
-.sk-followRow{
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-}
-
-.sk-followRow .ant-list-item-meta-title{
-  margin-bottom: 2px;
-}
-
-.sk-followName{
-  color: #fff !important;
-  font-weight: 900 !important;
-}
-
-.sk-followHandle{
-  color: rgba(244,246,251,0.70) !important;
-  font-weight: 800 !important;
-}
-
-.sk-officialTag{
-  border-radius: 999px !important;
-  border: 1px solid rgba(255,255,255,0.16) !important;
-  background: rgba(255,255,255,0.08) !important;
-  color: rgba(244,246,251,0.88) !important;
-  font-weight: 900 !important;
-}
-
-/* Row action button */
-.sk-followBtn{
-  background: rgba(255,255,255,0.10) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  color: #fff !important;
-  font-weight: 900 !important;
-  border-radius: 12px !important;
-}
-
-.sk-followBtn:hover{
-  border-color: rgba(255,138,42,0.45) !important;
-  background: rgba(255,138,42,0.12) !important;
-}
-
-/* Loading center */
-.sk-followLoading{
-  display: flex;
-  justify-content: center;
-  padding: 18px 0;
-}
-
-/* =========================================================
+/* =============================
    Responsive
-   ========================================================= */
+   ============================= */
 @media (max-width: 768px) {
-  .tp-chips { justify-content: center; }
-  .passport-meta__row { grid-template-columns: 1fr 1fr; }
+  .passport-wrap {
+    padding: 12px 12px 24px;
+  }
 }
