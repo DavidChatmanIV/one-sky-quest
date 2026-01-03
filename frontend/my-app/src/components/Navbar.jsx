@@ -58,6 +58,13 @@ export default function Navbar() {
     );
   }, [user, isGuest]);
 
+  const navTheme = useMemo(() => {
+    if (pathname.startsWith("/passport")) return "theme-passport";
+    if (pathname.startsWith("/booking")) return "theme-book";
+    if (pathname.startsWith("/skystream")) return "theme-skystream";
+    return "theme-discover";
+  }, [pathname]);
+
   const handleLogout = () => {
     if (auth?.logout) auth.logout();
     else {
@@ -96,11 +103,14 @@ export default function Navbar() {
       reason: "Create an account to save trips and join SkyStream.",
     });
 
-  // ✅ Keep text OFF for now (your logo already carries brand)
   const SHOW_BRAND_TEXT = false;
 
   return (
-    <header className={`sk-nav ${scrolled ? "is-scrolled is-compact" : ""}`}>
+    <header
+      className={`sk-nav ${navTheme} ${
+        scrolled ? "is-scrolled is-compact" : ""
+      }`}
+    >
       <div className="sk-nav-inner">
         {/* LEFT */}
         <div className="sk-left">
@@ -108,7 +118,7 @@ export default function Navbar() {
             className="sk-brand"
             onClick={() => navigate("/")}
             type="button"
-            aria-label="Home"
+            aria-label="Go to homepage"
           >
             <img src={logo} alt="Skyrio" className="sk-logoImg" />
             {SHOW_BRAND_TEXT ? (
@@ -119,7 +129,8 @@ export default function Navbar() {
 
         {/* CENTER */}
         <nav className="sk-centerNav" aria-label="Primary">
-          <div className="sk-links">
+          {/* ✅ New wrapper (this is what we style now) */}
+          <div className="sk-navPills">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -180,7 +191,6 @@ export default function Navbar() {
                         aria-label="Account menu"
                       >
                         <Avatar
-                          az
                           size={34}
                           src={user?.avatarUrl}
                           icon={!user?.avatarUrl ? <UserOutlined /> : null}
@@ -192,7 +202,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile hamburger */}
+            {/* MOBILE */}
             <button
               className={`hamburger ${mobileOpen ? "is-open" : ""}`}
               onClick={() => setMobileOpen((v) => !v)}
@@ -208,7 +218,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Optional glow line (now subtle) */}
       <div className="sk-glowline" />
 
       {/* MOBILE PANEL */}
@@ -249,6 +258,7 @@ export default function Navbar() {
                   Upgrade
                 </Button>
               ) : null}
+
               <Button danger onClick={handleLogout}>
                 Log out
               </Button>
