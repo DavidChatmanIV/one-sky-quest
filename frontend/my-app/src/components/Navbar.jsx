@@ -13,7 +13,7 @@ const navItems = [
   { label: "Discover", to: "/" },
   { label: "Book", to: "/booking" },
   { label: "SkyStream", to: "/skystream" },
-  { label: "Passport", to: "/passport", className: "passport-pill" },
+  { label: "Passport", to: "/passport" },
 ];
 
 export default function Navbar() {
@@ -43,7 +43,7 @@ export default function Navbar() {
   useEffect(() => setMobileOpen(false), [pathname]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -96,7 +96,7 @@ export default function Navbar() {
       reason: "Create an account to save trips and join SkyStream.",
     });
 
-  // ✅ If you consider the "Skyrio" text a second logo, toggle it off here:
+  // ✅ Keep text OFF for now (your logo already carries brand)
   const SHOW_BRAND_TEXT = false;
 
   return (
@@ -104,13 +104,20 @@ export default function Navbar() {
       <div className="sk-nav-inner">
         {/* LEFT */}
         <div className="sk-left">
-          <button className="sk-brand" onClick={() => navigate("/")} type="button">
+          <button
+            className="sk-brand"
+            onClick={() => navigate("/")}
+            type="button"
+            aria-label="Home"
+          >
             <img src={logo} alt="Skyrio" className="sk-logoImg" />
-            {SHOW_BRAND_TEXT ? <span className="sk-logoText">Skyrio</span> : null}
+            {SHOW_BRAND_TEXT ? (
+              <span className="sk-logoText">Skyrio</span>
+            ) : null}
           </button>
         </div>
 
-        {/* CENTER (TRUE CENTER) */}
+        {/* CENTER */}
         <nav className="sk-centerNav" aria-label="Primary">
           <div className="sk-links">
             {navItems.map((item) => (
@@ -119,12 +126,10 @@ export default function Navbar() {
                 to={item.to}
                 end={item.to === "/"}
                 className={({ isActive }) =>
-                  `sk-link ${item.className || ""} ${
-                    isActive ? "is-active" : ""
-                  }`
+                  `sk-link ${isActive ? "is-active" : ""}`
                 }
               >
-                {item.label}
+                <span className="sk-linkLabel">{item.label}</span>
               </NavLink>
             ))}
           </div>
@@ -139,7 +144,6 @@ export default function Navbar() {
                   <Button className="sk-btnGhost" onClick={openLogin}>
                     Log in
                   </Button>
-
                   <Button
                     type="primary"
                     className="sk-btnPrimary"
@@ -170,8 +174,13 @@ export default function Navbar() {
                       trigger={["click"]}
                       overlayClassName="sk-dropdown"
                     >
-                      <button className="sk-avatarBtn" type="button" aria-label="Account menu">
+                      <button
+                        className="sk-avatarBtn"
+                        type="button"
+                        aria-label="Account menu"
+                      >
                         <Avatar
+                          az
                           size={34}
                           src={user?.avatarUrl}
                           icon={!user?.avatarUrl ? <UserOutlined /> : null}
@@ -199,6 +208,7 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Optional glow line (now subtle) */}
       <div className="sk-glowline" />
 
       {/* MOBILE PANEL */}

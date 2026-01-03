@@ -6,11 +6,10 @@ export default function PageLayout({
   fullBleed = true,
   maxWidth = 1180,
   className = "",
-  withNavOffset = true,
+  withNavOffset = false, // ✅ DEFAULT OFF (IMPORTANT)
 }) {
   const { pathname } = useLocation();
 
-  // Normalize path (removes trailing slashes)
   const cleanPath = useMemo(() => {
     const p = (pathname || "/").replace(/\/+$/, "");
     return p === "" ? "/" : p;
@@ -24,7 +23,6 @@ export default function PageLayout({
       role="main"
       className={[
         "page-root",
-        "no-nav", // navbar handled elsewhere
         isBooking ? "page--booking" : "",
         fullBleed ? "full-bleed" : "constrained",
         withNavOffset ? "with-nav-offset" : "",

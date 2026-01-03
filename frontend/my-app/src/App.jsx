@@ -1,6 +1,9 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
+// Components
+import Navbar from "./components/Navbar"; 
+
 // Pages
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
@@ -13,29 +16,35 @@ import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
-    <main className="app-main">
-      <Routes>
-        {/* Discover */}
-        <Route path="/" element={<LandingPage />} />
+    <div className="app-shell">
+      {/* ✅ Always visible */}
+      <Navbar />
 
-        {/* Auth */}
-        <Route path="/login" element={<LoginPage />} />
+      {/* ✅ Main app content */}
+      <main className="app-main" id="main">
+        <Routes>
+          {/* Discover */}
+          <Route path="/" element={<LandingPage />} />
 
-        {/* Core */}
-        <Route path="/booking" element={<BookingPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/skystream" element={<SkyStreamPage />} />
+          {/* Auth */}
+          <Route path="/login" element={<LoginPage />} />
 
-        {/* Passport ✅ (support both paths to avoid 404) */}
-        <Route path="/passport" element={<DigitalPassportPage />} />
-        <Route path="/digital-passport" element={<DigitalPassportPage />} />
+          {/* Core */}
+          <Route path="/booking" element={<BookingPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/skystream" element={<SkyStreamPage />} />
 
-        {/* Profile */}
-        <Route path="/profile" element={<ProfilePage />} />
+          {/* Passport ✅ */}
+          <Route path="/passport" element={<DigitalPassportPage />} />
+          <Route path="/digital-passport" element={<DigitalPassportPage />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </main>
+          {/* Profile */}
+          <Route path="/profile" element={<ProfilePage />} />
+
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+    </div>
   );
 }

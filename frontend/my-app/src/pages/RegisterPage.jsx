@@ -102,105 +102,159 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="login-wrap">
-      {/* --- Header / Hero --- */}
-      <div className="login-hero">
-        <div className="logo-row">
-          <div className="brand-dot" aria-hidden />
-          <Text className="brand">Skyrio</Text>
-        </div>
-        <Title level={2} className="welcome">
-          Create your Skyrio account
-        </Title>
-        <Text className="tagline">
-          Start earning XP, saving trips, and planning smarter.
-        </Text>
-      </div>
+    <div className="auth-page">
+      {/* Soft background glows */}
+      <div className="glow g1" aria-hidden />
+      <div className="glow g2" aria-hidden />
+      <div className="glow g3" aria-hidden />
 
-      {/* --- Glass card --- */}
-      <div className="login-card-wrap">
-        <div className="passport-stamp" aria-hidden />
-        <Card
-          title="Sign Up"
-          className="login-card"
-          style={{ width: 400, borderRadius: 16, textAlign: "center" }}
-        >
-          <Input
-            placeholder="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange("username")}
-            style={{ marginBottom: 10 }}
-          />
-          <Input
-            placeholder="Full name (optional)"
-            name="name"
-            value={formData.name}
-            onChange={handleChange("name")}
-            style={{ marginBottom: 10 }}
-          />
-          <Input
-            placeholder="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange("email")}
-            style={{ marginBottom: 10 }}
-          />
-          <Input.Password
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange("password")}
-            style={{ marginBottom: 10 }}
-          />
-          <Input.Password
-            placeholder="Confirm password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange("confirmPassword")}
-            style={{ marginBottom: 16 }}
-          />
-
-          <Button
-            type="primary"
-            block
-            loading={loading}
-            onClick={handleRegister}
-            className="cta"
-          >
-            ✈️ Create Account
-          </Button>
-
-          <div style={{ marginTop: 12 }}>
-            <Text type="secondary">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => nav("/login")}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  color: "#40a9ff",
-                  cursor: "pointer",
-                  padding: 0,
-                }}
-              >
-                Log in
-              </button>
-            </Text>
+      <div className="auth-shell">
+        {/* Brand header */}
+        <div className="auth-top">
+          <div className="brand-row">
+            <div className="brand-dot" aria-hidden />
+            <span className="brand-text">Skyrio</span>
           </div>
 
-          {/* a11y live region */}
-          <div aria-live="polite" style={{ height: 0, overflow: "hidden" }}>
+          <Title level={2} className="auth-title">
+            Create your Skyrio account
+          </Title>
+
+          <Text className="auth-subtitle">
+            Start earning XP, saving trips, and planning smarter.
+          </Text>
+        </div>
+
+        {/* Boarding Pass Card (same as login styling) */}
+        <div className="pass" role="form">
+          <div className="pass-notch" aria-hidden />
+
+          <div className="pass-header">
+            <div className="pass-airline">
+              <span className="pass-chip" aria-hidden />
+              <span className="pass-airline-name">Skyrio Sign Up</span>
+            </div>
+
+            <div className="pass-mini">
+              <Text className="pass-mini-label">Gate</Text>
+              <div className="pass-mini-pill">SKY</div>
+            </div>
+          </div>
+
+          <div className="pass-route">
+            <div className="route-col">
+              <Text className="route-label">From</Text>
+              <div className="route-value">Sign Up</div>
+            </div>
+
+            <div className="route-mid" aria-hidden>
+              ✈️
+            </div>
+
+            <div className="route-col right">
+              <Text className="route-label">To</Text>
+              <div className="route-value">Dashboard</div>
+            </div>
+          </div>
+
+          <div className="pass-divider" aria-hidden />
+
+          <div className="pass-form">
+            <Input
+              className="auth-input"
+              placeholder="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange("username")}
+              autoComplete="username"
+            />
+
+            <Input
+              className="auth-input"
+              placeholder="Full name (optional)"
+              name="name"
+              value={formData.name}
+              onChange={handleChange("name")}
+              autoComplete="name"
+            />
+
+            <Input
+              className="auth-input"
+              placeholder="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange("email")}
+              autoComplete="email"
+            />
+
+            <Input.Password
+              className="auth-input"
+              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange("password")}
+              autoComplete="new-password"
+            />
+
+            <Input.Password
+              className="auth-input"
+              placeholder="Confirm password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange("confirmPassword")}
+              autoComplete="new-password"
+            />
+
+            <Button
+              type="primary"
+              block
+              loading={loading}
+              onClick={handleRegister}
+              className="pass-cta"
+            >
+              ✈️ Create Account
+            </Button>
+
+            <div className="pass-secondary">
+              <Text className="pass-secondary-text">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => nav("/login")}
+                  className="link-btn"
+                >
+                  Log in
+                </button>
+              </Text>
+            </div>
+          </div>
+
+          <div className="pass-divider dotted" aria-hidden />
+
+          <div className="pass-barcode" aria-hidden>
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+
+          <div aria-live="polite" className="sr-only">
             {loading ? "Creating your account…" : ""}
           </div>
-        </Card>
-      </div>
+        </div>
 
-      {/* --- Footer --- */}
-      <footer className="login-footer">
-        <Text type="secondary">© {new Date().getFullYear()} Skyrio</Text>
-      </footer>
+        <footer className="auth-footer">
+          <Text className="footer-text">
+            © {new Date().getFullYear()} Skyrio
+          </Text>
+        </footer>
+      </div>
     </div>
   );
 }

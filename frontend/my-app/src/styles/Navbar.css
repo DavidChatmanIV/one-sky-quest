@@ -1,47 +1,88 @@
 /* -------------------------------------------------
-   Skyrio Navbar Shell (Clean + Centered + Responsive)
+   Skyrio Navbar — Premium Passport Glass
 ------------------------------------------------- */
 
 :root {
-  --nav-h: 88px; /* default premium height */
+  --nav-h: 86px;
+
+  /* brand glow */
+  --sk-violet: rgba(120, 90, 255, 0.34);
+  --sk-amber: rgba(255, 138, 42, 0.26);
+
+  --sk-text: rgba(244, 246, 251, 0.92);
+  --sk-muted: rgba(244, 246, 251, 0.72);
+  --sk-stroke: rgba(255, 255, 255, 0.14);
+
+  --sk-glass: rgba(255, 255, 255, 0.06);
+  --sk-glass-2: rgba(255, 255, 255, 0.085);
 }
 
-/* ✅ CLEAN shell (no dark bar) */
+/* =================================================
+   SHELL
+================================================= */
+
 .sk-nav {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 3000;
 
   height: var(--nav-h);
   display: flex;
   align-items: center;
 
-  /* ✅ remove the dark background bar */
   background: transparent;
   border-bottom: none;
 
-  /* ✅ iPhone notch support */
   padding-top: env(safe-area-inset-top);
+  transition: height 220ms ease;
 
-  transition: height 220ms ease, box-shadow 220ms ease;
+  isolation: isolate;
 }
 
-/* ❌ remove the old overlay */
+/* premium haze: softer + melts into hero */
 .sk-nav::before {
-  content: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  background:
+    radial-gradient(1100px 320px at 18% 28%, var(--sk-violet), transparent 62%),
+    radial-gradient(1100px 320px at 84% 22%, var(--sk-amber), transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.025) 58%, rgba(255,255,255,0) 100%);
+
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 48%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 48%, transparent 100%);
+
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
 }
 
-/* Scrolled shrink (still clean) */
+/* top specular line (expensive edge) */
+.sk-nav::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 0;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2;
+
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+  opacity: 0.5;
+}
+
+/* shrink */
 .sk-nav.is-scrolled.is-compact {
   --nav-h: 72px;
-  box-shadow: none;
 }
 
-/* -------------------------------------------------
-   ✅ TRUE CENTER LAYOUT (THIS FIXES IT)
-------------------------------------------------- */
+/* =================================================
+   INNER LAYOUT
+================================================= */
 
-/* The inner row */
 .sk-nav-inner {
   position: relative;
   z-index: 1;
@@ -49,84 +90,67 @@
   max-width: 1280px;
   margin: 0 auto;
 
-  /* ✅ grid guarantees true center */
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* LEFT | CENTER | RIGHT */
+  display: flex;
   align-items: center;
 
-  padding: 0 18px;
+  padding: 0 22px;
 }
 
-/* wrappers (added in your updated Navbar.jsx) */
-.sk-left { justify-self: start; }
-.sk-centerNav { justify-self: center; }
-.sk-right { justify-self: end; }
+.sk-left { display: flex; align-items: center; }
+.sk-right { margin-left: auto; display: flex; align-items: center; }
 
-/* -------------------------------------------------
-   LEFT (Brand Lockup)
-------------------------------------------------- */
+/* =================================================
+   BRAND
+================================================= */
 
 .sk-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-
   background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
-
-  transition: transform 180ms ease;
+  transition: transform 180ms ease, filter 180ms ease;
 }
 
 .sk-brand:hover {
   transform: translateY(-1px);
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
 }
 
 .sk-logoImg {
-  width: 48px;
-  height: 48px;
+  width: 62px;
+  height: 62px;
   object-fit: contain;
-
-  transition: width 220ms ease, height 220ms ease, transform 220ms ease;
+  border-radius: 16px;
+  transition: width 220ms ease, height 220ms ease;
 }
 
 .sk-nav.is-scrolled.is-compact .sk-logoImg {
-  width: 40px;
-  height: 40px;
+  width: 52px;
+  height: 52px;
 }
 
 .sk-logoText {
-  color: #f4f6fb;
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 0.3px;
+  color: var(--sk-text);
+  font-weight: 850;
+  font-size: 18px;
+  letter-spacing: 0.2px;
   white-space: nowrap;
-
-  transition: opacity 200ms ease, transform 200ms ease, width 200ms ease;
 }
 
-/* Brand lockup: hide text on smaller screens */
-@media (max-width: 1060px) {
-  .sk-logoText {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-    transform: translateX(-6px);
-  }
-}
-
-/* -------------------------------------------------
-   CENTER NAV (NOW REALLY CENTERED)
-------------------------------------------------- */
+/* =================================================
+   CENTER NAV — premium pill
+================================================= */
 
 .sk-centerNav {
-  /* ✅ stop absolute centering — grid handles it */
-  position: static;
-  left: auto;
-  transform: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
+/* pill feels “integrated” now */
 .sk-links {
   display: flex;
   align-items: center;
@@ -135,50 +159,59 @@
   padding: 8px;
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  background:
+    radial-gradient(860px 220px at 22% 40%, rgba(120, 90, 255, 0.28), transparent 60%),
+    radial-gradient(860px 220px at 78% 55%, rgba(255, 138, 42, 0.22), transparent 60%),
+    rgba(255, 255, 255, 0.06);
 
-  transition: padding 220ms ease, transform 220ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
-.sk-nav.is-scrolled.is-compact .sk-links {
-  padding: 6px;
-  transform: translateY(-1px);
-}
-
-/* Link pills */
+/* ✅ kills the “huge orange circle” look */
 .sk-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 999px;
 
-  color: rgba(244, 246, 251, 0.86);
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--sk-text);
+  font-size: 14.5px;
+  font-weight: 700;
   text-decoration: none;
 
   transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sk-link:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.085);
   transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.14);
 }
 
-/* Active */
+/* ✅ premium active: tight “lit” capsule, not a bubble */
 .sk-link.is-active {
-  background: linear-gradient(135deg, #ff8a2a, #ffb86b);
+  background: linear-gradient(135deg, #ff8a2a, #ffcc8a);
   color: #0b1220;
-  font-weight: 800;
-  box-shadow: 0 10px 22px rgba(255, 138, 42, 0.25);
+  font-weight: 900;
+
+  box-shadow:
+    0 14px 26px rgba(255, 138, 42, 0.18),
+    0 0 0 1px rgba(255,255,255,0.14) inset;
 }
 
-/* ✅ force-remove any “second logo” injected by pseudo elements */
+.sk-linkLabel {
+  line-height: 1;
+}
+
+/* ensure nothing injects extra art */
 .sk-links::before,
 .sk-links::after,
 .sk-centerNav::before,
@@ -187,24 +220,12 @@
   display: none !important;
 }
 
-/* -------------------------------------------------
-   RIGHT (Premium buttons)
-------------------------------------------------- */
+/* =================================================
+   RIGHT ACTIONS
+================================================= */
 
-.sk-actions {
-  /* ❌ remove margin-left:auto (grid handles alignment) */
-  margin-left: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sk-actions-desktop {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
+.sk-actions,
+.sk-actions-desktop,
 .sk-user {
   display: flex;
   align-items: center;
@@ -212,9 +233,9 @@
 }
 
 .sk-hello {
-  color: rgba(244, 246, 251, 0.86);
-  font-weight: 600;
-  font-size: 15px;
+  color: var(--sk-muted);
+  font-weight: 650;
+  font-size: 14.5px;
 }
 
 .sk-avatarBtn {
@@ -222,33 +243,45 @@
   border: none;
   padding: 0;
   cursor: pointer;
+  display: inline-flex;
 }
 
+/* Buttons */
 .sk-btnPrimary,
 .sk-btnGhost {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 10px;
-  font-size: 14.5px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 14px;
+  font-size: 14px;
 }
 
+/* CTA */
 .sk-btnPrimary {
   background: linear-gradient(135deg, #ff8a2a, #ffb86b) !important;
   border: none !important;
   color: #0b1220 !important;
-  font-weight: 800 !important;
+  font-weight: 950 !important;
+  box-shadow:
+    0 18px 40px rgba(255, 138, 42, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.10) inset;
 }
 
+/* Ghost matches pill */
 .sk-btnGhost {
-  background: rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(10px);
-  color: #f4f6fb !important;
-  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  background:
+    radial-gradient(260px 90px at 28% 40%, rgba(120, 90, 255, 0.16), transparent 60%),
+    radial-gradient(260px 90px at 78% 55%, rgba(255, 138, 42, 0.14), transparent 60%),
+    rgba(255, 255, 255, 0.06) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: var(--sk-text) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-/* -------------------------------------------------
-   Glow line (sticks to bottom of navbar)
-------------------------------------------------- */
+/* =================================================
+   Subtle glow line (now softer)
+================================================= */
 
 .sk-glowline {
   position: absolute;
@@ -256,50 +289,49 @@
   right: 0;
   top: calc(var(--nav-h) - 1px);
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 138, 42, 0.35),
-    rgba(120, 90, 255, 0.25),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255,138,42,0.22), rgba(120,90,255,0.18), transparent);
+  opacity: 0.55;
   pointer-events: none;
   z-index: 2;
 }
 
-/* -------------------------------------------------
-   Mobile
-------------------------------------------------- */
+/* =================================================
+   MOBILE
+================================================= */
 
 .hamburger {
   display: none;
-  width: 44px;
-  height: 44px; /* ✅ better tap target */
-  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(12px);
+  background:
+    radial-gradient(220px 80px at 25% 40%, rgba(120, 90, 255, 0.16), transparent 60%),
+    radial-gradient(220px 80px at 78% 55%, rgba(255, 138, 42, 0.12), transparent 60%),
+    rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   cursor: pointer;
   position: relative;
 }
 
 .hamburger span {
   position: absolute;
-  left: 11px;
-  right: 11px;
+  left: 12px;
+  right: 12px;
   height: 2px;
   background: rgba(244, 246, 251, 0.9);
   border-radius: 2px;
   transition: transform 0.2s ease, opacity 0.2s ease, top 0.2s ease;
 }
 
-.hamburger span:nth-child(1) { top: 14px; }
-.hamburger span:nth-child(2) { top: 21px; }
-.hamburger span:nth-child(3) { top: 28px; }
+.hamburger span:nth-child(1) { top: 15px; }
+.hamburger span:nth-child(2) { top: 22px; }
+.hamburger span:nth-child(3) { top: 29px; }
 
-.hamburger.is-open span:nth-child(1) { top: 21px; transform: rotate(45deg); }
+.hamburger.is-open span:nth-child(1) { top: 22px; transform: rotate(45deg); }
 .hamburger.is-open span:nth-child(2) { opacity: 0; }
-.hamburger.is-open span:nth-child(3) { top: 21px; transform: rotate(-45deg); }
+.hamburger.is-open span:nth-child(3) { top: 22px; transform: rotate(-45deg); }
 
 /* Mobile panel */
 .mobile-panel {
@@ -308,8 +340,9 @@
   left: 0;
   right: 0;
 
-  background: rgba(10, 12, 26, 0.12);
-  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
   transform: translateY(-8px);
   opacity: 0;
@@ -331,14 +364,18 @@
   display: grid;
   gap: 10px;
 
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background:
+    radial-gradient(900px 240px at 25% 40%, rgba(120, 90, 255, 0.20), transparent 60%),
+    radial-gradient(900px 240px at 78% 55%, rgba(255, 138, 42, 0.16), transparent 60%),
+    rgba(255, 255, 255, 0.07);
+
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.20);
 }
 
 .mobile-item {
-  color: rgba(244, 246, 251, 0.9);
+  color: rgba(244, 246, 251, 0.92);
   text-decoration: none;
   padding: 10px 12px;
   border-radius: 12px;
@@ -346,43 +383,35 @@
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
+.mobile-ghost {
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+}
+
 .mobile-primary {
   margin-top: 6px;
+  height: 42px;
+  border-radius: 14px;
+
   background: linear-gradient(135deg, #ff8a2a, #ffb86b) !important;
   border: none !important;
   color: #0b1220 !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
 }
 
-/* Breakpoint: hide center nav + desktop actions, show hamburger */
 @media (max-width: 920px) {
-  .sk-centerNav {
-    display: none;
-  }
-  .sk-actions-desktop {
-    display: none;
-  }
-  .hamburger {
-    display: inline-block;
-  }
-}
+  :root { --nav-h: 78px; }
 
-/* -------------------------------------------------
-   1440p / 4K tuning
-------------------------------------------------- */
+  .sk-centerNav { display: none; }
+  .sk-actions-desktop { display: none; }
+  .hamburger { display: inline-block; }
+
+  .sk-logoImg { width: 56px; height: 56px; }
+}
 
 @media (min-width: 1440px) {
-  .sk-nav-inner {
-    max-width: 1380px;
-  }
-}
-
-@media (min-width: 2200px) {
-  .sk-nav-inner {
-    max-width: 1560px;
-  }
-  .sk-link {
-    font-size: 15px;
-    padding: 11px 20px;
-  }
+  .sk-nav-inner { max-width: 1380px; }
 }
