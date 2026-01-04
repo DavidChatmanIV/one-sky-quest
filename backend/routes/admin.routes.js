@@ -1,8 +1,155 @@
 import { Router } from "express";
-import User from "../models/user.js";
-import { verifyAdmin } from "../middleware/auth.js";
-
+import jwt from "jsonwebtoken";
+import User from "../models/user.js"; 
 const router = Router();
+
+const COOKIE_NAME = "skyrio_admin";
+const JWT_SECRET = process.env.JWT_SECRET;
+
+/* =========================
+   Admin Auth Helpers
+========================= */
+function signAdminToken(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+}
+
+function setAdminCookie(res, token) {
+  const isProd = process.env.NODE_ENV === "production";
+  const secure =
+    String(process.env.COOKIE_SECURE).toLowerCase() === "true" || isProd;
+
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
+
+function clearAdminCookie(res) {
+  const isProd = process.env.NODE_ENV === "production";
+  const secure =
+    String(process.env.COOKIE_SECURE).toLowerCase() === "true" || isProd;
+
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+  });
+}
+
+function readAdminFromCookie(req) {
+  const token = req.cookies?.[COOKIE_NAME];
+  if (!token) return null;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded?.isAdmin) return null;
+    return decoded;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * ✅ verifyAdmin middleware (cookie-based)
+ * Replaces your previous verifyAdmin import.
+ */
+function verifyAdmin(req, res, next) {
+  if (!JWT_SECRET) {
+    return res
+      .status(500)
+      .json({ ok: false, error: "Server misconfigured: JWT_SECRET missing" });
+  }
+
+  const admin = readAdminFromCookie(req);
+  if (!admin) {
+    return res.status(401).json({ ok: false, error: "Admin unauthorized" });
+  }
+
+  req.admin = admin; // { isAdmin, email, iat, exp }
+  next();
+}
+
+/* =========================
+   Auth Endpoints
+========================= */
+
+/**
+ * 🔐 POST /api/admin/login
+ * Sets httpOnly JWT cookie if credentials match env vars.
+ */
+router.post("/login", async (req, res) => {
+  try {
+    if (!JWT_SECRET) {
+      return res
+        .status(500)
+        .json({ ok: false, error: "Server misconfigured: JWT_SECRET missing" });
+    }
+
+    const { email, password } = req.body || {};
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+    const ok =
+      email &&
+      password &&
+      ADMIN_EMAIL &&
+      ADMIN_PASSWORD &&
+      String(email).toLowerCase() === String(ADMIN_EMAIL).toLowerCase() &&
+      String(password) === String(ADMIN_PASSWORD);
+
+    if (!ok) {
+      return res.status(401).json({
+        ok: false,
+        error: "Invalid admin credentials",
+      });
+    }
+
+    const token = signAdminToken({
+      isAdmin: true,
+      email: String(email).toLowerCase(),
+    });
+
+    setAdminCookie(res, token);
+
+    return res.json({
+      ok: true,
+      admin: { email: String(email).toLowerCase() },
+    });
+  } catch (e) {
+    console.error("[admin] Login failed:", e);
+    return res.status(500).json({ ok: false, error: "Login failed" });
+  }
+});
+
+/**
+ * 🚪 POST /api/admin/logout
+ */
+router.post("/logout", (req, res) => {
+  clearAdminCookie(res);
+  return res.json({ ok: true });
+});
+
+/**
+ * 👤 GET /api/admin/me
+ * Confirms admin session from cookie.
+ */
+router.get("/me", (req, res) => {
+  const admin = readAdminFromCookie(req);
+  if (!admin) return res.status(401).json({ ok: false, isAdmin: false });
+
+  return res.json({
+    ok: true,
+    isAdmin: true,
+    admin: { email: admin.email },
+  });
+});
+
+/* =========================
+   Admin Data Endpoints
+========================= */
 
 /**
  * 🧑‍✈️ GET /api/admin/users

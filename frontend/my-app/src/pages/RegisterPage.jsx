@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Input, Button, message, Card, Typography, notification } from "antd";
+import { Input, Button, message, Typography, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import BoardingPassToast from "../components/BoardingPassToast";
-import "../styles/login.css"; // reuse same layout styles for now
+import "../styles/login.css"; 
 
 const { Title, Text } = Typography;
 
@@ -30,7 +30,6 @@ export default function RegisterPage() {
 
     const { username, name, email, password, confirmPassword } = formData;
 
-    // basic client-side validation
     if (!username || !email || !password) {
       message.error("Username, email, and password are required");
       return;
@@ -49,24 +48,14 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          name,
-        }),
+        body: JSON.stringify({ username, email, password, name }),
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      // Save token + user
       localStorage.setItem("token", data.token);
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
+      if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
       const displayName =
         data.user?.name ||
@@ -103,13 +92,11 @@ export default function RegisterPage() {
 
   return (
     <div className="auth-page">
-      {/* Soft background glows */}
       <div className="glow g1" aria-hidden />
       <div className="glow g2" aria-hidden />
       <div className="glow g3" aria-hidden />
 
       <div className="auth-shell">
-        {/* Brand header */}
         <div className="auth-top">
           <div className="brand-row">
             <div className="brand-dot" aria-hidden />
@@ -125,7 +112,6 @@ export default function RegisterPage() {
           </Text>
         </div>
 
-        {/* Boarding Pass Card (same as login styling) */}
         <div className="pass" role="form">
           <div className="pass-notch" aria-hidden />
 

@@ -25,27 +25,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.set("trust proxy", 1);
 
-// ---------- Core middleware ----------
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
-app.use(compression());
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
-app.use(cookieParser());
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
-
-// ---------- AUTH RATE LIMIT ----------
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use("/api/auth", authLimiter);
-
 // ---------- CORS ----------
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_ORIGIN ||
@@ -56,17 +35,53 @@ const allowedOrigins = FRONTEND_ORIGIN.split(",")
   .map((o) => o.trim())
   .filter(Boolean);
 
+// Helper: checks if origin is allowed
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // Render health checks / Postman
+  return allowedOrigins.includes(origin);
+}
+
+// ---------- Core middleware ----------
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+app.use(compression());
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+
+// ✅ Required for cookie-based admin auth (skyrio_admin)
+app.use(cookieParser());
+
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+
+// ✅ IMPORTANT: CORS must come BEFORE routes and must allow credentials for cookies
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // Render health checks / Postman
-      return allowedOrigins.includes(origin)
+      return isAllowedOrigin(origin)
         ? cb(null, true)
         : cb(new Error("CORS blocked"));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204,
   })
 );
+
+// ✅ Helps preflight + some proxies
+app.options("*", cors());
+
+// ---------- AUTH RATE LIMIT ----------
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api/auth", authLimiter);
 
 // ---------- Global API rate limit ----------
 app.use(
@@ -85,6 +100,8 @@ app.get("/__envcheck", (_req, res) => {
   res.json({
     present: !!uri,
     sample: uri ? uri.slice(0, 16) + "..." + uri.slice(-6) : "not set",
+    allowedOrigins,
+    nodeEnv: process.env.NODE_ENV || "not set",
   });
 });
 
@@ -199,8 +216,7 @@ const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
     origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      return allowedOrigins.includes(origin)
+      return isAllowedOrigin(origin)
         ? cb(null, true)
         : cb(new Error("CORS blocked"));
     },
@@ -268,11 +284,12 @@ await connectMongo();
 // ✅ best spot: after DB is up, before the server starts accepting traffic
 startJobs();
 
-// Render provides PORT. Locally default to 5050.
+// Render provides PORT. Locally default to 4000 (your current default)
 const PORT = Number(process.env.PORT) || 4000;
 
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 API running on :${PORT} (mocks: ${USE_MOCKS})`);
+  console.log(`🌐 Allowed origins: ${allowedOrigins.join(", ")}`);
 });
 
 export { app, io, httpServer };

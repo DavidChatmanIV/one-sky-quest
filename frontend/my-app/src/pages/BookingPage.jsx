@@ -73,9 +73,6 @@ const VIBE_CHIPS = [
 
 /**
  * ✅ Quick filters (single-active)
- * - Shows an “on” state
- * - Applies a preset set of vibes (and optional tab)
- * - Tiny “Clear” button (no clutter)
  */
 const QUICK_FILTERS = [
   {
@@ -176,13 +173,11 @@ function setQueryParam(search, key, value) {
   return s ? `?${s}` : "";
 }
 
-// Small helper – keeps UI stable without fighting timezones
 function toISODate(d) {
   if (!d) return null;
   try {
     return d.format("YYYY-MM-DD");
   } catch {
-    // if date parsing fails, just return null (no need to surface)
     return null;
   }
 }
@@ -226,7 +221,6 @@ export default function BookingPage() {
 
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
-
   const [selectedId, setSelectedId] = useState(null);
 
   const [savedCount, setSavedCount] = useState(() => {
@@ -253,7 +247,7 @@ export default function BookingPage() {
   const pct =
     budgetTotal > 0 ? Math.min(100, Math.round((used / budgetTotal) * 100)) : 0;
 
-  // #1 Tour
+  // Guided Tour
   const TOUR_KEY = "skyrio_booking_tour_v1";
   const [tourOpen, setTourOpen] = useState(false);
 
@@ -300,7 +294,7 @@ export default function BookingPage() {
     }
   };
 
-  // #2 Why modal
+  // Why modal
   const [whyKey, setWhyKey] = useState(null);
   const whyOpen = !!whyKey;
   const openWhy = (key) => setWhyKey(key);
@@ -314,7 +308,6 @@ export default function BookingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
-  // AutoComplete (Where)
   const canned = useMemo(
     () => [
       { value: "Newark (EWR)" },
@@ -363,7 +356,6 @@ export default function BookingPage() {
     return `${pplLabel} · ${roomLabel}`;
   }, [adults, children, rooms]);
 
-  // AntD v5 Dropdown menu
   const sortMenu = useMemo(
     () => ({
       items: SORT_OPTIONS.map((o) => ({
@@ -383,9 +375,7 @@ export default function BookingPage() {
   );
 
   const toggleVibe = (key) => {
-    // if user manually toggles vibes, we consider quick filter “mixed”
     setActiveQuickKey(null);
-
     setActiveVibes((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -403,12 +393,9 @@ export default function BookingPage() {
     });
   };
 
-  // ✅ Apply quick filter with active “on” state
   const applyQuickFilter = (f) => {
     setActiveQuickKey(f.key);
     if (f.tab) setTab(f.tab);
-
-    // preset vibes (clean + predictable)
     setActiveVibes(new Set(f.vibes || []));
     toast(f.toast || `${f.label} applied`);
   };
@@ -564,12 +551,7 @@ export default function BookingPage() {
       trackPricesOn,
       quickFilter: activeQuickKey,
       selected: chosen,
-      budget: {
-        mode: budgetMode,
-        total: budgetTotal,
-        used,
-        left,
-      },
+      budget: { mode: budgetMode, total: budgetTotal, used, left },
     };
 
     try {
@@ -615,7 +597,8 @@ export default function BookingPage() {
         <div className="sk-bookingGrid">
           {/* LEFT */}
           <div className="sk-panel sk-panelLeft sk-bookingLeft">
-            <Card className="sk-glassCard sk-searchCard" bordered={false}>
+            {/* ✅ AntD v5: bordered={false} -> variant="borderless" */}
+            <Card className="sk-glassCard sk-searchCard" variant="borderless">
               {/* Tabs row */}
               <div className="sk-tabRow">
                 <Segmented
@@ -835,7 +818,7 @@ export default function BookingPage() {
                 </Text>
               </div>
 
-              {/* ✅ Quick filters (active state + tiny clear button) */}
+              {/* Quick filters */}
               <div className="sk-suggestRow">
                 <div className="sk-suggestBar">
                   <Space wrap size={10}>
@@ -867,7 +850,7 @@ export default function BookingPage() {
             </Card>
 
             {/* RESULTS */}
-            <Card className="sk-glassCard sk-resultsCard" bordered={false}>
+            <Card className="sk-glassCard sk-resultsCard" variant="borderless">
               <div className="sk-resultsHeader">
                 <div className="sk-resultsHeaderLeft">
                   <Title level={3} className="sk-resultsTitle">
@@ -907,7 +890,7 @@ export default function BookingPage() {
                   className={`sk-glassCard sk-resultItem ${
                     selectedId === r.id ? "isSelected" : ""
                   }`}
-                  bordered={false}
+                  variant="borderless"
                   onClick={() => setSelectedId(r.id)}
                 >
                   <div className="sk-resultTop">
@@ -982,7 +965,7 @@ export default function BookingPage() {
 
           {/* RIGHT */}
           <div className="sk-panel sk-panelRight sk-budgetSticky sk-bookingRight">
-            <Card className="sk-glassCard sk-budgetCard" bordered={false}>
+            <Card className="sk-glassCard sk-budgetCard" variant="borderless">
               <div className="sk-budgetHeader">
                 <div>
                   <Title level={4} className="sk-budgetTitle">
@@ -1011,12 +994,14 @@ export default function BookingPage() {
                 >
                   Edit
                 </Button>
+
                 <Button
                   className={`sk-pillBtn ${budgetMode === "solo" ? "on" : ""}`}
                   onClick={() => setBudgetMode("solo")}
                 >
                   Solo
                 </Button>
+
                 <Button
                   className={`sk-pillBtn ${budgetMode === "group" ? "on" : ""}`}
                   onClick={() => setBudgetMode("group")}
@@ -1026,7 +1011,9 @@ export default function BookingPage() {
               </Space>
 
               <div className="sk-budgetBig">
+                {/* ✅ This guarantees formatMoney() is USED (no lint warning) */}
                 <div className="sk-budgetAmount">${formatMoney(left)}</div>
+
                 <div className="sk-budgetMeta">
                   <Text className="sk-budgetMetaText">left to use</Text>
                 </div>
@@ -1073,6 +1060,7 @@ export default function BookingPage() {
                       min={0}
                     />
                   </Col>
+
                   <Col span={12}>
                     <InputNumber
                       placeholder="Budget total"
@@ -1083,6 +1071,7 @@ export default function BookingPage() {
                       min={0}
                     />
                   </Col>
+
                   <Col span={24}>
                     <input
                       className="sk-budgetNote"
@@ -1142,6 +1131,7 @@ export default function BookingPage() {
                 onChange={(v) => setAdults(Number(v || 1))}
               />
             </div>
+
             <div className="sk-drawerRow">
               <Text>Children</Text>
               <InputNumber
@@ -1150,6 +1140,7 @@ export default function BookingPage() {
                 onChange={(v) => setChildren(Number(v || 0))}
               />
             </div>
+
             <div className="sk-drawerRow">
               <Text>Rooms</Text>
               <InputNumber
@@ -1290,6 +1281,7 @@ export default function BookingPage() {
     </Layout>
   );
 }
+
 
 function formatMoney(n) {
   const num = Number(n || 0);

@@ -49,5 +49,8 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     sourcemap: false,
+
+    // ✅ Silence large bundle warning (intentional for Skyrio)
+    chunkSizeWarningLimit: 1200, // KB (1.2 MB)
   },
 });

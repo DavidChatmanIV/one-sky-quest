@@ -5,7 +5,7 @@ import PageLayout from "../components/PageLayout";
 import TutorialModal from "../components/TutorialModal";
 import SupportFormModal from "../components/SupportFormModal";
 
-// ✅ Add this banner component (code below)
+// Desktop / tablet banner stays
 import MemberBenefitsBanner from "../components/landing/MemberBenefitsBanner";
 
 import "../styles/LandingPage.css";
@@ -24,8 +24,44 @@ export default function LandingPage() {
 
   return (
     <PageLayout>
-      {/* ✅ Expedia-style membership notice (guest vs member) */}
-      <MemberBenefitsBanner />
+      {/* ✅ Desktop/Tablet MemberBenefitsBanner */}
+      <div className="lp-memberDesktop">
+        <MemberBenefitsBanner />
+      </div>
+
+      {/* ✅ Mobile-only: compact premium guest pill */}
+      <div
+        className="lp-memberMobile"
+        role="region"
+        aria-label="Skyrio membership"
+      >
+        <div className="lp-mobilePill">
+          <div className="lp-mobilePillLeft">
+            <div className="lp-mobilePillTitle">Guest mode</div>
+            <div className="lp-mobilePillSub">
+              Unlock rewards + price alerts
+            </div>
+          </div>
+
+          <div className="lp-mobilePillRight">
+            <Button
+              type="link"
+              className="lp-mobilePillBtn lp-mobilePillBtnPrimary"
+              onClick={() => setTutorialOpen(true)}
+            >
+              Quick tour
+            </Button>
+
+            <Button
+              type="link"
+              className="lp-mobilePillBtn"
+              onClick={() => setSupportOpen(true)}
+            >
+              Help
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* ===============================
           HERO SECTION
@@ -44,10 +80,11 @@ export default function LandingPage() {
               explorers.
             </Text>
 
+            {/* ✅ Airbnb-style: 1 primary CTA + 1 clean secondary link on mobile */}
             <div className="hero-cta-row hero-cta-row--links">
               <Button
                 type="link"
-                className="hero-login-link"
+                className="hero-login-link hero-ctaPrimary"
                 onClick={() => setTutorialOpen(true)}
               >
                 Take a 30-sec tour
@@ -55,7 +92,7 @@ export default function LandingPage() {
 
               <Button
                 type="link"
-                className="hero-login-link"
+                className="hero-login-link hero-ctaSecondary"
                 onClick={() => setSupportOpen(true)}
               >
                 Need help?

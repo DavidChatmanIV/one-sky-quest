@@ -8,8 +8,10 @@ import {
   Space,
   Typography,
   Divider,
+  message,
 } from "antd";
-import { useAuth } from "../auth/AuthProvider";
+
+import { useAuth } from "@/auth/AuthProvider";
 
 const { Text } = Typography;
 
@@ -28,8 +30,10 @@ export default function AuthModal({ open, onClose, intent = "continue" }) {
   async function onLogin(values) {
     setLoading(true);
     try {
-      const ok = await login(values);
+      const ok = await login(values); // { email, password }
       if (ok) onClose?.();
+    } catch (err) {
+      message.error(err?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -38,8 +42,10 @@ export default function AuthModal({ open, onClose, intent = "continue" }) {
   async function onSignup(values) {
     setLoading(true);
     try {
-      const ok = await signup(values);
+      const ok = await signup(values); // { name, email, password }
       if (ok) onClose?.();
+    } catch (err) {
+      message.error(err?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -71,17 +77,22 @@ export default function AuthModal({ open, onClose, intent = "continue" }) {
                 <Form.Item
                   name="email"
                   label="Email"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: "Email is required" }]}
                 >
-                  <Input placeholder="you@email.com" />
+                  <Input placeholder="you@email.com" autoComplete="email" />
                 </Form.Item>
+
                 <Form.Item
                   name="password"
                   label="Password"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: "Password is required" }]}
                 >
-                  <Input.Password placeholder="••••••••" />
+                  <Input.Password
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                  />
                 </Form.Item>
+
                 <Button
                   htmlType="submit"
                   type="primary"
@@ -101,24 +112,36 @@ export default function AuthModal({ open, onClose, intent = "continue" }) {
                 <Form.Item
                   name="name"
                   label="Name"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: "Name is required" }]}
                 >
-                  <Input placeholder="David" />
+                  <Input placeholder="David" autoComplete="name" />
                 </Form.Item>
+
                 <Form.Item
                   name="email"
                   label="Email"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: "Email is required" }]}
                 >
-                  <Input placeholder="you@email.com" />
+                  <Input placeholder="you@email.com" autoComplete="email" />
                 </Form.Item>
+
                 <Form.Item
                   name="password"
                   label="Password"
-                  rules={[{ required: true, min: 6 }]}
+                  rules={[
+                    { required: true, message: "Password is required" },
+                    {
+                      min: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  ]}
                 >
-                  <Input.Password placeholder="6+ characters" />
+                  <Input.Password
+                    placeholder="6+ characters"
+                    autoComplete="new-password"
+                  />
                 </Form.Item>
+
                 <Button
                   htmlType="submit"
                   type="primary"
@@ -138,16 +161,16 @@ export default function AuthModal({ open, onClose, intent = "continue" }) {
       <Space direction="vertical" style={{ width: "100%" }}>
         <Button
           onClick={() => {
-            continueAsGuest();
+            continueAsGuest?.();
             onClose?.();
           }}
           block
         >
           Continue as guest
         </Button>
+
         <Text type="secondary" style={{ fontSize: 12 }}>
-          You can upgrade to an account anytime. Guest mode won’t save posts,
-          DMs, or trips.
+          You can upgrade anytime. Guest mode won’t save posts, DMs, or trips.
         </Text>
       </Space>
     </Modal>
