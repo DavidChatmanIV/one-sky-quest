@@ -25,6 +25,7 @@ import {
   ShareAltOutlined,
   PlayCircleOutlined,
   SoundOutlined,
+  CrownOutlined,
 } from "@ant-design/icons";
 import { io } from "socket.io-client";
 
@@ -53,16 +54,20 @@ import TopEight from "./TopEight";
 import TopEightItemFriend from "./TopEightItemFriend";
 import TopEightItemPlace from "./TopEightItemPlace";
 
-/* Auth */
+/* Auth (still used for user display data where available) */
 import { useAuth } from "../../hooks/useAuth";
 
 /* Rewards opt-in prompt */
 import RewardsOptInPrompt from "../../components/rewards/RewardsOptInPrompt";
 import useRewardsOptInPrompt from "../../hooks/useRewardsOptInPrompt";
 
-/* ✅ Soft-block gate + guest banner */
-import RequireAuthBlock from "../../auth/RequireAuthBlock";
-import GuestBanner from "../../components/GuestBanner";
+/* ✅ ADMIN gate + admin session + logout */
+import RequireAdminBlock from "../../auth/RequireAdminBlock";
+import useAdminSession from "../../hooks/useAdminSession";
+import AdminLogoutButton from "../../auth/AdminLogoutButton";
+
+/* ✅ Admin controls */
+import AdminQuickControls from "./AdminQuickControls";
 
 const { Title, Text } = Typography;
 
@@ -84,6 +89,9 @@ function makeReferralCode(user) {
 export default function DigitalPassportPage() {
   const auth = useAuth();
   const rewardsOptIn = useRewardsOptInPrompt();
+
+  const adminSession = useAdminSession();
+  const isAdmin = !!adminSession?.isAdmin;
 
   const [musicOpen, setMusicOpen] = useState(false);
   const [profileMusic, setProfileMusic] = useState(null);
@@ -107,7 +115,7 @@ export default function DigitalPassportPage() {
 
   const displayName = useMemo(() => {
     const u = auth?.user;
-    if (!u) return "Guest";
+    if (!u) return "Admin";
     return (
       u.username || u.name || (u.email ? safeEmailPrefix(u.email) : "Explorer")
     );
@@ -230,7 +238,6 @@ export default function DigitalPassportPage() {
   useEffect(() => {
     if (!myId) return;
 
-    // create once
     if (!socketRef.current) {
       socketRef.current = io("/", { transports: ["websocket"] });
     }
@@ -258,24 +265,14 @@ export default function DigitalPassportPage() {
 
     return () => {
       s.off("social:counts:update", handler);
-      // do NOT force disconnect here if other pages reuse the socket later
     };
   }, [myId]);
 
-  /**
-   * ✅ XP percent:
-   * Your API currently gives xp + xpToNextBadge (remaining).
-   * We estimate progress with a soft goal so the bar stays meaningful.
-   */
   const xpPercent = useMemo(() => {
     const remaining = Number(xpToNextBadge || 0);
     const current = Number(xp || 0);
-
-    // If we have remaining, infer goal ≈ current + remaining
     const inferredGoal = remaining > 0 ? current + remaining : 1000;
-
     if (inferredGoal <= 0) return 0;
-
     return Math.max(
       0,
       Math.min(100, Math.round((current / inferredGoal) * 100))
@@ -310,7 +307,6 @@ export default function DigitalPassportPage() {
       />
 
       <div className="passport-wrap">
-        {/* HEADER */}
         <Row gutter={[16, 16]}>
           <Col span={24}>
             <Card className="passport-hero" bordered={false}>
@@ -327,6 +323,14 @@ export default function DigitalPassportPage() {
                   </Title>
 
                   <Text type="secondary">{levelLabel}</Text>
+
+                  {isAdmin && (
+                    <div style={{ marginTop: 8 }}>
+                      <Tag icon={<CrownOutlined />} color="gold">
+                        Admin
+                      </Tag>
+                    </div>
+                  )}
 
                   <div className="passport-social" style={{ marginTop: 10 }}>
                     <button
@@ -366,20 +370,21 @@ export default function DigitalPassportPage() {
                   )}
                 </div>
 
-                <div style={{ marginLeft: "auto" }}>
+                <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
                   <Button
                     icon={<PlayCircleOutlined />}
                     onClick={() => setMusicOpen(true)}
                   >
                     Profile Music
                   </Button>
+
+                  {isAdmin && <AdminLogoutButton />}
                 </div>
               </Space>
             </Card>
           </Col>
         </Row>
 
-        {/* SEGMENTS */}
         <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
           <Col span={24}>
             <Segmented
@@ -391,7 +396,6 @@ export default function DigitalPassportPage() {
           </Col>
         </Row>
 
-        {/* OVERVIEW */}
         {segment === "overview" && (
           <>
             <PassportIdentity />
@@ -444,11 +448,13 @@ export default function DigitalPassportPage() {
               </Space>
             </Card>
 
+            {/* ✅ Admin controls panel */}
+            <AdminQuickControls isAdmin={isAdmin} />
+
             <StampStrip />
           </>
         )}
 
-        {/* TRIPS */}
         {segment === "trips" && (
           <>
             <TripList />
@@ -456,15 +462,14 @@ export default function DigitalPassportPage() {
           </>
         )}
 
-        {/* VISAS */}
         {segment === "visas" && <VisaList />}
 
-        {/* REWARDS */}
         {segment === "rewards" && (
           <>
             <Membership />
             <SkyrioExchange showSearch={false} />
 
+            {/* Keep your rewards UI exactly as-is */}
             {rewardsEnabled ? (
               <Card
                 style={{ marginTop: 16 }}
@@ -570,10 +575,9 @@ export default function DigitalPassportPage() {
 
   return (
     <div className="passport-scope">
-      <GuestBanner />
-      <RequireAuthBlock feature="your Passport">
+      <RequireAdminBlock feature="the Digital Passport">
         {PassportContent}
-      </RequireAuthBlock>
+      </RequireAdminBlock>
     </div>
   );
 }

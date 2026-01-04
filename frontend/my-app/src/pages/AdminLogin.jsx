@@ -1,58 +1,88 @@
-import React from "react";
-import { Form, Input, Button, Typography, message } from "antd";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Form, Input, Button, Typography, message, Card } from "antd";
+import { LockOutlined, UserOutlined, SafetyOutlined } from "@ant-design/icons";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
-const AdminLogin = () => {
+export default function AdminLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = ({ email, password }) => {
-    if (email === "admin@oneskyquest.com" && password === "admin123") {
-      localStorage.setItem("admin", "true");
-      message.success("Login successful");
-      navigate("/admin/dashboard");
-    } else {
-      message.error("Invalid credentials");
+  const returnTo = location.state?.returnTo || "/passport";
+
+  const handleLogin = async ({ email, password }) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || "Login failed");
+      }
+
+      message.success("Admin verified");
+      navigate(returnTo);
+    } catch (err) {
+      message.error(err?.message || "Invalid admin credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <Title level={3} className="text-center mb-6">
-          Admin Login
-        </Title>
+    <div className="min-h-screen flex items-center justify-center bg-[#0b1220]">
+      <Card bordered={false} style={{ width: 380 }} className="osq-surface">
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <SafetyOutlined style={{ fontSize: 32, color: "#a78bfa" }} />
+          <Title level={3} style={{ marginTop: 12 }}>
+            Skyrio Admin Login
+          </Title>
+          <Text type="secondary">Restricted access — administrators only</Text>
+        </div>
+
         <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
             name="email"
-            label="Email"
-            rules={[{ required: true, message: "Please enter your email" }]}
+            label="Admin Email"
+            rules={[
+              { required: true, message: "Enter admin email" },
+              { type: "email", message: "Invalid email format" },
+            ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="admin@oneskyquest.com"
+              placeholder="skyrio_admin@gmail.com"
+              autoComplete="email"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
             label="Password"
-            rules={[{ required: true, message: "Please enter your password" }]}
+            rules={[{ required: true, message: "Enter password" }]}
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="admin123" />
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="••••••••"
+              autoComplete="current-password"
+            />
           </Form.Item>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Log In
+          <Form.Item style={{ marginTop: 12 }}>
+            <Button type="primary" htmlType="submit" block loading={loading}>
+              Verify Admin
             </Button>
           </Form.Item>
         </Form>
-      </div>
+      </Card>
     </div>
   );
-};
-
-export default AdminLogin;
+}
