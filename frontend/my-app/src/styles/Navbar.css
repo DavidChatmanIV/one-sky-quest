@@ -1,25 +1,32 @@
 :root {
   /* =============================
      NAVBAR HEIGHT
+     (Hero → Compact)
   ============================= */
-  --nav-h: 104px;
+  --nav-h: 112px;
+  --nav-h-hero: 240px;
 
   /* =============================
-     LOGO SIZING (DESKTOP)
-     Logo intentionally larger than navbar
+     LOGO SIZE — HERO
+     (Large landing presence)
   ============================= */
-  --logo-tile: 120px;
-  --logo-img: 104px;
+  --logo-tile: 140px;
+  --logo-img: 120px;
 
   /* =============================
-     LOGO SIZING (SCROLLED)
+     LOGO SIZE — COMPACT
+     (Expedia-class navbar)
   ============================= */
-  --logo-tile-compact: 78px;
-  --logo-img-compact: 64px;
+  --logo-tile-compact: 72px;
+  --logo-img-compact: 56px;
 
+  /* =============================
+     TEXT COLORS
+  ============================= */
   --sk-text: rgba(244, 246, 251, 0.92);
   --sk-muted: rgba(244, 246, 251, 0.72);
 }
+
 
 /* =================================================
    🚨 KILL ANY LAYOUT / HEADER BOXES (ANT SAFE)
@@ -120,52 +127,19 @@ header.main-layout-header,
 .sk-logoWrap {
   width: var(--logo-tile);
   height: var(--logo-tile);
-
   display: grid;
   place-items: center;
-
   background: transparent;
   box-shadow: none;
   border-radius: 0;
-
-  /* 🔥 premium optical centering */
-  transform: translateY(2px);
-
-  transition:
-    width 220ms ease,
-    height 220ms ease,
-    transform 220ms ease;
+  transform: translateY(1px);
 }
 
 .sk-logoImg {
   width: var(--logo-img);
   height: var(--logo-img);
   object-fit: contain;
-  display: block;
-
-  transition:
-    width 220ms ease,
-    height 220ms ease,
-    transform 220ms ease;
 }
-
-/* Shrink on scroll */
-.sk-nav.is-compact .sk-logoWrap {
-  width: var(--logo-tile-compact);
-  height: var(--logo-tile-compact);
-  transform: translateY(0);
-}
-
-.sk-nav.is-compact .sk-logoImg {
-  width: var(--logo-img-compact);
-  height: var(--logo-img-compact);
-}
-
-/* Subtle premium hover (optional but clean) */
-.sk-brand:hover .sk-logoImg {
-  transform: scale(1.03);
-}
-
 /* =================================================
    CENTER NAV (DISCOVER PILL SAFE)
 ================================================= */
