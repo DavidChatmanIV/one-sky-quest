@@ -1,11 +1,11 @@
-import React, { useState, useRef, useMemo } from "react";
-import { Input, Button, message, Typography, notification } from "antd";
+import React, { useState, useRef, useMemo, useEffect } from "react";
+import { Input, Button, message, Typography, notification, Tag } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import BoardingPassToast from "../components/BoardingPassToast";
 import AuthLayout from "../layout/AuthLayout";
 
-import "../styles/AuthCard.css";
-import "../styles/login.css";
+import "../styles/LoginBoardingPass.css";
 
 const { Title, Text } = Typography;
 
@@ -15,6 +15,9 @@ export default function LoginPage() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+
+  // ✨ scan animation state
+  const [isScanning, setIsScanning] = useState(false);
 
   const nav = useNavigate();
   const location = useLocation();
@@ -29,6 +32,20 @@ export default function LoginPage() {
     return "/dashboard";
   }, [location.state]);
 
+  // 🧠 Passenger auto-updates (premium)
+  const passenger = useMemo(() => {
+    const raw = (formData.emailOrUsername || "").trim();
+    if (!raw) return "Explorer";
+
+    const cleaned = raw.includes("@") ? raw.split("@")[0] : raw;
+    return cleaned.length > 18 ? cleaned.slice(0, 18) + "…" : cleaned;
+  }, [formData.emailOrUsername]);
+
+  // Stop scan if loading finishes (safety)
+  useEffect(() => {
+    if (!loading) setIsScanning(false);
+  }, [loading]);
+
   const handleLogin = async () => {
     if (loading) return;
     if (successHandledRef.current) return;
@@ -42,6 +59,7 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setIsScanning(true);
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -60,7 +78,7 @@ export default function LoginPage() {
       const displayName =
         data.user?.name ||
         data.user?.username ||
-        (data.user?.email ? data.user.email.split("@")[0] : "Explorer");
+        (data.user?.email ? data.user.email.split("@")[0] : passenger);
 
       successHandledRef.current = true;
 
@@ -79,12 +97,11 @@ export default function LoginPage() {
       });
 
       message.success(`Welcome aboard, ${displayName} ✈️`);
-
-      // Redirect back to protected page they originally requested
       nav(redirectTo, { replace: true });
     } catch (err) {
       successHandledRef.current = false;
       message.error(err.message || "Login failed");
+      setIsScanning(false);
     } finally {
       setLoading(false);
     }
@@ -94,128 +111,161 @@ export default function LoginPage() {
     if (e.key === "Enter") handleLogin();
   };
 
+  const routeLabel = redirectTo === "/dashboard" ? "Dashboard" : redirectTo;
+
   return (
     <AuthLayout>
-      {/* Brand header */}
-      <div className="auth-top">
-        <div className="brand-row">
-          <div className="brand-dot" aria-hidden />
-          <span className="brand-text">Skyrio</span>
+      <div className="sk-authWrap">
+        {/* Minimal hero (boarding pass is the star) */}
+        <div className="sk-authHero">
+          <Title level={1} className="sk-authTitle">
+            Welcome back, Explorer
+          </Title>
+          <Text className="sk-authSubtitle">
+            Check in fast. Earn XP. Keep it moving.
+          </Text>
         </div>
 
-        <Title level={2} className="auth-title">
-          Welcome back, Explorer
-        </Title>
+        {/* Boarding Pass */}
+        <div
+          className={`sk-pass ${isScanning ? "isScanning" : ""}`}
+          onKeyDown={onKeyDown}
+          role="form"
+          aria-busy={loading ? "true" : "false"}
+        >
+          <div className="sk-passScan" aria-hidden="true" />
 
-        <Text className="auth-subtitle">
-          Check in fast. Earn XP. Keep it moving.
-        </Text>
-      </div>
+          {/* Header */}
+          <div className="sk-passHeader">
+            <div className="sk-passBrand">
+              <div className="sk-dot" aria-hidden />
+              <Text className="sk-passBrandText">Skyrio</Text>
+            </div>
 
-      {/* Boarding Pass Card */}
-      <div className="pass" onKeyDown={onKeyDown} role="form">
-        <div className="pass-notch" aria-hidden />
-
-        <div className="pass-header">
-          <div className="pass-airline">
-            <span className="pass-chip" aria-hidden />
-            <span className="pass-airline-name">Skyrio Boarding Pass</span>
+            <Tag className="sk-passChip">
+              SKY <span className="sk-chipSep">•</span> Gate A3
+            </Tag>
           </div>
 
-          <div className="pass-mini">
-            <Text className="pass-mini-label">Gate</Text>
-            <div className="pass-mini-pill">SKY</div>
-          </div>
-        </div>
-
-        <div className="pass-route">
-          <div className="route-col">
-            <Text className="route-label">From</Text>
-            <div className="route-value">Login</div>
+          <div className="sk-passBig">
+            <Text className="sk-passLabel">BOARDING PASS</Text>
           </div>
 
-          <div className="route-mid" aria-hidden>
-            ✈️
-          </div>
-
-          <div className="route-col right">
-            <Text className="route-label">To</Text>
-            <div className="route-value">
-              {redirectTo === "/dashboard" ? "Dashboard" : redirectTo}
+          {/* Passenger + status */}
+          <div className="sk-passRow">
+            <div className="sk-passCol">
+              <Text className="sk-passMiniLabel">Passenger</Text>
+              <Text className="sk-passPassenger">{passenger}</Text>
+            </div>
+            <div className="sk-passCol sk-passColRight">
+              <Text className="sk-passMiniLabel">Status</Text>
+              <Text className="sk-passValue">
+                {loading ? "Checking in…" : "Ready"}
+              </Text>
             </div>
           </div>
-        </div>
 
-        <div className="pass-divider" aria-hidden />
+          {/* Route */}
+          <div className="sk-passRoute">
+            <div className="sk-routeCol">
+              <Text className="sk-passMiniLabel">From</Text>
+              <Text className="sk-passValue">Login</Text>
+            </div>
 
-        <div className="pass-form">
-          <Input
-            placeholder="Email or username"
-            name="emailOrUsername"
-            value={formData.emailOrUsername}
-            onChange={(e) =>
-              setFormData({ ...formData, emailOrUsername: e.target.value })
-            }
-            autoComplete="username"
-          />
+            <div className="sk-routeLine" aria-hidden="true">
+              <span className="sk-plane">✈</span>
+              <span className="sk-routeDash" />
+            </div>
 
-          <Input.Password
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            autoComplete="current-password"
-          />
+            <div className="sk-routeCol sk-routeColRight">
+              <Text className="sk-passMiniLabel">To</Text>
+              <Text className="sk-passValue">{routeLabel}</Text>
+            </div>
+          </div>
 
-          <Button
-            type="primary"
-            block
-            loading={loading}
-            onClick={handleLogin}
-            className="pass-cta"
-          >
-            🛫 Confirm Boarding
-          </Button>
+          {/* Perforation */}
+          <div className="sk-passPerforation" aria-hidden="true">
+            <span className="sk-notch left" />
+            <span className="sk-notch right" />
+            <span className="sk-perfLine" />
+          </div>
 
-          <div className="pass-secondary">
-            <Text className="pass-secondary-text">
-              New here?{" "}
-              <button
-                type="button"
-                onClick={() => nav("/register")}
-                className="link-btn"
-              >
-                Create an account
-              </button>
-            </Text>
+          {/* Form */}
+          <div className="sk-passForm">
+            <div className="sk-field">
+              <Text className="sk-formLabel">Email or username</Text>
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Email or username"
+                name="emailOrUsername"
+                value={formData.emailOrUsername}
+                onChange={(e) =>
+                  setFormData({ ...formData, emailOrUsername: e.target.value })
+                }
+                autoComplete="username"
+                onFocus={() => setIsScanning(true)}
+                onBlur={() => !loading && setIsScanning(false)}
+              />
+            </div>
+
+            <div className="sk-field">
+              <Text className="sk-formLabel">Password</Text>
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+                name="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                autoComplete="current-password"
+                onFocus={() => setIsScanning(true)}
+                onBlur={() => !loading && setIsScanning(false)}
+              />
+            </div>
+
+            <Button
+              type="primary"
+              block
+              loading={loading}
+              onClick={handleLogin}
+              className="sk-passCTA"
+            >
+              🛫 Confirm Boarding
+            </Button>
+
+            <div className="sk-authFooter">
+              <Text className="sk-footerText">
+                New here?{" "}
+                <button
+                  type="button"
+                  onClick={() => nav("/register")}
+                  className="sk-footerLink"
+                >
+                  Create a boarding pass
+                </button>
+              </Text>
+            </div>
+          </div>
+
+          {/* Barcode */}
+          <div className="sk-passBarcode" aria-hidden="true">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <span key={i} />
+            ))}
+          </div>
+
+          <div aria-live="polite" className="sr-only">
+            {loading ? "Signing in…" : ""}
           </div>
         </div>
 
-        <div className="pass-divider dotted" aria-hidden />
-
-        <div className="pass-barcode" aria-hidden>
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-
-        <div aria-live="polite" className="sr-only">
-          {loading ? "Signing in…" : ""}
-        </div>
+        <footer className="sk-authCopyright">
+          <Text className="sk-fineText">
+            © {new Date().getFullYear()} Skyrio
+          </Text>
+        </footer>
       </div>
-
-      <footer className="auth-footer">
-        <Text className="footer-text">© {new Date().getFullYear()} Skyrio</Text>
-      </footer>
     </AuthLayout>
   );
 }

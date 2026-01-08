@@ -7,180 +7,151 @@
   --sk-authGlass: rgba(255, 255, 255, 0.10);
   --sk-authInput: rgba(0, 0, 0, 0.28);
 
-  /* Skyrio site vibe (purple + warm orange) */
-  --sk-warmA: rgba(255, 140, 90, 0.22);
-  --sk-warmB: rgba(120, 90, 255, 0.32);
-
-  /* CTA gradient */
   --sk-ctaA: #6f68ff;
   --sk-ctaB: #c661ff;
   --sk-ctaC: #ff8fcf;
+
+  --auth-max: 560px;
 }
 
 /* =============================== */
-/* AUTH PAGE BACKGROUND */
+/* AUTH PAGE WRAPPER */
 /* =============================== */
 
 .auth-page {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  width: 100%;
   position: relative;
   overflow: hidden;
 
-  /* Keep layout below navbar */
-  padding-top: calc(var(--nav-h, 88px) + env(safe-area-inset-top));
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
 
-  /* ✅ Matches Skyrio site theme */
-  background:
-    radial-gradient(900px 520px at 75% 18%, var(--sk-warmA), transparent 60%),
-    radial-gradient(900px 600px at 25% 22%, var(--sk-warmB), transparent 65%),
-    linear-gradient(135deg, #0b1220 0%, #1a1c3b 50%, #2a1340 100%);
+  padding: calc(18px + env(safe-area-inset-top)) 16px
+    calc(18px + env(safe-area-inset-bottom));
+
+  color: var(--sk-authText);
 }
 
-/* Depth / blending under navbar */
-.auth-page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+/* =============================== */
+/* ✅ FIXED FULL-SCREEN BACKDROP LAYER
+   This forces auth background to show even if body has a gradient
+================================ */
 
+.auth-page .auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  /* base “sky” */
   background:
-    radial-gradient(900px 520px at 50% 30%, rgba(255, 255, 255, 0.04), transparent 72%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.38) 0%, transparent 28%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0%, transparent 40%);
+    radial-gradient(1200px 700px at 55% 18%, rgba(255,255,255,0.07), transparent 62%),
+    radial-gradient(900px 520px at 78% 12%, rgba(255,140,90,0.18), transparent 60%),
+    radial-gradient(900px 620px at 22% 16%, rgba(120,90,255,0.26), transparent 66%),
+    linear-gradient(135deg, #070b14 0%, #111533 40%, #1b1233 70%, #090b15 100%);
+
+  /* 🎬 subtle drift */
+  animation: skBackdropDrift 18s ease-in-out infinite alternate;
+  transform: translate3d(0,0,0);
 }
 
-/* subtle grain (no stripes) */
-.auth-page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+/* gentle drift by shifting background positions */
+@keyframes skBackdropDrift {
+  0% {
+    filter: saturate(1) brightness(1);
+  }
+  100% {
+    filter: saturate(1.04) brightness(1.02);
+  }
+}
 
-  opacity: 0.035;
+/* =============================== */
+/* 🌫️ CLOUD MOTION LAYERS */
+/* =============================== */
+
+.auth-page .auth-clouds {
+  position: fixed;
+  inset: -40px;
+  z-index: 1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(600px 240px at 10% 30%, rgba(255,255,255,0.06), transparent 70%),
+    radial-gradient(700px 260px at 35% 55%, rgba(255,255,255,0.05), transparent 72%),
+    radial-gradient(680px 260px at 70% 40%, rgba(255,255,255,0.045), transparent 72%),
+    radial-gradient(600px 240px at 90% 60%, rgba(255,255,255,0.05), transparent 72%);
+  filter: blur(18px);
+  opacity: 0.65;
+
+  animation: skCloudFloat 22s linear infinite;
+}
+
+@keyframes skCloudFloat {
+  0% { transform: translate3d(-2%, -1%, 0); }
+  50% { transform: translate3d(2%, 1.5%, 0); }
+  100% { transform: translate3d(-2%, -1%, 0); }
+}
+
+/* =============================== */
+/* subtle grain (premium) */
+/* =============================== */
+
+.auth-page .auth-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+
+  opacity: 0.03;
   mix-blend-mode: overlay;
 
   background-image:
     radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.06) 0 1px, transparent 2px),
     radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 0 1px, transparent 2px),
     radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.04) 0 1px, transparent 2px);
-
-  background-size: 180px 180px;
-}
-
-/* Text lock */
-.auth-page,
-.auth-page * {
-  color: var(--sk-authText) !important;
+  background-size: 220px 220px;
 }
 
 /* =============================== */
-/* GLOW ORBS */
-/* =============================== */
-
-.glow {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(110px);
-  opacity: 0.34;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.g1 {
-  width: 260px;
-  height: 260px;
-  left: -90px;
-  top: -90px;
-  background: #c35cff;
-}
-
-.g2 {
-  width: 300px;
-  height: 300px;
-  right: -130px;
-  bottom: -130px;
-
-  /* Warm orange orb to match Skyrio theme */
-  background: #ff8c5a;
-  opacity: 0.22;
-}
-
-.g3 {
-  width: 220px;
-  height: 220px;
-  left: 60px;
-  bottom: 140px;
-  background: #785aff;
-  opacity: 0.18;
-}
-
-/* =============================== */
-/* SHARED SHELL */
+/* CONTENT SHELL */
 /* =============================== */
 
 .auth-shell {
-  width: min(92vw, 460px);
-  padding: 24px 0;
+  width: min(92vw, var(--auth-max));
   position: relative;
-  z-index: 2;
+  z-index: 10;
+
   display: grid;
-  gap: 16px;
   justify-items: center;
+  align-content: start;
+  gap: 16px;
+
+  padding: 22px 0;
+}
+
+/* Typography lock (safe) */
+.auth-page .ant-typography,
+.auth-page .ant-typography * {
+  color: var(--sk-authText) !important;
+}
+.auth-page .ant-typography-secondary {
+  color: var(--sk-authMuted) !important;
 }
 
 /* =============================== */
-/* ANT INPUT OVERRIDES */
-/* =============================== */
-
-.auth-page .ant-input,
-.auth-page .ant-input-affix-wrapper,
-.auth-page .ant-input-password {
-  background: var(--sk-authInput) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  border-radius: 14px !important;
-  box-shadow: none !important;
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.auth-page input::placeholder,
-.auth-page textarea::placeholder {
-  color: var(--sk-authFaint) !important;
-}
-
-.auth-page .ant-input-password-icon,
-.auth-page .ant-input-prefix,
-.auth-page .ant-input-suffix,
-.auth-page .anticon {
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-.auth-page .ant-input:focus,
-.auth-page .ant-input-affix-wrapper-focused {
-  border-color: rgba(198, 97, 255, 0.65) !important;
-  box-shadow: 0 0 0 3px rgba(198, 97, 255, 0.18) !important;
-}
-
-/* =============================== */
-/* MOBILE */
+/* 📱 MOBILE TIGHTEN */
 /* =============================== */
 
 @media (max-width: 520px) {
   .auth-page {
     place-items: start center;
-    padding-top: calc(var(--nav-h, 88px) + 12px + env(safe-area-inset-top));
+    padding-top: calc(12px + env(safe-area-inset-top));
   }
 
   .auth-shell {
-    width: min(94vw, 460px);
-    padding: 18px 0;
+    width: min(94vw, var(--auth-max));
+    padding: 14px 0;
+    gap: 12px;
   }
 }
-
-/* EOF */

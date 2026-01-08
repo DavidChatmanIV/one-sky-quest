@@ -1,0 +1,380 @@
+.sk-authWrap {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 28px 18px 22px;
+  color: var(--sk-authText);
+}
+
+.sk-authHero {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.sk-authTitle {
+  margin: 0 0 8px !important;
+  color: var(--sk-authText) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.sk-authSubtitle {
+  display: block;
+  color: var(--sk-authMuted);
+  font-size: 14px;
+}
+
+/* ===== Boarding Pass ===== */
+.sk-pass {
+  position: relative;
+  border-radius: 22px;
+  padding: 18px 16px 16px;
+  border: 1px solid var(--sk-authStroke);
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.06)
+    ),
+    radial-gradient(700px 300px at 20% 20%, var(--sk-warmB), transparent 60%),
+    radial-gradient(700px 320px at 80% 30%, var(--sk-warmA), transparent 60%);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+/* Subtle ticket corner “cut” illusion */
+.sk-pass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.00)
+  );
+  pointer-events: none;
+}
+
+/* scan animation overlay */
+.sk-passScan {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(-120%);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.10),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.sk-pass.isScanning .sk-passScan {
+  opacity: 1;
+  animation: skScan 1.05s ease-in-out;
+}
+
+@keyframes skScan {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0.0;
+  }
+  25% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(120%);
+    opacity: 0.0;
+  }
+}
+
+/* header */
+.sk-passHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sk-passBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sk-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.06);
+}
+
+.sk-passBrandText {
+  color: var(--sk-authText);
+  font-weight: 700;
+}
+
+.sk-passChip {
+  margin: 0 !important;
+  border: 1px solid var(--sk-authStroke) !important;
+  background: rgba(0, 0, 0, 0.18) !important;
+  color: var(--sk-authMuted) !important;
+  border-radius: 999px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+.sk-chipSep {
+  opacity: 0.6;
+  margin: 0 6px;
+}
+
+/* “BOARDING PASS” */
+.sk-passBig {
+  margin-top: 10px;
+}
+
+.sk-passLabel {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sk-authMuted);
+}
+
+/* passenger row */
+.sk-passRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.sk-passCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sk-passColRight {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.sk-passMiniLabel {
+  font-size: 11px;
+  color: var(--sk-authFaint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sk-passPassenger {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--sk-authText);
+  line-height: 1.1;
+}
+
+.sk-passValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sk-authText);
+}
+
+/* route row */
+.sk-passRoute {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.sk-routeColRight {
+  text-align: right;
+}
+
+.sk-routeLine {
+  position: relative;
+  width: 86px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+}
+
+.sk-plane {
+  position: absolute;
+  top: 3px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.sk-routeDash {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.12)
+  );
+  opacity: 0.9;
+}
+
+/* perforation */
+.sk-passPerforation {
+  position: relative;
+  margin: 14px 0 12px;
+  height: 18px;
+}
+
+.sk-notch {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sk-notch.left {
+  left: -9px;
+}
+
+.sk-notch.right {
+  right: -9px;
+}
+
+.sk-perfLine {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 1px dashed rgba(255, 255, 255, 0.22);
+}
+
+/* form */
+.sk-passForm .ant-form-item {
+  margin-bottom: 10px;
+}
+
+.sk-formLabel {
+  color: var(--sk-authMuted);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.sk-passForm .ant-input,
+.sk-passForm .ant-input-password {
+  height: 44px;
+  border-radius: 12px;
+  background: var(--sk-authInput);
+  border: 1px solid var(--sk-authStroke);
+  color: var(--sk-authText);
+}
+
+.sk-passForm .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.sk-passForm .ant-input-prefix,
+.sk-passForm .ant-input-password-icon {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.sk-passForm .ant-input-password .ant-input {
+  height: 42px; /* aligns inside wrapper */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.sk-passForm .ant-form-item-explain-error {
+  color: rgba(255, 180, 180, 0.92);
+}
+
+/* CTA */
+.sk-passCTA {
+  height: 46px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: rgba(27, 16, 36, 0.95);
+  background: linear-gradient(90deg, var(--sk-ctaA), var(--sk-ctaB), var(--sk-ctaC));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.sk-passCTA:hover {
+  filter: brightness(1.04);
+}
+
+.sk-authFooter {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.sk-footerText {
+  color: var(--sk-authMuted);
+  font-size: 12px;
+}
+
+.sk-footerLink {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sk-footerLink:hover {
+  text-decoration: underline;
+}
+
+.sk-authFineprint {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.sk-fineText {
+  color: var(--sk-authFaint);
+  font-size: 11px;
+}
+
+.sk-authCopyright {
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ===== Mobile-first tuning ===== */
+@media (max-width: 420px) {
+  .sk-authWrap {
+    padding: 22px 14px 18px;
+  }
+
+  .sk-authTitle {
+    font-size: 30px !important;
+  }
+
+  .sk-pass {
+    padding: 16px 14px 14px;
+  }
+
+  .sk-passRoute {
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+  }
+
+  .sk-routeLine {
+    width: 74px;
+  }
+}

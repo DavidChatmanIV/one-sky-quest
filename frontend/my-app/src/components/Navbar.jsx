@@ -4,7 +4,7 @@ import { Avatar, Dropdown, Button, message } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 
 import "../styles/Navbar.css";
-import logo from "../assets/logo/skyrio-logo.png";
+import logo from "../assets/logo/skyrio-logo-mark-512.png"; 
 
 import { useAuth } from "../auth/useAuth";
 import { useAuthModal } from "../auth/AuthModalController";
@@ -94,7 +94,7 @@ export default function Navbar() {
   const openLogin = () =>
     openAuth({
       intent: "login",
-      reason: "Log in to access your Passport, DMs, and saves.",
+      reason: "Log in to access your Passport, DMs, and saved trips.",
     });
 
   const openSignup = () =>
@@ -103,14 +103,8 @@ export default function Navbar() {
       reason: "Create an account to save trips and join SkyStream.",
     });
 
-  const SHOW_BRAND_TEXT = false;
-
   return (
-    <header
-      className={`sk-nav ${navTheme} ${
-        scrolled ? "is-scrolled is-compact" : ""
-      }`}
-    >
+    <header className={`sk-nav ${navTheme} ${scrolled ? "is-compact" : ""}`}>
       <div className="sk-nav-inner">
         {/* LEFT */}
         <div className="sk-left">
@@ -120,16 +114,19 @@ export default function Navbar() {
             type="button"
             aria-label="Go to homepage"
           >
-            <img src={logo} alt="Skyrio" className="sk-logoImg" />
-            {SHOW_BRAND_TEXT ? (
-              <span className="sk-logoText">Skyrio</span>
-            ) : null}
+            <span className="sk-logoWrap" aria-hidden="true">
+              <img
+                src={logo}
+                alt="Skyrio"
+                className="sk-logoImg"
+                draggable="false"
+              />
+            </span>
           </button>
         </div>
 
         {/* CENTER */}
         <nav className="sk-centerNav" aria-label="Primary">
-          {/* ✅ New wrapper (this is what we style now) */}
           <div className="sk-navPills">
             {navItems.map((item) => (
               <NavLink
@@ -140,7 +137,7 @@ export default function Navbar() {
                   `sk-link ${isActive ? "is-active" : ""}`
                 }
               >
-                <span className="sk-linkLabel">{item.label}</span>
+                {item.label}
               </NavLink>
             ))}
           </div>
@@ -148,122 +145,69 @@ export default function Navbar() {
 
         {/* RIGHT */}
         <div className="sk-right">
-          <div className="sk-actions">
-            <div className="sk-actions-desktop">
-              {!isAuthed ? (
-                <>
-                  <Button className="sk-btnGhost" onClick={openLogin}>
-                    Log in
-                  </Button>
-                  <Button
-                    type="primary"
-                    className="sk-btnPrimary"
-                    onClick={openSignup}
-                  >
-                    Sign up
-                  </Button>
-                </>
-              ) : (
-                <div className="sk-user">
-                  <span className="sk-hello">
-                    Hey, {displayName}
-                    {isGuest ? " ✨" : ""}
-                  </span>
-
-                  {isGuest ? (
-                    <Button
-                      type="primary"
-                      className="sk-btnPrimary"
-                      onClick={openSignup}
-                    >
-                      Upgrade
-                    </Button>
-                  ) : (
-                    <Dropdown
-                      menu={avatarMenu}
-                      placement="bottomRight"
-                      trigger={["click"]}
-                      overlayClassName="sk-dropdown"
-                    >
-                      <button
-                        className="sk-avatarBtn"
-                        type="button"
-                        aria-label="Account menu"
-                      >
-                        <Avatar
-                          size={34}
-                          src={user?.avatarUrl}
-                          icon={!user?.avatarUrl ? <UserOutlined /> : null}
-                        />
-                      </button>
-                    </Dropdown>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* MOBILE */}
-            <button
-              className={`hamburger ${mobileOpen ? "is-open" : ""}`}
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label="Open menu"
-              aria-expanded={mobileOpen}
-              type="button"
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="sk-glowline" />
-
-      {/* MOBILE PANEL */}
-      <div className={`mobile-panel ${mobileOpen ? "open" : ""}`}>
-        <div className="mobile-panel-inner">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className="mobile-item"
-              onClick={() => setMobileOpen(false)}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-
           {!isAuthed ? (
             <>
-              <Button className="mobile-ghost" onClick={openLogin}>
+              <Button className="sk-btnGhost" onClick={openLogin}>
                 Log in
               </Button>
               <Button
                 type="primary"
-                className="mobile-primary"
+                className="sk-btnPrimary"
                 onClick={openSignup}
               >
                 Sign up
               </Button>
             </>
           ) : (
-            <>
+            <div className="sk-user">
+              <span className="sk-hello">
+                Hey, {displayName}
+                {isGuest ? " ✨" : ""}
+              </span>
+
               {isGuest ? (
                 <Button
                   type="primary"
-                  className="mobile-primary"
+                  className="sk-btnPrimary"
                   onClick={openSignup}
                 >
                   Upgrade
                 </Button>
-              ) : null}
-
-              <Button danger onClick={handleLogout}>
-                Log out
-              </Button>
-            </>
+              ) : (
+                <Dropdown
+                  menu={avatarMenu}
+                  placement="bottomRight"
+                  trigger={["click"]}
+                  overlayClassName="sk-dropdown"
+                >
+                  <button
+                    className="sk-avatarBtn"
+                    type="button"
+                    aria-label="Account menu"
+                  >
+                    <Avatar
+                      size={36}
+                      src={user?.avatarUrl}
+                      icon={!user?.avatarUrl ? <UserOutlined /> : null}
+                    />
+                  </button>
+                </Dropdown>
+              )}
+            </div>
           )}
+
+          {/* MOBILE HAMBURGER */}
+          <button
+            className={`hamburger ${mobileOpen ? "is-open" : ""}`}
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            type="button"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
       </div>
     </header>
