@@ -1,10 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { Button, Tag, Typography } from "antd";
+import {
+  PlusOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  EnvironmentOutlined,
+  CarOutlined,
+  IdcardOutlined,
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 function monthFromDateString(dateStr) {
-  // supports: "7/11/2025" "12/21/2024" etc
   try {
     const d = new Date(dateStr);
     if (Number.isNaN(d.getTime())) return null;
@@ -21,7 +28,7 @@ export default function TravelHistory({
   onAddStamp,
   onAddTrip,
   onAddVisa,
-  renewMonthIndex, // 0-11 (from PassportIdentity / DigitalPassportPage)
+  renewMonthIndex, // 0-11
 }) {
   const [showStamps, setShowStamps] = useState(true);
   const [showTrips, setShowTrips] = useState(true);
@@ -31,7 +38,7 @@ export default function TravelHistory({
 
   return (
     <div className="osq-surface" style={{ padding: 16 }}>
-      <Title level={3} style={{ margin: 0, color: "#fff" }}>
+      <Title level={3} style={{ margin: 0 }}>
         Travel History
       </Title>
       <Text style={{ color: "rgba(255,255,255,.78)" }}>
@@ -46,16 +53,25 @@ export default function TravelHistory({
             <Tag className="count-pill">{stampItems.length}</Tag>
           </div>
 
-          <div className="ph-section__actions">
-            <Button className="subtle-btn" onClick={onAddStamp}>
-              + Add Stamp
+          {/* ✅ ICON CHIPS */}
+          <div className="ph-section__actions pp-travelControls">
+            <Button
+              className="pp-chipBtn"
+              icon={<PlusOutlined />}
+              onClick={onAddStamp}
+              type="default"
+            >
+              Add Stamp
             </Button>
-            <button
-              className="collapse-btn"
+
+            <Button
+              className="pp-chipBtn pp-chipBtn--ghost"
+              icon={showStamps ? <EyeInvisibleOutlined /> : <EyeOutlined />}
               onClick={() => setShowStamps((v) => !v)}
+              type="default"
             >
               {showStamps ? "Hide" : "Show"}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -93,16 +109,25 @@ export default function TravelHistory({
             Trips <Tag className="count-pill">{(trips || []).length}</Tag>
           </div>
 
-          <div className="ph-section__actions">
-            <Button className="subtle-btn" onClick={onAddTrip}>
-              + Add Trip
+          {/* ✅ ICON CHIPS */}
+          <div className="ph-section__actions pp-travelControls">
+            <Button
+              className="pp-chipBtn"
+              icon={<EnvironmentOutlined />}
+              onClick={onAddTrip}
+              type="default"
+            >
+              Add Trip
             </Button>
-            <button
-              className="collapse-btn"
+
+            <Button
+              className="pp-chipBtn pp-chipBtn--ghost"
+              icon={showTrips ? <EyeInvisibleOutlined /> : <EyeOutlined />}
               onClick={() => setShowTrips((v) => !v)}
+              type="default"
             >
               {showTrips ? "Hide" : "Show"}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -145,16 +170,25 @@ export default function TravelHistory({
             Visas <Tag className="count-pill">{(visas || []).length}</Tag>
           </div>
 
-          <div className="ph-section__actions">
-            <Button className="subtle-btn" onClick={onAddVisa}>
-              + Add Visa
+          {/* ✅ ICON CHIPS */}
+          <div className="ph-section__actions pp-travelControls">
+            <Button
+              className="pp-chipBtn"
+              icon={<IdcardOutlined />}
+              onClick={onAddVisa}
+              type="default"
+            >
+              Add Visa
             </Button>
-            <button
-              className="collapse-btn"
+
+            <Button
+              className="pp-chipBtn pp-chipBtn--ghost"
+              icon={showVisas ? <EyeInvisibleOutlined /> : <EyeOutlined />}
               onClick={() => setShowVisas((v) => !v)}
+              type="default"
             >
               {showVisas ? "Hide" : "Show"}
-            </button>
+            </Button>
           </div>
         </div>
 

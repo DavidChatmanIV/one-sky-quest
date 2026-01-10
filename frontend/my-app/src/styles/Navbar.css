@@ -8,14 +8,12 @@
 
   /* =============================
      LOGO SIZE — HERO
-     (Large landing presence)
   ============================= */
   --logo-tile: 140px;
   --logo-img: 120px;
 
   /* =============================
      LOGO SIZE — COMPACT
-     (Expedia-class navbar)
   ============================= */
   --logo-tile-compact: 72px;
   --logo-img-compact: 56px;
@@ -26,7 +24,6 @@
   --sk-text: rgba(244, 246, 251, 0.92);
   --sk-muted: rgba(244, 246, 251, 0.72);
 }
-
 
 /* =================================================
    🚨 KILL ANY LAYOUT / HEADER BOXES (ANT SAFE)
@@ -39,7 +36,6 @@ header.main-layout-header,
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  border-radius: 0 !important;
   padding: 0 !important;
   height: auto !important;
   line-height: normal !important;
@@ -62,9 +58,10 @@ header.main-layout-header,
   box-shadow: none;
 
   isolation: isolate;
+  transform: translateZ(0); /* iOS stacking fix */
 }
 
-/* Glass gradient layer (NOT a box) */
+/* Glass gradient layer (visual ONLY — no clicks) */
 .sk-nav::before {
   content: "";
   position: absolute;
@@ -77,6 +74,8 @@ header.main-layout-header,
     rgba(255, 140, 60, 0.18)
   );
   backdrop-filter: blur(16px);
+
+  pointer-events: none; /* ✅ CRITICAL FIX */
 }
 
 .sk-nav.is-compact::before {
@@ -89,9 +88,12 @@ header.main-layout-header,
 }
 
 /* =================================================
-   INNER WRAPPER
+   INNER WRAPPER (CLICKABLE LAYER)
 ================================================= */
 .sk-nav-inner {
+  position: relative;
+  z-index: 2;
+
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
@@ -122,7 +124,7 @@ header.main-layout-header,
 }
 
 /* =================================================
-   LOGO — FINAL PREMIUM VERSION (NO BOX)
+   LOGO
 ================================================= */
 .sk-logoWrap {
   width: var(--logo-tile);
@@ -132,7 +134,6 @@ header.main-layout-header,
   background: transparent;
   box-shadow: none;
   border-radius: 0;
-  transform: translateY(1px);
 }
 
 .sk-logoImg {
@@ -140,8 +141,9 @@ header.main-layout-header,
   height: var(--logo-img);
   object-fit: contain;
 }
+
 /* =================================================
-   CENTER NAV (DISCOVER PILL SAFE)
+   CENTER NAV
 ================================================= */
 .sk-centerNav {
   position: absolute;
@@ -179,6 +181,9 @@ header.main-layout-header,
   display: flex;
   align-items: center;
   gap: 10px;
+
+  position: relative;
+  z-index: 3; /* above blur */
 }
 
 .sk-user {
@@ -222,7 +227,7 @@ header.main-layout-header,
 }
 
 /* =================================================
-   HAMBURGER
+   HAMBURGER (iOS SAFE)
 ================================================= */
 .hamburger {
   display: none;
@@ -231,7 +236,14 @@ header.main-layout-header,
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.10);
+
   position: relative;
+  z-index: 5;
+  cursor: pointer;
+
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger span {
@@ -247,7 +259,65 @@ header.main-layout-header,
 .hamburger span:nth-child(3) { top: 30px; }
 
 /* =================================================
-   MOBILE SAFE
+   MOBILE MENU PANEL
+================================================= */
+.sk-mobileMenu {
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+  z-index: 5000;
+
+  padding: 14px;
+}
+
+.sk-mobileMenuInner {
+  border-radius: 18px;
+  padding: 14px;
+
+  background: rgba(18, 20, 45, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sk-mobileLink {
+  padding: 14px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--sk-text);
+  font-weight: 800;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.sk-mobileLink.is-active {
+  background: linear-gradient(135deg, #ff8a2a, #ffcc8a);
+  color: #0b1220;
+  border: none;
+}
+
+.sk-mobileActions {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.sk-mobileClose {
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sk-text);
+  font-weight: 900;
+}
+
+/* =================================================
+   MOBILE BREAKPOINT
 ================================================= */
 @media (max-width: 920px) {
   :root {
@@ -260,6 +330,11 @@ header.main-layout-header,
     --logo-img-compact: 46px;
   }
 
-  .sk-centerNav { display: none; }
-  .hamburger { display: block; }
+  .sk-centerNav {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
 }

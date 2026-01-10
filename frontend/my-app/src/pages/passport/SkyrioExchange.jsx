@@ -100,11 +100,13 @@ const ALL_ITEMS = [
   },
 ];
 
-export default function SkyrioExchange({ showSearch = true }) {
-  const [xp, setXp] = useState(860);
-  const [level] = useState(5);
-  const nextLevelPct = 80;
-
+export default function SkyrioExchange({
+  showSearch = true,
+  level = 0, // ✅ soft launch default
+  balanceXp = 0, // ✅ soft launch default
+  nextLevelPct = 0, // ✅ soft launch default
+}) {
+  const [xp, setXp] = useState(balanceXp);
   const [segment, setSegment] = useState("All");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
@@ -187,6 +189,7 @@ export default function SkyrioExchange({ showSearch = true }) {
     if (xp < item.cost) {
       return message.error("Not enough XP yet. Keep exploring ✈️");
     }
+
     Modal.confirm({
       title: `Redeem ${item.name}?`,
       centered: true,

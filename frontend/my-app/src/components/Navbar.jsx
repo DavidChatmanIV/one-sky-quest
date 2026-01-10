@@ -4,7 +4,7 @@ import { Avatar, Dropdown, Button, message } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 
 import "../styles/Navbar.css";
-import logo from "../assets/logo/skyrio-logo-mark-512.png"; 
+import logo from "../assets/logo/skyrio-logo-mark-512.png";
 
 import { useAuth } from "../auth/useAuth";
 import { useAuthModal } from "../auth/AuthModalController";
@@ -40,6 +40,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  // close mobile menu on route change
   useEffect(() => setMobileOpen(false), [pathname]);
 
   useEffect(() => {
@@ -103,6 +104,25 @@ export default function Navbar() {
       reason: "Create an account to save trips and join SkyStream.",
     });
 
+  // ✅ block Passport for logged-out OR guest (works for desktop + mobile)
+  const handlePassportClick = (e) => {
+    const href = e?.currentTarget?.getAttribute("href");
+    const isPassport = href === "/passport";
+
+    if (!isPassport) return;
+
+    if (!isAuthed || isGuest) {
+      e.preventDefault();
+      setMobileOpen(false);
+      openAuth({
+        intent: isAuthed ? "signup" : "login",
+        reason: isGuest
+          ? "Guest mode can’t access Passport. Create an account to unlock it."
+          : "Log in to access your Digital Passport.",
+      });
+    }
+  };
+
   return (
     <header className={`sk-nav ${navTheme} ${scrolled ? "is-compact" : ""}`}>
       <div className="sk-nav-inner">
@@ -110,7 +130,10 @@ export default function Navbar() {
         <div className="sk-left">
           <button
             className="sk-brand"
-            onClick={() => navigate("/")}
+            onClick={() => {
+              setMobileOpen(false);
+              navigate("/");
+            }}
             type="button"
             aria-label="Go to homepage"
           >
@@ -125,7 +148,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* CENTER */}
+        {/* CENTER (desktop nav) */}
         <nav className="sk-centerNav" aria-label="Primary">
           <div className="sk-navPills">
             {navItems.map((item) => (
@@ -133,6 +156,9 @@ export default function Navbar() {
                 key={item.to}
                 to={item.to}
                 end={item.to === "/"}
+                onClick={(e) => {
+                  if (item.to === "/passport") handlePassportClick(e);
+                }}
                 className={({ isActive }) =>
                   `sk-link ${isActive ? "is-active" : ""}`
                 }
@@ -179,6 +205,8 @@ export default function Navbar() {
                   placement="bottomRight"
                   trigger={["click"]}
                   overlayClassName="sk-dropdown"
+                  // ✅ KEY FIX for iOS + fixed / glass headers:
+                  getPopupContainer={(node) => node.parentElement}
                 >
                   <button
                     className="sk-avatarBtn"
@@ -210,6 +238,70 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      {/* ✅ MOBILE MENU PANEL (this is what you were missing) */}
+      {mobileOpen && (
+        <div className="sk-mobileMenu" role="dialog" aria-label="Mobile menu">
+          <div className="sk-mobileMenuInner">
+            {navItems.map((item) => (
+              <NavLink
+                key={`m-${item.to}`}
+                to={item.to}
+                end={item.to === "/"}
+                onClick={(e) => {
+                  if (item.to === "/passport") handlePassportClick(e);
+                  else setMobileOpen(false);
+                }}
+                className={({ isActive }) =>
+                  `sk-mobileLink ${isActive ? "is-active" : ""}`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+
+            <div className="sk-mobileActions">
+              {!isAuthed ? (
+                <>
+                  <Button className="sk-btnGhost" block onClick={openLogin}>
+                    Log in
+                  </Button>
+                  <Button
+                    type="primary"
+                    className="sk-btnPrimary"
+                    block
+                    onClick={openSignup}
+                  >
+                    Sign up
+                  </Button>
+                </>
+              ) : isGuest ? (
+                <Button
+                  type="primary"
+                  className="sk-btnPrimary"
+                  block
+                  onClick={openSignup}
+                >
+                  Upgrade
+                </Button>
+              ) : (
+                <Button danger block onClick={handleLogout}>
+                  Log out
+                </Button>
+              )}
+            </div>
+
+            <button
+              className="sk-mobileClose"
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMobileOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

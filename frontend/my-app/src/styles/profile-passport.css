@@ -1,247 +1,772 @@
+/* =====================================================
+   SKYRIO PASSPORT — DESIGN CONTRACT (STABLE)
+   Edit ONLY the TOKENS section for safe adjustments.
+   ===================================================== */
 
+/* =============================
+   1) TOKENS (SAFE TO TWEAK)
+   ============================= */
 :root {
-  --bg-start: #0f1020;
-  --bg-mid: #231a3a;
-  --bg-end: #3a2430;
+  /* text */
+  --pp-text: rgba(244, 246, 251, 0.95);
+  --pp-muted: rgba(244, 246, 251, 0.72);
 
-  --surface: rgba(255, 255, 255, 0.06);
-  --surface-2: rgba(255, 255, 255, 0.08);
+  /* orange system */
+  --pp-orange: #ff8a2a;
+  --pp-orange-2: #ffb066;
+  --pp-orange-soft: rgba(255, 138, 42, 0.14);
+  --pp-orange-border: rgba(255, 138, 42, 0.55);
 
-  --text: #f4f6fb;
-  --muted: rgba(244, 246, 251, 0.78);
+  /* surfaces */
+  --pp-stroke: rgba(255, 255, 255, 0.12);
+  --pp-surface-a: rgba(255, 255, 255, 0.08);
+  --pp-surface-b: rgba(255, 255, 255, 0.03);
 
-  --cta: #ff8a2a;
-  --cta-hover: #ff7a00;
+  /* layout */
+  --pp-radius-lg: 22px;
+  --pp-radius-md: 18px;
+  --pp-radius-sm: 14px;
 
-  --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-  --stroke: rgba(255, 255, 255, 0.10);
+  /* shadow */
+  --pp-shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
 }
 
 /* =============================
-   Route Scope (MOST IMPORTANT)
+   2) ROUTE SCOPE (DO NOT TOUCH)
    ============================= */
 .passport-scope {
-  color: var(--text);
+  color: var(--pp-text);
 }
 
-/* HARD LOCK: stop dark text anywhere inside passport route */
-.passport-scope,
-.passport-scope * {
-  color: var(--text) !important;
-}
-
-/* Ant Typography */
+/* Only lock typography basics (not everything) */
 .passport-scope .ant-typography,
 .passport-scope .ant-typography * {
-  color: var(--text) !important;
+  color: var(--pp-text) !important;
 }
 
 .passport-scope .ant-typography-secondary,
-.passport-scope .ant-text-secondary,
-.passport-scope .ant-form-item-explain,
-.passport-scope .ant-form-item-extra {
-  color: var(--muted) !important;
-}
-
-/* ✅ Critical fix: Ant Card Body */
-.passport-scope .ant-card,
-.passport-scope .ant-card-body,
-.passport-scope .ant-card-body * {
-  color: var(--text) !important;
+.passport-scope .ant-text-secondary {
+  color: var(--pp-muted) !important;
 }
 
 /* =============================
-   Page Wrapper (layout)
+   3) LAYOUT
    ============================= */
 .passport-wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 12px 16px 24px;
+  padding: 16px 16px 28px;
 }
 
 /* =============================
-   Gate (RequireAuthBlock) Premium
-   Works if you updated RequireAuthBlock to add classes,
-   BUT still looks good even without it.
+   4) SURFACES (CARDS)
    ============================= */
-
-/* If you updated RequireAuthBlock.jsx with sk-authBlockCard */
-.passport-scope .sk-authBlock {
-  margin-top: 16px;
-}
-
-.passport-scope .sk-authBlockCard {
-  border-radius: 18px !important;
-  background: linear-gradient(
-    135deg,
-    rgba(120, 90, 255, 0.18),
-    rgba(255, 138, 42, 0.10)
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow: var(--shadow) !important;
+.passport-scope .osq-surface {
+  background: linear-gradient(180deg, var(--pp-surface-a), var(--pp-surface-b));
+  border: 1px solid var(--pp-stroke);
+  border-radius: var(--pp-radius-md);
+  box-shadow: var(--pp-shadow);
   backdrop-filter: blur(12px);
 }
 
-/* Fallback: if RequireAuthBlock has no class yet */
-.passport-scope > .ant-card {
-  border-radius: 18px !important;
+/* Hero surface */
+.passport-scope .passport-hero {
+  border-radius: var(--pp-radius-lg);
   background: linear-gradient(
     135deg,
     rgba(120, 90, 255, 0.18),
-    rgba(255, 138, 42, 0.10)
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow: var(--shadow) !important;
-  backdrop-filter: blur(12px);
+    rgba(255, 138, 42, 0.1)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: var(--pp-shadow);
 }
 
 /* =============================
-   Passport Hero
+   5) PILLS (YOUR SIGNATURE)
    ============================= */
-.passport-hero {
-  border-radius: 18px !important;
-  background: linear-gradient(
-    135deg,
-    rgba(120, 90, 255, 0.16),
-    rgba(255, 138, 42, 0.08)
-  ) !important;
+.pp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  background: var(--pp-orange-soft);
+  border: 1px solid var(--pp-orange-border);
+  color: var(--pp-text) !important;
+}
+
+.pp-pill--solid {
+  background: linear-gradient(180deg, var(--pp-orange-2), var(--pp-orange));
+  border: 1px solid rgba(255, 138, 42, 0.45);
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(255, 138, 42, 0.28);
+}
+
+/* Back-compat for your existing pill class names */
+.count-pill,
+.status-pill,
+.orange-pill,
+.view-only-pill,
+.top-eight__chip {
+  background: var(--pp-orange-soft) !important;
+  border: 1px solid var(--pp-orange-border) !important;
+  border-radius: 999px !important;
+  padding: 4px 10px !important;
+  font-weight: 900 !important;
+  color: #fff !important;
+}
+
+/* =============================
+   6) SEGMENTED (NO WHITE PILL)
+   (Kept for back-compat; you replaced it with Tab Rail)
+   ============================= */
+.passport-scope .ant-segmented {
+  background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: var(--shadow) !important;
-  backdrop-filter: blur(12px);
-}
-
-.tp-avatar {
-  background: rgba(255, 255, 255, 0.10) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-}
-
-/* =============================
-   Glass Surface Utility
-   ============================= */
-.osq-surface {
   border-radius: 16px !important;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.08),
-    rgba(255,255,255,0.03)
-  ) !important;
-  border: 1px solid var(--stroke) !important;
-  box-shadow: var(--shadow) !important;
-  backdrop-filter: blur(10px);
+  padding: 6px !important;
+}
+
+.passport-scope .ant-segmented-item {
+  border-radius: 12px !important;
+}
+
+.passport-scope .ant-segmented-item-selected {
+  background: var(--pp-orange-soft) !important;
+  border: 1px solid var(--pp-orange-border) !important;
+}
+
+.passport-scope .ant-segmented-item-label {
+  color: rgba(244, 246, 251, 0.88) !important;
+  font-weight: 850 !important;
+}
+
+.passport-scope .ant-segmented-item-selected .ant-segmented-item-label {
+  color: rgba(244, 246, 251, 0.98) !important;
+  font-weight: 950 !important;
 }
 
 /* =============================
-   Social buttons
+   7) HERO LAYOUT (STABLE)
    ============================= */
+.pp-heroGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.9fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.pp-heroLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .passport-social {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
   flex-wrap: wrap;
 }
 
 .passport-socialBtn {
-  appearance: none;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color: #fff !important;
-  border-radius: 14px;
-  padding: 8px 12px;
+  background: var(--pp-orange-soft);
+  border: 1px solid var(--pp-orange-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 900;
   cursor: pointer;
-  min-width: 112px;
-  text-align: left;
-  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
-  backdrop-filter: blur(10px);
+  transition: background 140ms ease, transform 140ms ease;
+  color: var(--pp-text) !important;
 }
 
-.passport-socialBtn strong {
-  display: block;
-  font-size: 18px;
-  line-height: 1.05;
+.passport-socialBtn:hover {
+  background: rgba(255, 138, 42, 0.22);
+  transform: translateY(-1px);
+}
+
+.pp-heroCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  text-align: center;
+}
+
+.pp-xpRing {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.pp-xpRing .ant-progress-text {
+  display: none !important;
+}
+
+.pp-mutedLine {
+  font-size: 13px;
+  max-width: 260px;
+  color: var(--pp-muted) !important;
+}
+
+.pp-heroRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.pp-membershipTag {
+  background: var(--pp-orange-soft);
+  border: 1px solid var(--pp-orange-border);
+  border-radius: 999px;
+  padding: 6px 12px;
   font-weight: 900;
   color: #fff !important;
 }
 
-.passport-socialBtn span {
-  display: block;
+.pp-expireTextSmall {
+  font-size: 13px;
+  color: var(--pp-muted) !important;
+}
+
+/* Hero buttons stay consistent */
+.pp-ctaBtn,
+.pp-ghostBtn {
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+}
+
+.pp-ghostBtn {
+  background: transparent !important;
+  border: 1px solid var(--pp-orange-border) !important;
+}
+
+.pp-ghostBtn:hover {
+  background: var(--pp-orange-soft) !important;
+}
+
+/* =====================================================
+   ✅ MERGED: INLINE IDENTITY (Hero embedded)
+   ===================================================== */
+.pp-identityInline {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.pp-identityChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pp-identityActions .subtle-btn {
+  border-radius: 14px !important;
+  height: 38px !important;
+  font-weight: 700 !important;
+}
+
+.pp-identityMeta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: rgba(244,246,251,0.75) !important;
+  opacity: 0.9;
 }
 
-.passport-socialBtn:hover {
-  border-color: rgba(255,138,42,0.45);
-  background: rgba(255,138,42,0.10);
-  transform: translateY(-1px);
-}
-
-/* =============================
-   Tabs
-   ============================= */
-.passport-scope .ant-tabs-tab-btn {
-  color: rgba(255,255,255,0.78) !important;
-}
-.passport-scope .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #fff !important;
-}
-
-/* =============================
-   Segmented
-   ============================= */
-.passport-scope .ant-segmented {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-.passport-scope .ant-segmented-item-label {
-  color: rgba(255,255,255,0.85);
+.pp-identityMeta .passport-meta__k {
+  opacity: 0.75;
   font-weight: 700;
 }
 
-.passport-scope .ant-segmented-item-selected {
-  background: rgba(255,255,255,0.16);
-}
-
-.passport-scope .ant-segmented-item-selected .ant-segmented-item-label {
-  color: #fff;
+.pp-identityMeta .passport-meta__v {
+  opacity: 0.95;
+  font-weight: 600;
 }
 
 /* =============================
-   Inputs
+   8) INNER CIRCLE / TOP 8 (TIGHT)
    ============================= */
-.passport-scope .ant-input,
-.passport-scope .ant-input-affix-wrapper,
-.passport-scope input {
+.top-eight__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.top-eight__item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 12px;
+  min-height: 96px;
+}
+
+/* =============================
+   9) PLACES (READABLE ORANGE TAGS)
+   ============================= */
+.place-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.place-title {
+  font-weight: 800;
+  font-size: 14px;
   color: #fff !important;
-  background: rgba(255,255,255,0.08) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
 }
 
-.passport-scope .ant-input::placeholder,
-.passport-scope input::placeholder {
-  color: rgba(255,255,255,0.55) !important;
+.place-sub {
+  font-size: 12px;
+  color: var(--pp-muted) !important;
+}
+
+.place-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--pp-orange-2), var(--pp-orange));
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(255, 138, 42, 0.28);
+  border: 1px solid rgba(255, 138, 42, 0.45);
+}
+
+.place-tag.passport-pick {
+  background: linear-gradient(180deg, #ffc07a, #ff9f43);
 }
 
 /* =============================
-   Buttons
+   10) TRAVEL HISTORY CONTROLS
    ============================= */
-.passport-scope .ant-btn,
-.passport-scope .ant-btn span {
+.ph-section__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.subtle-btn {
+  border-radius: 999px !important;
+  border: 1px solid var(--pp-orange-border) !important;
+  background: transparent !important;
+  font-weight: 900 !important;
+}
+
+.collapse-btn {
+  background: var(--pp-orange-soft) !important;
+  border: 1px solid var(--pp-orange-border) !important;
+  border-radius: 999px !important;
+  padding: 6px 12px !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+}
+
+/* =============================
+   11) ACCESSIBILITY / FOCUS
+   ============================= */
+.passport-scope button:focus-visible,
+.passport-scope .ant-btn:focus-visible,
+.passport-scope input:focus-visible {
+  outline: 2px solid var(--pp-orange);
+  outline-offset: 2px;
+}
+
+/* =============================
+   12) RESPONSIVE
+   ============================= */
+@media (max-width: 960px) {
+  .pp-heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-heroRight {
+    align-items: flex-start;
+  }
+
+  .top-eight__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================
+   FIX: 2 CARDS STILL NOT MATCHING (TARGETED PATCH)
+   ===================================================== */
+.passport-scope .passport-highlights .ant-tag.chip,
+.passport-scope .passport-highlights .chip {
+  background: linear-gradient(180deg, var(--pp-orange-2), var(--pp-orange)) !important;
+  border: 1px solid rgba(255, 138, 42, 0.55) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 2px 8px rgba(255, 138, 42, 0.22) !important;
+}
+
+.passport-scope .passport-highlights .chip .anticon,
+.passport-scope .passport-highlights .ant-tag.chip .anticon {
   color: #fff !important;
 }
 
-/* If your primary button is bright, dark text looks premium */
-.passport-scope .ant-btn-primary,
-.passport-scope .ant-btn-primary span {
-  color: #1b1024 !important;
+.passport-scope .passport-identity .tp-chips .ant-tag.chip,
+.passport-scope .passport-identity .tp-chips .chip,
+.passport-scope .pp-identityInline .ant-tag.chip,
+.passport-scope .pp-identityInline .chip {
+  background: linear-gradient(180deg, var(--pp-orange-2), var(--pp-orange)) !important;
+  border: 1px solid rgba(255, 138, 42, 0.55) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 2px 8px rgba(255, 138, 42, 0.22) !important;
 }
 
-/* =============================
-   Responsive
-   ============================= */
-@media (max-width: 768px) {
-  .passport-wrap {
-    padding: 12px 12px 24px;
+/* =====================================================
+   ✅ TAB RAIL (MOCK)
+   ===================================================== */
+.ppTabRail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 14px;
+  padding: 10px 12px;
+
+  border-radius: 16px;
+  background: rgba(10, 10, 18, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 14px 40px rgba(0, 0, 0, 0.28);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  position: relative;
+  overflow: hidden;
+}
+
+.ppTabRail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 138, 42, 0),
+    rgba(255, 138, 42, 0.75),
+    rgba(255, 138, 42, 0)
+  );
+  opacity: 0.55;
+}
+
+.ppTabRail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+.ppTabItemWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ppTabDivider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ppTabItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(244, 246, 251, 0.78);
+  cursor: pointer;
+
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.ppTabItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.ppTabItem.isActive {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 138, 42, 0.18),
+    rgba(120, 90, 255, 0.08)
+  );
+  border-color: rgba(255, 138, 42, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 138, 42, 0.10),
+    0 0 22px rgba(255, 138, 42, 0.22);
+  color: rgba(244, 246, 251, 0.95);
+  position: relative;
+}
+
+.ppTabItem.isActive::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -10px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 138, 42, 0),
+    rgba(255, 138, 42, 0.85),
+    rgba(255, 138, 42, 0)
+  );
+  opacity: 0.9;
+}
+
+/* =====================================================
+   ✅ SUMMARY GRID
+   ===================================================== */
+.ppSummaryGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+@media (max-width: 980px) {
+  .ppSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================
+   PASSPORT HOLDER PRIVILEGES — PERKS STYLE (BEST)
+   ===================================================== */
+
+/* Avoid :has() to prevent cross-browser issues */
+.pp-privCard {
+  padding: 16px !important;
+}
+
+/* Header */
+.pp-privHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.pp-privTitle {
+  margin: 0 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.2px;
+}
+
+/* Premium status chip */
+.pp-activeTag {
+  border-radius: 999px !important;
+  padding: 3px 10px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 138, 42, 0.35) !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Grid */
+.pp-privGrid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 920px) {
+  .pp-privGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Perk tiles */
+.pp-privGrid .pp-pill {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 138, 42, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Locked */
+.pp-privGrid .pp-pill--locked {
+  opacity: 0.55 !important;
+  border-style: dashed !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Description */
+.pp-privDesc {
+  display: block;
+  margin-top: 12px !important;
+  font-size: 13px !important;
+  max-width: 520px;
+  color: var(--pp-muted) !important;
+}
+
+/* =====================================================
+   ✅ SKYRIO EXCHANGE (Preview Module)
+   (Safe add-on for Passport Summary card)
+   ===================================================== */
+
+.skx-card {
+  padding: 16px !important;
+}
+
+.skx-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.skx-title {
+  margin: 0 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.2px;
+}
+
+.skx-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--pp-muted) !important;
+}
+
+.skx-preview {
+  opacity: 0.85;
+  font-weight: 800;
+}
+
+.skx-chip {
+  border-radius: 999px !important;
+  padding: 3px 10px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+}
+
+.skx-chip--soft {
+  border-color: rgba(255, 138, 42, 0.28) !important;
+}
+
+.skx-chip--soon {
+  border-color: rgba(255, 138, 42, 0.35) !important;
+}
+
+.skx-body {
+  display: grid;
+  gap: 12px;
+}
+
+.skx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.skx-row--perk {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 138, 42, 0.12),
+    rgba(120, 90, 255, 0.08)
+  );
+  border-color: rgba(255, 138, 42, 0.22);
+}
+
+.skx-rowLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skx-ico {
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.skx-label {
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.86;
+}
+
+.skx-value {
+  font-size: 14px;
+  font-weight: 900;
+  color: rgba(244, 246, 251, 0.96);
+}
+
+.skx-mini {
+  font-size: 12px;
+  opacity: 0.78;
+}
+
+.skx-progress {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.skx-progressTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.skx-cta {
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  border: 1px solid rgba(255, 138, 42, 0.35) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+}
+
+.skx-cta[disabled] {
+  opacity: 0.55 !important;
+}
+
+@media (max-width: 960px) {
+  .skx-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

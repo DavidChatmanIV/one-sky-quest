@@ -1,71 +1,111 @@
-import React, { useState } from "react";
-import { Card, Space, Typography, Button } from "antd";
+import React from "react";
+import { Card, Space, Typography, Button, Tag } from "antd";
 import { LockOutlined } from "@ant-design/icons";
-import AuthModal from "./AuthModal";
+import { useAuthModal } from "../auth/AuthModalController";
 import { useAuth } from "../auth/AuthProvider";
 
 const { Title, Text } = Typography;
 
 export default function SoftBlock({
-  intent = "continue", // "post" | "save" | "dm" | "continue"
+  intent = "continue",
   title,
   body,
-  cta = "Log in",
+  subtitle,
+
+  cta,
   secondaryCta = "Continue as guest",
-  children, // optional “preview” behind the block
+
+  primaryLabel,
+  primaryIntent = "signup",
+  secondaryLabel,
+  secondaryIntent = "login",
+
+  badge,
   compact = false,
+  children,
 }) {
   const { isAuthed, isGuest, continueAsGuest } = useAuth();
-  const [open, setOpen] = useState(false);
+  const { openAuth } = useAuthModal();
 
-  if (isAuthed) return children || null;
-
-  const defaultTitle =
-    intent === "post"
+  // ✅ compute strings without hooks
+  const resolvedTitle =
+    title ||
+    (intent === "post"
       ? "Log in to post ✨"
       : intent === "save"
       ? "Log in to save trips ✨"
       : intent === "dm"
       ? "Log in to message ✨"
-      : "Log in to continue ✨";
+      : intent === "passport"
+      ? "Create an account to access your Digital Passport"
+      : "Log in to continue ✨");
 
-  const defaultBody =
-    intent === "post"
+  const resolvedBody =
+    subtitle ||
+    body ||
+    (intent === "post"
       ? "Posting is tied to your account so your profile and XP stay accurate."
       : intent === "save"
       ? "Saving trips syncs across devices and lets us track budget + XP."
       : intent === "dm"
       ? "Messaging is private and account-based so you can pick up where you left off."
-      : "This feature needs an account so it can save your progress.";
+      : intent === "passport"
+      ? "Your Passport saves XP, badges, and trips so your progress stays synced."
+      : "This feature needs an account so it can save your progress.");
+
+  const resolvedPrimaryLabel = primaryLabel || cta || "Sign up";
+  const resolvedSecondaryLabel = secondaryLabel || "Log in";
+
+  // ✅ safe to early return now (no hooks below)
+  if (isAuthed) return children || null;
+
+  const triggerAuth = (nextIntent) =>
+    openAuth?.({ intent: nextIntent || intent });
 
   return (
-    <>
+    <div
+      style={{
+        minHeight: compact ? "auto" : "70vh",
+        display: "grid",
+        placeItems: "center",
+        padding: compact ? 0 : 24,
+      }}
+    >
       <Card
-        style={{ borderRadius: 16 }}
+        style={{ maxWidth: 560, width: "100%", borderRadius: 16 }}
         bodyStyle={{ padding: compact ? 14 : 18 }}
       >
         <Space direction="vertical" style={{ width: "100%" }} size={10}>
           <Space align="center">
             <LockOutlined />
-            <Title level={compact ? 5 : 4} style={{ margin: 0 }}>
-              {title || defaultTitle}
-            </Title>
+            {badge ? <Tag style={{ marginLeft: 8 }}>{badge}</Tag> : null}
           </Space>
 
-          <Text style={{ opacity: 0.9 }}>{body || defaultBody}</Text>
+          <Title level={compact ? 5 : 3} style={{ margin: 0 }}>
+            {resolvedTitle}
+          </Title>
 
-          <Space wrap>
-            <Button type="primary" onClick={() => setOpen(true)}>
-              {cta}
+          <Text style={{ opacity: 0.9 }}>{resolvedBody}</Text>
+
+          <Space wrap style={{ marginTop: 10 }}>
+            <Button type="primary" onClick={() => triggerAuth(primaryIntent)}>
+              {resolvedPrimaryLabel}
             </Button>
 
-            {!isGuest && (
-              <Button
-                onClick={() => {
-                  continueAsGuest();
-                }}
-              >
-                {secondaryCta}
+            {/* ✅ For Passport you usually want NO guest option */}
+            {intent === "passport" ? (
+              <Button onClick={() => triggerAuth(secondaryIntent)}>
+                {resolvedSecondaryLabel}
+              </Button>
+            ) : secondaryCta && typeof continueAsGuest === "function" ? (
+              !isGuest ? (
+                <Button onClick={() => continueAsGuest()}>
+                  {secondaryCta}
+                </Button>
+              ) : null
+            ) : (
+              <Button onClick={() => triggerAuth(secondaryIntent)}>
+                {resolvedSecondaryLabel}
               </Button>
             )}
           </Space>
@@ -79,8 +119,6 @@ export default function SoftBlock({
           ) : null}
         </Space>
       </Card>
-
-      <AuthModal open={open} onClose={() => setOpen(false)} intent={intent} />
-    </>
+    </div>
   );
 }
