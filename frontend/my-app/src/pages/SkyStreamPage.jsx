@@ -13,17 +13,28 @@ import {
   Tag,
   Badge,
   message,
+  Dropdown,
+  Menu,
+  Avatar,
+  Divider,
 } from "antd";
 import {
   SearchOutlined,
   PlusOutlined,
-  FireOutlined,
-  ThunderboltOutlined,
   ReloadOutlined,
+  ThunderboltOutlined,
+  PictureOutlined,
+  VideoCameraOutlined,
+  EnvironmentOutlined,
+  TagsOutlined,
+  SaveOutlined,
+  StarOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 
 import "../styles/skystream.css";
 import { useSkystreamFeed } from "../hooks/useSkystreamFeed";
+import { safeJson } from "../lib/safeJson";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -80,21 +91,109 @@ const TAB_OPTIONS = [
   { key: "news", label: "News" },
 ];
 
+const FEED_PRESETS = [
+  { key: "passport", label: "For You (Passport)" },
+  { key: "near", label: "Near Me" },
+  { key: "deals", label: "Deals Drop" },
+  { key: "gems", label: "Hidden Gems" },
+];
+
+function PostCard({ p, onFollow }) {
+  const author = p.authorId?.username || p.authorName || "Traveler";
+  const handle = p.authorId?.handle || p.handle || "@traveler";
+  const verified = !!p.verified;
+
+  return (
+    <div className="sk-postCard">
+      <div className="sk-postTop">
+        <div className="sk-postIdentity">
+          <Avatar size={42} src={p.avatarUrl} />
+          <div className="sk-postWho">
+            <div className="sk-postNameRow">
+              <span className="sk-postName">{author}</span>
+              <span className="sk-postHandle">{handle}</span>
+              {verified && <span className="sk-postVerified">verified</span>}
+            </div>
+            <div className="sk-postMetaLine">
+              {p.metaLine || "Skyrio Traveler"} {p.city ? `• ${p.city}` : ""}
+            </div>
+          </div>
+        </div>
+
+        <Button
+          className="sk-ghostIconBtn"
+          icon={<MoreOutlined />}
+          type="text"
+        />
+      </div>
+
+      <div className="sk-postText">
+        <Text className="sk-postBody">{p.body}</Text>
+        {!!p.tags?.length && (
+          <div className="sk-postTagsRow">
+            {p.tags.map((t) => (
+              <span key={t} className="sk-postTagLink">
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {!!p.imageUrl && (
+        <div className="sk-postMedia">
+          <img src={p.imageUrl} alt="" />
+        </div>
+      )}
+
+      {!!p.tripCard && (
+        <div className="sk-tripMini">
+          <div className="sk-tripMiniLeft">
+            {p.tripCard.thumb ? (
+              <img className="sk-tripMiniThumb" src={p.tripCard.thumb} alt="" />
+            ) : (
+              <div className="sk-tripMiniThumb sk-tripMiniThumb--empty" />
+            )}
+            <div className="sk-tripMiniText">
+              <div className="sk-tripMiniTitle">{p.tripCard.title}</div>
+              <div className="sk-tripMiniSub">{p.tripCard.sub}</div>
+            </div>
+          </div>
+
+          <Button className="sk-tripMiniBtn" size="small">
+            Save to trip
+          </Button>
+        </div>
+      )}
+
+      <div className="sk-postActionsRow">
+        <span className="sk-postAction">💬 {p.replyCount ?? "—"}</span>
+        <span className="sk-postAction">🔁 {p.repostCount ?? "—"}</span>
+        <span className="sk-postAction">❤️ {p.likeCount ?? "—"}</span>
+        <span className="sk-postAction">🔖 Save</span>
+
+        <Button className="sk-followBtn" size="small" onClick={onFollow}>
+          Follow
+        </Button>
+      </div>
+
+      <Divider className="sk-divider" />
+    </div>
+  );
+}
+
 export default function SkyStreamPage() {
   const [activeTab, setActiveTab] = useState("forYou");
   const [search, setSearch] = useState("");
+  const [feedPreset, setFeedPreset] = useState("passport");
 
-  /* ---------------------------
-     ✅ Following / Followers counts
-  --------------------------- */
+  /* ✅ counts */
   const [stats, setStats] = useState({
     followingCount: 0,
     followersCount: 0,
   });
 
-  /* ---------------------------
-     ✅ AUTH USER ID (FINAL FORM)
-  --------------------------- */
+  /* ✅ auth user id */
   const userId = useMemo(() => {
     try {
       const raw = localStorage.getItem("user");
@@ -105,9 +204,7 @@ export default function SkyStreamPage() {
     }
   }, []);
 
-  /* ---------------------------
-    Fetch passport stats
-  --------------------------- */
+  /* fetch passport stats (Option B + C) */
   useEffect(() => {
     let cancelled = false;
 
@@ -117,39 +214,42 @@ export default function SkyStreamPage() {
         return;
       }
 
-      try {
-        const res = await fetch("/api/passport/stats", {
-          headers: { "x-user-id": userId },
-        });
+      const data = await safeJson("/api/passport/stats", {
+        headers: { "x-user-id": userId },
+      });
 
-        const ct = res.headers.get("content-type") || "";
-        if (!ct.includes("application/json")) return;
-
-        const data = await res.json();
-        if (!cancelled && data?.ok) {
-          setStats({
-            followingCount:
-              data?.user?.followingCount ?? data?.followingCount ?? 0,
-            followersCount:
-              data?.user?.followersCount ?? data?.followersCount ?? 0,
-          });
+      // Option B: page-level context log (dev only)
+      if (!data) {
+        if (import.meta.env.DEV) {
+          console.warn(
+            "[SkyStream] passport stats unavailable (demo/guest/API)"
+          );
         }
-      } catch {
-        // silent fail
+        return;
+      }
+
+      if (!cancelled && data?.ok) {
+        setStats({
+          followingCount:
+            data?.user?.followingCount ?? data?.followingCount ?? 0,
+          followersCount:
+            data?.user?.followersCount ?? data?.followersCount ?? 0,
+        });
+      } else if (import.meta.env.DEV && data?.ok === false) {
+        console.warn("[SkyStream] passport stats ok=false:", data);
       }
     }
 
     loadStats();
+
     return () => {
       cancelled = true;
     };
   }, [userId]);
 
-  /* ---------------------------
-     Feed Hook
-  --------------------------- */
+  /* feed hook */
   const {
-    items: posts,
+    items: apiPosts,
     loading,
     error,
     hasMore,
@@ -162,9 +262,7 @@ export default function SkyStreamPage() {
     pageSize: 20,
   });
 
-  /* ---------------------------
-     UI helpers
-  --------------------------- */
+  /* Right rail data */
   const trending = useMemo(
     () => ["#Japan", "#Kyoto", "#HiddenGem", "#Weekend", "#deals"],
     []
@@ -180,6 +278,22 @@ export default function SkyStreamPage() {
     []
   );
 
+  const dealDrops = useMemo(
+    () => [
+      {
+        title: "Tokyo, Japan",
+        price: "$640 RT",
+        note: "Selected dates • 30% Off",
+      },
+      {
+        title: "Santorini, GR",
+        price: "$899 RT",
+        note: "Summer trips • 23% Off",
+      },
+    ],
+    []
+  );
+
   function applyPillFilter(label) {
     const clean = String(label || "").replace(/^#/, "");
     if (!clean) return;
@@ -190,173 +304,352 @@ export default function SkyStreamPage() {
   function clearFilters() {
     setSearch("");
     setActiveTab("forYou");
+    setFeedPreset("passport");
   }
 
-  /* ---------------------------
-     Follow user
-  --------------------------- */
   async function handleFollow(targetUserId) {
     if (!userId) {
       message.info("Sign in to follow travelers.");
       return;
     }
+    if (!targetUserId) return;
 
     try {
-      const res = await fetch(`/api/follow/${targetUserId}`, {
+      const data = await safeJson(`/api/follow/${targetUserId}`, {
         method: "POST",
         headers: { "x-user-id": userId },
       });
 
-      const data = await res.json();
-      if (!res.ok || data?.ok === false) {
+      if (!data || data?.ok === false) {
         throw new Error(data?.error || "Follow failed");
       }
 
       message.success("Followed");
 
-      // refresh stats instantly
-      const s = await fetch("/api/passport/stats", {
+      // Optional: refresh stats right after follow
+      const sd = await safeJson("/api/passport/stats", {
         headers: { "x-user-id": userId },
       });
-      const sd = await s.json();
+
       if (sd?.ok) {
         setStats({
-          followingCount: sd?.user?.followingCount ?? 0,
-          followersCount: sd?.user?.followersCount ?? 0,
+          followingCount: sd?.user?.followingCount ?? sd?.followingCount ?? 0,
+          followersCount: sd?.user?.followersCount ?? sd?.followersCount ?? 0,
         });
       }
     } catch (e) {
-      message.error(e.message || "Could not follow");
+      message.error(e?.message || "Could not follow");
     }
   }
+
+  /* ✅ MOCK FALLBACK so design shows even if API is down */
+  const MOCK_POSTS = useMemo(
+    () => [
+      {
+        _id: "m1",
+        authorName: "Peter Chen",
+        handle: "@petertravels",
+        verified: true,
+        metaLine: "Skyrio Traveler",
+        body: "Hidden gem! 🌸 Discover this secret trail in Kyoto away from the crowd! Peaceful and beautiful.",
+        tags: ["#Kyoto", "#HiddenGem"],
+        imageUrl:
+          "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1600&q=80",
+        tripCard: {
+          title: "Kyoto • Hidden Gem",
+          sub: "3 days • September 2024",
+          thumb:
+            "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=240&q=80",
+        },
+        replyCount: "15.2",
+        repostCount: "3.5K",
+        likeCount: "2.3K",
+      },
+      {
+        _id: "m2",
+        authorName: "Caitlyn James",
+        handle: "@cjames",
+        verified: true,
+        metaLine: "verified Traveler",
+        body: "Like this travel short asap — Santorini at golden hour is unreal. #Weekend",
+        tags: ["#Weekend"],
+        imageUrl:
+          "https://images.unsplash.com/photo-1504512485720-7d83a16ee930?auto=format&fit=crop&w=1600&q=80",
+        replyCount: "4.1",
+        repostCount: "1.1K",
+        likeCount: "5.2K",
+      },
+    ],
+    []
+  );
+
+  const posts = error ? MOCK_POSTS : apiPosts;
 
   const emptyDescription =
     activeTab === "following"
       ? "Follow travelers to see their posts here."
       : "No posts match your filters yet.";
 
-  /* ===========================
-     RENDER
-  =========================== */
+  const feedMenu = (
+    <Menu
+      onClick={({ key }) => setFeedPreset(key)}
+      items={FEED_PRESETS.map((f) => ({ key: f.key, label: f.label }))}
+    />
+  );
+
+  const currentFeedLabel =
+    FEED_PRESETS.find((f) => f.key === feedPreset)?.label ||
+    "For You (Passport)";
+
   return (
     <Layout className="skystream">
       <Content className="skystream-content">
-        {/* Hero */}
-        <div className="skystream-hero">
+        {/* Desktop title (keep minimal like mock) */}
+        <div className="skystream-hero sk-only-desktop">
           <div>
-            <Title level={1}>SkyStream</Title>
-            <Text className="skystream-subtitle">
-              Live travel moments across Skyrio
-            </Text>
+            <Title level={1} className="skystream-title">
+              SkyStream
+            </Title>
+            <Text className="skystream-subtitle">Live travel moments</Text>
           </div>
-
-          <Button icon={<PlusOutlined />}>Post</Button>
         </div>
 
-        {/* Controls */}
-        <div className="skystream-controls">
-          <Input
-            prefix={<SearchOutlined />}
-            placeholder="Search SkyStream"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            allowClear
-          />
+        <Row gutter={[14, 14]}>
+          {/* LEFT RAIL (desktop only) */}
+          <Col xs={24} lg={6} className="sk-only-desktop">
+            <Card className="sk-card sk-leftRail" bordered={false}>
+              <div className="sk-leftNav">
+                <div className="sk-leftItem">🏠 Home</div>
+                <div className="sk-leftItem">
+                  🔥 Explore <span className="sk-leftBadge">5</span>
+                </div>
+                <div className="sk-leftItem">🔔 Alerts</div>
+                <div className="sk-leftItem">💬 DMs</div>
+                <div className="sk-leftItem sk-leftItemActive">🧠 SkyFeeds</div>
+                <div className="sk-leftItem">👥 Circles</div>
+                <div className="sk-leftItem">💾 Saved</div>
+                <div className="sk-leftItem">🛂 Passport</div>
+              </div>
 
-          <Segmented
-            value={activeTab}
-            onChange={setActiveTab}
-            options={TAB_OPTIONS.map((t) =>
-              t.key === "following"
-                ? {
-                    value: t.key,
-                    label: (
-                      <span>
-                        Following
-                        <Badge
-                          count={stats.followingCount}
-                          showZero
-                          size="small"
-                          offset={[6, -2]}
-                        />
-                      </span>
-                    ),
-                  }
-                : { value: t.key, label: t.label }
-            )}
-          />
-        </div>
+              <div className="sk-leftSectionTitle">SkyFeeds</div>
+              <div className="sk-leftFeeds">
+                {FEED_PRESETS.map((f) => (
+                  <div
+                    key={f.key}
+                    className={[
+                      "sk-leftFeed",
+                      f.key === feedPreset && "sk-leftFeedActive",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => setFeedPreset(f.key)}
+                  >
+                    {f.label}
+                  </div>
+                ))}
+              </div>
 
-        {/* Feed */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={16}>
-            <Card>
-              {error ? (
-                <Empty description={error} />
-              ) : loading ? (
+              <Button className="sk-leftCTA" block>
+                + Create Feed
+              </Button>
+            </Card>
+          </Col>
+
+          {/* CENTER */}
+          <Col xs={24} lg={12}>
+            {/* Top controls (match mock: search + feed dropdown on same row) */}
+            <div className="sk-centerTop">
+              <Input
+                className="skystream-search"
+                prefix={<SearchOutlined />}
+                placeholder="Search SkyStream"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                allowClear
+              />
+
+              <div className="sk-centerTopRight">
+                <Dropdown overlay={feedMenu} trigger={["click"]}>
+                  <Button className="sk-feedSelect">
+                    {currentFeedLabel} <span className="sk-caret">▾</span>
+                  </Button>
+                </Dropdown>
+
+                <Button className="sk-starBtn" icon={<StarOutlined />} />
+              </div>
+            </div>
+
+            {/* Composer card */}
+            <Card className="sk-card sk-composer" bordered={false}>
+              <div className="sk-composerRow">
+                <Input
+                  className="sk-composerInput"
+                  prefix={<SearchOutlined />}
+                  placeholder="Share your latest travel moment..."
+                />
+                <Button className="skystream-postBtn">Post</Button>
+              </div>
+
+              <div className="sk-composerChips">
+                <Button className="sk-chip" icon={<PictureOutlined />}>
+                  Photo
+                </Button>
+                <Button className="sk-chip" icon={<VideoCameraOutlined />}>
+                  Video
+                </Button>
+                <Button className="sk-chip" icon={<EnvironmentOutlined />}>
+                  Location
+                </Button>
+                <Button className="sk-chip" icon={<TagsOutlined />}>
+                  Travel Tags
+                </Button>
+                <Button className="sk-chip" icon={<SaveOutlined />}>
+                  Save
+                </Button>
+              </div>
+            </Card>
+
+            {/* Tabs row */}
+            <div className="sk-tabsRow">
+              <Segmented
+                className="skystream-tabs"
+                value={activeTab}
+                onChange={setActiveTab}
+                options={TAB_OPTIONS.map((t) =>
+                  t.key === "following"
+                    ? {
+                        value: t.key,
+                        label: (
+                          <span>
+                            Following
+                            <Badge
+                              count={stats.followingCount}
+                              showZero
+                              size="small"
+                              offset={[6, -2]}
+                            />
+                          </span>
+                        ),
+                      }
+                    : { value: t.key, label: t.label }
+                )}
+              />
+
+              <Button
+                className="sk-resetBtn"
+                icon={<ReloadOutlined />}
+                onClick={clearFilters}
+              >
+                Reset Filters
+              </Button>
+            </div>
+
+            {/* Feed */}
+            <Card className="sk-card sk-feedCard" bordered={false}>
+              {loading && !error ? (
                 <Text className="muted">Loading…</Text>
               ) : posts.length === 0 ? (
                 <Empty description={emptyDescription} />
               ) : (
-                posts.map((p) => (
-                  <div key={p._id} className="sk-post">
-                    <Text strong>{p.authorId?.username || "Traveler"}</Text>
-                    <p>{p.body}</p>
+                <div className="sk-feed">
+                  {error && (
+                    <div className="sk-softError">
+                      Feed is in demo mode (API not available). Showing sample
+                      posts.
+                    </div>
+                  )}
 
-                    <Button
-                      size="small"
-                      onClick={() => handleFollow(p.authorId?._id)}
-                    >
-                      Follow
-                    </Button>
-                  </div>
-                ))
+                  {posts.map((p) => (
+                    <PostCard
+                      key={p._id}
+                      p={p}
+                      onFollow={() => handleFollow(p.authorId?._id)}
+                    />
+                  ))}
+                </div>
               )}
 
-              {hasMore && (
-                <Button block onClick={loadMore} loading={loadingMore}>
-                  Load more
-                </Button>
+              {hasMore && !error && (
+                <div className="sk-loadMoreRow">
+                  <Button
+                    className="sk-loadMoreBtn"
+                    block
+                    onClick={loadMore}
+                    loading={loadingMore}
+                  >
+                    Load more
+                  </Button>
+                </div>
               )}
             </Card>
           </Col>
 
-          {/* Right rail */}
-          <Col xs={24} lg={8}>
-            <Card title="Trending">
-              {trending.map((t, i) => (
-                <SkyrioPill
-                  key={t}
-                  label={t}
-                  pulse={i === 0}
-                  onClick={() => applyPillFilter(t)}
-                />
-              ))}
-            </Card>
+          {/* RIGHT RAIL */}
+          <Col xs={24} lg={6}>
+            <div className="sk-rail">
+              <Card className="sk-card" title="Trending" bordered={false}>
+                <div className="sk-pillGrid">
+                  {trending.map((t, i) => (
+                    <SkyrioPill
+                      key={t}
+                      label={t}
+                      pulse={i === 0}
+                      onClick={() => applyPillFilter(t)}
+                    />
+                  ))}
+                </div>
+              </Card>
 
-            <Card title="Today’s hotspots">
-              {hotspots.map((h) => (
-                <SkyrioPill
-                  key={h.label}
-                  label={h.label}
-                  percent={h.pct}
-                  onClick={() => applyPillFilter(h.label)}
-                />
-              ))}
-            </Card>
+              <Card
+                className="sk-card"
+                title="Today’s hotspots"
+                bordered={false}
+              >
+                <div className="sk-pillGrid">
+                  {hotspots.map((h) => (
+                    <SkyrioPill
+                      key={h.label}
+                      label={h.label}
+                      percent={h.pct}
+                      onClick={() => applyPillFilter(h.label)}
+                    />
+                  ))}
+                </div>
+              </Card>
 
-            <Card title="Quick Actions">
-              <Space direction="vertical" style={{ width: "100%" }}>
-                <Button icon={<ReloadOutlined />} onClick={clearFilters}>
-                  Reset
-                </Button>
-                <Button icon={<ThunderboltOutlined />} onClick={clearFilters}>
-                  Clear All
-                </Button>
-              </Space>
-            </Card>
+              <Card className="sk-card" title="Deal Drops" bordered={false}>
+                <Space direction="vertical" style={{ width: "100%" }} size={10}>
+                  {dealDrops.map((d) => (
+                    <div key={d.title} className="sk-dealMini">
+                      <div className="sk-dealMiniTitle">{d.title}</div>
+                      <div className="sk-dealMiniPrice">{d.price}</div>
+                      <div className="sk-dealMiniNote">{d.note}</div>
+                    </div>
+                  ))}
+                </Space>
+              </Card>
+
+              <Card className="sk-card" title="Quick Actions" bordered={false}>
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Button icon={<ReloadOutlined />} onClick={clearFilters}>
+                    Reset
+                  </Button>
+                  <Button icon={<ThunderboltOutlined />} onClick={clearFilters}>
+                    Clear All
+                  </Button>
+                </Space>
+              </Card>
+            </div>
           </Col>
         </Row>
+
+        {/* Mobile FAB */}
+        <Button
+          className="sk-fabPost sk-only-mobile"
+          type="primary"
+          shape="circle"
+          icon={<PlusOutlined />}
+        />
       </Content>
     </Layout>
   );

@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 6, 18, 0.75),
+      rgba(18, 10, 30, 0.85)
+    ),
+    url("/src/assets/background/skyrio-cosmos.jpg");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  color: rgba(244, 246, 251, 0.92);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* =========================================================
    ROOT FIX — CRITICAL
    (Removes Vite template boxing + padding bug)

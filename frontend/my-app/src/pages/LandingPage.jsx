@@ -1,16 +1,18 @@
-import React, { useState } from "react";
-import { Typography, Button } from "antd";
+import React, { useMemo, useState } from "react";
+import { Button, Card, Tag } from "antd";
+import { PlayCircleFilled, QuestionCircleOutlined } from "@ant-design/icons";
 
 import PageLayout from "../components/PageLayout";
 import TutorialModal from "../components/TutorialModal";
 import SupportFormModal from "../components/SupportFormModal";
 
-// Desktop / tablet banner stays
-import MemberBenefitsBanner from "../components/landing/MemberBenefitsBanner";
-
 import "../styles/LandingPage.css";
 
-const { Title, Text } = Typography;
+/**
+ * ✅ Keep image in src/assets and still use it safely:
+ * Vite will fingerprint + serve correctly.
+ */
+import cosmicBg from "../assets/landing/skyrio-cosmic.jpg";
 
 const destinations = [
   { label: "Bali", emoji: "🏝️" },
@@ -22,182 +24,170 @@ export default function LandingPage() {
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
 
+  // ✅ Inline background style so we NEVER depend on CSS url("/src/...")
+  const bgStyle = useMemo(
+    () => ({
+      backgroundImage: `url(${cosmicBg})`,
+    }),
+    []
+  );
+
   return (
-    <PageLayout>
-      {/* ✅ Desktop/Tablet MemberBenefitsBanner */}
-      <div className="lp-memberDesktop">
-        <MemberBenefitsBanner />
-      </div>
+    <PageLayout className="page--landing" fullBleed withNavOffset={false}>
+      <div className="sk-landing" aria-label="Skyrio Landing Page">
+        {/* ✅ Background layers (image + overlays) */}
+        <div className="sk-landing-bg" style={bgStyle} aria-hidden="true" />
+        <div className="sk-landing-vignette" aria-hidden="true" />
 
-      {/* ✅ Mobile-only: compact premium guest pill */}
-      <div
-        className="lp-memberMobile"
-        role="region"
-        aria-label="Skyrio membership"
-      >
-        <div className="lp-mobilePill">
-          <div className="lp-mobilePillLeft">
-            <div className="lp-mobilePillTitle">Guest mode</div>
-            <div className="lp-mobilePillSub">
-              Unlock rewards + price alerts
+        {/* ✅ Content */}
+        <div className="sk-landing-inner">
+          {/* ✅ Top member pill */}
+          <div className="sk-member-banner">
+            <div className="sk-member-left">
+              <div className="sk-member-title">🔒 Unlock member features</div>
+              <div className="sk-member-sub">
+                Sign in to get Member-only deals · XP rewards · Price-drop
+                alerts · Saved trips + faster checkout.
+              </div>
             </div>
-          </div>
 
-          <div className="lp-mobilePillRight">
-            <Button
-              type="link"
-              className="lp-mobilePillBtn lp-mobilePillBtnPrimary"
-              onClick={() => setTutorialOpen(true)}
-            >
-              Quick tour
-            </Button>
-
-            <Button
-              type="link"
-              className="lp-mobilePillBtn"
-              onClick={() => setSupportOpen(true)}
-            >
-              Help
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* ===============================
-          HERO SECTION
-      =============================== */}
-      <section className="hero-public" aria-label="Skyrio Public Landing">
-        <div className="lp-container hero-center">
-          <div className="hero-glass">
-            <Title className="hero-title">
-              Plan smarter.
-              <br />
-              Travel better.
-            </Title>
-
-            <Text className="hero-subtag">
-              Calm planning, real rewards, and price tracking — built for
-              explorers.
-            </Text>
-
-            {/* ✅ Airbnb-style: 1 primary CTA + 1 clean secondary link on mobile */}
-            <div className="hero-cta-row hero-cta-row--links">
-              <Button
-                type="link"
-                className="hero-login-link hero-ctaPrimary"
+            <div className="sk-member-actions">
+              <button
+                className="sk-btn sk-btn-primary"
                 onClick={() => setTutorialOpen(true)}
               >
-                Take a 30-sec tour
-              </Button>
-
-              <Button
-                type="link"
-                className="hero-login-link hero-ctaSecondary"
+                Sign in
+              </button>
+              <button
+                className="sk-btn sk-btn-ghost"
                 onClick={() => setSupportOpen(true)}
               >
-                Need help?
-              </Button>
-            </div>
-
-            <div className="hero-trust">
-              <Text className="hero-trust-text">
-                Trusted by early explorers worldwide
-              </Text>
-              <div className="hero-stars">★★★★★</div>
+                Learn more
+              </button>
             </div>
           </div>
 
-          <div className="lp-dest-row" aria-label="Featured destinations">
-            {destinations.map((d) => (
-              <div
-                key={d.label}
-                className="lp-dest-card"
-                role="button"
-                tabIndex={0}
-              >
-                <span className="lp-dest-emoji">{d.emoji}</span>
-                <span className="lp-dest-label">{d.label}</span>
+          {/* ✅ Hero glass card */}
+          <section className="sk-heroWrap" aria-label="Skyrio Hero">
+            <Card bordered={false} className="sk-heroCard">
+              <h1 className="sk-heroH1">
+                Plan smarter.
+                <br />
+                Travel better.
+              </h1>
+
+              <h2 className="sk-heroH2">Feel confident every step.</h2>
+
+              <p className="sk-heroP">
+                Calm planning, real rewards, and smart price tracking — built
+                for explorers who value clarity over chaos.
+              </p>
+
+              <div className="sk-heroCtas">
+                <Button
+                  className="sk-ctaPrimary"
+                  size="large"
+                  icon={<PlayCircleFilled />}
+                  onClick={() => setTutorialOpen(true)}
+                >
+                  See how Skyrio works
+                </Button>
+
+                <Button
+                  className="sk-ctaGhost"
+                  size="large"
+                  icon={<QuestionCircleOutlined />}
+                  onClick={() => setSupportOpen(true)}
+                >
+                  Need help?
+                </Button>
               </div>
-            ))}
-          </div>
+
+              <div className="sk-heroTrust">
+                <div className="sk-stars" aria-label="5 star rating">
+                  ★★★★★
+                </div>
+                <div className="sk-trustText">
+                  Trusted by early explorers worldwide
+                </div>
+              </div>
+
+              <div className="sk-destinationRow" aria-label="Featured trips">
+                {destinations.map((d) => (
+                  <Tag key={d.label} className="sk-destinationPill">
+                    {d.emoji} {d.label}
+                  </Tag>
+                ))}
+              </div>
+            </Card>
+          </section>
+
+          {/* ✅ Divider (fixes the “bleed” feeling) */}
+          <div className="sk-section-divider" aria-hidden="true" />
+
+          {/* ✅ Feature grid FIRST (clean flow) */}
+          <section aria-label="Skyrio features" className="sk-featureGridWrap">
+            <div className="sk-featureGrid">
+              <Card bordered={false} className="sk-featureCard">
+                <div className="sk-featureInline">
+                  <div className="sk-featureInlineIcon">🎁</div>
+                  <div className="sk-featureInlineText">
+                    <h3 className="sk-featureTitleText">Rewards</h3>
+                    <p className="sk-featureDesc">
+                      Earn XP every time you plan or book. Unlock perks as you
+                      level up.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card bordered={false} className="sk-featureCard">
+                <div className="sk-featureInline">
+                  <div className="sk-featureInlineIcon">⚡</div>
+                  <div className="sk-featureInlineText">
+                    <h3 className="sk-featureTitleText">AI Trip Planner</h3>
+                    <p className="sk-featureDesc">
+                      Tell us your vibe. We build the trip around your budget.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card bordered={false} className="sk-featureCard">
+                <div className="sk-featureInline">
+                  <div className="sk-featureInlineIcon">📉</div>
+                  <div className="sk-featureInlineText">
+                    <h3 className="sk-featureTitleText">Price Tracking</h3>
+                    <p className="sk-featureDesc">
+                      We watch prices for you. Book when the moment is right.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </section>
+
+          {/* ✅ Testimonials AFTER features (feels intentional) */}
+          <section className="sk-testimonials" aria-label="Testimonials">
+            <div className="sk-sectionTitle">What Travelers Are Saying</div>
+            <div className="sk-sectionSub">
+              Real feedback from early explorers — premium, simple, fast.
+            </div>
+
+            <div className="sk-emptyNote">No testimonials yet.</div>
+          </section>
         </div>
-      </section>
 
-      {/* ===============================
-          TESTIMONIALS (placeholder)
-      =============================== */}
-      <section className="testimonials-section">
-        <Title
-          level={4}
-          style={{ color: "var(--sk-text)", textAlign: "center" }}
-        >
-          What Travelers Are Saying
-        </Title>
-        <Text
-          style={{
-            display: "block",
-            textAlign: "center",
-            color: "var(--sk-muted)",
-            marginBottom: 8,
-          }}
-        >
-          Real feedback from early explorers — premium, simple, fast.
-        </Text>
-
-        <Text style={{ color: "var(--sk-muted)" }}>No testimonials yet.</Text>
-      </section>
-
-      {/* ===============================
-          FEATURES GRID
-      =============================== */}
-      <section aria-label="Skyrio features">
-        <div className="lp-feature-grid">
-          <div className="lp-feature-card">
-            <div className="lp-feature-icon">🎁</div>
-            <div className="lp-feature-body">
-              <div className="lp-feature-title">Rewards</div>
-              <div className="lp-feature-text">
-                Earn XP every time you plan or book. Unlock perks as you level
-                up.
-              </div>
-            </div>
-          </div>
-
-          <div className="lp-feature-card">
-            <div className="lp-feature-icon">⚡</div>
-            <div className="lp-feature-body">
-              <div className="lp-feature-title">AI Trip Planner</div>
-              <div className="lp-feature-text">
-                Tell us your vibe — we generate smart trip picks around your
-                budget.
-              </div>
-            </div>
-          </div>
-
-          <div className="lp-feature-card">
-            <div className="lp-feature-icon">📉</div>
-            <div className="lp-feature-body">
-              <div className="lp-feature-title">Price Tracking</div>
-              <div className="lp-feature-text">
-                We watch prices and notify you when they drop so you can book at
-                the right time.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===============================
-          MODALS
-      =============================== */}
-      <TutorialModal
-        open={tutorialOpen}
-        onClose={() => setTutorialOpen(false)}
-      />
-      <SupportFormModal
-        open={supportOpen}
-        onClose={() => setSupportOpen(false)}
-      />
+        {/* Modals */}
+        <TutorialModal
+          open={tutorialOpen}
+          onClose={() => setTutorialOpen(false)}
+        />
+        <SupportFormModal
+          open={supportOpen}
+          onClose={() => setSupportOpen(false)}
+        />
+      </div>
     </PageLayout>
   );
 }

@@ -53,7 +53,7 @@ header.main-layout-header,
   display: flex;
   align-items: center;
 
-  background: transparent;
+  background: transparent; /* ✅ must stay transparent */
   border: none;
   box-shadow: none;
 
@@ -61,30 +61,59 @@ header.main-layout-header,
   transform: translateZ(0); /* iOS stacking fix */
 }
 
-/* Glass gradient layer (visual ONLY — no clicks) */
+/* ✅ Glass gradient layer (visual ONLY — no clicks)
+   UPDATED to match cosmic background better
+*/
 .sk-nav::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
 
+  /* was: 135deg violet->orange
+     now: 180deg deep glass tint (matches cosmic bg)
+  */
   background: linear-gradient(
-    135deg,
-    rgba(120, 90, 255, 0.26),
-    rgba(255, 140, 60, 0.18)
+    180deg,
+    rgba(35, 18, 60, 0.55),
+    rgba(35, 18, 60, 0.34)
   );
-  backdrop-filter: blur(16px);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
   pointer-events: none; /* ✅ CRITICAL FIX */
 }
 
+/* ✅ Compact state slightly stronger (keeps your behavior) */
 .sk-nav.is-compact::before {
   background: linear-gradient(
-    135deg,
-    rgba(120, 90, 255, 0.34),
-    rgba(255, 140, 60, 0.22)
+    180deg,
+    rgba(35, 18, 60, 0.62),
+    rgba(35, 18, 60, 0.40)
   );
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ✅ Subtle premium glow line like the mock */
+.sk-nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 170, 80, 0.55),
+    transparent
+  );
+
+  pointer-events: none;
+  opacity: 0.9;
 }
 
 /* =================================================
@@ -278,6 +307,7 @@ header.main-layout-header,
   background: rgba(18, 20, 45, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
   display: flex;
   flex-direction: column;

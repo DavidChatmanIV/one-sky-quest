@@ -1,484 +1,369 @@
 :root{
-  --sk-text: rgba(244,246,251,0.92);
-  --sk-muted: rgba(244,246,251,0.72);
-
-  --sk-glass-bg: rgba(255,255,255,0.08);
-  --sk-glass-bg-strong: rgba(255,255,255,0.12);
-  --sk-glass-border: rgba(255,255,255,0.14);
-  --sk-glass-shadow: 0 18px 60px rgba(0,0,0,0.28);
+  --sk-white: rgba(255, 255, 255, 0.96);
+  --sk-muted: rgba(255, 255, 255, 0.74);
+  --sk-border: rgba(255, 255, 255, 0.14);
 }
 
-/* =====================================================
-   PAGE BASE
-   ===================================================== */
-.lp-page{
+/* =========================================================
+   LANDING PAGE MUST BE TRANSPARENT ABOVE COSMOS
+========================================================= */
+.page--landing,
+.page--landing.page-root,
+.page--landing.full-bleed,
+.page--landing .ant-layout,
+.page--landing .ant-layout-content,
+.page--landing main,
+.page--landing #main {
+  background: transparent !important;
+}
+
+/* =========================================================
+   LANDING ROOT
+========================================================= */
+.sk-landing{
   position: relative;
-  width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
+}
+
+/* =========================================================
+   BACKGROUND LAYERS
+========================================================= */
+.sk-landing-bg{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  transform: scale(1.08);
+  filter: saturate(1.18) contrast(1.10) brightness(1.03);
+}
+
+.sk-landing-vignette{
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
 
   background:
-    radial-gradient(900px 500px at 75% 18%, rgba(255,140,90,0.25), transparent 60%),
-    radial-gradient(900px 600px at 25% 22%, rgba(120,90,255,0.32), transparent 65%),
-    linear-gradient(135deg, #0b1220, #1a1c3b);
-
-  margin-top: calc(-1 * var(--nav-h));
-  padding-top: var(--nav-h);
+    radial-gradient(1000px 720px at 78% 55%, rgba(255, 160, 60, 0.22), transparent 60%),
+    radial-gradient(1200px 820px at 25% 35%, rgba(140, 100, 255, 0.28), transparent 64%),
+    radial-gradient(1300px 900px at 50% 42%, transparent 48%, rgba(0,0,0,0.18) 100%),
+    linear-gradient(180deg, rgba(10,8,24,0.10), rgba(10,8,24,0.42) 65%, rgba(10,8,24,0.78));
 }
 
-/* Shared container */
-.lp-container{
-  width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-/* =====================================================
-   HARD RULES: prevent mobile pill leaking into desktop
-   ===================================================== */
-.lp-memberDesktop{
-  display: block;
-}
-
-.lp-memberMobile{
-  display: none !important; /* ✅ default hidden everywhere */
-}
-
-/* =====================================================
-   MEMBER BENEFITS BANNER (Expedia-style)
-   ===================================================== */
-.lp-memberWrap{
-  max-width: 1100px;
-  margin: 14px auto 0;
-  padding: 0 18px;
+/* =========================================================
+   CONTENT WRAPPER
+========================================================= */
+.sk-landing-inner{
   position: relative;
-  z-index: 5;
+  z-index: 2;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 72px 18px 64px;
+  display: grid;
+  gap: 18px;
 }
 
-.lp-memberCard{
+/* =========================================================
+   MEMBER BANNER (TOP PILL)
+========================================================= */
+.sk-member-banner{
+  width: 100%;
+  border-radius: 18px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
 
-  border-radius: 18px;
-  padding: 14px 16px;
-
-  background: linear-gradient(
-    180deg,
-    var(--sk-glass-bg-strong),
-    rgba(255,255,255,0.06)
-  );
-
-  border: 1px solid var(--sk-glass-border);
-  box-shadow: var(--sk-glass-shadow);
-
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
   backdrop-filter: blur(14px);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.22);
 }
 
-.lp-memberLeft{
+.sk-member-left{ display: grid; gap: 2px; }
+.sk-member-title{ font-weight: 900; color: var(--sk-white); }
+.sk-member-sub{
+  color: var(--sk-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.sk-member-actions{
   display: flex;
-  flex-direction: column;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Custom buttons used in member banner */
+.sk-btn{
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.sk-btn-primary{
+  color: #1b1024;
+  background: linear-gradient(135deg, #ff9f43, #ff7a18);
+  box-shadow: 0 12px 30px rgba(255, 138, 42, 0.38);
+}
+
+.sk-btn-ghost{
+  color: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+
+/* =========================================================
+   HERO GLASS CARD
+========================================================= */
+.sk-heroWrap{
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.sk-heroCard{
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: center;
+  border-radius: 24px !important;
+  padding: 44px 30px !important;
+
+  background:
+    radial-gradient(980px 520px at 55% 30%, rgba(255, 170, 120, 0.22), transparent 62%),
+    radial-gradient(980px 620px at 30% 32%, rgba(150, 120, 255, 0.22), transparent 66%),
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06)) !important;
+
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset;
+  backdrop-filter: blur(16px);
+}
+
+.sk-heroCard,
+.sk-heroCard *{
+  color: var(--sk-white) !important;
+}
+
+.sk-heroH1{
+  margin: 0 0 6px;
+  font-weight: 950;
+  font-size: clamp(44px, 5vw, 72px);
+  line-height: 1.02;
+}
+
+.sk-heroH2{
+  margin-top: 6px;
+  font-weight: 900;
+  font-size: clamp(20px, 2.6vw, 38px);
+}
+
+.sk-heroP{
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 680px;
+  font-size: 14px;
+  color: var(--sk-muted) !important;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   HERO CTA BUTTONS (Ant Buttons)
+========================================================= */
+.sk-heroCtas{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.sk-ctaPrimary{
+  border: none !important;
+  border-radius: 999px !important;
+  font-weight: 950 !important;
+  padding: 0 18px !important;
+
+  color: #1b1024 !important;
+  background: linear-gradient(135deg, #ff9f43, #ff7a18) !important;
+  box-shadow: 0 12px 30px rgba(255, 138, 42, 0.34) !important;
+}
+
+.sk-ctaPrimary:hover{
+  filter: brightness(1.02);
+  transform: translateY(-1px);
+}
+
+.sk-ctaGhost{
+  border-radius: 999px !important;
+  font-weight: 950 !important;
+  padding: 0 18px !important;
+
+  color: rgba(255,255,255,0.92) !important;
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+
+.sk-ctaGhost:hover{
+  background: rgba(255,255,255,0.14) !important;
+}
+
+/* =========================================================
+   TRUST ROW
+========================================================= */
+.sk-heroTrust{
+  margin-top: 12px;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+
+.sk-stars{
+  letter-spacing: 2px;
+  opacity: 0.95;
+}
+
+.sk-trustText{
+  font-size: 13px;
+  color: var(--sk-muted) !important;
+}
+
+/* =========================================================
+   DESTINATION PILLS
+========================================================= */
+.sk-destinationRow{
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sk-destinationPill{
+  border-radius: 999px !important;
+  padding: 6px 10px !important;
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  color: rgba(255,255,255,0.90) !important;
+}
+
+/* =========================================================
+   SECTION DIVIDER
+========================================================= */
+.sk-section-divider{
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.18),
+    transparent
+  );
+  margin: 10px 0 8px;
+  opacity: 0.7;
+}
+
+/* =========================================================
+   FEATURE GRID (INLINE ICON NEXT TO TEXT)
+========================================================= */
+.sk-featureGridWrap{
+  margin: 10px auto 0;
+  max-width: 980px;
+}
+
+.sk-featureGrid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sk-featureCard{
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.045)) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.22);
+  backdrop-filter: blur(14px);
+  padding: 16px;
+}
+
+.sk-featureInline{
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.sk-featureInlineIcon{
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.sk-featureInlineText{
+  display: grid;
   gap: 4px;
 }
 
-.lp-memberTitle{
-  color: var(--sk-text);
+.sk-featureTitleText{
+  margin: 0;
   font-weight: 900;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  color: var(--sk-white);
 }
 
-.lp-memberSub{
-  color: var(--sk-muted);
+.sk-featureDesc{
+  margin: 0;
+  color: var(--sk-muted) !important;
+  line-height: 1.45;
+  font-size: 13px;
 }
 
-.lp-memberRight{
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.lp-memberBtn{
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 999px;
-  font-weight: 900;
-  box-shadow: 0 14px 30px rgba(0,0,0,0.22);
-}
-
-.lp-memberLink{
-  font-weight: 800;
-  color: rgba(244,246,251,0.9);
-}
-
-.lp-memberCard--active{
-  border: 1px solid rgba(255,140,90,0.28);
-  background: linear-gradient(
-    180deg,
-    rgba(255,140,90,0.12),
-    rgba(255,255,255,0.06)
-  );
-}
-
-.lp-memberBtnGhost{
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.16);
-  color: var(--sk-text);
-  font-weight: 900;
-}
-
-/* =====================================================
-   HERO SECTION
-   ===================================================== */
-.hero-public{
-  min-height: 100vh;
-  padding: 64px 0 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-public::before{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(120,90,255,0.22),
-    rgba(255,140,90,0.12),
-    transparent
-  );
-  z-index: 0;
-}
-
-.lp-container.hero-center{
-  max-width: 760px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-/* =====================================================
-   HERO GLASS
-   ===================================================== */
-.hero-glass{
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.18),
-    rgba(255,255,255,0.10)
-  );
-  border-radius: 22px;
-  padding: clamp(18px, 3vw, 28px);
-  border: 1px solid var(--sk-glass-border);
-  box-shadow: var(--sk-glass-shadow);
-  backdrop-filter: blur(14px);
-}
-
-/* HERO TEXT — WHITE */
-.hero-title{
-  font-size: clamp(2.4rem, 5vw, 3.3rem);
-  font-weight: 900;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: var(--sk-text);
-}
-
-.hero-subtag{
-  margin-top: 14px;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--sk-muted);
-}
-
-/* =====================================================
-   CTA ROW (desktop baseline)
-   ===================================================== */
-.hero-cta-row{
-  margin-top: 18px;
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.hero-login-link{
-  height: 44px;
-  padding: 0 16px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.14);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: var(--sk-text);
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.hero-login-link:first-child{
-  background: rgba(255,140,90,0.22);
-  border-color: rgba(255,140,90,0.34);
-}
-
-/* =====================================================
-   TRUST
-   ===================================================== */
-.hero-trust{
-  margin-top: 18px;
-}
-
-.hero-trust-text{
-  font-size: 0.85rem;
-  color: rgba(244,246,251,0.70);
-}
-
-.hero-stars{
-  margin-top: 4px;
-  letter-spacing: 2px;
-  color: #ff9f45;
-}
-
-/* =====================================================
-   DESTINATION PILLS
-   ===================================================== */
-.lp-dest-row{
-  margin-top: 22px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.lp-dest-card{
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(10px);
-  color: var(--sk-text);
-  font-weight: 700;
-}
-
-/* =====================================================
+/* =========================================================
    TESTIMONIALS
-   ===================================================== */
-.testimonials-section{
-  margin: 70px auto 0;
-  max-width: 1100px;
-  padding: 26px 18px;
-
-  background: linear-gradient(
-    180deg,
-    var(--sk-glass-bg-strong),
-    rgba(255,255,255,0.06)
-  );
-  border-radius: 20px;
-  border: 1px solid var(--sk-glass-border);
-  box-shadow: var(--sk-glass-shadow);
-  backdrop-filter: blur(14px);
+========================================================= */
+.sk-testimonials{
+  margin: 26px auto 0;
+  max-width: 980px;
+  padding: 10px 2px 2px;
 }
 
-/* =====================================================
-   FEATURE GRID
-   ===================================================== */
-.lp-feature-grid{
-  max-width: 1100px;
-  margin: 28px auto 0;
-  padding: 0 18px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+.sk-sectionTitle{
+  font-weight: 950;
+  color: var(--sk-white);
+  font-size: 16px;
+  letter-spacing: 0.2px;
 }
 
-.lp-feature-card{
-  padding: 16px;
-  border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    var(--sk-glass-bg-strong),
-    rgba(255,255,255,0.06)
-  );
-  border: 1px solid var(--sk-glass-border);
-  box-shadow: var(--sk-glass-shadow);
-  display: flex;
-  gap: 12px;
-  align-items: center;
+.sk-sectionSub{
+  margin-top: 6px;
+  color: var(--sk-muted) !important;
+  font-size: 13px;
 }
 
-.lp-feature-title{
-  font-weight: 900;
-  color: var(--sk-text);
+.sk-emptyNote{
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.86);
 }
 
-.lp-feature-text{
-  color: var(--sk-muted);
-  font-size: 0.95rem;
+/* =========================================================
+   MOBILE
+========================================================= */
+@media (max-width: 900px){
+  .sk-featureGrid{ grid-template-columns: 1fr; }
 }
 
-/* =====================================================
-   RESPONSIVE (existing)
-   ===================================================== */
-@media (max-width: 680px){
-  .lp-feature-grid{
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px){
-  .hero-cta-row{
-    flex-direction: column;
-  }
-
-  .hero-login-link,
-  .lp-memberBtn,
-  .lp-memberBtnGhost{
-    width: 100%;
-  }
-
-  .lp-memberCard{
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-/* =====================================================
-   MOBILE MEMBER PILL + AIRBNB CTA UPGRADE (SAFE)
-   - ONLY triggers <= 480px
-   ===================================================== */
-@media (max-width: 480px) {
-  /* swap desktop banner -> mobile pill */
-  .lp-memberDesktop{
-    display: none !important;
-  }
-
-  .lp-memberMobile{
-    display: block !important;
-    position: sticky;
-    top: calc(var(--nav-h) + 10px);
-    z-index: 10;
-    padding: 0 16px;
-    margin-top: 10px;
-  }
-
-  .lp-mobilePill{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-
-    border-radius: 18px;
-    padding: 12px;
-
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,255,0.14),
-      rgba(255,255,255,0.06)
-    );
-
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow: 0 16px 46px rgba(0,0,0,0.28);
-    backdrop-filter: blur(14px);
-  }
-
-  .lp-mobilePillLeft{
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-
-  .lp-mobilePillTitle{
-    font-weight: 950;
-    color: var(--sk-text);
-    line-height: 1.1;
-  }
-
-  .lp-mobilePillSub{
-    font-weight: 850;
-    font-size: 12px;
-    color: rgba(244,246,251,0.72);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-  }
-
-  .lp-mobilePillRight{
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .lp-mobilePillBtn{
-    height: 38px;
-    padding: 0 12px;
-    border-radius: 999px;
-    background: rgba(0,0,0,0.18);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(244,246,251,0.92);
-    font-weight: 900;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .lp-mobilePillBtnPrimary{
-    background: linear-gradient(135deg, rgba(255,140,90,0.32), rgba(255,255,255,0.08));
-    border-color: rgba(255,140,90,0.30);
-  }
-
-  /* ✅ Airbnb-style hero CTA row on mobile */
-  .hero-cta-row--links{
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  /* Primary CTA = button */
-  .hero-ctaPrimary{
-    width: 100%;
-    height: 48px;
-    border-radius: 16px;
-    font-weight: 950;
-
-    background: linear-gradient(135deg, #ff9a4d, #ff7a18);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 18px 34px rgba(255,140,90,0.22);
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    color: #1b1024 !important;
-    text-decoration: none !important;
-  }
-
-  /* Secondary CTA = clean link */
-  .hero-ctaSecondary{
-    width: 100%;
-    height: auto;
-    padding: 0 !important;
-
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-
-    display: inline-flex;
-    justify-content: center;
-
-    color: rgba(244,246,251,0.86) !important;
-    font-weight: 900;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
+@media (max-width: 520px){
+  .sk-heroCard{ padding: 36px 16px !important; }
 }

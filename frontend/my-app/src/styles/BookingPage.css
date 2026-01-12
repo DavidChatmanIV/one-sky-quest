@@ -13,6 +13,11 @@
     linear-gradient(135deg, #0b1220, #1a1c3b 45%, #2a1340);
 }
 
+/* ✅ NEW: let global galaxy background show through (non-landing pages) */
+.sk-appShell .sk-bookingPage {
+  background: transparent !important;
+}
+
 /* ============================= */
 /* FINAL PREMIUM TEXT LOCK */
 /* ============================= */
@@ -890,7 +895,7 @@
    MOBILE OVERLAY PACK (SAFE)
    - Only affects phones
    - Desktop stays identical
-   ===================================================== */
+===================================================== */
 @media (max-width: 480px) {
   .sk-bookingWrap,
   .sk-bookingContent {

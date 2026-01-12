@@ -4,23 +4,25 @@
 
 /* =========================================================
    🌎 Global Reset
-   ========================================================= */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+========================================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 /* =========================================================
    🎛️ Global Theme Tokens (Skyrio)
-   - Safe to keep here even if you also load theme-warm.css.
-   - Includes fallbacks so nothing breaks if a var isn't defined there.
-   ========================================================= */
-:root{
+========================================================= */
+:root {
   /* viewport + layout */
-  --vh: 100dvh;                 /* safe viewport height */
-  --header-h: 64px;             /* updated at runtime */
-  --search-h: 78px;             /* height of the search dock */
-  --lp-gap: 16px;               /* rhythm gap */
+  --vh: 100dvh;
+  --header-h: 64px;
+  --search-h: 78px;
+  --lp-gap: 16px;
   --lp-radius: 14px;
 
-  /* type scale (compact for one-screen fit) */
+  /* type scale */
   --h1: clamp(22px, 3.4vw, 36px);
   --h2: clamp(16px, 2.2vw, 22px);
   --body: clamp(13px, 1.2vw, 16px);
@@ -29,22 +31,34 @@
   --pad-hero: clamp(8px, 2.5vh, 20px);
   --pad-card: 12px;
 
-  /* ---- color fallbacks (map to your warm theme if present) ---- */
-  --bg-page: var(--bg-start, #0f1020);
-  --text-default: var(--text-1, #f4f6fb);
+  /* ---- Skyrio Cosmos Background ---- */
+  --bg-cosmos:
+    linear-gradient(
+      180deg,
+      rgba(8, 6, 18, 0.75),
+      rgba(18, 10, 30, 0.85)
+    ),
+    url("/background/skyrio-cosmos.jpg"); /* ✅ public/ safe */
+
+  --bg-page: var(--bg-cosmos);
+
+  /* colors */
   --text-1: #f4f6fb;
   --text-2: #c9cbe3;
-  --surface: var(--surface, rgba(255,255,255,.06));
-  --surface-2: var(--surface-2, rgba(255,255,255,.08));
+  --text-default: var(--text-1);
+
+  --surface: rgba(255,255,255,.06);
+  --surface-2: rgba(255,255,255,.08);
   --glass: rgba(255,255,255,.06);
   --shadow: 0 10px 30px rgba(0,0,0,.30);
+
   --cta: #ff8a2a;
   --cta-2: #ffa94d;
 }
 
-/* Smaller density for short-height laptops (13–14") */
-@media (max-height: 800px){
-  :root{
+/* Compact screens */
+@media (max-height: 800px) {
+  :root {
     --lp-gap: 12px;
     --search-h: 70px;
     --h1: clamp(20px, 3vw, 30px);
@@ -54,71 +68,114 @@
 }
 
 /* =========================================================
-   🧱 App Base
-   ========================================================= */
+   🧱 ROOT + BODY (GLOBAL BACKGROUND LAYER)
+========================================================= */
+html {
+  height: auto;
+  min-height: 100%;
+}
+
 body {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100%;
+  margin: 0;
+
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   line-height: 1.6;
-  background-color: var(--bg-page);
   color: var(--text-default);
+
+  /* ✅ GLOBAL COSMOS BACKGROUND */
+  background: var(--bg-page);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 🔗 Links */
-a { text-decoration: none; color: inherit; }
+#root {
+  min-height: 100%;
+}
 
-/* 📐 Default section layout (exclude hero so it can fit one screen) */
-section:not(.hero-fold) { 
-  max-width: 1200px; 
-  margin: 0 auto; 
-  padding: 4rem 1rem 3rem; 
+/* =========================================================
+   🚨 CRITICAL FIX — REMOVE COVERING LAYERS
+   (Ant Design + Page Shells)
+========================================================= */
+.ant-layout,
+.ant-layout-header,
+.ant-layout-content,
+.ant-layout-footer {
+  background: transparent !important;
+}
+
+/* Page-level wrappers */
+.page-layout,
+.page--landing,
+.page--booking,
+.page--passport,
+.page--skystream {
+  background: transparent !important;
+}
+
+/* =========================================================
+   🔗 Links
+========================================================= */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* =========================================================
+   📐 Default Section Layout
+========================================================= */
+section:not(.hero-fold) {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 1rem 3rem;
 }
 
 /* =========================================================
    🖥️ One-Screen Hero + Dock
-   ========================================================= */
-
-/* Wrap for the whole landing area */
-.landing-wrap { 
-  max-width: 1180px; 
-  margin: 0 auto; 
+========================================================= */
+.landing-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
   padding: 8px 14px 12px;
 }
 
-/* Make the above-the-fold region exactly one screen tall */
-.hero-fold{
+.hero-fold {
   min-height: calc(var(--vh) - var(--header-h));
   display: grid;
-  grid-template-rows: 1fr auto;   /* center content + dock at bottom */
+  grid-template-rows: 1fr auto;
   gap: var(--lp-gap);
   padding: var(--pad-hero) 0;
 }
 
-/* Center “Good morning” group */
-.hero-center{
+.hero-center {
   align-self: center;
   text-align: center;
 }
 
-.hero-title{
+.hero-title {
   font-size: var(--h1);
   line-height: 1.1;
-  letter-spacing: .2px;
-  margin: 0 0 10px;
+  margin-bottom: 10px;
   color: var(--text-1);
 }
 
-.hero-chips{
-  display: inline-flex; 
-  gap: 8px; 
-  flex-wrap: wrap; 
+.hero-chips {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
   justify-content: center;
   font-size: var(--body);
 }
 
-/* Compact XP card */
-.xp-card{
+/* =========================================================
+   💳 Cards / Glass Surfaces
+========================================================= */
+.xp-card {
   margin: 14px auto 0;
   padding: var(--pad-card);
   background: var(--surface);
@@ -127,16 +184,16 @@ section:not(.hero-fold) {
   width: min(420px, 92%);
 }
 
-/* Dock sits at the bottom of the fold */
-.search-dock{
+/* =========================================================
+   🔍 Search Dock
+========================================================= */
+.search-dock {
   align-self: end;
   height: var(--search-h);
   display: grid;
-  grid-template-columns: 1fr;
 }
 
-/* Compact dock styling */
-.dock-inner{
+.dock-inner {
   height: 100%;
   display: grid;
   grid-auto-flow: column;
@@ -147,49 +204,42 @@ section:not(.hero-fold) {
   box-shadow: var(--shadow);
 }
 
-/* Tabs row (icons + labels) condensed */
-.dock-tabs{
-  display: flex; 
-  gap: 8px; 
+.dock-tabs {
+  display: flex;
+  gap: 8px;
   align-items: center;
 }
 
-.dock-tab{
-  display: inline-flex; 
-  align-items: center; 
+.dock-tab {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  padding: 6px 10px; 
+  padding: 6px 10px;
   border-radius: 12px;
   background: var(--glass);
   font-size: var(--body);
   white-space: nowrap;
 }
 
-/* Inputs compact */
-.dock-field{ 
-  min-width: 0; 
-  display: grid; 
-  align-items: center;
-}
-
-.dock-input{ 
-  width: 100%; 
-  height: 38px; 
-  padding: 0 10px; 
-  border-radius: 10px; 
+.dock-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.10);
   color: var(--text-1);
   font-size: var(--body);
 }
 
-/* If height gets really tight, collapse labels on tabs */
-@media (max-height: 740px){
-  .dock-tab span.label{ display: none; }  /* keep icons only */
-  .dock-inner{ padding: 8px; }
-  .dock-input{ height: 34px; }
+@media (max-height: 740px) {
+  .dock-tab span.label {
+    display: none;
+  }
+  .dock-inner {
+    padding: 8px;
+  }
+  .dock-input {
+    height: 34px;
+  }
 }
-
-/* Hide empty page scrollbars caused by shadows/margins */
-html, body{ height: 100%; overflow: hidden; }
-main{ height: 100%; overflow: auto; }   /* allow inner sections to scroll when needed */

@@ -1,5 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* =========================================================
-   BASE RESET (SAFE)
+   BASE RESET
 ========================================================= */
 html, body, #root { height: 100%; }
 * { box-sizing: border-box; }
@@ -20,138 +24,71 @@ html { scroll-behavior: smooth; }
 }
 
 /* =========================================================
-   ROOT TOKENS
+   ROOT TOKENS (NEUTRAL)
 ========================================================= */
 :root{
-  /* layout */
   --nav-h: 88px;
   --page-w: 1180px;
   --radius: 16px;
 
-  /* text */
-  --text-1: #f4f6fb;
-  --text-2: #c9cbe3;
+  --text-1: rgba(244, 246, 251, 0.92);
+  --text-2: rgba(244, 246, 251, 0.72);
 
-  /* glass */
   --glass: rgba(255,255,255,.08);
   --glass-2: rgba(255,255,255,.12);
   --border-soft: rgba(255,255,255,.14);
 
-  /* brand */
   --cta: #ff8a2a;
   --cta-2: #ffa94d;
   --cta-glow: rgba(255,138,42,.45);
 
-  /* background */
-  --bg-start:#0f1020;
-  --bg-mid:#231a3a;
-  --bg-end:#3a2430;
+  /* IMPORTANT: GLOBAL SHOULD NOT FORCE A BACKGROUND */
+  --sk-bg-image: none;
 }
 
-/* =========================================================
-   BACKGROUND + TYPOGRAPHY
-========================================================= */
 body{
   margin:0;
-  color:var(--text-1);
+  color: var(--text-1);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter;
   line-height:1.45;
+  background: #0b0b18; /* neutral fallback */
+}
 
-  background:
-    radial-gradient(900px 600px at 15% -120px, #2b1e4b 0%, rgba(43,30,75,0) 60%),
-    radial-gradient(900px 600px at 85% -120px, #3a2430 0%, rgba(58,36,48,0) 60%),
-    linear-gradient(180deg, var(--bg-start), var(--bg-mid) 45%, var(--bg-end));
-
-  background-attachment: fixed;
+#root{
+  background: transparent;
 }
 
 /* =========================================================
-   STACKING CONTEXT (CRITICAL FIX)
+   ANT DESIGN SAFETY (don’t paint)
 ========================================================= */
-html, body { position: relative; }
-#root { position: relative; z-index: 1; }
-
-/* =========================================================
-   ✅ APP WRAPPERS: NEVER PAINT A BAR
-========================================================= */
-.app-shell,
-.app-main{
-  background: transparent !important;
-}
-
-/* ✅ If any layout wrapper exists (Ant / generic), keep it transparent */
 .ant-layout,
 .ant-layout-header,
-.ant-layout-content{
+.ant-layout-content {
   background: transparent !important;
 }
 
 /* =========================================================
-   NAVBAR VISIBILITY (FINAL)
-   NOTE: Your Navbar.css will still style the *inside* (pill, logo, etc).
-   This is just the global “surface” safety layer.
+   NAVBAR (your existing look)
 ========================================================= */
 .sk-nav{
   position: sticky;
   top: 0;
   z-index: 5000;
-
   height: var(--nav-h);
   display: flex;
   align-items: center;
 
-  /* warm, clean, theme-matched surface */
   background: linear-gradient(
     90deg,
     rgba(255,138,42,.12),
     rgba(120,90,255,.12)
   );
   backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.sk-nav-inner{
-  position: relative;
-  z-index: 5001;
 }
 
 /* =========================================================
-   NAV OFFSET — OPT IN ONLY (NO DARK BAND)
+   GLOBAL GLASS DEFAULTS (safe)
 ========================================================= */
-main,
-.ant-layout-content{
-  padding-top: 0 !important;
-}
-
-/* apply ONLY when explicitly enabled */
-.with-nav-offset{
-  padding-top: calc(var(--nav-h) + 12px) !important;
-}
-
-/* anchor offset */
-section[id],
-[data-anchor],
-:target{
-  scroll-margin-top: calc(var(--nav-h) + 12px);
-}
-
-/* =========================================================
-   PAGE WRAPPERS
-========================================================= */
-.page-root,
-.landing-wrap,
-.booking-wrap,
-.passport-wrap{
-  background: transparent !important;
-  min-height: 100vh;
-}
-
-/* =========================================================
-   CARDS / PANELS
-========================================================= */
-.card,
-.panel,
-.section,
 .ant-card{
   background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
   border: 1px solid var(--border-soft);
@@ -160,67 +97,10 @@ section[id],
   box-shadow: 0 10px 30px rgba(0,0,0,.30);
 }
 
-/* =========================================================
-   BUTTONS
-========================================================= */
 .ant-btn-primary{
   background: linear-gradient(180deg, var(--cta-2), var(--cta)) !important;
   border: none !important;
   color: #0b1220 !important;
   font-weight: 700;
   box-shadow: 0 8px 26px var(--cta-glow);
-}
-
-.ant-btn-default{
-  background: var(--glass) !important;
-  border: 1px solid var(--border-soft) !important;
-  color: var(--text-1) !important;
-}
-
-/* =========================================================
-   INPUTS
-========================================================= */
-.ant-input,
-.ant-input-affix-wrapper,
-.ant-select-selector,
-.ant-picker{
-  background: rgba(255,255,255,.06);
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  color: var(--text-1);
-}
-
-.ant-input::placeholder{ color: var(--text-2); }
-
-.ant-input:focus,
-.ant-input-affix-wrapper-focused{
-  border-color: var(--cta);
-  box-shadow: 0 0 0 3px rgba(255,138,42,.28);
-}
-
-/* =========================================================
-   HERO / LANDING
-========================================================= */
-.hero-fold{
-  min-height: calc(100vh - var(--nav-h));
-  display: grid;
-  place-items: center;
-}
-
-/* =========================================================
-   UTILITIES
-========================================================= */
-.container{
-  max-width: var(--page-w);
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-.fade-in{
-  animation: fade-in .3s ease both;
-}
-
-@keyframes fade-in{
-  from{ opacity:0; transform:translateY(8px); }
-  to{ opacity:1; transform:translateY(0); }
 }

@@ -6,7 +6,8 @@ export default function PageLayout({
   fullBleed = true,
   maxWidth = 1180,
   className = "",
-  withNavOffset = false, // ✅ DEFAULT OFF (IMPORTANT)
+  withNavOffset = false,
+  showBackground = true, // ✅ NEW: enable/disable per page if needed
 }) {
   const { pathname } = useLocation();
 
@@ -16,6 +17,8 @@ export default function PageLayout({
   }, [pathname]);
 
   const isBooking = cleanPath.startsWith("/booking");
+  const isPassport = cleanPath.startsWith("/passport");
+  const isSkyStream = cleanPath.startsWith("/skystream");
 
   return (
     <main
@@ -24,6 +27,8 @@ export default function PageLayout({
       className={[
         "page-root",
         isBooking ? "page--booking" : "",
+        isPassport ? "page--passport" : "",
+        isSkyStream ? "page--skystream" : "",
         fullBleed ? "full-bleed" : "constrained",
         withNavOffset ? "with-nav-offset" : "",
         className,
@@ -41,7 +46,11 @@ export default function PageLayout({
             }
       }
     >
-      {children}
+      {/* ✅ Background layer (same concept as your Landing) */}
+      {showBackground && <div className="sk-bg" aria-hidden="true" />}
+
+      {/* ✅ Content layer */}
+      <div className="page-content">{children}</div>
     </main>
   );
 }

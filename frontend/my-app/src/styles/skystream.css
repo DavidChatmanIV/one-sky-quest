@@ -15,10 +15,9 @@
   --sk-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
 }
 
-/* ===============================
-   Page wrapper + background
-   =============================== */
-
+/* =========================================================
+   PAGE WRAPPER + BACKGROUND
+========================================================= */
 .skystream {
   min-height: 100vh;
   background:
@@ -27,16 +26,26 @@
     linear-gradient(135deg, var(--sk-bg-1), var(--sk-bg-2));
 }
 
+/* ✅ NEW: let global galaxy background show through (non-landing pages) */
+.sk-appShell .skystream {
+  background: transparent !important;
+}
+
+/* (Optional but recommended) prevent future wrappers from painting backgrounds */
+.sk-appShell .skystream-content,
+.sk-appShell .skystream-hero {
+  background: transparent !important;
+}
+
 .skystream-content {
   max-width: 1180px;
   margin: 0 auto;
   padding: 18px 16px 40px;
 }
 
-/* ===============================
-   FORCE TEXT WHITE (SkyStream only)
-   =============================== */
-
+/* =========================================================
+   FORCE TEXT WHITE (SKYSTREAM ONLY) + MUTED
+========================================================= */
 .skystream,
 .skystream * {
   color: var(--sk-text) !important;
@@ -48,10 +57,28 @@
   color: var(--sk-muted) !important;
 }
 
-/* ===============================
-   Hero
-   =============================== */
+.skystream h1,
+.skystream h2,
+.skystream h3,
+.skystream h4,
+.skystream h5,
+.skystream h6 {
+  color: var(--sk-text) !important;
+}
 
+.skystream .ant-card-head-title,
+.skystream .ant-card-head-title * {
+  color: var(--sk-text) !important;
+}
+
+.skystream .ant-card-extra,
+.skystream .ant-card-extra * {
+  color: var(--sk-text) !important;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
 .skystream-hero {
   display: flex;
   align-items: flex-start;
@@ -62,7 +89,7 @@
 
 .skystream-title {
   margin: 0 !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
   letter-spacing: -0.02em;
 }
 
@@ -70,9 +97,10 @@
   display: block;
   margin-top: 4px;
   color: var(--sk-muted) !important;
-  font-weight: 600;
+  font-weight: 700;
 }
 
+/* CTA Post (used for desktop or composer button) */
 .skystream-postBtn {
   background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
   border: 0 !important;
@@ -80,16 +108,16 @@
   height: 44px !important;
   padding: 0 18px !important;
   box-shadow: 0 14px 30px rgba(255, 138, 42, 0.28);
+  font-weight: 950 !important;
 }
 
 .skystream-postBtn:hover {
-  filter: brightness(1.03);
+  filter: brightness(1.04);
 }
 
-/* ===============================
-   Controls (Search + Tabs)
-   =============================== */
-
+/* =========================================================
+   CONTROLS (Search + Tabs)
+========================================================= */
 .skystream-controls {
   display: grid;
   grid-template-columns: 1fr;
@@ -118,8 +146,8 @@
 }
 
 .skystream .ant-segmented-item {
-  color: rgba(244, 246, 251, 0.75) !important;
-  font-weight: 700;
+  color: rgba(244, 246, 251, 0.80) !important;
+  font-weight: 850;
 }
 
 .skystream .ant-segmented-item-selected {
@@ -128,15 +156,16 @@
   color: var(--sk-text) !important;
 }
 
-/* Search chip row */
-.skystream-searchChipRow {
-  margin: 8px 0 10px;
+@media (min-width: 900px) {
+  .skystream-controls {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
 }
 
-/* ===============================
-   Cards / layout
-   =============================== */
-
+/* =========================================================
+   CARDS / SURFACES
+========================================================= */
 .sk-card {
   background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -149,99 +178,361 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
-.sk-cardTitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .sk-rail {
   display: grid;
   gap: 12px;
 }
-/* ===============================
-   Feed styling
-   =============================== */
 
+/* =========================================================
+   MOCKUP MATCH — TOP ROW HELPERS
+========================================================= */
+.sk-centerTop {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sk-centerTopRight {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sk-feedSelect {
+  border-radius: 999px !important;
+  height: 44px !important;
+  padding: 0 14px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid var(--sk-stroke) !important;
+  font-weight: 900 !important;
+}
+
+.sk-caret {
+  opacity: 0.8;
+  margin-left: 6px;
+}
+
+.sk-starBtn {
+  height: 44px !important;
+  width: 44px !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid var(--sk-stroke) !important;
+}
+
+.sk-tabsRow {
+  margin: 10px 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sk-resetBtn {
+  border-radius: 999px !important;
+  height: 40px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid var(--sk-stroke) !important;
+  font-weight: 900 !important;
+}
+
+/* =========================================================
+   LEFT RAIL (Mock style)
+========================================================= */
+.sk-leftRail {
+  padding: 6px 0 !important;
+}
+
+.sk-leftNav {
+  display: grid;
+  gap: 8px;
+  padding: 6px 6px 10px;
+}
+
+.sk-leftItem {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sk-leftItem:hover {
+  border-color: rgba(255,255,255,0.16);
+  filter: brightness(1.03);
+}
+
+.sk-leftItemActive {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255, 138, 42, 0.30);
+  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.10);
+}
+
+.sk-leftBadge {
+  margin-left: 8px;
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  background: rgba(255, 138, 42, 0.22);
+  border: 1px solid rgba(255, 138, 42, 0.32);
+}
+
+.sk-leftSectionTitle {
+  padding: 12px 12px 8px;
+  font-weight: 950;
+  opacity: 0.92;
+}
+
+.sk-leftFeeds {
+  display: grid;
+  gap: 8px;
+  padding: 0 6px 12px;
+}
+
+.sk-leftFeed {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.sk-leftFeed:hover {
+  border-color: rgba(255,255,255,0.16);
+}
+
+.sk-leftFeedActive {
+  border-color: rgba(255, 138, 42, 0.32);
+  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.10);
+}
+
+.sk-leftCTA {
+  margin: 0 10px 10px !important;
+  border-radius: 14px !important;
+  height: 42px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  font-weight: 950 !important;
+}
+
+/* =========================================================
+   COMPOSER (Mock style)
+========================================================= */
+.sk-composer {
+  padding: 14px !important;
+  margin-bottom: 12px;
+}
+
+.sk-composerRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.sk-composerInput {
+  border-radius: 14px !important;
+  height: 44px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid var(--sk-stroke) !important;
+}
+
+.sk-composerChips {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sk-chip {
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  font-weight: 900 !important;
+}
+
+/* =========================================================
+   FEED + POST CARD (Mock style)
+========================================================= */
 .sk-feed {
   display: grid;
   gap: 14px;
 }
 
-/* Individual post card */
-.sk-post {
-  padding: 12px 12px 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: var(--sk-shadow);
+.sk-divider {
+  border-color: rgba(255,255,255,0.10) !important;
+  margin: 12px 0 0 !important;
 }
 
-/* --------------------------------
-   Post header row (author + actions)
----------------------------------- */
+.sk-postCard {
+  padding: 12px 12px 8px;
+}
 
-.sk-postMeta {
+.sk-postTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sk-postIdentity {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.sk-postWho {
+  display: grid;
+  gap: 4px;
+}
+
+.sk-postNameRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sk-postName {
+  font-weight: 950;
+}
+
+.sk-postHandle {
+  opacity: 0.78;
+  font-weight: 900;
+}
+
+.sk-postVerified {
+  font-size: 12px;
+  opacity: 0.88;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.sk-postMetaLine {
+  font-size: 12px;
+  color: var(--sk-muted) !important;
+  font-weight: 800;
+}
+
+.sk-ghostIconBtn {
+  border-radius: 12px !important;
+  background: rgba(255,255,255,0.05) !important;
+}
+
+.sk-postText {
+  margin-top: 10px;
+}
+
+.sk-postTagsRow {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sk-postTagLink {
+  color: rgba(255, 200, 160, 0.95) !important;
+  font-weight: 950;
+}
+
+.sk-postMedia {
+  margin-top: 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.sk-postMedia img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Save-to-trip mini card */
+.sk-tripMini {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
+  gap: 10px;
 }
 
-.sk-postMetaRight {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Author text */
-.sk-postAuthor {
-  font-weight: 700;
-}
-
-/* --------------------------------
-   Post content
----------------------------------- */
-
-.sk-postTitle {
-  margin: 2px 0 6px !important;
-  font-weight: 800 !important;
-}
-
-.sk-postBody {
-  display: block;
-  margin-bottom: 10px;
-  color: rgba(244, 246, 251, 0.86) !important;
-}
-
-.sk-postTags {
-  margin-top: 6px;
+.sk-tripMiniLeft {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 10px;
+  align-items: center;
 }
 
-/* --------------------------------
-   Premium Follow button
----------------------------------- */
+.sk-tripMiniThumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.sk-tripMiniThumb--empty {
+  background: rgba(255,255,255,0.06);
+}
+
+.sk-tripMiniTitle {
+  font-weight: 950;
+}
+
+.sk-tripMiniSub {
+  font-size: 12px;
+  color: var(--sk-muted) !important;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.sk-tripMiniBtn {
+  border-radius: 12px !important;
+  background: rgba(90, 160, 255, 0.20) !important;
+  border: 1px solid rgba(90, 160, 255, 0.35) !important;
+  font-weight: 950 !important;
+}
+
+/* Post action row */
+.sk-postActionsRow {
+  margin-top: 10px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  opacity: 0.95;
+}
+
+.sk-postAction {
+  font-weight: 900;
+  opacity: 0.85;
+}
 
 .sk-followBtn {
   border-radius: 999px !important;
   height: 32px !important;
   padding: 0 12px !important;
-
   background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: var(--sk-text) !important;
-
   backdrop-filter: blur(10px);
-  font-weight: 700;
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
+  font-weight: 900 !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .sk-followBtn:hover {
@@ -250,17 +541,16 @@
   box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.14);
 }
 
-/* Optional state when already following */
-.sk-followBtn.isFollowing {
-  background: rgba(255, 138, 42, 0.14) !important;
-  border-color: rgba(255, 138, 42, 0.45) !important;
-  color: var(--sk-text) !important;
+.sk-softError {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 138, 42, 0.10);
+  border: 1px solid rgba(255, 138, 42, 0.22);
+  font-weight: 900;
 }
 
-/* --------------------------------
-   Load More
----------------------------------- */
-
+/* Load more */
 .sk-loadMoreRow {
   margin-top: 14px;
   display: grid;
@@ -270,15 +560,10 @@
 .sk-loadMoreBtn {
   border-radius: 14px !important;
   height: 42px !important;
-
   background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: var(--sk-text) !important;
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  font-weight: 900 !important;
 }
 
 .sk-loadMoreBtn:hover {
@@ -286,67 +571,57 @@
   border-color: rgba(255, 138, 42, 0.40) !important;
   box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.12);
 }
-/* ===============================
-   ORANGE PILLS (SkyrioPill)
-   =============================== */
 
-.skystream .sk-pill {
+/* =========================================================
+   TAGS + PILLS
+========================================================= */
+.skystream .ant-tag {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 999px !important;
+}
+
+.skystream .sk-pill,
+.skystream .ant-tag.sk-pill,
+.skystream .sk-pill.ant-tag {
   background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
-  color: #111 !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.2px;
-
   border: 0 !important;
   border-radius: 999px !important;
-  padding: 6px 12px !important;
-
-  display: inline-flex !important;
-  align-items: center;
-  gap: 10px;
-
-  margin-inline-end: 8px !important;
-  margin-bottom: 8px !important;
-
+  padding: 9px 16px !important;
+  min-height: 36px;
+  font-size: 13px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.2px;
+  margin-inline-end: 10px !important;
+  margin-bottom: 10px !important;
   box-shadow:
-    0 6px 14px rgba(255, 138, 42, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-
+    0 10px 24px rgba(255, 138, 42, 0.38),
+    0 0 0 6px rgba(255, 138, 42, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
   user-select: none;
   opacity: 1 !important;
 }
 
+.skystream .sk-pill,
 .skystream .sk-pill * {
-  color: #111 !important;
+  color: rgba(255, 255, 255, 0.96) !important;
 }
 
-.sk-pillGrid {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-/* Click feel */
 .skystream .sk-pill--clickable {
   cursor: pointer;
-  transition: transform 0.16s ease, filter 0.16s ease;
+  transition: transform 0.18s ease, filter 0.18s ease;
 }
 
 .skystream .sk-pill--clickable:hover {
   transform: translateY(-1px);
-  filter: brightness(1.05);
+  filter: brightness(1.06);
 }
 
 .skystream .sk-pill--clickable:active {
   transform: translateY(0);
-  filter: brightness(0.96);
+  filter: brightness(0.98);
 }
 
-/* Active pill outline */
-.skystream .sk-pill--active {
-  outline: 2px solid rgba(255, 255, 255, 0.55);
-  outline-offset: 2px;
-}
-
-/* Subtle pulse for top Trending pill */
 .skystream .sk-pill--pulse {
   animation: skPillPulse 2.2s ease-in-out infinite;
 }
@@ -354,59 +629,106 @@
 @keyframes skPillPulse {
   0% {
     box-shadow:
-      0 6px 14px rgba(255, 138, 42, 0.40),
-      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+      0 10px 24px rgba(255, 138, 42, 0.32),
+      0 0 0 6px rgba(255, 138, 42, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
   55% {
     box-shadow:
-      0 0 0 6px rgba(255, 138, 42, 0.10),
-      0 10px 20px rgba(255, 138, 42, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+      0 0 0 9px rgba(255, 138, 42, 0.12),
+      0 14px 30px rgba(255, 138, 42, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
   }
   100% {
     box-shadow:
-      0 6px 14px rgba(255, 138, 42, 0.40),
-      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+      0 10px 24px rgba(255, 138, 42, 0.32),
+      0 0 0 6px rgba(255, 138, 42, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 }
 
-/* Hotspots % micro-bar */
 .skystream .sk-pillPctWrap {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .skystream .sk-pillPctText {
   font-weight: 950;
   font-size: 12px;
-  color: #111 !important;
-  opacity: 0.85;
+  opacity: 0.95;
 }
 
 .skystream .sk-pillPctBar {
-  width: 66px;
-  height: 7px;
+  width: 78px;
+  height: 8px;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.22);
+  background: rgba(255, 255, 255, 0.26);
   overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.20);
 }
 
 .skystream .sk-pillPctFill {
   height: 100%;
   display: block;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.55);
+  background: rgba(255, 255, 255, 0.78);
 }
 
-/* ===============================
-   Responsive tweaks
-   =============================== */
+/* =========================================================
+   DEAL DROPS
+========================================================= */
+.sk-dealMini {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.25);
+}
 
-@media (min-width: 900px) {
-  .skystream-controls {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
+.sk-dealMiniTitle {
+  font-weight: 950;
+  color: rgba(255,255,255,0.95) !important;
+}
+
+.sk-dealMiniPrice {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 950;
+  color: rgba(255,255,255,0.95) !important;
+}
+
+.sk-dealMiniNote {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(244, 246, 251, 0.75) !important;
+  font-weight: 800;
+}
+
+/* =========================================================
+   MOBILE SYSTEM
+========================================================= */
+.sk-only-mobile { display: none; }
+.sk-only-desktop { display: block; }
+
+@media (max-width: 991px) {
+  .sk-only-mobile { display: block; }
+  .sk-only-desktop { display: none; }
+  .skystream-content { padding-bottom: 96px; }
+}
+
+/* Floating Post FAB */
+.sk-fabPost {
+  position: fixed !important;
+  right: 16px;
+  bottom: 92px;
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
+  border: 0 !important;
+  box-shadow:
+    0 18px 45px rgba(0,0,0,0.35),
+    0 10px 28px rgba(255, 138, 42, 0.22);
+  z-index: 80;
 }

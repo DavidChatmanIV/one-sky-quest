@@ -558,13 +558,10 @@
 /* =====================================================
    PASSPORT HOLDER PRIVILEGES — PERKS STYLE (BEST)
    ===================================================== */
-
-/* Avoid :has() to prevent cross-browser issues */
 .pp-privCard {
   padding: 16px !important;
 }
 
-/* Header */
 .pp-privHeader {
   display: flex;
   align-items: center;
@@ -579,7 +576,6 @@
   letter-spacing: 0.2px;
 }
 
-/* Premium status chip */
 .pp-activeTag {
   border-radius: 999px !important;
   padding: 3px 10px !important;
@@ -591,7 +587,6 @@
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
 }
 
-/* Grid */
 .pp-privGrid {
   display: grid !important;
   grid-template-columns: 1fr 1fr;
@@ -605,7 +600,6 @@
   }
 }
 
-/* Perk tiles */
 .pp-privGrid .pp-pill {
   width: 100%;
   justify-content: flex-start;
@@ -616,14 +610,12 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Locked */
 .pp-privGrid .pp-pill--locked {
   opacity: 0.55 !important;
   border-style: dashed !important;
   background: rgba(255, 255, 255, 0.04) !important;
 }
 
-/* Description */
 .pp-privDesc {
   display: block;
   margin-top: 12px !important;
@@ -634,9 +626,7 @@
 
 /* =====================================================
    ✅ SKYRIO EXCHANGE (Preview Module)
-   (Safe add-on for Passport Summary card)
    ===================================================== */
-
 .skx-card {
   padding: 16px !important;
 }
@@ -769,4 +759,138 @@
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* =====================================================
+   ✅ TOP 8 — Your Inner Circle (Premium polish)
+   ===================================================== */
+
+/* Card header row polish (if your TopEight header uses these) */
+.top-eight__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.top-eight__title {
+  font-weight: 950;
+  letter-spacing: 0.2px;
+}
+
+.top-eight__sub {
+  color: var(--pp-muted) !important;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* Grid spacing */
+.top-eight__grid {
+  gap: 12px;
+}
+
+/* Friend tile: more premium */
+.top-eight__item {
+  position: relative;
+  overflow: hidden;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, 0.04)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 12px;
+
+  transition: transform 160ms ease, box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+/* subtle gradient edge */
+.top-eight__item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      600px 220px at 20% 10%,
+      rgba(255, 138, 42, 0.14),
+      transparent 55%
+    ),
+    radial-gradient(
+      520px 240px at 80% 0%,
+      rgba(120, 90, 255, 0.18),
+      transparent 55%
+    );
+  opacity: 0.9;
+}
+
+/* Hover: lift + glow */
+.top-eight__item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 138, 42, 0.28);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 138, 42, 0.1), 0 0 24px rgba(255, 138, 42, 0.18);
+}
+
+/* Avatar ring effect (works if your friend item uses .top-eight__avatar) */
+.top-eight__avatar {
+  border-radius: 999px;
+  padding: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 138, 42, 0.65),
+    rgba(120, 90, 255, 0.45)
+  );
+  display: inline-flex;
+}
+
+.top-eight__avatarInner {
+  border-radius: 999px;
+  background: rgba(10, 10, 18, 0.35);
+  padding: 6px;
+}
+
+/* Name/handle hierarchy (if your friend item uses these) */
+.top-eight__name {
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.top-eight__handle {
+  font-size: 12px;
+  color: var(--pp-muted) !important;
+  opacity: 0.95;
+}
+
+/* Chip polish */
+.top-eight__chip {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 138, 42, 0.22) !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* “Pinned” indicator (optional) */
+.top-eight__pin {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  opacity: 0.85;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Locked hint text */
+.top-eight__lockedHint {
+  font-size: 12px;
+  color: var(--pp-muted) !important;
+  opacity: 0.9;
+  margin-top: 8px;
 }
