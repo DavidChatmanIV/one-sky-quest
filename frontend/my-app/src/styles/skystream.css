@@ -1,734 +1,397 @@
-:root {
-  --sk-bg-1: #0b1220;
-  --sk-bg-2: #1a1c3b;
-
-  --sk-surface: rgba(255, 255, 255, 0.08);
-  --sk-surface-2: rgba(255, 255, 255, 0.10);
-  --sk-stroke: rgba(255, 255, 255, 0.12);
-
-  --sk-text: #f4f6fb;
-  --sk-muted: rgba(244, 246, 251, 0.72);
-
-  --sk-cta: #ff8a2a;
-  --sk-cta-2: #ffb066;
-
-  --sk-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-}
-
-/* =========================================================
-   PAGE WRAPPER + BACKGROUND
-========================================================= */
-.skystream {
+/* Root page wrapper */
+.ss-page {
   min-height: 100vh;
-  background:
-    radial-gradient(900px 500px at 75% 18%, rgba(255, 140, 90, 0.24), transparent 60%),
-    radial-gradient(900px 600px at 25% 22%, rgba(120, 90, 255, 0.30), transparent 65%),
-    linear-gradient(135deg, var(--sk-bg-1), var(--sk-bg-2));
+  position: relative;
+  z-index: 0;
 }
 
-/* ✅ NEW: let global galaxy background show through (non-landing pages) */
-.sk-appShell .skystream {
-  background: transparent !important;
+/* 🌌 Background image layer (FULL viewport) */
+.ss-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("../assets/Skystream/galaxy.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -2;
 }
 
-/* (Optional but recommended) prevent future wrappers from painting backgrounds */
-.sk-appShell .skystream-content,
-.sk-appShell .skystream-hero {
-  background: transparent !important;
+/* 🎨 Gradient overlay layer */
+.ss-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(22, 14, 40, 0.55) 0%,
+    rgba(58, 24, 78, 0.52) 40%,
+    rgba(255, 140, 72, 0.18) 100%
+  );
+  z-index: -1;
 }
 
-.skystream-content {
-  max-width: 1180px;
+/* =========================================================
+   CONTENT CONTAINER
+========================================================= */
+
+.ss-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 18px 16px 40px;
+  padding: 28px 18px 40px;
 }
 
-/* =========================================================
-   FORCE TEXT WHITE (SKYSTREAM ONLY) + MUTED
-========================================================= */
-.skystream,
-.skystream * {
-  color: var(--sk-text) !important;
+.ss-hero {
+  margin: 6px 0 16px;
 }
 
-.skystream .muted,
-.skystream .ant-typography-secondary,
-.skystream .ant-text-secondary {
-  color: var(--sk-muted) !important;
-}
-
-.skystream h1,
-.skystream h2,
-.skystream h3,
-.skystream h4,
-.skystream h5,
-.skystream h6 {
-  color: var(--sk-text) !important;
-}
-
-.skystream .ant-card-head-title,
-.skystream .ant-card-head-title * {
-  color: var(--sk-text) !important;
-}
-
-.skystream .ant-card-extra,
-.skystream .ant-card-extra * {
-  color: var(--sk-text) !important;
-}
-
-/* =========================================================
-   HERO
-========================================================= */
-.skystream-hero {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 6px 2px 14px;
-}
-
-.skystream-title {
+.ss-title {
   margin: 0 !important;
-  font-weight: 900 !important;
+  color: rgba(244, 246, 251, 0.95) !important;
+  font-weight: 800 !important;
   letter-spacing: -0.02em;
 }
 
-.skystream-subtitle {
-  display: block;
-  margin-top: 4px;
-  color: var(--sk-muted) !important;
+.ss-subtitle {
+  color: rgba(244, 246, 251, 0.75);
+}
+
+/* =========================================================
+   GLASS CARD BASE
+========================================================= */
+
+.ss-card {
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+/* =========================================================
+   LEFT SIDEBAR
+========================================================= */
+
+.ss-side .ant-card-body {
+  padding: 16px;
+}
+
+.ss-sideItem {
+  padding: 12px;
+  border-radius: 14px;
+  color: rgba(244, 246, 251, 0.86);
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.ss-sideItem.active {
+  border-color: rgba(255, 155, 70, 0.55);
+  box-shadow: 0 0 0 2px rgba(255, 155, 70, 0.12) inset;
+}
+
+.ss-badge {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(255, 155, 70, 0.22);
+  border: 1px solid rgba(255, 155, 70, 0.35);
+}
+
+.ss-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 14px 0;
+}
+
+.ss-sideGroupTitle {
+  color: rgba(244, 246, 251, 0.62);
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.ss-pill {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(244, 246, 251, 0.86);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.ss-pill.active {
+  border-color: rgba(255, 155, 70, 0.55);
+}
+
+/* =========================================================
+   TOP SEARCH BAR
+========================================================= */
+
+.ss-topbar .ant-card-body {
+  padding: 14px;
+}
+
+.ss-topbarRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ss-input {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 14px !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+}
+
+.ss-input input {
+  color: rgba(244, 246, 251, 0.92) !important;
+}
+
+.ss-input input::placeholder {
+  color: rgba(244, 246, 251, 0.6) !important;
+}
+
+.ss-pillBtn {
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(0, 0, 0, 0.18) !important;
+  color: rgba(244, 246, 251, 0.9) !important;
   font-weight: 700;
 }
 
-/* CTA Post (used for desktop or composer button) */
-.skystream-postBtn {
-  background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
-  border: 0 !important;
+.ss-iconBtn {
   border-radius: 14px !important;
-  height: 44px !important;
-  padding: 0 18px !important;
-  box-shadow: 0 14px 30px rgba(255, 138, 42, 0.28);
-  font-weight: 950 !important;
-}
-
-.skystream-postBtn:hover {
-  filter: brightness(1.04);
-}
-
-/* =========================================================
-   CONTROLS (Search + Tabs)
-========================================================= */
-.skystream-controls {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin: 6px 0 8px;
-}
-
-.skystream-search {
-  border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid var(--sk-stroke) !important;
-  height: 46px !important;
-  box-shadow: var(--sk-shadow);
-}
-
-.skystream .ant-input-affix-wrapper .ant-input-prefix {
-  color: rgba(244, 246, 251, 0.65) !important;
-}
-
-.skystream-tabs {
-  width: fit-content;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid var(--sk-stroke) !important;
-  border-radius: 16px !important;
-  padding: 6px !important;
-}
-
-.skystream .ant-segmented-item {
-  color: rgba(244, 246, 251, 0.80) !important;
-  font-weight: 850;
-}
-
-.skystream .ant-segmented-item-selected {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border-radius: 12px !important;
-  color: var(--sk-text) !important;
-}
-
-@media (min-width: 900px) {
-  .skystream-controls {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
-}
-
-/* =========================================================
-   CARDS / SURFACES
-========================================================= */
-.sk-card {
-  background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-radius: 18px !important;
-  box-shadow: var(--sk-shadow);
-  backdrop-filter: blur(10px);
-}
-
-.sk-card .ant-card-head {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
-}
-
-.sk-rail {
-  display: grid;
-  gap: 12px;
+  background: rgba(0, 0, 0, 0.18) !important;
+  color: rgba(244, 246, 251, 0.9) !important;
 }
 
 /* =========================================================
-   MOCKUP MATCH — TOP ROW HELPERS
+   COMPOSER
 ========================================================= */
-.sk-centerTop {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
+
+.ss-composer .ant-card-body {
+  padding: 16px;
 }
 
-.sk-centerTopRight {
-  display: inline-flex;
+.ss-composeRow {
+  display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.sk-feedSelect {
-  border-radius: 999px !important;
-  height: 44px !important;
-  padding: 0 14px !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid var(--sk-stroke) !important;
-  font-weight: 900 !important;
+.ss-cta {
+  border-radius: 14px !important;
+  background: rgba(255, 155, 70, 0.92) !important;
+  border: none !important;
+  color: rgba(30, 14, 36, 0.95) !important;
+  font-weight: 800;
+  height: 40px;
+  padding: 0 16px;
 }
 
-.sk-caret {
-  opacity: 0.8;
+.ss-chip {
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(244, 246, 251, 0.9) !important;
+  font-weight: 700;
+}
+
+/* =========================================================
+   FEED TABS
+========================================================= */
+
+.ss-feedTabs {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ss-tab {
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(244, 246, 251, 0.88) !important;
+  font-weight: 700;
+}
+
+.ss-tab.active {
+  border-color: rgba(255, 155, 70, 0.55) !important;
+  box-shadow: 0 0 0 2px rgba(255, 155, 70, 0.12) inset;
+}
+
+.ss-dot {
+  display: inline-block;
   margin-left: 6px;
-}
-
-.sk-starBtn {
-  height: 44px !important;
-  width: 44px !important;
-  border-radius: 14px !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid var(--sk-stroke) !important;
-}
-
-.sk-tabsRow {
-  margin: 10px 0 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.sk-resetBtn {
-  border-radius: 999px !important;
-  height: 40px !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid var(--sk-stroke) !important;
-  font-weight: 900 !important;
-}
-
-/* =========================================================
-   LEFT RAIL (Mock style)
-========================================================= */
-.sk-leftRail {
-  padding: 6px 0 !important;
-}
-
-.sk-leftNav {
-  display: grid;
-  gap: 8px;
-  padding: 6px 6px 10px;
-}
-
-.sk-leftItem {
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.sk-leftItem:hover {
-  border-color: rgba(255,255,255,0.16);
-  filter: brightness(1.03);
-}
-
-.sk-leftItemActive {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255, 138, 42, 0.30);
-  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.10);
-}
-
-.sk-leftBadge {
-  margin-left: 8px;
-  display: inline-flex;
-  min-width: 18px;
-  height: 18px;
+  padding: 0 8px;
   border-radius: 999px;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  background: rgba(255, 138, 42, 0.22);
-  border: 1px solid rgba(255, 138, 42, 0.32);
+  background: rgba(255, 155, 70, 0.22);
+  border: 1px solid rgba(255, 155, 70, 0.35);
 }
 
-.sk-leftSectionTitle {
-  padding: 12px 12px 8px;
-  font-weight: 950;
-  opacity: 0.92;
-}
-
-.sk-leftFeeds {
-  display: grid;
-  gap: 8px;
-  padding: 0 6px 12px;
-}
-
-.sk-leftFeed {
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  cursor: pointer;
-  font-weight: 900;
-}
-
-.sk-leftFeed:hover {
-  border-color: rgba(255,255,255,0.16);
-}
-
-.sk-leftFeedActive {
-  border-color: rgba(255, 138, 42, 0.32);
-  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.10);
-}
-
-.sk-leftCTA {
-  margin: 0 10px 10px !important;
-  border-radius: 14px !important;
-  height: 42px !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  font-weight: 950 !important;
+.ss-reset {
+  margin-left: auto;
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(244, 246, 251, 0.88) !important;
+  font-weight: 800;
 }
 
 /* =========================================================
-   COMPOSER (Mock style)
+   NOTICE
 ========================================================= */
-.sk-composer {
-  padding: 14px !important;
-  margin-bottom: 12px;
+
+.ss-notice {
+  margin-top: 12px;
+  background: rgba(255, 155, 70, 0.1) !important;
+  border-color: rgba(255, 155, 70, 0.25) !important;
 }
 
-.sk-composerRow {
-  display: grid;
-  grid-template-columns: 1fr auto;
+.ss-notice .ant-card-body {
+  padding: 14px;
+}
+
+.ss-notice * {
+  color: rgba(244, 246, 251, 0.9) !important;
+}
+
+/* =========================================================
+   POST
+========================================================= */
+
+.ss-post .ant-card-body {
+  padding: 16px;
+}
+
+.ss-postHeader {
+  display: flex;
   gap: 12px;
   align-items: center;
+  margin-bottom: 10px;
 }
 
-.sk-composerInput {
-  border-radius: 14px !important;
-  height: 44px !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid var(--sk-stroke) !important;
+.ss-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.sk-composerChips {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.sk-chip {
-  border-radius: 999px !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  font-weight: 900 !important;
-}
-
-/* =========================================================
-   FEED + POST CARD (Mock style)
-========================================================= */
-.sk-feed {
-  display: grid;
-  gap: 14px;
-}
-
-.sk-divider {
-  border-color: rgba(255,255,255,0.10) !important;
-  margin: 12px 0 0 !important;
-}
-
-.sk-postCard {
-  padding: 12px 12px 8px;
-}
-
-.sk-postTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.sk-postIdentity {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.sk-postWho {
-  display: grid;
-  gap: 4px;
-}
-
-.sk-postNameRow {
+.ss-nameRow {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
 }
 
-.sk-postName {
-  font-weight: 950;
-}
-
-.sk-postHandle {
-  opacity: 0.78;
-  font-weight: 900;
-}
-
-.sk-postVerified {
-  font-size: 12px;
-  opacity: 0.88;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-.sk-postMetaLine {
-  font-size: 12px;
-  color: var(--sk-muted) !important;
+.ss-name {
+  color: rgba(244, 246, 251, 0.92) !important;
   font-weight: 800;
 }
 
-.sk-ghostIconBtn {
-  border-radius: 12px !important;
-  background: rgba(255,255,255,0.05) !important;
+.ss-handle {
+  color: rgba(244, 246, 251, 0.62) !important;
 }
 
-.sk-postText {
-  margin-top: 10px;
-}
-
-.sk-postTagsRow {
-  margin-top: 6px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.sk-postTagLink {
-  color: rgba(255, 200, 160, 0.95) !important;
-  font-weight: 950;
-}
-
-.sk-postMedia {
-  margin-top: 10px;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.14);
-}
-
-.sk-postMedia img {
-  width: 100%;
-  height: 360px;
-  object-fit: cover;
+.ss-role {
   display: block;
-}
-
-/* Save-to-trip mini card */
-.sk-tripMini {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.14);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.sk-tripMiniLeft {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.sk-tripMiniThumb {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 1px solid rgba(255,255,255,0.14);
-}
-
-.sk-tripMiniThumb--empty {
-  background: rgba(255,255,255,0.06);
-}
-
-.sk-tripMiniTitle {
-  font-weight: 950;
-}
-
-.sk-tripMiniSub {
-  font-size: 12px;
-  color: var(--sk-muted) !important;
-  font-weight: 800;
+  color: rgba(244, 246, 251, 0.62) !important;
   margin-top: 2px;
 }
 
-.sk-tripMiniBtn {
-  border-radius: 12px !important;
-  background: rgba(90, 160, 255, 0.20) !important;
-  border: 1px solid rgba(90, 160, 255, 0.35) !important;
-  font-weight: 950 !important;
+.ss-verify {
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(244, 246, 251, 0.85) !important;
 }
 
-/* Post action row */
-.sk-postActionsRow {
+.ss-postText {
+  color: rgba(244, 246, 251, 0.88) !important;
+}
+
+.ss-tags {
   margin-top: 10px;
   display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-  opacity: 0.95;
-}
-
-.sk-postAction {
-  font-weight: 900;
-  opacity: 0.85;
-}
-
-.sk-followBtn {
-  border-radius: 999px !important;
-  height: 32px !important;
-  padding: 0 12px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  backdrop-filter: blur(10px);
-  font-weight: 900 !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-
-.sk-followBtn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 138, 42, 0.45) !important;
-  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.14);
-}
-
-.sk-softError {
-  margin-bottom: 10px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(255, 138, 42, 0.10);
-  border: 1px solid rgba(255, 138, 42, 0.22);
-  font-weight: 900;
-}
-
-/* Load more */
-.sk-loadMoreRow {
-  margin-top: 14px;
-  display: grid;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
-.sk-loadMoreBtn {
-  border-radius: 14px !important;
-  height: 42px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  font-weight: 900 !important;
+.ss-tag {
+  border-radius: 999px !important;
+  background: rgba(255, 155, 70, 0.16) !important;
+  border: 1px solid rgba(255, 155, 70, 0.26) !important;
+  color: rgba(244, 246, 251, 0.9) !important;
+  font-weight: 700;
 }
 
-.sk-loadMoreBtn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 138, 42, 0.40) !important;
-  box-shadow: 0 0 0 4px rgba(255, 138, 42, 0.12);
+.ss-photoMock {
+  margin-top: 12px;
+  height: 190px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* =========================================================
-   TAGS + PILLS
+   RIGHT SIDEBAR
 ========================================================= */
-.skystream .ant-tag {
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: 999px !important;
+
+.ss-right .ant-card-body {
+  padding: 16px;
 }
 
-.skystream .sk-pill,
-.skystream .ant-tag.sk-pill,
-.skystream .sk-pill.ant-tag {
-  background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  padding: 9px 16px !important;
-  min-height: 36px;
-  font-size: 13px !important;
-  font-weight: 950 !important;
-  letter-spacing: 0.2px;
-  margin-inline-end: 10px !important;
-  margin-bottom: 10px !important;
-  box-shadow:
-    0 10px 24px rgba(255, 138, 42, 0.38),
-    0 0 0 6px rgba(255, 138, 42, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
-  user-select: none;
-  opacity: 1 !important;
+.ss-rightTitle {
+  margin: 0 0 12px !important;
+  color: rgba(244, 246, 251, 0.92) !important;
 }
 
-.skystream .sk-pill,
-.skystream .sk-pill * {
-  color: rgba(255, 255, 255, 0.96) !important;
-}
-
-.skystream .sk-pill--clickable {
-  cursor: pointer;
-  transition: transform 0.18s ease, filter 0.18s ease;
-}
-
-.skystream .sk-pill--clickable:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.06);
-}
-
-.skystream .sk-pill--clickable:active {
-  transform: translateY(0);
-  filter: brightness(0.98);
-}
-
-.skystream .sk-pill--pulse {
-  animation: skPillPulse 2.2s ease-in-out infinite;
-}
-
-@keyframes skPillPulse {
-  0% {
-    box-shadow:
-      0 10px 24px rgba(255, 138, 42, 0.32),
-      0 0 0 6px rgba(255, 138, 42, 0.10),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  }
-  55% {
-    box-shadow:
-      0 0 0 9px rgba(255, 138, 42, 0.12),
-      0 14px 30px rgba(255, 138, 42, 0.30),
-      inset 0 1px 0 rgba(255, 255, 255, 0.20);
-  }
-  100% {
-    box-shadow:
-      0 10px 24px rgba(255, 138, 42, 0.32),
-      0 0 0 6px rgba(255, 138, 42, 0.10),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  }
-}
-
-.skystream .sk-pillPctWrap {
-  display: inline-flex;
-  align-items: center;
+.ss-tagCloud {
+  display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.skystream .sk-pillPctText {
-  font-weight: 950;
-  font-size: 12px;
-  opacity: 0.95;
-}
-
-.skystream .sk-pillPctBar {
-  width: 78px;
-  height: 8px;
+.ss-trendTag {
+  padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.26);
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.20);
+  background: rgba(255, 155, 70, 0.92);
+  color: rgba(30, 14, 36, 0.95);
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
 
-.skystream .sk-pillPctFill {
-  height: 100%;
-  display: block;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
+.ss-hotspotPill {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 155, 70, 0.18);
+  border: 1px solid rgba(255, 155, 70, 0.28);
+  color: rgba(244, 246, 251, 0.92);
+  font-weight: 900;
+  margin-bottom: 10px;
 }
 
 /* =========================================================
-   DEAL DROPS
+   MOBILE POLISH
 ========================================================= */
-.sk-dealMini {
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.25);
-}
 
-.sk-dealMiniTitle {
-  font-weight: 950;
-  color: rgba(255,255,255,0.95) !important;
-}
+@media (max-width: 992px) {
+  .ss-container {
+    padding: 18px 14px 30px;
+  }
 
-.sk-dealMiniPrice {
-  margin-top: 6px;
-  font-size: 18px;
-  font-weight: 950;
-  color: rgba(255,255,255,0.95) !important;
-}
-
-.sk-dealMiniNote {
-  margin-top: 4px;
-  font-size: 12px;
-  color: rgba(244, 246, 251, 0.75) !important;
-  font-weight: 800;
-}
-
-/* =========================================================
-   MOBILE SYSTEM
-========================================================= */
-.sk-only-mobile { display: none; }
-.sk-only-desktop { display: block; }
-
-@media (max-width: 991px) {
-  .sk-only-mobile { display: block; }
-  .sk-only-desktop { display: none; }
-  .skystream-content { padding-bottom: 96px; }
-}
-
-/* Floating Post FAB */
-.sk-fabPost {
-  position: fixed !important;
-  right: 16px;
-  bottom: 92px;
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 999px !important;
-  background: linear-gradient(135deg, var(--sk-cta), var(--sk-cta-2)) !important;
-  border: 0 !important;
-  box-shadow:
-    0 18px 45px rgba(0,0,0,0.35),
-    0 10px 28px rgba(255, 138, 42, 0.22);
-  z-index: 80;
+  .ss-title {
+    font-size: 44px !important;
+  }
 }

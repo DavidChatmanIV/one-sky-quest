@@ -10,15 +10,15 @@ import "../styles/appLayout.css";
 /* ✅ IMPORTANT: load Skyrio theme system */
 import "../styles/skyrio-theme.css";
 
-/* ✅ Option A: Vite-safe background import */
-import galaxy from "../assets/Background/skyrio-galaxy.png";
-
 const { Header, Content, Footer } = Layout;
 
+/* -------------------------------------------
+   Route → Theme Mapper
+-------------------------------------------- */
 function themeForPath(pathname) {
   if (pathname.startsWith("/booking")) return "sk-theme-book";
   if (pathname.startsWith("/passport")) return "sk-theme-passport";
-  if (pathname.startsWith("/skystream")) return "sk-theme-social"; // optional
+  if (pathname.startsWith("/skystream")) return "sk-theme-social";
   return "sk-theme-discover";
 }
 
@@ -27,9 +27,12 @@ export default function AppLayout() {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
 
-  // ✅ Landing stays untouched
+  /* ✅ Landing stays untouched */
   const isLanding = pathname === "/";
 
+  /* -------------------------------------------
+     Scroll Detection (Navbar polish)
+  -------------------------------------------- */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
@@ -37,6 +40,9 @@ export default function AppLayout() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* -------------------------------------------
+     Auth Meta (passed to Navbar)
+  -------------------------------------------- */
   const role = user?.role || "user";
   const isAdmin = role === "admin" || role === "manager";
 
@@ -53,20 +59,19 @@ export default function AppLayout() {
     [user, isAdmin, role]
   );
 
-  // ✅ Put theme class + bg var on the Layout itself (guaranteed in DOM)
+  /* -------------------------------------------
+     Shell Classes (theme-driven)
+  -------------------------------------------- */
   const shellClass = isLanding
     ? "osq-shell"
     : `osq-shell sk-appShell ${themeForPath(pathname)}`;
 
-  const shellStyle = isLanding
-    ? { minHeight: "100vh" }
-    : {
-        minHeight: "100vh",
-        "--sk-bg-image": `url(${galaxy})`,
-      };
+  const shellStyle = {
+    minHeight: "100vh",
+  };
 
   return (
-    <Layout style={shellStyle} className={shellClass}>
+    <Layout className={shellClass} style={shellStyle}>
       <Header className={`osq-navbar ${scrolled ? "is-scrolled" : ""}`}>
         <Navbar {...authMeta} />
       </Header>

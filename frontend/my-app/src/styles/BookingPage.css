@@ -1,979 +1,313 @@
-.sk-bookingPage {
+/* =================
+   THEME TOKENS
+   ================= */
+.sk-booking {
+  --sk-orange: #ff8a2a;
+  --sk-orange-2: #ffb347;
+  --sk-orange-grad: linear-gradient(135deg, var(--sk-orange), var(--sk-orange-2));
+  --sk-glass: rgba(15, 12, 35, 0.42);
+  --sk-border: rgba(255, 255, 255, 0.12);
+  --sk-border-2: rgba(255, 255, 255, 0.16);
+  --sk-text: rgba(255, 255, 255, 0.92);
+  --sk-muted: rgba(255, 255, 255, 0.72);
+
   min-height: 100vh;
-  background: radial-gradient(
-      900px 500px at 75% 35%,
-      rgba(255, 140, 90, 0.25),
-      transparent 60%
-    ),
-    radial-gradient(
-      900px 600px at 25% 40%,
-      rgba(120, 90, 255, 0.32),
-      transparent 65%
-    ),
-    linear-gradient(135deg, #0b1220, #1a1c3b 45%, #2a1340);
+  position: relative;
+  color: var(--sk-text);
+  overflow-x: hidden;
 }
 
-/* ✅ NEW: let global galaxy background show through (non-landing pages) */
-.sk-appShell .sk-bookingPage {
-  background: transparent !important;
+/* full-page background image */
+.sk-booking::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--sk-bg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  transform: translateZ(0);
 }
 
-/* ============================= */
-/* FINAL PREMIUM TEXT LOCK */
-/* ============================= */
-.sk-bookingPage,
-.sk-bookingPage * {
-  color: rgba(255, 255, 255, 0.92);
+/* overlay for readability */
+.sk-booking::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(140, 90, 255, 0.35), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 42, 0.22), transparent 55%),
+    linear-gradient(180deg, rgba(10, 8, 22, 0.55), rgba(10, 8, 22, 0.86));
+  z-index: 0;
 }
 
-.sk-bookingPage .ant-typography,
-.sk-bookingPage .ant-typography * {
-  color: rgba(255, 255, 255, 0.92) !important;
+.sk-booking > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* keep CTA text dark on purpose */
-.sk-bookingPage .sk-cta {
-  color: #1b1024 !important;
-}
-
-/* ============================= */
-/* Page container */
-/* ============================= */
-.sk-bookingWrap,
-.sk-bookingContent {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 34px 16px 64px;
-}
-
-/* ============================= */
-/* HERO */
-/* ============================= */
-.sk-bookingHero {
-  text-align: center;
-  padding: 26px 0 18px;
-}
-
-.sk-bookingHeroTitle {
-  margin: 0 !important;
-  font-weight: 950;
-  letter-spacing: -0.02em;
-}
-
-.sk-bookingHeroSub {
-  display: block;
-  margin-top: 10px;
-  color: rgba(255, 255, 255, 0.72) !important;
-}
-
-/* Top chips under hero title */
-.sk-chip {
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.86) !important;
-}
-
-/* ============================= */
-/* GRID */
-/* ============================= */
-.sk-bookingGrid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 16px;
-  margin-top: 18px;
-}
-
-.sk-panel {
-  min-width: 0;
-}
-
-@media (max-width: 980px) {
-  .sk-bookingGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Sticky right column wrapper */
-.sk-budgetSticky {
-  position: sticky;
-  top: 14px;
-  align-self: start;
-}
-
-@media (max-width: 980px) {
-  .sk-budgetSticky {
-    position: static;
-    top: auto;
-  }
-}
-
-/* ============================= */
-/* Glass cards */
-/* ============================= */
-.sk-glassCard {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 18px !important;
+/* ================= HERO ================= */
+.sk-booking-hero {
+  padding: 72px 80px;
+  margin: 26px 36px 0;
+  border-radius: 18px;
+  background: rgba(15, 12, 35, 0.38);
+  border: 1px solid var(--sk-border);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(12px);
-  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.28);
-}
+  -webkit-backdrop-filter: blur(12px);
 
-.sk-searchCard {
-  padding: 14px;
-}
-
-.sk-resultsCard {
-  padding: 14px;
-  margin-top: 14px;
-}
-
-/* ============================= */
-/* Clear hierarchy helpers */
-/* ============================= */
-.sk-helperText {
-  display: block;
-  margin-top: 10px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.68) !important;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.sk-groupLabel {
-  display: block;
-  margin-bottom: 6px;
-  color: rgba(255, 255, 255, 0.68) !important;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.sk-refineHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.sk-refineOptional {
-  font-weight: 850 !important;
-  color: rgba(255, 255, 255, 0.6) !important;
-  margin-left: 6px;
-}
-
-/* Utility buttons */
-.sk-utilityBtn {
-  opacity: 0.92;
-}
-.sk-utilityBtn:hover {
-  opacity: 1;
-}
-
-/* ============================= */
-/* Tabs (Segmented) */
-/* ============================= */
-.sk-tabRow {
-  margin-bottom: 12px;
-}
-
-.sk-tabPills.ant-segmented {
-  background: rgba(0, 0, 0, 0.18) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 999px !important;
-  padding: 4px !important;
-}
-
-/* ✅ FIX: white pill -> orange Skyrio thumb */
-.sk-tabPills .ant-segmented-thumb {
-  background: linear-gradient(135deg, #ff9a4d, #ff7a18) !important;
-  border-radius: 999px !important;
-  box-shadow: 0 10px 22px rgba(255, 140, 90, 0.25);
-}
-
-.sk-tabPills .ant-segmented-item-label {
-  color: rgba(255, 255, 255, 0.78) !important;
-  font-weight: 850 !important;
-}
-
-/* ✅ Selected label becomes dark for contrast on orange */
-.sk-tabPills .ant-segmented-item-selected .ant-segmented-item-label {
-  color: #1b1024 !important;
-  font-weight: 950 !important;
-}
-
-/* ============================= */
-/* Fields */
-/* ============================= */
-.sk-fieldLabel {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 850;
-  color: rgba(255, 255, 255, 0.72) !important;
-}
-
-/* AutoComplete wrapper */
-.sk-whereAuto .ant-select-selector {
-  height: 46px !important;
-  border-radius: 14px !important;
-  background: rgba(0, 0, 0, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: none !important;
-  padding: 0 12px !important;
-  display: flex;
-  align-items: center;
-}
-
-.sk-whereAuto input {
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 800 !important;
-}
-
-.sk-whereAuto input::placeholder {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-/* DatePicker */
-.sk-datePicker.ant-picker {
-  height: 46px !important;
-  border-radius: 14px !important;
-  background: rgba(0, 0, 0, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: none !important;
-}
-
-.sk-bookingPage .ant-picker-input > input {
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 800 !important;
-}
-
-.sk-bookingPage .ant-picker-input > input::placeholder {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-.sk-bookingPage .ant-picker .anticon,
-.sk-bookingPage .ant-picker-separator,
-.sk-bookingPage .ant-picker-suffix,
-.sk-bookingPage .ant-picker-clear {
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-/* Travelers row */
-.sk-travelersBtnRow {
-  display: grid;
-  grid-template-columns: 1fr 46px;
-  gap: 10px;
-  align-items: center;
-}
-
-.sk-pillBtn {
-  height: 46px !important;
-  border-radius: 14px !important;
-  background: rgba(0, 0, 0, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 850 !important;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.sk-pillBtn:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  transform: translateY(-1px);
-}
-
-.sk-iconPillBtn {
-  height: 46px !important;
-  width: 46px !important;
-  border-radius: 14px !important;
-  background: rgba(0, 0, 0, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* ============================= */
-/* ACTION ROW */
-/* ============================= */
-.sk-actionRow {
-  margin-top: 12px;
-}
-
-.sk-sortBtn {
-  height: 46px !important;
-  border-radius: 14px !important;
-  background: rgba(0, 0, 0, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 900 !important;
-}
-
-.sk-sortValue {
-  color: rgba(255, 255, 255, 0.96) !important;
-  font-weight: 950 !important;
-}
-
-/* CTA Search */
-.sk-cta {
-  height: 46px !important;
-  border-radius: 14px !important;
-  border: none !important;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 152, 80, 0.95),
-    rgba(255, 204, 120, 0.95)
-  ) !important;
-  font-weight: 950 !important;
-  box-shadow: 0 18px 34px rgba(255, 152, 80, 0.2);
-}
-
-.sk-searchCTA {
-  min-width: 168px;
-}
-
-@media (max-width: 520px) {
-  .sk-searchCTA {
-    width: 100%;
-  }
-}
-
-/* ============================= */
-/* Vibe chips row */
-/* ============================= */
-.sk-vibeRow {
-  margin-top: 12px;
-}
-
-.sk-vibeChip {
-  border-radius: 999px !important;
-  height: 40px !important;
-  padding: 0 14px !important;
-  background: rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: rgba(255, 255, 255, 0.78) !important;
-  font-weight: 850 !important;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.sk-vibeChip:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  transform: translateY(-1px);
-}
-
-.sk-vibeChip.on {
-  background: linear-gradient(135deg, #ff9a4d, #ff7a18) !important;
-  border-color: rgba(255, 140, 90, 0.55) !important;
-  color: rgba(255, 255, 255, 0.96) !important;
-  box-shadow: 0 6px 18px rgba(255, 140, 90, 0.35);
-}
-
-/* ============================= */
-/* Rewards + Track prices row */
-/* ============================= */
-.sk-toggleRow {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sk-toggleLabel {
-  color: rgba(255, 255, 255, 0.82) !important;
-  font-weight: 900;
-}
-
-.sk-toggleHint {
-  color: rgba(255, 255, 255, 0.62) !important;
-  font-size: 12px;
-  margin-left: 6px;
-}
-
-/* ============================= */
-/* Quick filters */
-/* ============================= */
-.sk-suggestRow {
-  margin-top: 12px;
-}
-
-.sk-suggestBtn {
-  height: 40px !important;
-  border-radius: 999px !important;
-  padding: 0 14px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.82) !important;
-  font-weight: 850 !important;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-}
-
-.sk-suggestBtn:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 140, 90, 0.25) !important;
-}
-
-.sk-suggestBtn.on {
-  background: linear-gradient(135deg, #ff9a4d, #ff7a18) !important;
-  border-color: rgba(255, 140, 90, 0.55) !important;
-  color: #1b1024 !important;
-  box-shadow: 0 10px 22px rgba(255, 140, 90, 0.22);
-}
-
-.sk-clearQuickBtn.ant-btn {
-  color: rgba(255, 255, 255, 0.78) !important;
-  font-weight: 850 !important;
-  padding: 0 6px !important;
-}
-.sk-clearQuickBtn.ant-btn:hover {
-  color: rgba(255, 255, 255, 0.92) !important;
-}
-
-/* ============================= */
-/* RESULTS */
-/* ============================= */
-.sk-resultsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.sk-resultsHeaderLeft {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
 }
 
-.sk-resultsMeta {
+.sk-hero-title {
+  color: #fff !important;
+  font-size: 44px;
+  margin: 0 !important;
+}
+
+.sk-hero-sub {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+}
+
+/* ================= PILLS ================= */
+.sk-pill {
+  background: var(--sk-orange-grad);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+}
+
+/* ================= “ALL BUTTONS ORANGE” ================= */
+.sk-btn-orange {
+  background: var(--sk-orange-grad) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+.sk-btn-orange:hover {
+  filter: brightness(1.04);
+}
+.sk-btn-orange:active {
+  transform: translateY(1px);
+}
+
+/* keep inputs glass */
+.sk-glass-input {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid var(--sk-border-2) !important;
+  color: var(--sk-text) !important;
+}
+
+/* ================= TABS (Segmented) — SELECTED ORANGE ================= */
+.sk-orange-segmented {
+  margin-top: 22px;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid var(--sk-border-2);
+  border-radius: 14px;
+  padding: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.sk-booking .ant-segmented-item-label {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-weight: 700;
+}
+
+/* selected pill */
+.sk-booking .ant-segmented-item-selected {
+  background: var(--sk-orange-grad) !important;
+  border-radius: 10px;
+}
+.sk-booking .ant-segmented-item-selected .ant-segmented-item-label {
+  color: #fff !important;
+}
+
+/* ================= SEARCH BAR ================= */
+.sk-search-bar {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 18px;
+  width: min(980px, 100%);
+  justify-content: center;
   flex-wrap: wrap;
 }
 
-@media (max-width: 520px) {
-  .sk-resultsHeader {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .sk-resultsHeader .ant-btn {
-    width: 100%;
-  }
+/* ================= DATE PICKER ORANGE (start/end) ================= */
+.sk-booking .ant-picker {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid var(--sk-border-2) !important;
+  color: var(--sk-text) !important;
 }
 
-.sk-resultsTitle {
-  margin: 0 !important;
-  font-weight: 950 !important;
+.sk-booking .ant-picker:hover,
+.sk-booking .ant-picker-focused {
+  border-color: rgba(255, 138, 42, 0.85) !important;
+  box-shadow: 0 0 0 3px rgba(255, 138, 42, 0.18) !important;
 }
 
-.sk-divider {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+.sk-booking .ant-picker input {
+  color: var(--sk-text) !important;
 }
 
-.sk-emptyState {
-  padding: 34px 10px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.72);
+.sk-booking .ant-picker-suffix,
+.sk-booking .ant-picker-clear,
+.sk-booking .ant-picker-separator {
+  color: rgba(255, 255, 255, 0.88) !important;
 }
 
-.sk-emptyIcon {
-  width: 78px;
-  height: 60px;
-  margin: 0 auto 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* calendar selection (popup) */
+.sk-booking .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.sk-booking .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.sk-booking .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: var(--sk-orange) !important;
 }
 
-.sk-resultItem {
-  margin-top: 12px;
-  padding: 12px;
+/* range hover background */
+.sk-booking .ant-picker-cell-in-view.ant-picker-cell-in-range::before {
+  background: rgba(255, 138, 42, 0.22) !important;
+}
+
+/* ================= ACTION ROW ================= */
+.sk-action-row {
+  margin-top: 18px;
+}
+
+/* ================= QUICK FILTERS — ORANGE TOGGLES ================= */
+.sk-filters {
+  margin-top: 18px;
+}
+
+.sk-qf {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.90);
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-weight: 800;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, outline 0.15s ease;
+  backdrop-filter: blur(10px);
 }
 
-.sk-resultItem:hover {
-  transform: translateY(-1px);
+.sk-qf:hover {
+  border-color: rgba(255, 138, 42, 0.65);
 }
 
-.sk-resultItem.isSelected {
-  outline: 2px solid rgba(255, 140, 90, 0.55);
-  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.4);
+/* active = orange */
+.sk-qf.is-active {
+  background: var(--sk-orange-grad);
+  border-color: transparent;
+  color: #fff;
 }
 
-.sk-resultTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-@media (max-width: 520px) {
-  .sk-resultTop {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.sk-resultBrand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sk-resultLogo {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  font-weight: 950;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.sk-resultName {
-  font-weight: 950 !important;
-}
-
-.sk-resultSub {
-  color: rgba(255, 255, 255, 0.72) !important;
-  font-size: 12px;
-}
-
-.sk-miniBadge {
-  border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.86) !important;
-}
-
-.sk-route {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-}
-
-@media (max-width: 520px) {
-  .sk-route {
-    grid-template-columns: 1fr;
-    text-align: left;
-  }
-  .sk-routeLine {
-    text-align: left;
-  }
-}
-
-.sk-airport {
-  font-weight: 950;
-  font-size: 16px;
-}
-
-.sk-routeLine {
-  text-align: center;
-}
-
-.sk-routeSub {
-  color: rgba(255, 255, 255, 0.68) !important;
-}
-
-.sk-resultBottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-@media (max-width: 520px) {
-  .sk-resultBottom {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .sk-resultBottom .ant-space {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .sk-resultBottom .ant-btn {
-    flex: 1;
-  }
-}
-
-.sk-totalLabel {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.sk-price {
-  font-weight: 950;
-  font-size: 18px;
-}
-
-/* ============================= */
-/* RIGHT: BUDGET CARD */
-/* ============================= */
-.sk-budgetCard {
-  padding: 14px;
-}
-
-.sk-budgetHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.sk-budgetTitle {
-  margin: 0 !important;
-  font-weight: 950 !important;
-}
-
-.sk-budgetSub {
-  color: rgba(255, 255, 255, 0.68) !important;
-  font-size: 12px;
-}
-
-.sk-budgetBig {
-  margin-top: 10px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sk-budgetAmount {
-  font-size: 30px;
-  font-weight: 950;
-  letter-spacing: -0.02em;
-  display: inline-flex;
-  align-items: center;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #ff9a4d, #ff7a18);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 22px rgba(255, 140, 90, 0.18);
-}
-
-.sk-budgetMetaText {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.sk-budgetProgressRow {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 12px;
-}
-
-.sk-budgetSmall {
-  color: rgba(255, 255, 255, 0.68) !important;
-}
-
-.sk-budgetBar {
-  height: 12px;
-  border-radius: 999px;
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.sk-budgetBarFill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(120, 90, 255, 0.95),
-    rgba(255, 140, 90, 0.95)
-  );
-  box-shadow: 0 10px 22px rgba(255, 140, 90, 0.18);
-}
-
-.sk-budgetFooter {
-  margin-top: 10px;
-}
-
-.sk-budgetFootText {
-  color: rgba(255, 255, 255, 0.68) !important;
-  font-size: 12px;
-}
-
-.sk-budgetSoftNote {
-  display: block;
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.62) !important;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.sk-budgetAdd {
-  margin-top: 10px;
-}
-
-.sk-budgetAddTitle {
-  font-size: 12px;
+/* clear button matches theme too */
+.sk-qf-clear {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.90);
   font-weight: 900;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.78) !important;
+  padding: 7px 10px;
 }
 
-/* ============================= */
-/* Budget InputNumber Theme Fix */
-/* ============================= */
-.sk-bookingPage .sk-budgetInput,
-.sk-bookingPage .sk-budgetInput.ant-input-number,
-.sk-bookingPage .sk-budgetInput .ant-input-number {
-  width: 100% !important;
-  height: 42px !important;
-  border-radius: 16px !important;
-  background: rgba(18, 14, 30, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
-  color: rgba(255, 255, 255, 0.92) !important;
+/* ================= RESULTS ================= */
+.sk-results-wrap {
+  padding: 46px 80px 90px;
 }
 
-.sk-bookingPage .sk-budgetInput input,
-.sk-bookingPage .sk-budgetInput .ant-input-number-input {
-  background: transparent !important;
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 800 !important;
+.sk-section-title {
+  color: #fff !important;
 }
 
-.sk-bookingPage .sk-budgetInput input::placeholder {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-.sk-bookingPage .sk-budgetInput:hover,
-.sk-bookingPage .sk-budgetInput:focus-within {
-  border-color: rgba(255, 140, 90, 0.35) !important;
-  box-shadow: 0 0 0 3px rgba(255, 140, 90, 0.12);
-}
-
-.sk-budgetNote {
-  width: 100%;
-  height: 42px;
-  border-radius: 14px;
-  background: rgba(18, 14, 30, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0 12px;
-  outline: none;
-  color: rgba(255, 255, 255, 0.92);
-  font-weight: 800;
-}
-
-.sk-budgetNote::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.sk-expenseList {
-  margin-top: 12px;
-  display: grid;
-  gap: 10px;
-}
-
-.sk-expenseItem {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sk-expenseNote {
-  color: rgba(255, 255, 255, 0.74) !important;
-}
-
-.sk-expenseAmt {
-  font-weight: 950;
-}
-
-/* ============================= */
-/* Why buttons */
-/* ============================= */
-.sk-whyBtn.ant-btn-link {
-  padding: 0 !important;
-  height: auto !important;
-  color: rgba(255, 255, 255, 0.78) !important;
-  font-weight: 850 !important;
-}
-
-.sk-whyBtn.ant-btn-link:hover {
-  color: rgba(255, 255, 255, 0.92) !important;
-}
-
-.sk-whyIconBtn.ant-btn {
-  width: 38px !important;
-  height: 38px !important;
-  border-radius: 12px !important;
-  background: rgba(0, 0, 0, 0.14) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.sk-whyIconBtn.ant-btn:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* ============================= */
-/* Tour theme */
-/* ============================= */
-.sk-bookingPage .sk-tour .ant-tour-content {
-  background: rgba(15, 18, 35, 0.96) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(14px);
-  border-radius: 16px;
-}
-
-.sk-bookingPage .sk-tour .ant-tour-title {
-  color: rgba(255, 255, 255, 0.95) !important;
-  font-weight: 950 !important;
-}
-
-.sk-bookingPage .sk-tour .ant-tour-description {
-  color: rgba(255, 255, 255, 0.74) !important;
-  font-weight: 800;
-}
-
-/* ============================= */
-/* Drawer / Modal theme */
-/* ============================= */
-.sk-bookingPage .ant-drawer-content,
-.sk-bookingPage .ant-modal-content {
-  background: rgba(15, 18, 35, 0.96) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(14px);
-}
-
-.sk-bookingPage .ant-drawer-header,
-.sk-bookingPage .ant-modal-header {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.sk-bookingPage .ant-drawer-title,
-.sk-bookingPage .ant-modal-title {
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 950 !important;
-}
-
-.sk-bookingPage .ant-drawer-close,
-.sk-bookingPage .ant-modal-close {
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-
-/* ============================= */
-/* Toast/message readability fix */
-/* ============================= */
-.sk-toast .ant-message-notice-content {
-  background: rgba(15, 18, 35, 0.92) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+.sk-result-card,
+.sk-budget-card {
+  background: rgba(15, 12, 35, 0.42) !important;
+  border-radius: 18px;
+  border: 1px solid var(--sk-border) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(12px);
 }
 
-.sk-toast .ant-message-custom-content,
-.sk-toast .ant-message-custom-content span {
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 850 !important;
+.sk-result-img {
+  height: 90px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* ============================= */
-/* Footer mark */
-/* ============================= */
-.sk-footerMark {
-  text-align: center;
-  margin-top: 22px;
-  opacity: 0.75;
+.sk-card-title {
+  color: rgba(255, 255, 255, 0.94) !important;
+  margin: 0 !important;
 }
 
-/* =====================================================
-   MOBILE OVERLAY PACK (SAFE)
-   - Only affects phones
-   - Desktop stays identical
-===================================================== */
-@media (max-width: 480px) {
-  .sk-bookingWrap,
-  .sk-bookingContent {
-    padding: 18px 16px 48px;
-  }
+.sk-muted {
+  color: var(--sk-muted) !important;
+}
 
-  .sk-bookingHero {
-    padding: 16px 0 12px;
-  }
+.sk-price {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--sk-orange);
+  text-align: right;
+}
 
-  .sk-bookingHeroTitle {
-    line-height: 1.12;
-  }
+/* ================= BUDGET CARD ================= */
+.sk-budget-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
 
-  .sk-bookingGrid {
-    gap: 12px;
-    margin-top: 12px;
-  }
+.sk-number {
+  width: 170px;
+}
 
-  .sk-searchCard {
-    padding: 12px;
-  }
-  .sk-resultsCard {
-    padding: 12px;
-    margin-top: 12px;
-  }
-  .sk-budgetCard {
-    padding: 12px;
-  }
+/* orange focus for InputNumber */
+.sk-booking .ant-input-number,
+.sk-booking .ant-input-number-input {
+  color: var(--sk-text) !important;
+}
 
-  .sk-tabRow {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-  }
+.sk-booking .ant-input-number {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid var(--sk-border-2) !important;
+}
 
-  .sk-tabRow::-webkit-scrollbar {
-    display: none;
-  }
+.sk-booking .ant-input-number:focus,
+.sk-booking .ant-input-number-focused {
+  border-color: rgba(255, 138, 42, 0.85) !important;
+  box-shadow: 0 0 0 3px rgba(255, 138, 42, 0.18) !important;
+}
 
-  .sk-tabPills.ant-segmented {
-    min-width: 520px;
-  }
+.sk-budget-left {
+  color: #fff !important;
+  margin: 8px 0 6px !important;
+}
 
-  .sk-travelersBtnRow {
-    grid-template-columns: 1fr 46px;
-    gap: 10px;
-  }
+.sk-divider {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  margin: 14px 0 !important;
+}
 
-  .sk-actionRow .ant-space,
-  .sk-actionRow .ant-space-item {
-    width: 100%;
-  }
+.sk-budget-input {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-  .sk-sortBtn,
-  .sk-searchCTA {
-    width: 100%;
-  }
-
-  .sk-resultItem {
-    padding: 12px;
-  }
-
-  .sk-resultTop {
-    gap: 10px;
-  }
-
-  .sk-bookingPage .ant-btn,
-  .sk-pillBtn,
-  .sk-iconPillBtn,
-  .sk-sortBtn,
-  .sk-cta,
-  .sk-suggestBtn {
-    min-height: 48px !important;
-  }
-
-  .sk-suggestRow .ant-space {
-    flex-wrap: wrap;
-    row-gap: 10px;
-  }
+.sk-budget-hint {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
 }
