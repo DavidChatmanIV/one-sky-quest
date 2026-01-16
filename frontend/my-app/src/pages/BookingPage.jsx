@@ -14,11 +14,15 @@ import {
   Col,
   InputNumber,
   Divider,
+  message as antdMessage,
 } from "antd";
-import { SearchOutlined, SaveOutlined, TeamOutlined } from "@ant-design/icons";
+import { SearchOutlined, TeamOutlined } from "@ant-design/icons";
 
-import heroImg from "../assets/Booking/skyrio-hero.jpg"; // ✅ adjust if needed
+import heroImg from "../assets/Booking/skyrio-hero.jpg"; 
 import "../styles/BookingPage.css";
+
+/* ✅ NEW: Guest-gated Save Trip button */
+import SaveTripButton from "../components/trips/SaveTripButton";
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -73,6 +77,14 @@ export default function BookingPage() {
     setUsed((prev) => Number(prev || 0) + amt);
   };
 
+  // ----------------------------
+  // ✅ Demo save handler (swap with real API later)
+  // ----------------------------
+  const handleSaveTrip = (source = "page") => {
+    // only runs after auth (SaveTripButton gates)
+    antdMessage.success(`Trip saved (${source})`);
+  };
+
   return (
     <Layout
       className="sk-booking"
@@ -125,9 +137,10 @@ export default function BookingPage() {
         {/* ================= ACTION ROW ================= */}
         <Space className="sk-action-row">
           <Button className="sk-btn-orange">Sort: Recommended</Button>
-          <Button className="sk-btn-orange" icon={<SaveOutlined />}>
-            Save Trip
-          </Button>
+
+          {/* ✅ REPLACED: old Save Trip button -> auth-gated SaveTripButton */}
+          <SaveTripButton onSaveConfirmed={() => handleSaveTrip("hero")} />
+
           <Button className="sk-btn-orange" icon={<TeamOutlined />}>
             Teams Travel
           </Button>
@@ -186,7 +199,21 @@ export default function BookingPage() {
               </Col>
 
               <Col span={6} className="sk-price">
-                $168 total
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    gap: 8,
+                  }}
+                >
+                  <div>$168 total</div>
+
+                  {/* ✅ Add SaveTripButton on each result card too */}
+                  <SaveTripButton
+                    onSaveConfirmed={() => handleSaveTrip("result")}
+                  />
+                </div>
               </Col>
             </Row>
           </Card>

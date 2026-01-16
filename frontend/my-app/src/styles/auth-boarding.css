@@ -1,0 +1,418 @@
+/* ==========
+   PAGE WRAP
+========== */
+.sk-authWrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 56px 18px;
+  position: relative;
+  overflow: hidden;
+
+  /* Premium Skyrio gradient background */
+  background: radial-gradient(1200px 700px at 50% 10%, rgba(255, 138, 42, 0.18), transparent 60%),
+    radial-gradient(1100px 650px at 15% 85%, rgba(120, 90, 255, 0.26), transparent 55%),
+    radial-gradient(900px 600px at 85% 85%, rgba(255, 138, 42, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(22, 16, 40, 0.92), rgba(10, 10, 18, 0.92));
+}
+
+/* Soft depth orbs */
+.sk-authWrap::before,
+.sk-authWrap::after {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 999px;
+  filter: blur(40px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.sk-authWrap::before {
+  left: -120px;
+  top: -160px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 138, 42, 0.9), transparent 60%);
+}
+
+.sk-authWrap::after {
+  right: -140px;
+  bottom: -200px;
+  background: radial-gradient(circle at 30% 30%, rgba(120, 90, 255, 0.9), transparent 60%);
+}
+
+/* ==========
+   HERO COPY
+========== */
+.sk-authHero {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.sk-authTitle {
+  color: rgba(244, 246, 251, 0.96) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.6px;
+  margin-bottom: 4px !important;
+  font-size: clamp(34px, 4vw, 52px) !important;
+}
+
+.sk-authSub {
+  color: rgba(244, 246, 251, 0.70) !important;
+  font-size: 14px;
+}
+
+/* ==========
+   BOARDING PASS CARD
+========== */
+.sk-surface {
+  background: rgba(12, 12, 18, 0.34) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(18px);
+}
+
+.sk-boardingPass {
+  width: min(520px, 92vw);
+  border-radius: 22px !important;
+  padding: 22px 20px 18px !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+  color: rgba(244, 246, 251, 0.92);
+}
+
+.sk-boardingPass:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.55);
+}
+
+.sk-boardingPass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 500px at 50% 35%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(900px 380px at 30% 70%, rgba(255, 138, 42, 0.08), transparent 55%),
+    radial-gradient(900px 380px at 70% 70%, rgba(120, 90, 255, 0.10), transparent 55%);
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+/* Top row */
+.sk-passTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sk-brandRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+
+.sk-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 138, 42, 0.95);
+  box-shadow: 0 0 18px rgba(255, 138, 42, 0.35);
+}
+
+.sk-brand {
+  letter-spacing: 0.2px;
+}
+
+.sk-gatePill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(244, 246, 251, 0.82);
+  font-size: 12px;
+}
+
+/* Meta section */
+.sk-passMeta {
+  margin-bottom: 14px;
+}
+
+.sk-metaLabel {
+  color: rgba(244, 246, 251, 0.55);
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.sk-metaValue {
+  font-weight: 800;
+  color: rgba(244, 246, 251, 0.95);
+  font-size: 16px;
+}
+
+.sk-metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-top: 10px;
+}
+
+.sk-metaItem.sk-right {
+  text-align: right;
+}
+
+.sk-dividerLine {
+  margin-top: 12px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.sk-planeMark {
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  opacity: 0.9;
+  padding: 0 10px;
+  background: rgba(12, 12, 18, 0.30);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ==========
+   FIELDS
+========== */
+.sk-field .sk-label {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(244, 246, 251, 0.70);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.sk-input .ant-input,
+.sk-input.ant-input-affix-wrapper {
+  border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(10, 10, 18, 0.28) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: rgba(244, 246, 251, 0.92) !important;
+}
+
+.sk-input .ant-input::placeholder {
+  color: rgba(244, 246, 251, 0.55) !important;
+}
+
+.sk-input.ant-input-affix-wrapper-focused,
+.sk-input.ant-input-affix-wrapper:focus-within {
+  border-color: rgba(255, 138, 42, 0.55) !important;
+  box-shadow:
+    0 0 0 4px rgba(255, 138, 42, 0.14),
+    0 0 0 9px rgba(120, 90, 255, 0.10),
+    0 16px 44px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Visible focus for keyboard users */
+.sk-login :focus-visible {
+  outline: 2px solid rgba(255, 138, 42, 0.65);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+/* ==========
+   BUTTONS
+========== */
+.sk-primaryBtn {
+  border-radius: 16px !important;
+  height: 54px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.2px;
+  border: none !important;
+  background: linear-gradient(90deg, rgba(255, 138, 42, 0.95), rgba(255, 188, 92, 0.95)) !important;
+  color: rgba(10, 10, 18, 0.92) !important;
+  box-shadow: 0 18px 60px rgba(255, 138, 42, 0.20);
+}
+
+.sk-primaryBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 24px 86px rgba(255, 138, 42, 0.26);
+}
+
+.sk-primaryBtn:active {
+  transform: translateY(1px) scale(0.99);
+  filter: brightness(0.98);
+}
+
+/* Ghost button (Guest mode) */
+.sk-ghostBtn {
+  border-radius: 16px !important;
+  height: 48px !important;
+  font-weight: 800 !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.sk-ghostBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Under button microcopy */
+.sk-underBtn {
+  text-align: center;
+  margin-top: -4px;
+}
+.sk-micro {
+  color: rgba(244, 246, 251, 0.62);
+  font-size: 12px;
+}
+
+/* Links row */
+.sk-linksRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.sk-link {
+  position: relative;
+  color: rgba(244, 246, 251, 0.88);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.sk-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, rgba(255,138,42,0.9), rgba(120,90,255,0.9));
+  border-radius: 2px;
+}
+
+.sk-link:hover::after {
+  transform: scaleX(1);
+}
+
+.sk-strong {
+  color: rgba(255, 188, 92, 0.95);
+}
+
+.sk-sep {
+  color: rgba(244, 246, 251, 0.35);
+}
+
+/* Guest hint */
+.sk-guestBox {
+  margin-top: 2px;
+  text-align: center;
+}
+.sk-guestHint {
+  display: block;
+  margin-top: 8px;
+  color: rgba(244, 246, 251, 0.58);
+  font-size: 12px;
+}
+
+/* Barcode */
+.sk-barcodeRow {
+  display: grid;
+  grid-template-columns: repeat(22, 1fr);
+  gap: 6px;
+  margin-top: 18px;
+  opacity: 0.65;
+}
+
+.sk-bar {
+  height: 18px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* Footer */
+.sk-authFooter {
+  margin-top: 14px;
+  text-align: center;
+}
+
+/* ==========
+   SHIMMER (loading)
+========== */
+.sk-loadingShimmer {
+  position: relative;
+  overflow: hidden;
+}
+.sk-loadingShimmer::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  transform: translateX(-60%) rotate(10deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  animation: sk-shimmer 1.2s linear infinite;
+  pointer-events: none;
+}
+@keyframes sk-shimmer {
+  to {
+    transform: translateX(60%) rotate(10deg);
+  }
+}
+
+/* ==========
+   SUCCESS SCAN (Login -> Passport)
+========== */
+.sk-boardingPass.sk-scan::after {
+  content: "";
+  position: absolute;
+  left: -30%;
+  top: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.10),
+    rgba(255, 138, 42, 0.14),
+    rgba(120, 90, 255, 0.12),
+    transparent
+  );
+  transform: skewX(-12deg);
+  animation: sk-scan 850ms ease forwards;
+  pointer-events: none;
+}
+@keyframes sk-scan {
+  to {
+    left: 115%;
+  }
+}
+
+/* ==========
+   MOTION RESPECT
+========== */
+@media (prefers-reduced-motion: reduce) {
+  .sk-authWrap,
+  .sk-boardingPass,
+  .sk-boardingPass::before,
+  .sk-loadingShimmer::after,
+  .sk-boardingPass.sk-scan::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  .sk-boardingPass:hover {
+    transform: none !important;
+  }
+}

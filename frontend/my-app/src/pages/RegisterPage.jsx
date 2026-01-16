@@ -4,8 +4,10 @@ import { UserOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../layout/AuthLayout";
 import BoardingPassToast from "../components/BoardingPassToast";
+import { useAuthModal } from "../auth/AuthModalController";
 
-import "../styles/LoginBoardingPass.css"; 
+import galaxyLogin from "../assets/LoginBoardingpass/galaxy-login.png"; // ✅ same bg as login
+import "../styles/LoginBoardingPass.css";
 
 const { Title, Text } = Typography;
 
@@ -22,6 +24,8 @@ export default function RegisterPage() {
 
   const nav = useNavigate();
   const location = useLocation();
+  const authModal = useAuthModal();
+
   const successHandledRef = useRef(false);
 
   const redirectTo = useMemo(() => {
@@ -30,7 +34,6 @@ export default function RegisterPage() {
     return "/dashboard";
   }, [location.state]);
 
-  // 🧠 Passenger auto-updates from username (or name/email fallback)
   const passenger = useMemo(() => {
     const raw =
       (formData.username || "").trim() ||
@@ -87,7 +90,6 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      // Save token (and user) for later API calls
       if (data.token) localStorage.setItem("token", data.token);
       if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -111,6 +113,8 @@ export default function RegisterPage() {
       });
 
       message.success(`Account created. Welcome aboard, ${displayName} ✈️`);
+
+      authModal?.closeAuthModal?.();
       nav(redirectTo, { replace: true });
     } catch (err) {
       successHandledRef.current = false;
@@ -141,6 +145,7 @@ export default function RegisterPage() {
 
         <div
           className={`sk-pass ${isScanning ? "isScanning" : ""}`}
+          style={{ "--sk-pass-bg": `url(${galaxyLogin})` }} // ✅ add same bg
           onKeyDown={onKeyDown}
           role="form"
           aria-busy={loading ? "true" : "false"}
@@ -289,7 +294,7 @@ export default function RegisterPage() {
                 Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => nav("/login")}
+                  onClick={() => authModal?.setAuthModalMode?.("login")}
                   className="sk-footerLink"
                 >
                   Log in

@@ -26,7 +26,10 @@ import "./styles/Navbar.css";
 import "./styles/LandingPage.css";
 import "./styles/BookingPage.css";
 import "./styles/flights.css";
-import "./styles/skystream.css";
+
+// ✅ NEW: SkyHub styles (was skystream.css)
+import "./styles/skyhub.css";
+
 import "./styles/profile-passport.css";
 import "./styles/SmartPlan.css";
 import "./styles/surfaces.css";
@@ -36,26 +39,26 @@ import "./styles/theme.css";
 /* ============================= */
 /* Render */
 /* ============================= */
-const root = document.getElementById("root");
+const rootEl = document.getElementById("root");
 
-createRoot(root).render(
+createRoot(rootEl).render(
   <React.StrictMode>
-    <AuthProvider>
-      <AuthModalProvider>
-        <AssistantProvider>
-          <ConfigProvider
-            theme={{
-              components: {
-                Card: { variant: "outlined" },
-              },
-            }}
-          >
-            <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <AuthModalProvider>
+          <AssistantProvider>
+            <ConfigProvider
+              theme={{
+                components: {
+                  Card: { variant: "outlined" },
+                },
+              }}
+            >
               <AppRoutes />
-            </BrowserRouter>
-          </ConfigProvider>
-        </AssistantProvider>
-      </AuthModalProvider>
-    </AuthProvider>
+            </ConfigProvider>
+          </AssistantProvider>
+        </AuthModalProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

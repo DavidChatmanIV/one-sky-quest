@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Row,
   Col,
@@ -16,6 +17,7 @@ import {
   Progress,
   Input,
   Tag,
+  Segmented,
   message as antdMessage,
 } from "antd";
 import {
@@ -35,6 +37,9 @@ import { io } from "socket.io-client";
 /* ✅ IMPORTANT: load Passport CSS on this route */
 import "../../styles/profile-passport.css";
 
+/* ✅ Galaxy BG (Vite-safe import) */
+import galaxyBg from "../../assets/DigitalPassport/galaxy-sunset.png";
+
 import ProfileMusicModal, {
   SKYRIO_PROFILE_MUSIC_KEY,
 } from "./music/ProfileMusicModal";
@@ -52,15 +57,17 @@ import Membership from "./Membership";
 /* Followers/Following Modal */
 import FollowersModal from "./FollowersModal";
 
-/* Top 8 */
+/* Top 8 (Places only here) */
 import TopEight from "./TopEight";
-import TopEightItemFriend from "./TopEightItemFriend";
 import TopEightItemPlace from "./TopEightItemPlace";
+
+/* ✅ Inner Circle (MySpace Top 8) */
+import InnerCircleFriends from "./InnerCircleFriends";
 
 /* ✅ Privileges */
 import PassportPrivilegesCard from "./PassportPrivilegesCard";
 
-/* ✅ NEW: Exchange preview card (for Summary) */
+/* ✅ Exchange preview card (for Summary) */
 import SkyrioExchangePreviewCard from "./SkyrioExchangePreviewCard";
 
 /* ✅ Use ONE auth hook consistently across the app (match Navbar usage) */
@@ -90,7 +97,7 @@ function makeReferralCode(user) {
     .replace(/[^A-Z0-9]/g, "")}-001`;
 }
 
-/* ✅ Mock-style tabs (icon + label) */
+/* ✅ Tabs (keep your keys so logic doesn’t break) */
 const PASSPORT_TABS = [
   { key: "summary", label: "Passport Summary", icon: <IdcardOutlined /> },
   { key: "journeys", label: "Your Journeys", icon: <CompassOutlined /> },
@@ -99,19 +106,17 @@ const PASSPORT_TABS = [
 ];
 
 export default function DigitalPassportPage() {
+  const location = useLocation();
   const auth = useAuth();
   const rewardsOptIn = useRewardsOptInPrompt();
 
-  // ✅ Passport is member-only (handled by RequireAuth/RequireMember at route level)
   const isAdmin = auth?.user?.role === "admin";
 
   const [musicOpen, setMusicOpen] = useState(false);
   const [profileMusic, setProfileMusic] = useState(null);
 
-  // ✅ tabs renamed to match mock
   const [segment, setSegment] = useState("summary");
 
-  // API fields can vary — keep flexible
   const [xp, setXp] = useState(0);
   const [xpToNextBadge, setXpToNextBadge] = useState(0);
   const [nextBadgeName, setNextBadgeName] = useState("Wanderer");
@@ -121,7 +126,7 @@ export default function DigitalPassportPage() {
     following: 0,
   });
   const [followOpen, setFollowOpen] = useState(false);
-  const [followMode, setFollowMode] = useState("following"); // "following" | "followers"
+  const [followMode, setFollowMode] = useState("following");
 
   const socketRef = useRef(null);
 
@@ -167,22 +172,16 @@ export default function DigitalPassportPage() {
 
   const canEditTop8 = !!auth?.user;
 
-  const top8Friends = useMemo(
+  // ✅ Inner Circle preview (you can wire real data later)
+  const innerCircleFriends = useMemo(
     () => [
+      { id: "ic1", name: "Savid", coverUrl: "/images/circle/friend1.jpg" },
       {
-        id: "f1",
-        name: "David (CEO)",
-        username: "skyrio_ceo",
-        verified: true,
-        vibe: "Founder Energy",
-      },
-      {
-        id: "f2",
+        id: "ic2",
         name: "Skyrio Explorer",
-        username: "explorer_01",
-        verified: false,
-        vibe: "Chill",
+        coverUrl: "/images/circle/friend2.jpg",
       },
+      { id: "ic3", name: "LoneApp", coverUrl: "/images/circle/friend3.jpg" },
     ],
     []
   );
@@ -197,17 +196,36 @@ export default function DigitalPassportPage() {
     []
   );
 
+  /* ✅ transition toast after auth redirect */
+  useEffect(() => {
+    const fromAuth = !!location?.state?.fromAuth;
+    if (!fromAuth) return;
+
+    antdMessage.success({
+      content: `Welcome aboard${
+        auth?.user?.name ? `, ${auth.user.name}` : ""
+      } ✈️`,
+      duration: 2,
+    });
+
+    try {
+      window.history.replaceState({}, document.title);
+    } catch {
+      // ignore
+    }
+  }, [location?.state?.fromAuth, auth?.user?.name]);
+
   /* ---------- profile music ---------- */
   useEffect(() => {
     try {
       const raw = localStorage.getItem(SKYRIO_PROFILE_MUSIC_KEY);
       if (raw) setProfileMusic(JSON.parse(raw));
     } catch {
-      // ignore (soft launch)
+      // ignore
     }
   }, []);
 
-  /* ---------- profile data (SAFE) ---------- */
+  /* ---------- profile data ---------- */
   useEffect(() => {
     let ignore = false;
 
@@ -290,13 +308,9 @@ export default function DigitalPassportPage() {
     };
 
     s.on("social:counts:update", handler);
-
-    return () => {
-      s.off("social:counts:update", handler);
-    };
+    return () => s.off("social:counts:update", handler);
   }, [myId]);
 
-  // ✅ ring goal = current + remaining (fallback to 100)
   const xpGoal = useMemo(() => {
     const current = Number(xp || 0);
     const remaining = Number(xpToNextBadge || 0);
@@ -327,21 +341,20 @@ export default function DigitalPassportPage() {
     }
   }, []);
 
-  /* ✅ YourInnerCircle = TopEight Friends */
-  const YourInnerCircle = useMemo(() => {
-    return (
-      <TopEight
-        title="Your Inner Circle"
-        subtitle="Top 8 Friends"
-        canEdit={canEditTop8}
-        storageKey={`skyrio_top8_friends_${auth?.user?.id || "member"}`}
-        defaultItems={top8Friends}
-        renderItem={(item, ctx) => (
-          <TopEightItemFriend {...item} isDragging={ctx.isDragging} />
-        )}
-      />
-    );
-  }, [auth?.user?.id, canEditTop8, top8Friends]);
+  /* ✅ Segmented options built from your existing tab list */
+  const segmentedOptions = useMemo(
+    () =>
+      PASSPORT_TABS.map((t) => ({
+        label: (
+          <span className="ppSegLabel">
+            <span className="ppSegIcon">{t.icon}</span>
+            <span className="ppSegText">{t.label}</span>
+          </span>
+        ),
+        value: t.key,
+      })),
+    []
+  );
 
   const PassportContent = (
     <>
@@ -351,32 +364,57 @@ export default function DigitalPassportPage() {
         onConfirm={rewardsOptIn.confirm}
       />
 
-      <div className="passport-wrap">
-        {/* =========================
-           TIER 1 — PASSPORT HERO
-           ========================= */}
-        <Row gutter={[16, 16]}>
-          <Col span={24}>
-            <Card className="passport-hero passport-heroV2" bordered={false}>
-              <div className="pp-heroGrid">
-                {/* Left: Avatar + identity */}
-                <div className="pp-heroLeft">
+      {/* ✅ NEW: mock layout shell wrapper */}
+      <div className="pp-page">
+        <div className="pp-shell pp-shell--mock">
+          {/* =========================
+             HERO ROW (3 cards)
+          ========================= */}
+          <Row gutter={[16, 16]} className="pp-heroRow">
+            {/* Left: identity */}
+            <Col xs={24} lg={9}>
+              <Card bordered={false} className="pp-card pp-card--hero">
+                <Space align="start" size={14} style={{ width: "100%" }}>
                   <div className="pp-avatarGlow">
-                    <Avatar size={72} icon={<UserOutlined />} />
+                    <Avatar size={74} icon={<UserOutlined />} />
                   </div>
 
-                  <div className="pp-idBlock">
-                    <Title level={2} className="pp-name" style={{ margin: 0 }}>
+                  <div style={{ flex: 1 }}>
+                    <Title level={3} className="pp-title" style={{ margin: 0 }}>
                       {displayName}
                     </Title>
-
-                    <Text className="pp-handle">
+                    <Text className="pp-muted">
                       {handle} · Explorer · Level {levelNumber}
                     </Text>
 
-                    <div className="pp-socialRow">
+                    <div style={{ marginTop: 10 }}>
+                      <Tag className="pp-tag">Passport Holder</Tag>
+                      {profileMusic && (
+                        <Tag className="pp-tag" icon={<SoundOutlined />}>
+                          Music On
+                        </Tag>
+                      )}
+                      {isAdmin && (
+                        <Tag className="pp-tag" icon={<CrownOutlined />}>
+                          Admin
+                        </Tag>
+                      )}
+                    </div>
+
+                    <div className="pp-kv" style={{ marginTop: 10 }}>
+                      <Text className="pp-kvLabel">Issued—Expires:</Text>
+                      <Text className="pp-kvValue">{passportExpiresLabel}</Text>
+                    </div>
+
+                    {/* Keep your identity block (inline) */}
+                    <div style={{ marginTop: 10 }}>
+                      <PassportIdentity user={auth?.user} variant="inline" />
+                    </div>
+
+                    {/* Follow counts row (keeps your modal logic) */}
+                    <div className="pp-followRow">
                       <button
-                        className="passport-socialBtn"
+                        className="ppFollowBtn"
                         onClick={() => {
                           setFollowMode("following");
                           setFollowOpen(true);
@@ -388,7 +426,7 @@ export default function DigitalPassportPage() {
                       </button>
 
                       <button
-                        className="passport-socialBtn"
+                        className="ppFollowBtn"
                         onClick={() => {
                           setFollowMode("followers");
                           setFollowOpen(true);
@@ -399,69 +437,86 @@ export default function DigitalPassportPage() {
                         <span>Followers</span>
                       </button>
                     </div>
-
-                    <div className="pp-chipsRow">
-                      <Tag className="pp-chip">Passport Holder</Tag>
-
-                      {profileMusic && (
-                        <Tag className="pp-chip" icon={<SoundOutlined />}>
-                          Music On
-                        </Tag>
-                      )}
-
-                      {isAdmin && (
-                        <Tag
-                          className="pp-chip pp-chipAdmin"
-                          icon={<CrownOutlined />}
-                        >
-                          Admin
-                        </Tag>
-                      )}
-                    </div>
-
-                    <PassportIdentity user={auth?.user} variant="inline" />
                   </div>
+                </Space>
+              </Card>
+            </Col>
+
+            {/* Center: XP ring */}
+            <Col xs={24} lg={6}>
+              <Card
+                bordered={false}
+                className="pp-card pp-card--hero pp-card--center"
+              >
+                <div className="pp-levelWrap">
+                  <Progress
+                    type="dashboard"
+                    percent={xpPercent}
+                    strokeWidth={10}
+                    className="pp-levelRing"
+                    format={() => (
+                      <div className="pp-levelText">
+                        <div className="pp-levelRole">{nextBadgeName}</div>
+                        <div className="pp-levelNum">Level {levelNumber}</div>
+                        <div className="pp-levelXp">
+                          {xp} / {xpGoal} XP
+                        </div>
+                      </div>
+                    )}
+                  />
                 </div>
 
-                {/* Center: XP Ring */}
-                <div className="pp-heroCenter">
-                  <div className="pp-xpRingWrap">
-                    <Progress
-                      type="circle"
-                      percent={xpPercent}
-                      size={150}
-                      strokeWidth={9}
-                      className="pp-xpRing"
-                      format={() => ""}
-                    />
-                    <div className="pp-xpOverlay">
-                      <Text className="pp-nextTier">{nextBadgeName}</Text>
-                      <div className="pp-levelBig">Level {levelNumber}</div>
-                      <Text className="pp-xpSmall">
-                        {xp} / {xpGoal} XP
-                      </Text>
-                    </div>
-                  </div>
-
-                  <Text className="pp-mutedLine">
+                <div style={{ marginTop: 10, textAlign: "center" }}>
+                  <Text className="pp-muted" style={{ fontSize: 12 }}>
                     {xpToNextBadge} XP to next badge — {nextBadgeName}
                   </Text>
                 </div>
+              </Card>
+            </Col>
 
-                {/* Right: Membership + actions */}
-                <div className="pp-heroRight">
-                  <div className="pp-membershipBox">
-                    <Tag className="pp-membershipTag" icon={<CrownOutlined />}>
-                      {membershipLabel}
-                    </Tag>
-                    <Text className="pp-expireTextSmall">
+            {/* Right: membership + actions */}
+            <Col xs={24} lg={9}>
+              <Card bordered={false} className="pp-card pp-card--hero">
+                <div className="pp-membershipTop">
+                  <Space align="center">
+                    <CrownOutlined />
+                    <Text className="pp-muted">{membershipLabel}</Text>
+                  </Space>
+
+                  <Space>
+                    <Button className="pp-ghost-btn" size="small">
+                      ⋯
+                    </Button>
+                    <Button className="pp-cta-btn" size="small">
+                      ＋
+                    </Button>
+                  </Space>
+                </div>
+
+                <Text className="pp-muted" style={{ fontSize: 12 }}>
+                  Issued—Expires: {passportExpiresLabel}
+                </Text>
+
+                <div className="pp-membershipCard">
+                  <div className="pp-membershipBadge" />
+                  <div style={{ flex: 1 }}>
+                    <Title level={5} style={{ margin: 0 }} className="pp-title">
+                      Passport Holder
+                    </Title>
+                    <Text className="pp-muted" style={{ fontSize: 12 }}>
                       Passport Expires: {passportExpiresLabel}
                     </Text>
                   </div>
 
+                  <Button className="pp-ghost-btn" size="small">
+                    ⋯
+                  </Button>
+                </div>
+
+                <div style={{ marginTop: 12 }}>
                   <Space wrap>
                     <Button
-                      className="pp-ghostBtn"
+                      className="pp-ghost-btn"
                       icon={<PlayCircleOutlined />}
                       onClick={() => setMusicOpen(true)}
                     >
@@ -469,7 +524,7 @@ export default function DigitalPassportPage() {
                     </Button>
 
                     <Button
-                      className="pp-ghostBtn"
+                      className="pp-ghost-btn"
                       icon={<CopyOutlined />}
                       onClick={copyPassportLink}
                     >
@@ -477,7 +532,7 @@ export default function DigitalPassportPage() {
                     </Button>
 
                     <Button
-                      className="pp-ctaBtn"
+                      className="pp-cta-btn"
                       icon={<ShareAltOutlined />}
                       onClick={() =>
                         antdMessage.info("Sharing enabled post-launch")
@@ -487,191 +542,198 @@ export default function DigitalPassportPage() {
                     </Button>
                   </Space>
                 </div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* =========================
+             TAB BAR (Segmented)
+          ========================= */}
+          <Card bordered={false} className="pp-card pp-card--tabs">
+            <Segmented
+              value={segment}
+              onChange={setSegment}
+              options={segmentedOptions}
+              block
+              className="pp-tabs"
+            />
+          </Card>
+
+          {/* =========================
+             CONTENT (by segment)
+          ========================= */}
+          {segment === "summary" && (
+            <>
+              {/* Main grid: Highlights + Inner Circle */}
+              <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+                <Col xs={24} lg={14}>
+                  <Card bordered={false} className="pp-card pp-card--panel">
+                    <div className="pp-panelHeader">
+                      <Title level={4} className="pp-title" style={{ margin: 0 }}>
+                        Highlights
+                      </Title>
+                      <Text className="pp-muted">
+                        A quiet flex — clean and meaningful.
+                      </Text>
+                    </div>
+
+                    <PassportHighlights />
+
+                    <div style={{ marginTop: 16 }}>
+                      <PassportPrivilegesCard />
+                    </div>
+                  </Card>
+                </Col>
+
+                <Col xs={24} lg={10}>
+                  <Card bordered={false} className="pp-card pp-card--panel">
+                    <div className="pp-panelHeaderRow">
+                      <Title level={4} className="pp-title" style={{ margin: 0 }}>
+                        Your Inner Circle
+                      </Title>
+                      <Text className="pp-muted">0 XP</Text>
+                    </div>
+
+                    <InnerCircleFriends
+                      items={innerCircleFriends}
+                      title=""
+                      subtitle=""
+                    />
+                  </Card>
+                </Col>
+              </Row>
+
+              {/* Keep stamps strip exactly where it was */}
+              <div style={{ marginTop: 16 }}>
+                <StampStrip />
               </div>
-            </Card>
-          </Col>
-        </Row>
 
-        {/* =========================
-           TIER 1.5 — MOCK TAB RAIL
-           ========================= */}
-        <Row gutter={[16, 16]} style={{ marginTop: 12 }}>
-          <Col span={24}>
-            <div className="ppTabRail">
-              {PASSPORT_TABS.map((t, idx) => (
-                <div className="ppTabItemWrap" key={t.key}>
-                  <button
-                    type="button"
-                    className={`ppTabItem ${
-                      segment === t.key ? "isActive" : ""
-                    }`}
-                    onClick={() => setSegment(t.key)}
-                  >
-                    <span className="ppTabIcon">{t.icon}</span>
-                    <span className="ppTabLabel">{t.label}</span>
-                  </button>
+              {/* Bottom grid: TopEight + Exchange Preview */}
+              <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+                <Col xs={24} lg={14}>
+                  <TopEight
+                    title="Places That Define You"
+                    subtitle="Top 8 Locations"
+                    canEdit={canEditTop8}
+                    storageKey={`skyrio_top8_places_${auth?.user?.id || "member"}`}
+                    defaultItems={top8Places}
+                    renderItem={(item, ctx) => (
+                      <TopEightItemPlace {...item} isDragging={ctx.isDragging} />
+                    )}
+                  />
+                </Col>
 
-                  {idx !== PASSPORT_TABS.length - 1 && (
-                    <span className="ppTabDivider" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </Col>
-        </Row>
+                <Col xs={24} lg={10}>
+                  <SkyrioExchangePreviewCard
+                    level={levelNumber}
+                    balanceXp={xp}
+                    nextLevelGoal={250}
+                    featuredDrop="Priority Support Week"
+                    ctaLabel="Open Exchange"
+                  />
+                </Col>
+              </Row>
 
-        {/* =========================
-           TIER 2–4 — CONTENT
-           ========================= */}
-        {segment === "summary" && (
-          <>
-            <div className="ppSummaryGrid" style={{ marginTop: 12 }}>
-              <div className="ppSummaryLeft">
-                <PassportHighlights />
+              <AdminQuickControls isAdmin={isAdmin} />
+            </>
+          )}
 
-                <div style={{ marginTop: 16 }}>
-                  <PassportPrivilegesCard />
-                </div>
-              </div>
+          {segment === "journeys" && (
+            <>
+              <TripList />
+              <TravelHistory />
+            </>
+          )}
 
-              <div className="ppSummaryRight">{YourInnerCircle}</div>
-            </div>
+          {segment === "borders" && <VisaList />}
 
-            <StampStrip />
+          {segment === "vault" && (
+            <>
+              <Membership />
+              <SkyrioExchange showSearch={false} />
 
-            <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-              <Col xs={24} lg={12}>
-                <TopEight
-                  title="Places That Define You"
-                  subtitle="Top 8 Locations"
-                  canEdit={canEditTop8}
-                  storageKey={`skyrio_top8_places_${
-                    auth?.user?.id || "member"
-                  }`}
-                  defaultItems={top8Places}
-                  renderItem={(item, ctx) => (
-                    <TopEightItemPlace {...item} isDragging={ctx.isDragging} />
-                  )}
-                />
-              </Col>
+              {rewardsEnabled ? (
+                <Card
+                  style={{ marginTop: 16 }}
+                  bordered={false}
+                  className="osq-surface"
+                >
+                  <Title level={5} style={{ marginBottom: 6 }}>
+                    Seasonal Rewards
+                  </Title>
 
-              {/* ✅ UPDATED: Exchange preview module (replaces placeholder Card) */}
-              <Col xs={24} lg={12}>
-                <SkyrioExchangePreviewCard
-                  level={levelNumber}
-                  balanceXp={xp}
-                  nextLevelGoal={250}
-                  featuredDrop="Priority Support Week"
-                  ctaLabel="Open Exchange"
-                />
-              </Col>
-            </Row>
+                  <Text type="secondary">
+                    Limited-time XP missions and rewards. You control when seasons
+                    go live.
+                  </Text>
 
-            <AdminQuickControls isAdmin={isAdmin} />
-          </>
-        )}
+                  <div style={{ marginTop: 12 }}>
+                    <Tag color="gold">Soft Launch</Tag>
+                    <Tag color="purple">Coming Soon</Tag>
+                  </div>
 
-        {segment === "journeys" && (
-          <>
-            <TripList />
-            <TravelHistory />
-          </>
-        )}
+                  <div style={{ marginTop: 12 }}>
+                    <Button type="primary" disabled style={{ marginRight: 8 }}>
+                      View Season Rewards
+                    </Button>
 
-        {segment === "borders" && <VisaList />}
+                    <Button
+                      onClick={() =>
+                        antdMessage.info(
+                          "Seasonal rewards go live when you turn on a season."
+                        )
+                      }
+                    >
+                      How it works
+                    </Button>
+                  </div>
+                </Card>
+              ) : (
+                <Card
+                  style={{ marginTop: 16 }}
+                  bordered={false}
+                  className="osq-surface"
+                >
+                  <Title level={5} style={{ marginBottom: 6 }}>
+                    Rewards are off
+                  </Title>
 
-        {segment === "vault" && (
-          <>
-            <Membership />
-            <SkyrioExchange showSearch={false} />
+                  <Text type="secondary">
+                    Turn on Rewards to unlock XP missions, badges, and seasonal
+                    rewards.
+                  </Text>
 
-            {rewardsEnabled ? (
+                  <div style={{ marginTop: 12 }}>
+                    <Button
+                      type="primary"
+                      onClick={() => rewardsOptIn.confirm(true)}
+                    >
+                      Turn on Rewards
+                    </Button>
+                  </div>
+                </Card>
+              )}
+
               <Card
                 style={{ marginTop: 16 }}
                 bordered={false}
                 className="osq-surface"
               >
-                <Title level={5} style={{ marginBottom: 6 }}>
-                  Seasonal Rewards
-                </Title>
-
-                <Text type="secondary">
-                  Limited-time XP missions and rewards. You control when seasons
-                  go live.
-                </Text>
-
-                <div style={{ marginTop: 12 }}>
-                  <Tag color="gold">Soft Launch</Tag>
-                  <Tag color="purple">Coming Soon</Tag>
-                </div>
-
-                <div style={{ marginTop: 12 }}>
-                  <Button type="primary" disabled style={{ marginRight: 8 }}>
-                    View Season Rewards
-                  </Button>
-
+                <Title level={5}>Invite & Earn</Title>
+                <Space wrap>
+                  <Input value={referralCode} readOnly style={{ minWidth: 280 }} />
+                  <Button icon={<CopyOutlined />} onClick={copyReferral} />
                   <Button
-                    onClick={() =>
-                      antdMessage.info(
-                        "Seasonal rewards go live when you turn on a season."
-                      )
-                    }
-                  >
-                    How it works
-                  </Button>
-                </div>
+                    icon={<ShareAltOutlined />}
+                    onClick={() => antdMessage.info("Sharing enabled post-launch")}
+                  />
+                </Space>
               </Card>
-            ) : (
-              <Card
-                style={{ marginTop: 16 }}
-                bordered={false}
-                className="osq-surface"
-              >
-                <Title level={5} style={{ marginBottom: 6 }}>
-                  Rewards are off
-                </Title>
+            </>
+          )}
 
-                <Text type="secondary">
-                  Turn on Rewards to unlock XP missions, badges, and seasonal
-                  rewards.
-                </Text>
-
-                <div style={{ marginTop: 12 }}>
-                  <Button
-                    type="primary"
-                    onClick={() => rewardsOptIn.confirm(true)}
-                  >
-                    Turn on Rewards
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            <Card
-              style={{ marginTop: 16 }}
-              bordered={false}
-              className="osq-surface"
-            >
-              <Title level={5}>Invite & Earn</Title>
-              <Space wrap>
-                <Input
-                  value={referralCode}
-                  readOnly
-                  style={{ minWidth: 280 }}
-                />
-                <Button icon={<CopyOutlined />} onClick={copyReferral} />
-                <Button
-                  icon={<ShareAltOutlined />}
-                  onClick={() =>
-                    antdMessage.info("Sharing enabled post-launch")
-                  }
-                />
-              </Space>
-            </Card>
-          </>
-        )}
-
-        <PassportFooter />
+          <PassportFooter />
+        </div>
       </div>
 
       <FollowersModal
@@ -688,5 +750,10 @@ export default function DigitalPassportPage() {
     </>
   );
 
-  return <div className="passport-scope">{PassportContent}</div>;
+  /* ✅ keep your existing background wrapper */
+  return (
+    <div className="sk-passportPage" style={{ "--passport-bg": `url(${galaxyBg})` }}>
+      <div className="passport-scope">{PassportContent}</div>
+    </div>
+  );
 }

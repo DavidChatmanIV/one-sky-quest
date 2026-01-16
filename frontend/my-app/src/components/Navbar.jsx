@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
-import { Avatar, Dropdown, Button, message } from "antd";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Avatar, Dropdown, Button, Drawer, message } from "antd";
+import { UserOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
 
 import "../styles/Navbar.css";
 import logo from "../assets/logo/skyrio-logo-mark-512.png";
 
-import { useAuth } from "../auth/useAuth";
-import { useAuthModal } from "../auth/AuthModalController";
+
+import { useAuth, useAuthModal } from "../auth/AuthModalController";
 
 const navItems = [
   { label: "Discover", to: "/" },
   { label: "Book", to: "/booking" },
-  { label: "SkyStream", to: "/skystream" },
+  { label: "SkyHub", to: "/skyhub" },
   { label: "Passport", to: "/passport" },
 ];
 
@@ -21,7 +21,7 @@ export default function Navbar() {
   const { pathname } = useLocation();
 
   const auth = useAuth();
-  const { openAuth } = useAuthModal();
+  const authModal = useAuthModal();
 
   const isAuthed = !!auth?.isAuthed;
   const isGuest = !!auth?.isGuest;
@@ -37,11 +37,10 @@ export default function Navbar() {
       }
     })();
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // close mobile menu on route change
-  useEffect(() => setMobileOpen(false), [pathname]);
+  useEffect(() => setDrawerOpen(false), [pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -59,19 +58,35 @@ export default function Navbar() {
     );
   }, [user, isGuest]);
 
+  // ✅ Themes per route
   const navTheme = useMemo(() => {
     if (pathname.startsWith("/passport")) return "theme-passport";
     if (pathname.startsWith("/booking")) return "theme-book";
-    if (pathname.startsWith("/skystream")) return "theme-skystream";
+    if (pathname.startsWith("/skyhub")) return "theme-skyhub"; // ✅ renamed
     return "theme-discover";
   }, [pathname]);
 
+  const activeKey = useMemo(() => {
+    const match = navItems.find((i) =>
+      i.to === "/" ? pathname === "/" : pathname.startsWith(i.to)
+    );
+    return match?.to || "/";
+  }, [pathname]);
+
+  const go = (to) => {
+    setDrawerOpen(false);
+    navigate(to);
+  };
+
   const handleLogout = () => {
+    setDrawerOpen(false);
+
     if (auth?.logout) auth.logout();
     else {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     }
+
     message.success("See you next trip ✈️");
     navigate("/");
   };
@@ -92,35 +107,43 @@ export default function Navbar() {
     ],
   };
 
-  const openLogin = () =>
-    openAuth({
-      intent: "login",
-      reason: "Log in to access your Passport, DMs, and saved trips.",
-    });
+  /* =========================================================
+     ✅ Auth pages
+  ========================================================= */
 
-  const openSignup = () =>
-    openAuth({
-      intent: "signup",
-      reason: "Create an account to save trips and join SkyStream.",
-    });
+  const goLogin = () => {
+    setDrawerOpen(false);
+    authModal?.closeAuthModal?.();
+    navigate("/login", { state: { from: pathname } });
+  };
 
-  // ✅ block Passport for logged-out OR guest (works for desktop + mobile)
-  const handlePassportClick = (e) => {
-    const href = e?.currentTarget?.getAttribute("href");
-    const isPassport = href === "/passport";
+  const goSignup = () => {
+    setDrawerOpen(false);
+    authModal?.closeAuthModal?.();
+    navigate("/register", { state: { from: pathname } });
+  };
 
-    if (!isPassport) return;
+  /* ✅ Guard Passport: if blocked, route to auth PAGE (not modal) */
+  const guardPassport = (eOrTo) => {
+    const to =
+      typeof eOrTo === "string"
+        ? eOrTo
+        : eOrTo?.currentTarget?.getAttribute("href");
+
+    const isPassport = to === "/passport";
+    if (!isPassport) return false;
 
     if (!isAuthed || isGuest) {
-      e.preventDefault();
-      setMobileOpen(false);
-      openAuth({
-        intent: isAuthed ? "signup" : "login",
-        reason: isGuest
-          ? "Guest mode can’t access Passport. Create an account to unlock it."
-          : "Log in to access your Digital Passport.",
-      });
+      if (eOrTo?.preventDefault) eOrTo.preventDefault();
+      setDrawerOpen(false);
+
+      if (isGuest) goSignup();
+      else goLogin();
+
+      return true;
     }
+
+    return false;
   };
 
   return (
@@ -130,10 +153,7 @@ export default function Navbar() {
         <div className="sk-left">
           <button
             className="sk-brand"
-            onClick={() => {
-              setMobileOpen(false);
-              navigate("/");
-            }}
+            onClick={() => go("/")}
             type="button"
             aria-label="Go to homepage"
           >
@@ -157,7 +177,7 @@ export default function Navbar() {
                 to={item.to}
                 end={item.to === "/"}
                 onClick={(e) => {
-                  if (item.to === "/passport") handlePassportClick(e);
+                  if (item.to === "/passport") guardPassport(e);
                 }}
                 className={({ isActive }) =>
                   `sk-link ${isActive ? "is-active" : ""}`
@@ -173,13 +193,13 @@ export default function Navbar() {
         <div className="sk-right">
           {!isAuthed ? (
             <>
-              <Button className="sk-btnGhost" onClick={openLogin}>
+              <Button className="sk-btnGhost" onClick={goLogin}>
                 Log in
               </Button>
               <Button
                 type="primary"
                 className="sk-btnPrimary"
-                onClick={openSignup}
+                onClick={goSignup}
               >
                 Sign up
               </Button>
@@ -195,7 +215,7 @@ export default function Navbar() {
                 <Button
                   type="primary"
                   className="sk-btnPrimary"
-                  onClick={openSignup}
+                  onClick={goSignup}
                 >
                   Upgrade
                 </Button>
@@ -205,7 +225,6 @@ export default function Navbar() {
                   placement="bottomRight"
                   trigger={["click"]}
                   overlayClassName="sk-dropdown"
-                  // ✅ KEY FIX for iOS + fixed / glass headers:
                   getPopupContainer={(node) => node.parentElement}
                 >
                   <button
@@ -224,84 +243,97 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* MOBILE HAMBURGER */}
-          <button
-            className={`hamburger ${mobileOpen ? "is-open" : ""}`}
-            onClick={() => setMobileOpen((v) => !v)}
+          {/* MOBILE MENU BUTTON */}
+          <Button
+            className="sk-mobileMenuBtn"
+            icon={<MenuOutlined />}
+            onClick={() => setDrawerOpen(true)}
             aria-label="Open menu"
-            aria-expanded={mobileOpen}
-            type="button"
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          />
         </div>
       </div>
 
-      {/* ✅ MOBILE MENU PANEL (this is what you were missing) */}
-      {mobileOpen && (
-        <div className="sk-mobileMenu" role="dialog" aria-label="Mobile menu">
-          <div className="sk-mobileMenuInner">
-            {navItems.map((item) => (
-              <NavLink
-                key={`m-${item.to}`}
-                to={item.to}
-                end={item.to === "/"}
-                onClick={(e) => {
-                  if (item.to === "/passport") handlePassportClick(e);
-                  else setMobileOpen(false);
-                }}
-                className={({ isActive }) =>
-                  `sk-mobileLink ${isActive ? "is-active" : ""}`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-
-            <div className="sk-mobileActions">
-              {!isAuthed ? (
-                <>
-                  <Button className="sk-btnGhost" block onClick={openLogin}>
-                    Log in
-                  </Button>
-                  <Button
-                    type="primary"
-                    className="sk-btnPrimary"
-                    block
-                    onClick={openSignup}
-                  >
-                    Sign up
-                  </Button>
-                </>
-              ) : isGuest ? (
-                <Button
-                  type="primary"
-                  className="sk-btnPrimary"
-                  block
-                  onClick={openSignup}
-                >
-                  Upgrade
-                </Button>
-              ) : (
-                <Button danger block onClick={handleLogout}>
-                  Log out
-                </Button>
-              )}
-            </div>
-
-            <button
-              className="sk-mobileClose"
-              type="button"
-              aria-label="Close menu"
-              onClick={() => setMobileOpen(false)}
-            >
-              Close
-            </button>
+      {/* MOBILE DRAWER */}
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        placement="right"
+        className="sk-mobileDrawer"
+        title={null}
+      >
+        <div className="sk-drawerTop">
+          <img className="sk-drawerLogo" src={logo} alt="Skyrio" />
+          <div className="sk-drawerHello">
+            {isAuthed
+              ? `Hey, ${displayName}${isGuest ? " ✨" : ""}`
+              : "Welcome"}
           </div>
         </div>
-      )}
+
+        <div className="sk-drawerLinks">
+          {navItems.map((item) => (
+            <button
+              key={item.to}
+              className={`sk-drawerLink ${
+                activeKey === item.to ? "is-active" : ""
+              }`}
+              onClick={() => {
+                if (item.to === "/passport") {
+                  const blocked = guardPassport(item.to);
+                  if (!blocked) go(item.to);
+                } else {
+                  go(item.to);
+                }
+              }}
+              type="button"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="sk-drawerActions">
+          {!isAuthed ? (
+            <>
+              <Button block className="sk-btnGhost" onClick={goLogin}>
+                Log in
+              </Button>
+              <Button
+                block
+                type="primary"
+                className="sk-btnPrimary"
+                onClick={goSignup}
+              >
+                Sign up
+              </Button>
+            </>
+          ) : isGuest ? (
+            <>
+              <Button
+                block
+                type="primary"
+                className="sk-btnPrimary"
+                onClick={goSignup}
+              >
+                Upgrade
+              </Button>
+              <div className="sk-guestNote">
+                You’re browsing as Guest. Create an account to save trips and
+                earn XP.
+              </div>
+            </>
+          ) : (
+            <Button
+              danger
+              block
+              onClick={handleLogout}
+              icon={<LogoutOutlined />}
+            >
+              Log out
+            </Button>
+          )}
+        </div>
+      </Drawer>
     </header>
   );
 }

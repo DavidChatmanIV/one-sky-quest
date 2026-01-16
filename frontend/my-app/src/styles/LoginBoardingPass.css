@@ -1,246 +1,295 @@
-/* ============================= */
-/* Wrapper / Page */
-/* ============================= */
+/* ---------- PAGE BACKGROUND WRAPPER ---------- */
+.sk-authPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 56px 16px 44px;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(1200px 800px at 50% 20%, rgba(140, 110, 255, 0.22), transparent 65%),
+              radial-gradient(900px 600px at 60% 85%, rgba(255, 150, 90, 0.18), transparent 65%),
+              linear-gradient(180deg, rgba(16, 10, 28, 1), rgba(22, 12, 40, 1));
+}
 
+/* 🌌 Parallax galaxy image layer */
+.sk-authPage::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  background-image: url("../assets/LoginBoardingpass/galaxy-login.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(1.08) contrast(1.05) brightness(0.92);
+  opacity: 0.85;
+  transform: translate3d(0, 0, 0);
+  animation: sk-parallax 26s ease-in-out infinite;
+}
+
+/* Dark readability overlay */
+.sk-authPage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 700px at 50% 20%, rgba(0,0,0,0.25), rgba(0,0,0,0.72)),
+    linear-gradient(180deg, rgba(0,0,0,0.20), rgba(0,0,0,0.62));
+  pointer-events: none;
+}
+
+/* ✨ Stars layer (subtle twinkle) */
+.sk-authPage .sk-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.9), transparent 55%),
+    radial-gradient(1px 1px at 28% 72%, rgba(255,255,255,0.8), transparent 55%),
+    radial-gradient(1px 1px at 44% 30%, rgba(255,255,255,0.85), transparent 55%),
+    radial-gradient(1px 1px at 66% 22%, rgba(255,255,255,0.75), transparent 55%),
+    radial-gradient(1px 1px at 78% 64%, rgba(255,255,255,0.85), transparent 55%),
+    radial-gradient(1px 1px at 90% 38%, rgba(255,255,255,0.75), transparent 55%),
+    radial-gradient(2px 2px at 20% 42%, rgba(255,255,255,0.35), transparent 60%),
+    radial-gradient(2px 2px at 72% 78%, rgba(255,255,255,0.30), transparent 60%);
+  animation: sk-twinkle 5.6s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes sk-parallax {
+  0%   { transform: translate3d(0, 0, 0) scale(1.02); }
+  50%  { transform: translate3d(-10px, 10px, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1.02); }
+}
+
+@keyframes sk-twinkle {
+  0%, 100% { opacity: 0.28; }
+  50%      { opacity: 0.48; }
+}
+
+/* ---------- CONTENT WRAPPER ---------- */
 .sk-authWrap {
   width: 100%;
-  max-width: 560px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 26px 18px 20px;
-  color: var(--sk-authText);
+  position: relative;
+  z-index: 2; /* above background layers */
 }
 
 .sk-authHero {
   text-align: center;
-  margin-bottom: 16px;
+  margin: 10px 0 18px;
 }
 
 .sk-authTitle {
-  margin: 0 0 8px !important;
-  color: var(--sk-authText) !important;
-  font-weight: 850 !important;
+  margin: 0 !important;
+  color: rgba(244, 246, 251, 0.96) !important;
   letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-size: clamp(28px, 3.4vw, 44px) !important;
+  line-height: 1.1 !important;
 }
 
 .sk-authSubtitle {
   display: block;
-  color: var(--sk-authMuted);
+  margin-top: 8px;
+  color: rgba(244, 246, 251, 0.74);
   font-size: 14px;
 }
 
-/* ============================= */
-/* Boarding Pass Card */
-/* ============================= */
-
+/* ---------- BOARDING PASS CORE ---------- */
 .sk-pass {
   position: relative;
-  border-radius: 22px;
-  padding: 18px 16px 16px;
-  border: 1px solid var(--sk-authStroke);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.14),
-      rgba(255, 255, 255, 0.06)
-    ),
-    radial-gradient(700px 300px at 20% 20%, var(--sk-warmB), transparent 60%),
-    radial-gradient(700px 320px at 80% 30%, var(--sk-warmA), transparent 60%);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(18px);
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  border-radius: 24px;
   overflow: hidden;
+  padding: 18px 20px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  background:
+    linear-gradient(180deg, rgba(36, 24, 64, 0.72), rgba(24, 18, 44, 0.78)),
+    radial-gradient(900px 380px at 15% 10%, rgba(255, 155, 80, 0.26), transparent 60%),
+    radial-gradient(820px 460px at 85% 30%, rgba(170, 120, 255, 0.28), transparent 60%);
+
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
-/* ============================= */
-/* Scan Animation */
-/* ============================= */
-
-.sk-passScan {
+/* Uses image var injected from React */
+.sk-pass::before {
+  content: "";
   position: absolute;
   inset: 0;
-  opacity: 0;
-  transform: translateY(-120%);
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(255, 255, 255, 0.10),
-    transparent
-  );
+  background-image: var(--sk-pass-bg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.62;
+  filter: saturate(1.10) contrast(1.06) brightness(0.95);
+  transform: scale(1.04);
   pointer-events: none;
 }
 
+/* Readability overlay */
+.sk-pass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 520px at 70% 35%, rgba(0,0,0,0.08), rgba(0,0,0,0.62)),
+    linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.46));
+  pointer-events: none;
+}
+
+.sk-pass > * { position: relative; z-index: 2; }
+
+/* ---------- SCAN EFFECT ---------- */
+.sk-passScan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+}
 .sk-pass.isScanning .sk-passScan {
   opacity: 1;
-  animation: skScan 1.05s ease-in-out;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 180, 120, 0.14),
+      rgba(170, 120, 255, 0.16),
+      transparent
+    );
+  animation: sk-scan 1.25s linear infinite;
+  mix-blend-mode: screen;
+}
+@keyframes sk-scan {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(110%); }
 }
 
-@keyframes skScan {
-  0% {
-    transform: translateY(-120%);
-    opacity: 0;
-  }
-  25% {
-    opacity: 0.75;
-  }
-  100% {
-    transform: translateY(120%);
-    opacity: 0;
-  }
-}
-
-/* ============================= */
-/* Header */
-/* ============================= */
-
+/* ---------- HEADER + BRAND ---------- */
 .sk-passHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
-
 .sk-passBrand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
 }
-
 .sk-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.06);
+  width: 10px; height: 10px; border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, rgba(255,210,170,1), rgba(255,130,60,0.85));
+  box-shadow: 0 0 18px rgba(255,160,90,0.35), 0 0 28px rgba(150,120,255,0.18);
 }
-
 .sk-passBrandText {
-  color: var(--sk-authText);
-  font-weight: 700;
+  color: rgba(244, 246, 251, 0.92) !important;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
-
 .sk-passChip {
-  margin: 0 !important;
-  border: 1px solid var(--sk-authStroke) !important;
-  background: rgba(0, 0, 0, 0.18) !important;
-  color: var(--sk-authMuted) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border-radius: 999px !important;
   padding: 6px 10px !important;
-  font-size: 12px !important;
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  color: rgba(244,246,251,0.84) !important;
 }
+.sk-chipSep { opacity: 0.65; }
 
-.sk-chipSep {
-  opacity: 0.6;
-  margin: 0 6px;
-}
-
-/* ============================= */
-/* Boarding Pass Label */
-/* ============================= */
-
-.sk-passBig {
-  margin-top: 10px;
-}
+/* ---------- LABELS ---------- */
+.sk-passBig { margin-top: 12px; }
 
 .sk-passLabel {
-  font-size: 12px;
+  display: block;
+  font-size: 13px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--sk-authMuted);
+  color: rgba(244, 246, 251, 0.82) !important;
 }
-
-/* ============================= */
-/* Passenger Row */
-/* ============================= */
-
-.sk-passRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.sk-passCol {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sk-passColRight {
-  align-items: flex-end;
-  text-align: right;
-}
-
-.sk-passMiniLabel {
-  font-size: 11px;
-  color: var(--sk-authFaint);
-  letter-spacing: 0.08em;
+.sk-passMiniLabel,
+.sk-formLabel {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
+  color: rgba(244, 246, 251, 0.70) !important;
 }
-
 .sk-passPassenger {
-  font-size: 16px;
-  font-weight: 850;
-  color: var(--sk-authText);
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(244, 246, 251, 0.98) !important;
 }
-
 .sk-passValue {
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--sk-authText);
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(244, 246, 251, 0.94) !important;
+  word-break: break-word;
 }
 
-/* ============================= */
-/* Route Row */
-/* ============================= */
+/* ---------- ROWS + ROUTE (no clipping) ---------- */
+.sk-passRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+.sk-passColRight { text-align: right; }
 
 .sk-passRoute {
-  margin-top: 12px;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 12px;
+  margin-top: 12px;
 }
-
-.sk-routeColRight {
-  text-align: right;
-}
+.sk-routeColRight { text-align: right; }
 
 .sk-routeLine {
-  position: relative;
-  width: 86px;
+  width: 110px;
   height: 26px;
   display: grid;
   place-items: center;
+  position: relative;
 }
-
+.sk-routeDash {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(255,255,255,0.18), rgba(255,255,255,0.60), rgba(255,255,255,0.18));
+}
 .sk-plane {
   position: absolute;
   top: 3px;
   font-size: 12px;
-  opacity: 0.75;
+  opacity: 0.95;
+  color: rgba(255,200,150,0.92);
+  text-shadow: 0 0 10px rgba(255,160,90,0.35);
 }
 
-.sk-routeDash {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0.12),
-    rgba(255, 255, 255, 0.45),
-    rgba(255, 255, 255, 0.12)
-  );
-}
-
-/* ============================= */
-/* Perforation */
-/* ============================= */
-
+/* ---------- PERFORATION ---------- */
 .sk-passPerforation {
   position: relative;
-  margin: 14px 0 12px;
-  height: 18px;
+  margin: 16px 0 12px;
+  height: 14px;
 }
-
 .sk-notch {
   position: absolute;
   top: 50%;
@@ -248,161 +297,142 @@
   height: 18px;
   border-radius: 999px;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 6, 18, 0.55);
+  border: 1px solid rgba(255,255,255,0.10);
 }
-
-.sk-notch.left { left: -9px; }
-.sk-notch.right { right: -9px; }
-
+.sk-notch.left { left: -10px; }
+.sk-notch.right { right: -10px; }
 .sk-perfLine {
   position: absolute;
   left: 10px;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  border-top: 1px dashed rgba(255, 255, 255, 0.22);
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255,255,255,0.26),
+    rgba(255,255,255,0.26) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+  opacity: 0.6;
 }
 
-/* ============================= */
-/* Form */
-/* ============================= */
+/* 🎟️ Tear animation (optional class) */
+.sk-pass.isTearing .sk-perfLine {
+  animation: sk-tear 520ms ease-in-out forwards;
+}
+@keyframes sk-tear {
+  0%   { transform: translateY(-50%) scaleX(1); opacity: 0.6; }
+  50%  { transform: translateY(-50%) scaleX(0.85); opacity: 0.95; }
+  100% { transform: translateY(-50%) scaleX(1.05); opacity: 0; }
+}
 
+/* ---------- FORM ---------- */
 .sk-passForm {
   display: grid;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 8px;
 }
 
-.sk-field {
-  display: grid;
-  gap: 6px;
+.sk-field .ant-input,
+.sk-field .ant-input-affix-wrapper {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 14px !important;
+  color: rgba(244, 246, 251, 0.95) !important;
 }
 
-.sk-formLabel {
-  color: var(--sk-authMuted);
-  font-size: 12px;
-}
+.sk-field .ant-input::placeholder { color: rgba(244, 246, 251, 0.55); }
+.sk-field .ant-input-affix-wrapper .anticon { color: rgba(244, 246, 251, 0.70); }
 
-.sk-passForm .ant-input,
-.sk-passForm .ant-input-password {
-  height: 44px;
-  border-radius: 12px;
-  background: var(--sk-authInput);
-  border: 1px solid var(--sk-authStroke);
-  color: var(--sk-authText);
+.sk-field .ant-input-affix-wrapper-focused {
+  border-color: rgba(255, 175, 110, 0.60) !important;
+  box-shadow: 0 0 0 3px rgba(255, 160, 90, 0.16) !important;
 }
-
-.sk-passForm .ant-input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.sk-passForm .ant-input-prefix,
-.sk-passForm .ant-input-password-icon {
-  color: rgba(255, 255, 255, 0.55) !important;
-}
-
-.sk-passForm .ant-input-password .ant-input {
-  height: 42px;
-  background: transparent;
-  border: none;
-}
-
-/* ============================= */
-/* CTA Button */
-/* ============================= */
 
 .sk-passCTA {
-  height: 46px;
-  border-radius: 999px;
-  border: none;
-  font-weight: 850;
-  letter-spacing: 0.01em;
-  color: rgba(27, 16, 36, 0.95) !important;
-  background: linear-gradient(
-    90deg,
-    var(--sk-ctaA),
-    var(--sk-ctaB),
-    var(--sk-ctaC)
-  ) !important;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  margin-top: 10px;
+  height: 48px;
+  border-radius: 14px !important;
+  border: none !important;
+  font-weight: 900;
+
+  background: linear-gradient(90deg, rgba(255,140,60,0.95), rgba(170,120,255,0.95)) !important;
+  box-shadow:
+    0 18px 40px rgba(0,0,0,0.35),
+    0 0 26px rgba(255,160,90,0.16),
+    0 0 34px rgba(150,120,255,0.14);
 }
 
-.sk-passCTA:hover {
-  filter: brightness(1.04);
-}
-
-/* ============================= */
-/* Footer + Barcode */
-/* ============================= */
-
-.sk-authFooter {
-  text-align: center;
-}
-
-.sk-footerText {
-  color: var(--sk-authMuted);
-  font-size: 12px;
-}
-
+.sk-authFooter { text-align: center; margin-top: 6px; }
+.sk-footerText { color: rgba(244,246,251,0.78); font-size: 13px; }
 .sk-footerLink {
-  background: none;
+  background: transparent;
   border: none;
   padding: 0;
-  font-weight: 750;
-  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
   cursor: pointer;
-}
-
-.sk-footerLink:hover {
+  font-weight: 800;
+  color: rgba(255,185,130,0.92);
   text-decoration: underline;
 }
 
+/* ---------- BARCODE ---------- */
 .sk-passBarcode {
-  margin-top: 14px;
-  height: 44px;
   display: grid;
   grid-auto-flow: column;
-  align-items: end;
+  grid-auto-columns: 1fr;
   gap: 4px;
-  padding-top: 10px;
-  opacity: 0.75;
+  margin-top: 14px;
+  height: 36px;
+  opacity: 0.55;
 }
-
 .sk-passBarcode span {
-  width: 3px;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(244, 246, 251, 0.92);
   border-radius: 2px;
+  opacity: 0.35;
 }
+.sk-passBarcode span:nth-child(3n) { opacity: 0.75; }
+.sk-passBarcode span:nth-child(4n) { opacity: 0.55; }
+.sk-passBarcode span:nth-child(5n) { opacity: 0.25; }
 
-.sk-passBarcode span:nth-child(odd) { height: 70%; }
-.sk-passBarcode span:nth-child(even) { height: 45%; }
-
-/* ============================= */
-/* Misc */
-/* ============================= */
-
-.sk-authCopyright {
-  margin-top: 12px;
-  text-align: center;
-}
-
-.sk-fineText {
-  color: var(--sk-authFaint);
-  font-size: 11px;
-}
-
+/* ---------- ACCESSIBILITY ---------- */
 .sr-only {
-  position: absolute;
-  left: -9999px;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
-/* ============================= */
-/* Mobile */
-/* ============================= */
+/* =========================================================
+   📱 ULTRA-TIGHT MOBILE
+========================================================= */
+@media (max-width: 520px) {
+  .sk-authPage { padding: 34px 12px 26px; }
+  .sk-authWrap { max-width: 100%; }
 
-@media (max-width: 420px) {
-  .sk-authWrap { padding: 22px 14px; }
+  .sk-authHero { margin-bottom: 14px; }
   .sk-authTitle { font-size: 30px !important; }
-  .sk-pass { padding: 16px 14px; }
-  .sk-routeLine { width: 74px; }
+  .sk-authSubtitle { font-size: 13px; }
+
+  .sk-pass {
+    max-width: 100%;
+    padding: 14px 14px 12px;
+    border-radius: 20px;
+  }
+
+  .sk-passRow { grid-template-columns: 1fr; }
+  .sk-passColRight,
+  .sk-routeColRight { text-align: left; }
+
+  .sk-routeLine { width: 86px; }
+
+  .sk-passCTA { height: 46px; }
 }

@@ -1,32 +1,30 @@
 :root {
   /* =============================
      NAVBAR HEIGHT
-     (Hero → Compact)
-  ============================= */
+     ============================= */
   --nav-h: 112px;
-  --nav-h-hero: 240px;
 
   /* =============================
      LOGO SIZE — HERO
-  ============================= */
+     ============================= */
   --logo-tile: 140px;
   --logo-img: 120px;
 
   /* =============================
      LOGO SIZE — COMPACT
-  ============================= */
+     ============================= */
   --logo-tile-compact: 72px;
   --logo-img-compact: 56px;
 
   /* =============================
      TEXT COLORS
-  ============================= */
+     ============================= */
   --sk-text: rgba(244, 246, 251, 0.92);
   --sk-muted: rgba(244, 246, 251, 0.72);
 }
 
 /* =================================================
-   🚨 KILL ANY LAYOUT / HEADER BOXES (ANT SAFE)
+   🚨 KILL ANT HEADER WRAPPERS (SAFE)
 ================================================= */
 .ant-layout-header,
 header.ant-layout-header,
@@ -42,37 +40,36 @@ header.main-layout-header,
 }
 
 /* =================================================
-   NAVBAR ROOT
+   NAVBAR ROOT (FIXED & PINNED)
 ================================================= */
 .sk-nav {
-  position: sticky;
-  top: 0;
-  z-index: 3000;
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 9999;
 
   height: var(--nav-h);
   display: flex;
   align-items: center;
 
-  background: transparent; /* ✅ must stay transparent */
+  background: transparent;
   border: none;
   box-shadow: none;
 
   isolation: isolate;
-  transform: translateZ(0); /* iOS stacking fix */
+  transform: translateZ(0);
+
+  transition: height 220ms ease;
 }
 
-/* ✅ Glass gradient layer (visual ONLY — no clicks)
-   UPDATED to match cosmic background better
-*/
+/* =================================================
+   GLASS LAYER (DEFAULT)
+================================================= */
 .sk-nav::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
 
-  /* was: 135deg violet->orange
-     now: 180deg deep glass tint (matches cosmic bg)
-  */
   background: linear-gradient(
     180deg,
     rgba(35, 18, 60, 0.55),
@@ -81,22 +78,25 @@ header.main-layout-header,
 
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  pointer-events: none;
 
-  pointer-events: none; /* ✅ CRITICAL FIX */
+  transition: background 220ms ease, backdrop-filter 220ms ease;
 }
 
-/* ✅ Compact state slightly stronger (keeps your behavior) */
+/* Compact (on scroll) */
 .sk-nav.is-compact::before {
   background: linear-gradient(
     180deg,
-    rgba(35, 18, 60, 0.62),
-    rgba(35, 18, 60, 0.40)
+    rgba(35, 18, 60, 0.65),
+    rgba(35, 18, 60, 0.45)
   );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
-/* ✅ Subtle premium glow line like the mock */
+/* =================================================
+   SUBTLE DIVIDER GLOW
+================================================= */
 .sk-nav::after {
   content: "";
   position: absolute;
@@ -117,7 +117,46 @@ header.main-layout-header,
 }
 
 /* =================================================
-   INNER WRAPPER (CLICKABLE LAYER)
+   BOOKING PAGE (GLASS ON, LIGHTER)
+================================================= */
+.sk-nav.theme-book::before {
+  background: linear-gradient(
+    180deg,
+    rgba(35, 18, 60, 0.42),
+    rgba(35, 18, 60, 0.22)
+  );
+}
+
+.sk-nav.theme-book.is-compact::before {
+  background: linear-gradient(
+    180deg,
+    rgba(35, 18, 60, 0.65),
+    rgba(35, 18, 60, 0.40)
+  );
+}
+
+/* =================================================
+   SKYHUB PAGE (SOCIAL HOME)
+   ✅ Added safely (no impact on other routes)
+================================================= */
+.sk-nav.theme-skyhub::before {
+  background: linear-gradient(
+    180deg,
+    rgba(35, 18, 60, 0.50),
+    rgba(35, 18, 60, 0.28)
+  );
+}
+
+.sk-nav.theme-skyhub.is-compact::before {
+  background: linear-gradient(
+    180deg,
+    rgba(35, 18, 60, 0.70),
+    rgba(35, 18, 60, 0.45)
+  );
+}
+
+/* =================================================
+   INNER WRAPPER
 ================================================= */
 .sk-nav-inner {
   position: relative;
@@ -128,10 +167,9 @@ header.main-layout-header,
   margin: 0 auto;
   padding: 0 22px;
 
+  height: 100%;
   display: flex;
   align-items: center;
-
-  background: transparent;
 }
 
 /* =================================================
@@ -147,7 +185,6 @@ header.main-layout-header,
   border: none;
   padding: 0;
   cursor: pointer;
-
   display: flex;
   align-items: center;
 }
@@ -160,15 +197,27 @@ header.main-layout-header,
   height: var(--logo-tile);
   display: grid;
   place-items: center;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 0;
+
+  transition: width 220ms ease, height 220ms ease;
 }
 
 .sk-logoImg {
   width: var(--logo-img);
   height: var(--logo-img);
   object-fit: contain;
+
+  transition: width 220ms ease, height 220ms ease;
+}
+
+/* Compact logo */
+.sk-nav.is-compact .sk-logoWrap {
+  width: var(--logo-tile-compact);
+  height: var(--logo-tile-compact);
+}
+
+.sk-nav.is-compact .sk-logoImg {
+  width: var(--logo-img-compact);
+  height: var(--logo-img-compact);
 }
 
 /* =================================================
@@ -183,7 +232,6 @@ header.main-layout-header,
 .sk-navPills {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
 .sk-link {
@@ -192,14 +240,20 @@ header.main-layout-header,
   color: var(--sk-text);
   font-weight: 800;
   text-decoration: none;
+
+  transition: padding 220ms ease;
 }
 
 .sk-link.is-active {
   padding: 18px 26px;
-  border-radius: 999px;
   background: linear-gradient(135deg, #ff8a2a, #ffcc8a);
   color: #0b1220;
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+}
+
+/* Prevent jump on compact */
+.sk-nav.is-compact .sk-link.is-active {
+  padding: 12px 18px;
 }
 
 /* =================================================
@@ -210,37 +264,12 @@ header.main-layout-header,
   display: flex;
   align-items: center;
   gap: 10px;
-
-  position: relative;
-  z-index: 3; /* above blur */
 }
 
-.sk-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sk-hello {
-  color: var(--sk-text);
-  font-weight: 700;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.sk-avatarBtn {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-}
-
-/* Buttons */
 .sk-btnPrimary {
   height: 42px;
   border-radius: 14px;
   font-weight: 900;
-
   background: linear-gradient(135deg, #ff8a2a, #ffb86b);
   color: #0b1220;
   border: none;
@@ -249,14 +278,27 @@ header.main-layout-header,
 .sk-btnGhost {
   height: 42px;
   border-radius: 14px;
-
   background: rgba(255, 255, 255, 0.08);
   color: var(--sk-text);
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 /* =================================================
-   HAMBURGER (iOS SAFE)
+   AVATAR BUTTON (so dropdown click area is stable)
+================================================= */
+.sk-avatarBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =================================================
+   HAMBURGER (kept for safety)
+   ✅ On mobile we will hide this and use Drawer button instead.
 ================================================= */
 .hamburger {
   display: none;
@@ -265,14 +307,8 @@ header.main-layout-header,
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.10);
-
   position: relative;
-  z-index: 5;
   cursor: pointer;
-
-  pointer-events: auto;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger span {
@@ -283,79 +319,112 @@ header.main-layout-header,
   background: white;
 }
 
-.hamburger span:nth-child(1) { top: 14px; }
-.hamburger span:nth-child(2) { top: 22px; }
-.hamburger span:nth-child(3) { top: 30px; }
-
-/* =================================================
-   MOBILE MENU PANEL
-================================================= */
-.sk-mobileMenu {
-  position: fixed;
-  top: var(--nav-h);
-  left: 0;
-  right: 0;
-  z-index: 5000;
-
-  padding: 14px;
+.hamburger span:nth-child(1) {
+  top: 14px;
+}
+.hamburger span:nth-child(2) {
+  top: 22px;
+}
+.hamburger span:nth-child(3) {
+  top: 30px;
 }
 
-.sk-mobileMenuInner {
-  border-radius: 18px;
-  padding: 14px;
+/* =================================================
+   ✅ DRAWER + MOBILE BUTTON (MERGED ADDITIONS)
+================================================= */
 
-  background: rgba(18, 20, 45, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+/* Ensure drawer menu button is hidden by default */
+.sk-mobileMenuBtn {
+  display: none !important;
+  border-radius: 16px !important; /* match your pill-ish style */
+  height: 46px !important;
+  width: 46px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: rgba(244, 246, 251, 0.92) !important;
+}
 
+/* Drawer theming */
+.sk-mobileDrawer .ant-drawer-content {
+  background: rgba(18, 12, 26, 0.94) !important;
+  color: rgba(244, 246, 251, 0.92);
+}
+
+/* Make close icon visible on dark drawer */
+.sk-mobileDrawer .ant-drawer-close {
+  color: rgba(244, 246, 251, 0.88) !important;
+}
+
+/* Drawer header spacing */
+.sk-mobileDrawer .ant-drawer-body {
+  padding: 18px !important;
+}
+
+.sk-drawerTop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  margin-bottom: 16px;
+}
+
+.sk-drawerLogo {
+  height: 44px;
+  width: auto;
+}
+
+.sk-drawerHello {
+  font-weight: 900;
+  color: rgba(244, 246, 251, 0.92);
+  opacity: 0.95;
+}
+
+.sk-drawerLinks {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.sk-mobileLink {
-  padding: 14px;
-  border-radius: 14px;
-  text-decoration: none;
-  color: var(--sk-text);
-  font-weight: 800;
-
+.sk-drawerLink {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(244, 246, 251, 0.92);
+  border-radius: 14px;
+  padding: 14px 14px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-.sk-mobileLink.is-active {
-  background: linear-gradient(135deg, #ff8a2a, #ffcc8a);
-  color: #0b1220;
-  border: none;
+.sk-drawerLink.is-active {
+  border-color: rgba(255, 170, 64, 0.35);
+  background: rgba(255, 170, 64, 0.14);
 }
 
-.sk-mobileActions {
+.sk-drawerActions {
+  margin-top: 16px;
   display: grid;
   gap: 10px;
-  margin-top: 6px;
 }
 
-.sk-mobileClose {
-  height: 42px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--sk-text);
-  font-weight: 900;
+.sk-guestNote {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 /* =================================================
-   MOBILE BREAKPOINT
+   MOBILE
 ================================================= */
 @media (max-width: 920px) {
   :root {
     --nav-h: 78px;
-
     --logo-tile: 64px;
     --logo-img: 52px;
-
     --logo-tile-compact: 56px;
     --logo-img-compact: 46px;
   }
@@ -364,7 +433,26 @@ header.main-layout-header,
     display: none;
   }
 
+  /* ✅ Use Drawer button, not hamburger panel */
+  .sk-mobileMenuBtn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ✅ Hide hamburger so you don't have 2 menus */
   .hamburger {
-    display: block;
+    display: none !important;
+  }
+
+  /* Optional: tighten right-side spacing */
+  .sk-right {
+    gap: 8px;
+  }
+
+  /* Optional: reduce button height slightly on mobile */
+  .sk-btnPrimary,
+  .sk-btnGhost {
+    height: 40px;
   }
 }

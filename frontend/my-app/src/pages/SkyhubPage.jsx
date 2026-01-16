@@ -20,7 +20,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 
-import "../styles/skystream.css";
+import "../styles/skyhub.css";
 
 const { Title, Text } = Typography;
 
@@ -33,7 +33,7 @@ const hotspots = [
   { label: "Seoul", pct: 18 },
 ];
 
-export default function SkyStreamPage() {
+export default function SkyHubPage() {
   return (
     <div className="ss-page">
       <div className="ss-overlay" />
@@ -41,9 +41,9 @@ export default function SkyStreamPage() {
       <div className="ss-container">
         <div className="ss-hero">
           <Title className="ss-title" level={1}>
-            SkyStream
+            SkyHub
           </Title>
-          <Text className="ss-subtitle">Live travel moments</Text>
+          <Text className="ss-subtitle">Where travel stories live</Text>
         </div>
 
         <Row gutter={[18, 18]} align="start">
@@ -59,14 +59,14 @@ export default function SkyStreamPage() {
 
               <div className="ss-divider" />
 
-              <div className="ss-sideItem">🧠 SkyFeeds</div>
+              <div className="ss-sideItem">🧭 Feeds</div>
               <div className="ss-sideItem">👥 Circles</div>
               <div className="ss-sideItem">💾 Saved</div>
               <div className="ss-sideItem">🛂 Passport</div>
 
               <div className="ss-divider" />
 
-              <div className="ss-sideGroupTitle">SkyFeeds</div>
+              <div className="ss-sideGroupTitle">Feeds</div>
               <div className="ss-pill active">For You (Passport)</div>
               <div className="ss-pill">Near Me</div>
             </Card>
@@ -78,7 +78,7 @@ export default function SkyStreamPage() {
               <div className="ss-topbarRow">
                 <Input
                   prefix={<SearchOutlined />}
-                  placeholder="Search SkyStream"
+                  placeholder="Search SkyHub"
                   className="ss-input"
                 />
                 <Button className="ss-pillBtn">For You (Passport) ▾</Button>
@@ -89,10 +89,10 @@ export default function SkyStreamPage() {
             <Card bordered={false} className="ss-card ss-composer">
               <div className="ss-composeRow">
                 <Input
-                  placeholder="Share your latest travel moment..."
+                  placeholder="Share your latest SkyStory..."
                   className="ss-input"
                 />
-                <Button className="ss-cta">Post</Button>
+                <Button className="ss-cta">Post SkyStory</Button>
               </div>
 
               <Space wrap size={10} style={{ marginTop: 10 }}>
@@ -127,7 +127,8 @@ export default function SkyStreamPage() {
 
             <Card bordered={false} className="ss-card ss-notice">
               <Text>
-                Feed is in demo mode (API not available). Showing sample posts.
+                SkyHub is in demo mode (API not available). Showing sample
+                SkyStories.
               </Text>
             </Card>
 
@@ -146,8 +147,8 @@ export default function SkyStreamPage() {
               </div>
 
               <Text className="ss-postText">
-                Hidden gem! 🌸 Discover this secret trail in Kyoto away from the
-                crowd! Peaceful and beautiful.
+                SkyStory: Hidden gem! 🌸 Discover this secret trail in Kyoto away
+                from the crowd! Peaceful and beautiful.
               </Text>
 
               <div className="ss-tags">

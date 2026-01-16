@@ -195,7 +195,7 @@ export default function SkyrioExchange({
       centered: true,
       content: (
         <div className="sv-confirm">
-          <Paragraph type="secondary">
+          <Paragraph className="sv-confirm-text">
             This will spend <b>{item.cost} XP</b>. You’ll receive{" "}
             <b>{item.kind}</b>: <i>{item.name}</i>.
           </Paragraph>
@@ -203,6 +203,7 @@ export default function SkyrioExchange({
       ),
       okText: "Redeem",
       okButtonProps: { className: "sv-cta" },
+      cancelButtonProps: { className: "sv-btn" },
       onOk: () => {
         setXp((x) => x - item.cost);
         message.success(`Redeemed: ${item.name}`);
@@ -252,7 +253,7 @@ export default function SkyrioExchange({
             <Col flex="none">
               <div className="sv-balance">
                 <Text className="muted">Balance</Text>
-                <div className="sv-xp">
+                <div className="sv-xp" aria-live="polite">
                   <StarOutlined />
                   <b>{xp.toLocaleString()} XP</b>
                 </div>
@@ -292,7 +293,9 @@ export default function SkyrioExchange({
 
             <Col xs={24} md="auto">
               <Tooltip title="Coming soon: filter by level, price, owned">
-                <Button disabled>More filters</Button>
+                <Button className="sv-btn" disabled>
+                  More filters
+                </Button>
               </Tooltip>
             </Col>
           </Row>
@@ -310,6 +313,8 @@ export default function SkyrioExchange({
                     className="sv-card glass"
                     hoverable
                     onClick={() => setSelected(item)}
+                    role="button"
+                    tabIndex={0}
                   >
                     <Space size={12} align="start">
                       <div className={`sv-icon ${item.kind.toLowerCase()}`}>
@@ -321,7 +326,13 @@ export default function SkyrioExchange({
                           <Tag className={`sv-kind ${item.kind.toLowerCase()}`}>
                             {item.kind}
                           </Tag>
-                          {item.tag && <Tag color="gold">{item.tag}</Tag>}
+
+                          {/* IMPORTANT: remove Tag color="gold" (it forces off-brand yellow).
+                              We keep your same text, but let CSS style it via .sv-tag-gold */}
+                          {item.tag && (
+                            <Tag className="sv-tag-gold">{item.tag}</Tag>
+                          )}
+
                           <Tag className="sv-req">Lvl {item.levelReq}+</Tag>
                         </Space>
 
@@ -380,6 +391,7 @@ export default function SkyrioExchange({
               ? level < selected.levelReq || xp < selected.cost
               : true,
           }}
+          cancelButtonProps={{ className: "sv-btn" }}
           centered
           title={selected?.name || "Details"}
         >
@@ -398,7 +410,7 @@ export default function SkyrioExchange({
                 <StarOutlined /> <b>{selected.cost} XP</b>
               </div>
 
-              <Text type="secondary">
+              <Text className="sv-tip">
                 Tip: XP refills by booking, reviewing trips, and inviting
                 friends.
               </Text>

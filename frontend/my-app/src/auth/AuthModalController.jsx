@@ -6,6 +6,11 @@ import React, {
   useState,
   useCallback,
 } from "react";
+import { Modal } from "antd";
+
+// ✅ Put your real forms here if you have them:
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
 
 const AuthContext = createContext(null);
 
@@ -46,7 +51,7 @@ function AuthProvider({ children }) {
 
   const isAuthed = !!(token || user?.id || user?._id);
 
-  // ✅ Modal helpers
+  // ✅ Modal helpers (keep)
   const openAuthModal = useCallback(({ mode } = {}) => {
     if (mode === "signup" || mode === "login") setAuthModalMode(mode);
     setAuthModalOpen(true);
@@ -103,7 +108,33 @@ function AuthProvider({ children }) {
     ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+
+      {/* ✅ Render the modal (clean + responsive shell) */}
+      <Modal
+        open={authModalOpen}
+        onCancel={closeAuthModal}
+        footer={null}
+        centered
+        destroyOnClose
+        className="sk-authModal"
+        width={560}
+        maskClosable
+        styles={{
+          body: { padding: 0 },
+          content: { padding: 0, borderRadius: 18, overflow: "hidden" },
+        }}
+      >
+        <div className="sk-authShell">
+          <div className="sk-authScroll">
+            {authModalMode === "signup" ? <RegisterPage /> : <LoginPage />}
+          </div>
+        </div>
+      </Modal>
+    </AuthContext.Provider>
+  );
 }
 
 // ✅ Existing hook (keep)
@@ -113,7 +144,7 @@ export function useAuth() {
   return ctx;
 }
 
-// ✅ NEW hook (fixes your error)
+// ✅ Existing hook (keep)
 export function useAuthModal() {
   const ctx = useAuth();
   return {

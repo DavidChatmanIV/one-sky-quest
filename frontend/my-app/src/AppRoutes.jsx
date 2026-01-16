@@ -6,7 +6,9 @@ import AppLayout from "./layout/AppLayout";
 // ---------- Public Pages ----------
 import LandingPage from "./pages/LandingPage";
 import BookingPage from "./pages/BookingPage";
-import SkyStreamPage from "./pages/SkyStreamPage";
+
+// ✅ NEW: SkyHub page file
+import SkyhubPage from "./pages/SkyhubPage";
 
 // Passport pages moved into /pages/passport
 import DigitalPassportPage from "./pages/passport/DigitalPassportPage";
@@ -17,7 +19,6 @@ import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/NotFound";
 
 // ---------- Optional / Legacy ----------
-// Membership moved into /pages/passport (based on your screenshot)
 import MembershipPage from "./pages/passport/Membership";
 
 // If TeamTravel is still in ./pages/TeamTravelPage keep this:
@@ -40,9 +41,12 @@ export default function AppRoutes() {
         {/* ---------- Core ---------- */}
         <Route path="booking" element={<BookingPage />} />
 
-        {/* SkyStream */}
-        <Route path="skystream" element={<SkyStreamPage />} />
-        <Route path="feed" element={<Navigate to="/skystream" replace />} />
+        {/* ✅ SkyHub (new canonical route) */}
+        <Route path="skyhub" element={<SkyhubPage />} />
+
+        {/* ✅ Legacy routes still work (no broken links) */}
+        <Route path="skystream" element={<Navigate to="/skyhub" replace />} />
+        <Route path="feed" element={<Navigate to="/skyhub" replace />} />
 
         {/* ---------- Passport ---------- */}
         <Route path="passport" element={<DigitalPassportPage />} />
